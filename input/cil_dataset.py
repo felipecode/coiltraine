@@ -2,10 +2,14 @@
 from torch.utils.data import Dataset, DataLoader
 
 
+
+# TODO: Warning, maybe this does not need to be included everywhere.
+from configs import g_conf
+
 class CILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
-    def __init__(self, dataset_configuration, root_dir, transform=None): # The transformation object.
+    def __init__(self, transform=None): # The transformation object.
         """
         Function to encapsulate the dataset
 
@@ -16,7 +20,7 @@ class CILDataset(Dataset):
                 on a sample.
         """
 
-        self.images = root_di
+        self.images = pre_load_hdf5_files(root_dir)
         self.transform = transform
 
     def __len__(self):
@@ -63,11 +67,56 @@ class CILDataset(Dataset):
 
 
 
+    def pre_load_hdf5_files(self):
 
+        datasets_cat = [list([]) for _ in xrange(len(dataset_names))]
 
+        images_data_cat = [list([]) for _ in xrange(len(image_dataset_names))]
 
+        lastidx = 0
+        count = 0
+        # print file_names
+        for cword in file_names:
+            try:
+                print
+                cword
+                print
+                count
+                dset = h5py.File(cword, "r")
 
+                for i in range(len(image_dataset_names)):
+                    # print image_dataset_names[i]
+                    x = dset[image_dataset_names[i]]
+                    # print x
+                    old_shape = x.shape[0]
+                    # print old_shape
 
+                    images_data_cat[i].append((lastidx, lastidx + x.shape[0], x))
+
+                for i in range(len(dataset_names)):
+                    dset_to_append = dset[dataset_names[i]]
+
+                    datasets_cat[i].append(dset_to_append[:])
+
+                lastidx += old_shape
+                dset.flush()
+                count += 1
+
+            except IOError:
+                import traceback
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                traceback.print_exc()
+                traceback.print_tb(exc_traceback, limit=1, file=sys.stdout)
+                traceback.print_exception(exc_type, exc_value, exc_traceback,
+                                          limit=2, file=sys.stdout)
+                print
+                "failed to open", cword
+
+        for i in range(len(dataset_names)):
+            datasets_cat[i] = np.concatenate(datasets_cat[i], axis=0)
+            datasets_cat[i] = datasets_cat[i].transpose((1, 0))
+
+        return images_data_cat, datasets_cat
 
 
 

@@ -18,6 +18,7 @@ import torch
 
 
 
+
 class Scheduler(object):
 
     def __init__(self, initialIteration, splited_keys, images, datasets, config_input, augmenter_input, perform_sequential):
@@ -259,7 +260,7 @@ class Scheduler(object):
         #                                   self._config.sensors_size[i][1], self._config.sensors_size[i][2]),
         #                                  dtype='uint8'))        for s in range(len(self._images)):
 
-        # We test here directly and inlude the other images here.
+        # We test here directly and include the other images here.
         sensors_batch = []
         for i in range(len(images)):
             sensors_batch.append(np.zeros(
