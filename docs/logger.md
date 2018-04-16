@@ -5,6 +5,8 @@ So the log is made during execution on ALL levels,
 but also there is a interface for the user to
 consult it at any moment.
 
+The logger is global and accessible at any moment
+(CHECK FOR THREAD SAFETY ISSUES)
 
 The experiments have a set of status
 

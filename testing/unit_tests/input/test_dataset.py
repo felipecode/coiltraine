@@ -6,30 +6,34 @@ from input import CILDataset
 
 class testCILDataset(unittest.TestCase):
 
-    def __init__(self,*args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(testCILDataset, self).__init__(*args, **kwargs)
-
-        self.root_test_dir = 'test/unit_tests/data'
-
-
-
-
+        self.root_test_dir = 'testing/unit_tests/data'
 
     def test___get_item__(self):
 
         # This depends on the number of fused frames. A image could have
         # A certain number of fused frames
-        CILDataset()
+        #CILDataset()
 
         # number of frames fused equal 1, should return a simple case with three channels in the end.
-        dataset_configuration
-        self.assertEqual()
+        #dataset_configuration
+        #self.assertEqual()
         # number of frames fused equal 3, should return 9 frames in the end
 
+        pass
 
 
     def test_init(self):
 
+        # Assert for error when read on wrong place
+        #with self.assertRaises():
+        #dataset = CILDataset("Wrong place")
+
+        #
         dataset = CILDataset(self.root_test_dir)
+
+        # Assert for all
+        print (dataset.images)
 
 

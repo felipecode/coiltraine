@@ -9,6 +9,7 @@ Modules
 * Configuration Module
 * Data Input
 * Training Module
+* Network Module
 * Evaluation Module
 * Logging Module
 * Testing Module
