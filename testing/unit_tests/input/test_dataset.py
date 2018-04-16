@@ -6,6 +6,13 @@ from input import CILDataset
 
 class testCILDataset(unittest.TestCase):
 
+    def __init__(self,*args, **kwargs):
+        super(testCILDataset, self).__init__(*args, **kwargs)
+
+        self.root_test_dir = 'test/unit_tests/data'
+
+
+
 
 
     def test___get_item__(self):
@@ -22,4 +29,7 @@ class testCILDataset(unittest.TestCase):
 
 
     def test_init(self):
-        pass
+
+        dataset = CILDataset(self.root_test_dir)
+
+

@@ -2,25 +2,23 @@
 from torch.utils.data import Dataset, DataLoader
 
 
-
 # TODO: Warning, maybe this does not need to be included everywhere.
 from configs import g_conf
 
 class CILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
-    def __init__(self, transform=None): # The transformation object.
+    def __init__(self, root_dir, transform=None): # The transformation object.
         """
         Function to encapsulate the dataset
 
         Arguments:
-            dataset_configuration: the configuration file for the datasets.
             root_dir (string): Directory with all the hdfiles from the dataset.
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
 
-        self.images = pre_load_hdf5_files(root_dir)
+        self.images = self.pre_load_hdf5_files(root_dir)
         self.transform = transform
 
     def __len__(self):
@@ -42,7 +40,7 @@ class CILDataset(Dataset):
                 for i in range(self._number_frames_fused):
                     chosen_key = chosen_key + i * 3
 
-                    for es, ee, x in images[s]:
+                    for es, ee, x in self.images[s]:
 
                         if chosen_key >= es and chosen_key < ee:
                             """ We found the part of the data to open """
@@ -66,8 +64,8 @@ class CILDataset(Dataset):
                 count += 1
 
 
-
-    def pre_load_hdf5_files(self):
+    # file_names, image_dataset_names, dataset_names
+    def pre_load_hdf5_files(self, path_for_files):
 
         datasets_cat = [list([]) for _ in xrange(len(dataset_names))]
 

@@ -29,7 +29,6 @@ class Scheduler(object):
 
         self._perform_sequential = perform_sequential
 
-
         self._number_frames_fused = config_input.number_frames_fused
         self._number_frames_sequenced = config_input.number_frames_sequenced
         self._inputs_per_sequence = config_input.number_frames_sequenced  # config_input.number_frames_fused + config_input.number_frames_sequenced
@@ -75,45 +74,6 @@ class Scheduler(object):
 
         torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
                                     shuffle=True, num_workers=4, pin_memory=True
-
-
-        """
-        self._queue_image_input = tf.placeholder(tf.float32, shape=[config_input.batch_size, config_input.image_size[0],
-                                                                    config_input.image_size[1],
-                                                                    config_input.image_size[
-                                                                        2] * self._number_frames_fused])
-
-        self._queue_targets = []
-        self._queue_inputs = []
-        self._queue_shapes = [[config_input.image_size[0], config_input.image_size[1],
-                               config_input.image_size[2] * self._number_frames_fused]]
-
-        for i in range(len(self._config.targets_names)):
-            self._queue_targets.append(
-                tf.placeholder(tf.float32, shape=[config_input.batch_size, self._config.targets_sizes[i]]))
-            self._queue_shapes.append([self._config.targets_sizes[i]])
-
-        for i in range(len(self._config.inputs_names)):
-            self._queue_inputs.append(
-                tf.placeholder(tf.float32, shape=[config_input.batch_size, self._config.inputs_sizes[i]]))
-            self._queue_shapes.append([self._config.inputs_sizes[i]])
-
-        print [tf.float32] * (len(self._config.targets_names) + len(self._config.inputs_names))
-
-        print [self._queue_image_input] + self._queue_targets + self._queue_inputs
-
-        self._queue = tf.FIFOQueue(capacity=config_input.queue_capacity, dtypes=[tf.float32] * (
-                len(self._config.targets_names) + len(self._config.inputs_names) + 1), \
-                                   shapes=self._queue_shapes)
-
-        self._enqueue_op = self._queue.enqueue_many(
-            [self._queue_image_input] + self._queue_targets + self._queue_inputs)
-        self._dequeue_op = self._queue.dequeue()
-
-        self._batch_tensor = tf.train.batch(self._dequeue_op, batch_size=config_input.batch_size,
-                                            capacity=config_input.queue_capacity)
-        """
-
 
     @property
     def images(self):
