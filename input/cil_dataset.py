@@ -68,7 +68,7 @@ class CILDataset(Dataset):
                             # img = Image.fromarray(sensors_batch[s][count])
                             # img.save('test' + str(self._current_position_on_dataset +count) + '_0_.jpg')
                 count += 1
-
+        return SensorBatch
 
     # file_names, image_dataset_names, dataset_names
     def pre_load_hdf5_files(self, path_for_files):

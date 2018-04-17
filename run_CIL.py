@@ -19,7 +19,8 @@ def execute():
 
 def persistent():
     """
-    On this mode the training software keeps all 
+    On this mode the training software keeps all
+    It forks a process to run the monitor over the training logs.
     """
 
 
