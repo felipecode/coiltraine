@@ -37,7 +37,7 @@ class GlobalConfig(object):
 
         self.param = AttributeDict()
         self.param.INPUT = AttributeDict()
-        self.param.INPUT.SENSORS = {'rgb': (88, 200, 3)}
+        self.param.INPUT.SENSORS = {'rgb': (3, 88, 200)}
         self.param.INPUT.MEASUREMENTS = {'targets': (31)}
 
         self.param.MISC = AttributeDict

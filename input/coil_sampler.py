@@ -1,15 +1,14 @@
 
 import numpy as np
 
-from PIL import Image
 import random
 import bisect
 import os.path
-import h5py
+
 import traceback
 import time
 import math
-import augmenter
+import spliter
 import tensorflow as tf
 from scipy.ndimage.filters import gaussian_filter
 from skimage.transform import resize
@@ -20,9 +19,107 @@ from torch.utils.data.sampler import Sampler
 
 
 
-class CoILSampler(object):
+class CoILSampler(Sampler):
 
-    def __init__(self, initialIteration, splited_keys, images, datasets, config_input, augmenter_input, perform_sequential):
+    def __init__(self, measurements):
+
+        control = measurements
+        steering = measurements
+        keys =
+        keys_splited = spliter.split_by_value(spliter.split_by_label(keys, split_style, labels),
+                                              spliting_bins)
+
+
+
+
+
+
+
+
+
+
+             #initialIteration,  , , , ,):
+
+
+
+
+
+
+
+
+
+
+
+             if not hasattr(config, 'just_validating'):
+                 file_step = len(file_names) / config.number_data_divisions
+
+             print
+             len(file_names)
+
+             spliter_vec = []
+
+             images_vec = []
+
+             dataset_vec = []
+             for div in range(config.number_data_divisions):
+                 """ Read all hdf5_files """
+             self._images_train, self._datasets_train = self.read_all_files(
+                 file_names[(div) * file_step:(div + 1) * file_step], config.sensor_names,
+             config.dataset_names)
+
+             images_vec.append(self._images_train)
+             dataset_vec.append(self._datasets_train)
+
+             # print self._datasets_train[0][config.variable_names.index("Steer")][:]
+             divided_keys_train = spliter_control.divide_keys_by_labels(
+
+            self._datasets_train[0][config.variable_names.index("Control")][:], config.labels_per_division)
+
+
+                # The vector that says if there is noise or not
+
+                np.set_printoptions(threshold=np.nan)
+
+                # print len(divided_keys_train)
+                if hasattr(config, 'labels_angle_per_division') and len(config.labels_angle_per_division) > 0:
+                    correct_angle = spliter_angle.divide_keys_by_labels(
+                self._datasets_train[0][config.variable_names.index("Angle")][:],
+                config.labels_angle_per_division)
+
+                for i in range(len(divided_keys_train)):
+                    divided_keys_train[i] = list(set(divided_keys_train[i]).intersection(set(correct_angle[0])))
+
+                if hasattr(config, 'labels_noise_per_division') and len(config.labels_noise_per_division) > 0:
+                    noise_vec = self._datasets_train[0][config.variable_names.index("Steer")][:] != \
+                                self._datasets_train[0][config.variable_names.index("Steer_N")][:]
+
+                # print noise_vec
+                # print np.where(noise_vec==True)
+                correct_angle = spliter_angle.divide_keys_by_labels(noise_vec,
+                config.labels_noise_per_division)
+
+                for i in range(len(divided_keys_train)):
+                    divided_keys_train[i] = list(set(divided_keys_train[i]).intersection(set(correct_angle[0])))
+
+                self._splited_keys_train = spliter_control.split_by_output(
+
+
+            self._datasets_train[0][config.variable_names.index("Steer")][:], divided_keys_train)
+
+            spliter_vec.append(self._splited_keys_train)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         # Parameters related to files and sequence size. That is used for using sequences instead of images
 
@@ -58,7 +155,8 @@ class CoILSampler(object):
         self._positions_to_train = range(0,
                                          config_input.number_steering_bins)  # WARNING THIS NEED TO BE A MULTIPLE OF THE NUMBER OF CLIPS
 
-        self._iteration = initialIteration
+        # The iteration may be neccessary.
+        #self._iteration = initialIteration
 
 
         if hasattr(config_input, 'augmentation_function'):
@@ -68,13 +166,10 @@ class CoILSampler(object):
 
 
 
-        self._augmenter_sched = augmenter_input
 
         self._config = config_input
         self._batch_size = config_input.batch_size
 
-        torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
-                                    shuffle=True, num_workers=4, pin_memory=True
 
     @property
     def images(self):

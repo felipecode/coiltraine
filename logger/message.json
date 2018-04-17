@@ -10,7 +10,17 @@ date_and_hour  >>> {
 
 }
 
+
+data_module_message >>> {
+
+        "read keys": [123125415612,412,34123,1,21,23,12,31,2]
+        ""
+
+}
+
+
 Train/Evaluate extra fields from message
+
 
 date_and_hour >>> {
 

@@ -4,6 +4,7 @@ import h5py
 import traceback
 import sys
 import numpy as np
+from PIL import Image
 
 from torch.utils.data import Dataset
 
@@ -43,7 +44,7 @@ class CoILDataset(Dataset):
 
         # Number of positions
 
-        try :
+        try:
             number_of_position = len(used_ids)
         except:
             number_of_position = 1
@@ -54,7 +55,7 @@ class CoILDataset(Dataset):
             sensor_data = np.zeros(
                 (number_of_position, sensor_size[0], sensor_size[1],
                  sensor_size[2] * g_conf.param.MISC.NUMBER_FRAMES_FUSION),
-                dtype='uint8'
+                 dtype='float32'
             )
 
             batch_sensors.update({sensor_name: sensor_data})
@@ -81,13 +82,17 @@ class CoILDataset(Dataset):
 
                             pos_inside = chosen_key - es
 
-                            # print 'el i'
-                            # print chosen_key
-                            # print pos_inside
-                            # print x[chosen_key - es - 1 + 1:chosen_key - es + 1,:,:,:].shape
+                            sensor_image = np.array(x[pos_inside, :, :, :])
+                            #print (sensor_image.shape)
+                            if self.transform is not None:
+                                sensor_image = self.transform(sensor_image)
+                            else:
+                                sensor_image = np.swapaxes(sensor_image,0,2)
+                                sensor_image = np.swapaxes(sensor_image,1, 2)
 
-                            batch_sensors[sensor_name][count, :, :,
-                            (i * 3):((i + 1) * 3)] = np.array(x[pos_inside, :, :, :])
+                            batch_sensors[sensor_name][count,(i * 3):((i + 1) * 3), :, :
+                            ] = sensor_image
+
 
                             # print sensors_batch[s][count].shape
                             # if not self._perform_sequential:

@@ -7,7 +7,10 @@ Quick Start
 Modules
 
 * Configuration Module
-* Data Input
+* Data Input Module
+    * Dataset
+    * Sampler
+    * Spliter
 * Training Module
 * Network Module
 * Evaluation Module
