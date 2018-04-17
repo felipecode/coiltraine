@@ -2,7 +2,7 @@ import os
 import numpy as np
 import unittest
 
-from input import CILDataset
+from input import CoILDataset
 
 class testLogger(unittest.TestCase):
 

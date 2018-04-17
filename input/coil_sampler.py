@@ -16,10 +16,11 @@ from skimage.transform import resize
 #from codification import *
 import torch
 
+from torch.utils.data.sampler import Sampler
 
 
 
-class Scheduler(object):
+class CoILSampler(object):
 
     def __init__(self, initialIteration, splited_keys, images, datasets, config_input, augmenter_input, perform_sequential):
 

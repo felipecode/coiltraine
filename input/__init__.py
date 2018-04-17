@@ -1,1 +1,1 @@
-from .cil_dataset import CILDataset
+from .coil_dataset import CoILDataset

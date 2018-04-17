@@ -2,10 +2,10 @@ import os
 import numpy as np
 import time
 import unittest
+import torch
 
 
-
-from input import CILDataset
+from input import CoILDataset
 
 
 class testCILDataset(unittest.TestCase):
@@ -18,12 +18,14 @@ class testCILDataset(unittest.TestCase):
 
         # This depends on the number of fused frames. A image could have
         # A certain number of fused frames
-        dataset = CILDataset(self.root_test_dir)
-
+        dataset = CoILDataset(self.root_test_dir)
+        data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
+                                                  shuffle=True, num_workers=12, pin_memory=True)
         capture_time = time.time()
-        for i in range(len(dataset)):
+        for data in data_loader:
 
-            read_data = dataset[i]
+            image, labels = data
+            print (image['rgb'].shape)
 
         print ("Time to load", time.time() - capture_time)
         # number of frames fused equal 1, should return a simple case with three channels in the end.
@@ -38,14 +40,14 @@ class testCILDataset(unittest.TestCase):
 
         # Assert for error when read on wrong place
         with self.assertRaises(ValueError):
-            _ = CILDataset("Wrong place")
+            _ = CoILDataset("Wrong place")
 
         #
-        dataset = CILDataset(self.root_test_dir)
+        dataset = CoILDataset(self.root_test_dir)
 
-        print dataset.shape
-
+        print (len(dataset.sensor_data))
+        print (dataset.sensor_data[0])
         # Assert for all
-        print (dataset.images)
+        #print (dataset.images)
 
 

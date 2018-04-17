@@ -5,13 +5,12 @@ import traceback
 import sys
 import numpy as np
 
-from torch.utils.data import Dataset, DataLoader
-
+from torch.utils.data import Dataset
 
 # TODO: Warning, maybe this does not need to be included everywhere.
 from configs import g_conf
 
-class CILDataset(Dataset):
+class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
     def __init__(self, root_dir, transform=None):# The transformation object.
@@ -24,34 +23,61 @@ class CILDataset(Dataset):
                 on a sample.
         """
 
-        self.images = self.pre_load_hdf5_files(root_dir)
+        self.sensor_data, self.measurements = self.pre_load_hdf5_files(root_dir)
         self.transform = transform
 
     def __len__(self):
-        return len(self.images)
+        return 1400
 
     def __getitem__(self, used_ids):
+        """
+        Function to get the items from a dataset
+
+        Arguments
+            us
+        """
 
 
         # We test here directly and include the other images here.
+        batch_sensors = {}
 
-        for s in range(len(self.images)):
+        # Number of positions
+
+        try :
+            number_of_position = len(used_ids)
+        except:
+            number_of_position = 1
+            used_ids = [used_ids]
+
+        # Initialization of the numpy arrays
+        for sensor_name, sensor_size in g_conf.param.INPUT.SENSORS.items():
+            sensor_data = np.zeros(
+                (number_of_position, sensor_size[0], sensor_size[1],
+                 sensor_size[2] * g_conf.param.MISC.NUMBER_FRAMES_FUSION),
+                dtype='uint8'
+            )
+
+            batch_sensors.update({sensor_name: sensor_data})
+
+
+
+
+        for sensor_name, sensor_size in g_conf.param.INPUT.SENSORS.items():
             count = 0
-
             for chosen_key in used_ids:
 
                 count_seq = 0
                 first_enter = True
 
-                for i in range(g_conf.MISC.NUMBER_FRAMES_FUSION):
+                for i in range(g_conf.param.MISC.NUMBER_FRAMES_FUSION):
                     chosen_key = chosen_key + i * 3
 
-                    for es, ee, x in self.images[s]:
+                    for es, ee, x in self.sensor_data[count]:
 
                         if chosen_key >= es and chosen_key < ee:
                             """ We found the part of the data to open """
                             # print x[]
-                            first_enter = False
+                            #first_enter = False
 
                             pos_inside = chosen_key - es
 
@@ -60,15 +86,18 @@ class CILDataset(Dataset):
                             # print pos_inside
                             # print x[chosen_key - es - 1 + 1:chosen_key - es + 1,:,:,:].shape
 
-                            sensors_batch[s][count, :, :,
+                            batch_sensors[sensor_name][count, :, :,
                             (i * 3):((i + 1) * 3)] = np.array(x[pos_inside, :, :, :])
 
                             # print sensors_batch[s][count].shape
                             # if not self._perform_sequential:
                             # img = Image.fromarray(sensors_batch[s][count])
                             # img.save('test' + str(self._current_position_on_dataset +count) + '_0_.jpg')
+
+
                 count += 1
-        return SensorBatch
+
+        return batch_sensors, self.measurements[:,used_ids]
 
     # file_names, image_dataset_names, dataset_names
     def pre_load_hdf5_files(self, path_for_files):
@@ -84,9 +113,9 @@ class CILDataset(Dataset):
         """
 
         # Take the names of all measurements from the dataset
-        meas_names = g_conf.param.INPUT.DATASET.MEASUREMENTS_DATASET_NAMES
+        meas_names = list(g_conf.param.INPUT.MEASUREMENTS.keys())
         # take the names for all sensors
-        sensors_names = g_conf.param.INPUT.DATASET.SENSOR_DATASET_NAMES
+        sensors_names = list(g_conf.param.INPUT.SENSORS.keys())
 
         # From the determined path take all the possible file names.
         # TODO: Add more flexibility for the file base names ??
@@ -137,7 +166,7 @@ class CILDataset(Dataset):
             meas_data_cat[i] = np.concatenate(meas_data_cat[i], axis=0)
             meas_data_cat[i] = meas_data_cat[i].transpose((1, 0))
 
-        return sensors_data_cat, meas_data_cat
+        return sensors_data_cat, meas_data_cat[0]
 
 
 

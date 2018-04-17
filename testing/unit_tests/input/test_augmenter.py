@@ -2,7 +2,7 @@ import os
 import numpy as np
 import unittest
 
-from input import scheduler
+from input import coil_sampler
 
 
 class testAugmenter(unittest.TestCase):

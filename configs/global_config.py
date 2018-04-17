@@ -37,9 +37,8 @@ class GlobalConfig(object):
 
         self.param = AttributeDict()
         self.param.INPUT = AttributeDict()
-        self.param.INPUT.DATASET = AttributeDict()
-        self.param.INPUT.DATASET.SENSOR_DATASET_NAMES = ['rgb']
-        self.param.INPUT.DATASET.MEASUREMENTS_DATASET_NAMES = ['targets']
+        self.param.INPUT.SENSORS = {'rgb': (88, 200, 3)}
+        self.param.INPUT.MEASUREMENTS = {'targets': (31)}
 
         self.param.MISC = AttributeDict
         self.param.MISC.NUMBER_FRAMES_FUSION = 1
