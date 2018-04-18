@@ -119,16 +119,16 @@ aug = transforms.Compose([
 Multiply(0.15, 2.5),
 Multiply(0.15, 2.5),
 Multiply(0.15, 2.5),
-Multiply(0.15, 2.5)
+Multiply(0.15, 2.5),
 
     ])
 
 aug_cpu = transforms.Compose([
         transforms.ToTensor(),
-    MultiplyCPU(0.15, 2.5),
-    MultiplyCPU(0.15, 2.5),
-    MultiplyCPU(0.15, 2.5),
-    MultiplyCPU(0.15, 2.5),
-    MultiplyCPU(0.15, 2.5)
+    Multiply(0.15, 2.5),
+    Multiply(0.15, 2.5),
+    Multiply(0.15, 2.5),
+    Multiply(0.15, 2.5),
+    Multiply(0.15, 2.5),
 
     ])
