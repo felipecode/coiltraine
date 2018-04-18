@@ -42,7 +42,7 @@ class testCILDataset(unittest.TestCase):
 
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0])
 
-            image_to_save.save(os.path.join(self.test_images_write_path + 'augmented_gpu', str(count)+'.png'))
+            image_to_save.save(os.path.join(self.test_images_write_path + 'normal', str(count)+'.png'))
             count += 1
 
         print ("Time to load", time.time() - capture_time)
@@ -51,6 +51,9 @@ class testCILDataset(unittest.TestCase):
         #self.assertEqual()
         #TODO: Test frame fusion
         # number of frames fused equal 3, should return 9 frames in the end
+
+
+#TODO Basic Augmentation tests to be removed ! !! ! ! ! ! ! ! ! ! ! ! ! !
 
     def test_get_item_augmented(self):
         # Function to test the augmentation
@@ -73,7 +76,7 @@ class testCILDataset(unittest.TestCase):
 
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0])
 
-            image_to_save.save(os.path.join(self.test_images_write_path + 'augmented_gpu', str(count)+'.png'))
+            image_to_save.save(os.path.join(self.test_images_write_path + 'augmented', str(count)+'.png'))
             count +=1
 
         print("Time to load AUGMENT", time.time() - capture_time)
@@ -101,7 +104,7 @@ class testCILDataset(unittest.TestCase):
             image, labels = data
             result = aug(image['rgb'])
 
-            image_to_save = transforms.ToPILImage()(image['rgb'][0][0])
+            image_to_save = transforms.ToPILImage()(result[0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'augmented_gpu', str(count)+'.png'))
             count += 1
 

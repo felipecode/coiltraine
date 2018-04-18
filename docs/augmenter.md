@@ -1,4 +1,9 @@
 
+The augmenter module is a mixture betweent many:
+
+imgaug
+pytorch vision augmentation.
+
 
 THe augmentar is a sequence of callables.
 It is kind of hard to control it on a config file. 

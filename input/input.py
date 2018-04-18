@@ -33,7 +33,7 @@ def the_loop():
         # At this point the data was augmented and was send to GPU, the data loader is
         # working in  parallel to upload many juicy images to the memory.
 
-        sensors_augmented = augment(sensors)
+        sensors_augmented = augment(iteration, sensors)
 
         # All the magic should happen here after.
         forward_pass(data_augmented,labels)
