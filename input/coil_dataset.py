@@ -85,7 +85,10 @@ class CoILDataset(Dataset):
                             sensor_image = np.array(x[pos_inside, :, :, :])
                             #print (sensor_image.shape)
                             if self.transform is not None:
-                                sensor_image = self.transform(sensor_image)
+                                try:
+                                    sensor_image = self.transform(sensor_image)
+                                except:
+                                    sensor_image = self.transform(0, sensor_image)
                             else:
                                 sensor_image = np.swapaxes(sensor_image,0,2)
                                 sensor_image = np.swapaxes(sensor_image,1, 2)
