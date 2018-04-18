@@ -3,6 +3,99 @@ import numbers
 
 import six
 from abc import ABCMeta, abstractmethod
+from utils import checking  as ch
+
+
+def handle_continuous_param(param, name, value_range=None, tuple_to_uniform=True, list_to_choice=True):
+    def check_value_range(v):
+        if value_range is None:
+            return True
+        elif isinstance(value_range, tuple):
+            ch.do_assert(len(value_range) == 2)
+            if value_range[0] is None and value_range[1] is None:
+                return True
+            elif value_range[0] is None:
+                ch.do_assert(v <= value_range[1], "Parameter '%s' is outside of the expected value range (x <= %.4f)" % (name, value_range[1]))
+                return True
+            elif value_range[1] is None:
+                ch.do_assert(value_range[0] <= v, "Parameter '%s' is outside of the expected value range (%.4f <= x)" % (name, value_range[0]))
+                return True
+            else:
+                ch.do_assert(value_range[0] <= v <= value_range[1], "Parameter '%s' is outside of the expected value range (%.4f <= x <= %.4f)" % (name, value_range[0], value_range[1]))
+                return True
+        elif ch.is_callable(value_range):
+            value_range(v)
+            return True
+        else:
+            raise Exception("Unexpected input for value_range, got %s." % (str(value_range),))
+
+    if ch.is_single_number(param):
+        check_value_range(param)
+        return Deterministic(param)
+    elif tuple_to_uniform and isinstance(param, tuple):
+        ch.do_assert(len(param) == 2)
+        check_value_range(param[0])
+        check_value_range(param[1])
+        return Uniform(param[0], param[1])
+    elif list_to_choice and isinstance(param, (tuple, list)):
+        for param_i in param:
+            check_value_range(param_i)
+        return Choice(param)
+    elif isinstance(param, StochasticParameter):
+        return param
+    else:
+        raise Exception("Expected number, tuple of two number, list of number or StochasticParameter for %s, got %s." % (name, type(param),))
+
+
+def handle_discrete_param(param, name, value_range=None, tuple_to_uniform=True, list_to_choice=True, allow_floats=True):
+    def check_value_range(v):
+        if value_range is None:
+            return True
+        elif isinstance(value_range, tuple):
+            ch.do_assert(len(value_range) == 2)
+            if value_range[0] is None and value_range[1] is None:
+                return True
+            elif value_range[0] is None:
+                ch.do_assert(v <= value_range[1], "Parameter '%s' is outside of the expected value range (x <= %.4f)" % (name, value_range[1]))
+                return True
+            elif value_range[1] is None:
+                ch.do_assert(value_range[0] <= v, "Parameter '%s' is outside of the expected value range (%.4f <= x)" % (name, value_range[0]))
+                return True
+            else:
+                ch.do_assert(value_range[0] <= v <= value_range[1], "Parameter '%s' is outside of the expected value range (%.4f <= x <= %.4f)" % (name, value_range[0], value_range[1]))
+                return True
+        elif ch.is_callable(value_range):
+            value_range(v)
+            return True
+        else:
+            raise Exception("Unexpected input for value_range, got %s." % (str(value_range),))
+
+    if isinstance(param, numbers.Integral) or (allow_floats and isinstance(param, numbers.Real)):
+        check_value_range(param)
+        return Deterministic(int(param))
+    elif tuple_to_uniform and isinstance(param, tuple):
+        ch.do_assert(len(param) == 2)
+        if allow_floats:
+            ch.do_assert(ch.is_single_number(param[0]), "Expected number, got %s." % (type(param[0]),))
+            ch.do_assert(ch.is_single_number(param[1]), "Expected number, got %s." % (type(param[1]),))
+        else:
+            ch.do_assert(isinstance(param[0], numbers.Integral), "Expected integer, got %s." % (type(param[0]),))
+            ch.do_assert(isinstance(param[1], numbers.Integral), "Expected integer, got %s." % (type(param[1]),))
+        check_value_range(param[0])
+        check_value_range(param[1])
+        return DiscreteUniform(int(param[0]), int(param[1]))
+    elif list_to_choice and isinstance(param, (tuple, list)):
+        for param_i in param:
+            check_value_range(param_i)
+        return Choice([int(param_i) for param_i in param])
+    elif isinstance(param, StochasticParameter):
+        return param
+    else:
+        if allow_floats:
+            raise Exception("Expected number, tuple of two number, list of number or StochasticParameter for %s, got %s." % (name, type(param),))
+        else:
+            raise Exception("Expected int, tuple of two int, list of int or StochasticParameter for %s, got %s." % (name, type(param),))
+
 
 CURRENT_RANDOM_STATE = np.random.RandomState(42)
 
@@ -323,6 +416,96 @@ class DiscreteUniform(StochasticParameter):
 
     def __str__(self):
         return "DiscreteUniform(%s, %s)" % (self.a, self.b)
+
+
+class Choice(StochasticParameter):
+    """
+    Parameter that samples value from a list of allowed values.
+
+    Parameters
+    ----------
+    a : iterable
+        List of allowed values.
+        Usually expected to be integers, floats or strings.
+
+    replace : bool, optional(default=True)
+        Whether to perform sampling with or without
+        replacing.
+
+    p : None or iterable, optional(default=None)
+        Optional probabilities of each element in `a`.
+        Must have the same length as `a` (if provided).
+
+    Examples
+    --------
+    >>> param = Choice([0.25, 0.5, 0.75], p=[0.25, 0.5, 0.25])
+
+    Parameter of which 50 pecent of all sampled values will be 0.5.
+    The other 50 percent will be either 0.25 or 0.75.
+
+    """
+    def __init__(self, a, replace=True, p=None):
+        super(Choice, self).__init__()
+
+        self.a = a
+        self.replace = replace
+        self.p = p
+
+    def _draw_samples(self, size, random_state):
+        if any([isinstance(a_i, StochasticParameter) for a_i in self.a]):
+            seed = random_state.randint(0, 10**6, 1)[0]
+            samples = ia.new_random_state(seed).choice(self.a, np.prod(size), replace=self.replace, p=self.p)
+
+            # collect the sampled parameters and how many samples must be taken
+            # from each of them
+            params_counter = defaultdict(lambda: 0)
+            #params_keys = set()
+            for sample in samples:
+                if isinstance(sample, StochasticParameter):
+                    key = str(sample)
+                    params_counter[key] += 1
+                    #params_keys.add(key)
+
+            # collect per parameter once the required number of samples
+            # iterate here over self.a to always use the same seed for
+            # the same parameter
+            # TODO this might fail if the same parameter is added
+            # multiple times to self.a?
+            # TODO this will fail if a parameter cant handle size=(N,)
+            param_to_samples = dict()
+            for i, param in enumerate(self.a):
+                key = str(param)
+                if key in params_counter:
+                    #print("[Choice] sampling %d from %s" % (params_counter[key], key))
+                    param_to_samples[key] = param.draw_samples(
+                        size=(params_counter[key],),
+                        random_state=ia.new_random_state(seed+1+i)
+                    )
+
+            # assign the values sampled from the parameters to the `samples`
+            # array by replacing the respective parameter
+            param_to_readcount = defaultdict(lambda: 0)
+            for i, sample in enumerate(samples):
+                #if i%10 == 0:
+                #    print("[Choice] assigning sample %d" % (i,))
+                if isinstance(sample, StochasticParameter):
+                    key = str(sample)
+                    readcount = param_to_readcount[key]
+                    #if readcount%10==0:
+                    #    print("[Choice] readcount %d for %s" % (readcount, key))
+                    samples[i] = param_to_samples[key][readcount]
+                    param_to_readcount[key] += 1
+
+            samples = samples.reshape(size)
+        else:
+            samples = random_state.choice(self.a, size, replace=self.replace, p=self.p)
+        return samples
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return "Choice(a=%s, replace=%s, p=%s)" % (str(self.a), str(self.replace), str(self.p),)
 
 
 

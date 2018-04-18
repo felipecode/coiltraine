@@ -15,45 +15,7 @@ from input.augmenter import functional as F
 from abc import ABCMeta
 
 from . import randomizer
-
-def _is_tensor_image(img):
-    return torch.is_tensor(img) and img.ndimension() == 3
-
-
-def _is_numpy_image(img):
-    return isinstance(img, np.ndarray) and (img.ndim in {2, 3})
-
-
-def copy_dtypes_for_restore(images, force_list=False):
-    if ia.is_np_array(images):
-        if force_list:
-            return [images.dtype for _ in sm.xrange(len(images))]
-        else:
-            return images.dtype
-    else:
-        return [image.dtype for image in images]
-
-
-def do_assert(condition, message="Assertion failed."):
-    """
-    Function that behaves equally to an `assert` statement, but raises an
-    Exception.
-
-    This is added because `assert` statements are removed in optimized code.
-    It replaces `assert` statements throughout the library that should be
-    kept even in optimized code.
-
-    Parameters
-    ----------
-    condition : bool
-        If False, an exception is raised.
-
-    message : string, optional(default="Assertion failed.")
-        Error message.
-
-    """
-    if not condition:
-        raise AssertionError(str(message))
+from utils import checking as ch
 
 
 
@@ -227,13 +189,13 @@ class Add(BaseTransform):
                 for c, sample in enumerate(samples):
                     # TODO make value range more flexible
 
-                    do_assert(-255 <= sample <= 255)
+                    ch.do_assert(-255 <= sample <= 255)
 
 
                     F.add(image[c, ...].cuda(), torch.ones(1).cuda() * float(sample))
             else:
                 sample = self.value.draw_sample(random_state=rs_image)
-                do_assert(-255 <= sample <= 255) # TODO make value range more flexible
+                ch.do_assert(-255 <= sample <= 255) # TODO make value range more flexible
 
                 F.add(image.cuda(), torch.ones(1).cuda() * float(sample))
 
@@ -302,10 +264,10 @@ class Multiply(BaseTransform):
         super(Multiply, self).__init__(name=name, deterministic=deterministic, random_state=random_state)
 
         if isinstance(mul, numbers.Real) or isinstance(mul, numbers.Integral):
-            do_assert(mul >= 0.0, "Expected multiplier to have range [0, inf), got value %.4f." % (mul,))
+            ch.do_assert(mul >= 0.0, "Expected multiplier to have range [0, inf), got value %.4f." % (mul,))
             self.mul = randomizer.Deterministic(mul)
         else:#elif ia.is_iterable(mul):
-            do_assert(len(mul) == 2, "Expected tuple/list with 2 entries, got %d entries." % (len(mul),))
+            ch.do_assert(len(mul) == 2, "Expected tuple/list with 2 entries, got %d entries." % (len(mul),))
             self.mul = randomizer.Uniform(mul[0], mul[1])
 
 
@@ -317,7 +279,7 @@ class Multiply(BaseTransform):
         if per_channel in [True, False, 0, 1, 0.0, 1.0]:
             self.per_channel = randomizer.Deterministic(int(per_channel))
         else: #ia.is_single_number(per_channel):
-            do_assert(0 <= per_channel <= 1.0)
+            ch.do_assert(0 <= per_channel <= 1.0)
             self.per_channel = randomizer.Binomial(per_channel)
         #else:
         #    raise Exception("Expected per_channel to be boolean or number or StochasticParameter")
@@ -337,12 +299,12 @@ class Multiply(BaseTransform):
                 nb_channels = image.shape[2]
                 samples = self.mul.draw_samples((nb_channels,), random_state=rs_image)
                 for c, sample in enumerate(samples):
-                    do_assert(sample >= 0)
+                    ch.do_assert(sample >= 0)
 
                     F.multiply(image[c, ...].cuda(), torch.ones(1).cuda() * float(sample))
             else:
                 sample = self.mul.draw_sample(random_state=rs_image)
-                do_assert(sample >= 0)
+                ch.do_assert(sample >= 0)
                 F.multiply(image.cuda(), torch.ones(1).cuda() * float(sample))
 
 
