@@ -1,2 +1,2 @@
-from .augmenter import Augmenter
-from .transforms import Add, Multiply
+from .augmenter import Augmenter, ToGPU
+from .transforms import Add, Multiply, AddCPU, MultiplyCPU

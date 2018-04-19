@@ -286,7 +286,7 @@ class Binomial(StochasticParameter):
 
     def _draw_samples(self, size, random_state):
         p = self.p.draw_sample(random_state=random_state)
-        ia.do_assert(0 <= p <= 1.0, "Expected probability p to be in range [0.0, 1.0], got %s." % (p,))
+        ch.do_assert(0 <= p <= 1.0, "Expected probability p to be in range [0.0, 1.0], got %s." % (p,))
         return random_state.binomial(1, p, size)
 
     def __repr__(self):

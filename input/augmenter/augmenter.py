@@ -1,3 +1,12 @@
+import torch
+
+class ToGPU(object):
+
+
+    def __call__(self, img):
+        return torch.squeeze(img.cuda())
+
+
 
 class Augmenter(object):
     # Here besides just applying the list, the class should also apply the scheduling
