@@ -26,7 +26,7 @@ def folder_execute(folder,gpus,param):
 
 
     for all methods in the folder
-        logger.check_if_done()
+        logger.check_if_done() # TODO: should we call this logger or monitorer ?¿?
             if not done or executing  get to the list
 
 
