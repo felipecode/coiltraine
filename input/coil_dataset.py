@@ -7,6 +7,7 @@ import numpy as np
 from PIL import Image
 
 from torch.utils.data import Dataset
+import torch
 
 # TODO: Warning, maybe this does not need to be included everywhere.
 from configs import g_conf
@@ -14,7 +15,7 @@ from configs import g_conf
 class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
-    def __init__(self, root_dir, transform=None):# The transformation object.
+    def __init__(self, root_dir, transform=None):  # The transformation object.
         """
         Function to encapsulate the dataset
 
@@ -28,7 +29,7 @@ class CoILDataset(Dataset):
         self.transform = transform
 
     def __len__(self):
-        return 1400
+        return len(self.measurements)
 
     def __getitem__(self, used_ids):
         """
@@ -58,6 +59,7 @@ class CoILDataset(Dataset):
                  dtype='float32'
             )
 
+
             batch_sensors.update({sensor_name: sensor_data})
 
 
@@ -66,9 +68,6 @@ class CoILDataset(Dataset):
         for sensor_name, sensor_size in g_conf.param.INPUT.SENSORS.items():
             count = 0
             for chosen_key in used_ids:
-
-                count_seq = 0
-                first_enter = True
 
                 for i in range(g_conf.param.MISC.NUMBER_FRAMES_FUSION):
                     chosen_key = chosen_key + i * 3
@@ -83,29 +82,22 @@ class CoILDataset(Dataset):
                             pos_inside = chosen_key - es
 
                             sensor_image = np.array(x[pos_inside, :, :, :])
-                            #print (sensor_image.shape)
-                            if self.transform is not None:
-                                try:
-                                    sensor_image = self.transform(sensor_image)
-                                except:
-                                    sensor_image = self.transform(0, sensor_image)
-                            else:
-                                sensor_image = np.swapaxes(sensor_image,0,2)
-                                sensor_image = np.swapaxes(sensor_image,1, 2)
 
-                            batch_sensors[sensor_name][count,(i * 3):((i + 1) * 3), :, :
+                            try:
+                                sensor_image = self.transform(sensor_image)
+                            except:
+                                sensor_image = self.transform(0, sensor_image)
+
+
+
+                            batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
                             ] = sensor_image
 
-
-                            # print sensors_batch[s][count].shape
-                            # if not self._perform_sequential:
-                            # img = Image.fromarray(sensors_batch[s][count])
-                            # img.save('test' + str(self._current_position_on_dataset +count) + '_0_.jpg')
 
 
                 count += 1
 
-        return batch_sensors, self.measurements[:,used_ids]
+        return batch_sensors, self.measurements[:, used_ids]
 
     # file_names, image_dataset_names, dataset_names
     def pre_load_hdf5_files(self, path_for_files):

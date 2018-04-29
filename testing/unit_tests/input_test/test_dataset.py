@@ -34,7 +34,7 @@ class testCILDataset(unittest.TestCase):
         data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
                                                   shuffle=True, num_workers=12, pin_memory=True)
         capture_time = time.time()
-        count =0
+        count = 0
         for data in data_loader:
 
             image, labels = data

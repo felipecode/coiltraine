@@ -1,10 +1,13 @@
 
 
-def order_sequence( steerings, keys_sequence):
+from configs import g_conf
+
+def order_sequence(steerings, keys_sequence):
 
     sequence_average = []
     # print 'keys'
     # print keys_sequence
+
     for i in keys_sequence:
         sampled_sequence = steerings[(i):(i + self._sequence_size)]
 
@@ -14,41 +17,7 @@ def order_sequence( steerings, keys_sequence):
 
     return [i[0] for i in sorted(enumerate(sequence_average), key=lambda x: x[1])], sequence_average
 
-def partition_keys_by_steering( steerings, keys):
-
-    # print len(steerings)
-    # print steerings
-    max_steer = min(0.6, max(steerings))  # SUPER HACKY MEGA WARNING
-    print 'Max Steer'
-    print max_steer
-    min_steer = max(-0.5, min(steerings))
-    print 'Min Steer'
-    print min_steer
-    # print steerings
-
-    steerinterval = (max_steer - min_steer) / len(self._steering_bins_perc)
-
-    iter_value = min_steer + steerinterval
-    iter_index = 0
-    splited_keys = []
-    # print 'len steerings'
-    # print len(steerings)
-    for i in range(0, len(steerings)):
-
-        if steerings[i] >= iter_value:
-            # We split
-
-            splited_keys.append(keys[iter_index:i])
-            iter_index = i
-            iter_value = iter_value + steerinterval
-
-            print 'split on ', i
-            print len(splited_keys)
-            print len(splited_keys[-1])
-
-    return splited_keys
-
-def partition_keys_by_steering_quad( steerings, keys):
+def partition_keys_by_steering(steerings, keys):
 
     iter_index = 0
     quad_pos = 0
@@ -75,7 +44,7 @@ def partition_keys_by_steering_quad( steerings, keys):
             print len(splited_keys)
             print len(splited_keys[-1])
 
-    print 'Finished splitting'
+
 
     return splited_keys
 
@@ -116,7 +85,7 @@ def select_data_sequence( control, selected_data):
 
 """ Split the outputs keys with respect to the labels. The selected labels represents how it is going to be split """
 
-def divide_keys_by_labels( labels, selected_data):
+def label_split( labels, selected_data):
 
     new_splited_array = []
     keys_for_divison = []  # The set of all possible keys for each division
@@ -133,21 +102,38 @@ def divide_keys_by_labels( labels, selected_data):
 
     return keys_for_divison
 
-def split_by_output( output_to_split, divided_keys):
+def float_split( output_to_split, keys, percentiles, sequence_size):
+
+    """
+    Split data based on the the float value of some variable.
+    Everything is splitted with respect to the percentages.
+
+    Arguments
+        :param output_to_split:
+        :param keys:
+        :param percentages:
+        :return:
+    """
+
+    # TODO: test the number of parts that the splitter keys have.
+
+
 
     splited_keys = []
-    for i in range(len(divided_keys)):
+    for i in range(len(keys)):
         # We use this keys to grab the steerings we want... divided into groups
-        keys_ordered, average_outputs = self.order_sequence(output_to_split, divided_keys[i])
+        # TODO: Test the spliting based on median.
+        keys_ordered, average_outputs = order_sequence(output_to_split, keys[i])
         # we get new keys and order steering, each steering group
         sorted_outputs = [average_outputs[j] for j in keys_ordered]
 
         # We split each group...
         if len(keys_ordered) > 0:
-            splited_keys_part = self.partition_keys_by_steering_quad(sorted_outputs,
-                                                                     divided_keys[i])  # config.balances_train)
+            splited_keys_part = partition_keys_by_steering(sorted_outputs,
+                                                                     keys[i], percentiles)
         else:
             splited_keys_part = []
+
         splited_keys.append(splited_keys_part)
 
     return splited_keys

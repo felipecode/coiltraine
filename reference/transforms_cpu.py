@@ -7,10 +7,10 @@ import six.moves as sm
 import torch
 
 
-from .transforms import BaseTransform
+from input.augmenter.transforms import BaseTransform
 
 from input.augmenter import functional as F
-from . import randomizer
+from input.augmenter import randomizer
 from utils import checking as ch
 
 

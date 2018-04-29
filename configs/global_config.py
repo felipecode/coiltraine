@@ -39,9 +39,11 @@ class GlobalConfig(object):
         self.param.INPUT = AttributeDict()
         self.param.INPUT.SENSORS = {'rgb': (3, 88, 200)}
         self.param.INPUT.MEASUREMENTS = {'targets': (31)}
+        self.param.INPUT.STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
 
         self.param.MISC = AttributeDict
         self.param.MISC.NUMBER_FRAMES_FUSION = 1
+        self.param.MISC.DATASET_SIZE = 2000
 
 
 
