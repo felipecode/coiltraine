@@ -4,6 +4,9 @@ class ToGPU(object):
 
 
     def __call__(self, img):
+        #img = img.transpose(0, 1)
+        #img = img.transpose(1, 2)
+        #img = img.transpose(2, 3)
         return torch.squeeze(img.cuda())
 
 
