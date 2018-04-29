@@ -48,5 +48,23 @@ def create_log(exp_batch_name, exp_name, process_name):
 
     fh = logging.FileHandler(os.path.join(exp_batch_name,exp_name,process_name))
 
+
+
     fh.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+
+def add_message(module, message):
+
+    # What if it is an error message ?
+    # We can monitor the status based on error message. An error should mean the exp is not working
+
+    pass
+
+# TODO: the logger should also interface with tensorboard.
+
+
+def add_image(some_image):
+    # Add the image to a log, the monitorer is the module responsible by checking this
+    # and eventually put some of the images to tensorboard.
+    pass

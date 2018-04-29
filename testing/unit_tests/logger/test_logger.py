@@ -2,6 +2,7 @@ import os
 import numpy as np
 import unittest
 
+
 from input import CoILDataset
 
 class testLogger(unittest.TestCase):
@@ -14,3 +15,6 @@ class testLogger(unittest.TestCase):
         # I will simulate an entire execution pass of the system
 
         pass
+    def test_writing_data_message(self):
+
+        logger.create_log_message()

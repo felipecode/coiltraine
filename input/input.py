@@ -1,5 +1,5 @@
 
-
+#TODO: This file could be easily eliminated !
 def coil_input_init():
 
     #Define the dataset. This structure is has the __get_item__ redefined in a way
