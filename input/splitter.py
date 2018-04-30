@@ -9,7 +9,7 @@ def order_sequence(steerings, keys_sequence):
     # print keys_sequence
 
     for i in keys_sequence:
-        sampled_sequence = steerings[(i):(i + self._sequence_size)]
+        sampled_sequence = steerings[(i):(i + g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE)]
 
         sequence_average.append(sum(sampled_sequence) / len(sampled_sequence))
 
@@ -17,18 +17,18 @@ def order_sequence(steerings, keys_sequence):
 
     return [i[0] for i in sorted(enumerate(sequence_average), key=lambda x: x[1])], sequence_average
 
-def partition_keys_by_steering(steerings, keys):
+def partition_keys_by_percentiles(steerings, keys, percentiles):
 
     iter_index = 0
     quad_pos = 0
     splited_keys = []
     # print 'len steerings'
     # print len(steerings
-    quad_vec = [self._steering_bins_perc[0]]
-    for i in range(1, len(self._steering_bins_perc)):
-        quad_vec.append(quad_vec[-1] + self._steering_bins_perc[i])
+    quad_vec = [percentiles[0]]
+    for i in range(1, percentiles):
+        quad_vec.append(quad_vec[-1] + percentiles[i])
 
-    print quad_vec
+    print (quad_vec)
 
     for i in range(0, len(steerings)):
 
@@ -40,9 +40,9 @@ def partition_keys_by_steering(steerings, keys):
             iter_index = i
             quad_pos += 1
 
-            print 'split on ', i, 'with ', steerings[i]
-            print len(splited_keys)
-            print len(splited_keys[-1])
+            print ('split on ', i, 'with ', steerings[i])
+            print (len(splited_keys)    )
+            print (len(splited_keys[-1])          )
 
 
 
@@ -57,11 +57,12 @@ def select_data_sequence( control, selected_data):
     del_pos = []
     # print "SELECTED"
     # print selected_data
-    while count * self._sequence_stride <= (len(control) - self._sequence_size):
+    while count * g_conf.param.MISC.SEQUENCE_STRIDE <= (len(control) - g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE):
 
         # print 'sequence starting on : ', count*self._sequence_stride
-        for iter_sequence in range((count * self._sequence_stride),
-                                   (count * self._sequence_stride) + self._sequence_size):
+        for iter_sequence in range((count * g_conf.param.MISC.SEQUENCE_STRIDE),
+                                   (count * g_conf.param.MISC.SEQUENCE_STRIDE) +
+                                    g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE):
 
             # print ' control ', control[iter_sequence], ' selected ', selected_data
             # The position is one
@@ -69,7 +70,7 @@ def select_data_sequence( control, selected_data):
             if control[iter_sequence] not in selected_data:
                 # print control[j,iter_sequence]
                 # print 'OUT'
-                del_pos.append(count * self._sequence_stride)
+                del_pos.append(count * g_conf.param.MISC.SEQUENCE_STRIDE)
 
                 break_sequence = True
                 break
@@ -85,16 +86,26 @@ def select_data_sequence( control, selected_data):
 
 """ Split the outputs keys with respect to the labels. The selected labels represents how it is going to be split """
 
-def label_split( labels, selected_data):
+def label_split( labels, keys, selected_data):
+
+    """
+    
+    :param labels:
+    :param keys:
+    :param selected_data:
+    :return:
+    """
 
     new_splited_array = []
     keys_for_divison = []  # The set of all possible keys for each division
     sorted_steering_division = []
+    #TODO: here we divid keys in the same way as for float split .
 
     for j in range(len(selected_data)):
-        keys_to_delete = self.select_data_sequence(labels, selected_data[j])
+        keys_to_delete = select_data_sequence(labels, selected_data[j])
         # print got_keys_for_divison
-        keys_for_this_part = range(0, len(labels) - self._sequence_size, self._sequence_stride)
+        keys_for_this_part = range(0, len(labels) - g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE,
+                                   g_conf.param.MISC.SEQUENCE_STRIDE)
 
         keys_for_this_part = list(set(keys_for_this_part) - set(keys_to_delete))
 
@@ -102,7 +113,7 @@ def label_split( labels, selected_data):
 
     return keys_for_divison
 
-def float_split( output_to_split, keys, percentiles, sequence_size):
+def float_split( output_to_split, keys, percentiles):
 
     """
     Split data based on the the float value of some variable.
@@ -129,7 +140,7 @@ def float_split( output_to_split, keys, percentiles, sequence_size):
 
         # We split each group...
         if len(keys_ordered) > 0:
-            splited_keys_part = partition_keys_by_steering(sorted_outputs,
+            splited_keys_part = partition_keys_by_percentiles(sorted_outputs,
                                                                      keys[i], percentiles)
         else:
             splited_keys_part = []

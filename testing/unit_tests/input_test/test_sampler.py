@@ -6,7 +6,7 @@ import torch
 
 from input.coil_sampler import CoILSampler
 from input.coil_dataset import CoILDataset
-import input.spliter as spliter
+import input.splitter as spliter
 from torch.utils.data.sampler import BatchSampler
 
 
@@ -14,6 +14,7 @@ from torch.utils.data import TensorDataset as dset
 from configs import g_conf
 
 class testSampler(unittest.TestCase):
+
 
     def test_fake_data(self):
 
@@ -52,6 +53,7 @@ class testSampler(unittest.TestCase):
 
         for i in BatchSampler(sampler, 120, False):
             print(i)
+
 
 
 
