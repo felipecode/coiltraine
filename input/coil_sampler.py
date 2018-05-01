@@ -19,6 +19,8 @@ class CoILSampler(Sampler):
     def __iter__(self):
         # Chose here
         #print(self.weights)
+
+        # TODO: take into acount multiple divisions
         idx = torch.multinomial(self.weights, g_conf.param.MISC.DATASET_SIZE, True)
         idx = idx.tolist()
         #print (self.keys[0])

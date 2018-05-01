@@ -25,7 +25,7 @@ class CoILDataset(Dataset):
                 on a sample.
         """
 
-        self.sensor_data, self.measurements = self.pre_load_hdf5_files(root_dir)
+        self.sensor_data, self.measurements, self.meta_data = self.pre_load_hdf5_files(root_dir)
         self.transform = transform
 
     def __len__(self):
@@ -129,8 +129,16 @@ class CoILDataset(Dataset):
         sensors_data_cat = [list([]) for _ in range(len(sensors_names))]
 
 
+
+        # We open one dataset to get the metadata for targets
+        # that is important to be able to reference variables in a more legible way
+        dataset = h5py.File(folder_file_names[0], "r")
+        metadata_targets = np.array(dataset['metadata_'+meas_names[0]])
+
+        # TODO: Add to the logger the status of dataload.
         lastidx = 0
         count = 0
+
         for file_name in folder_file_names:
             try:
                 dataset = h5py.File(file_name, "r")
@@ -166,7 +174,7 @@ class CoILDataset(Dataset):
             meas_data_cat[i] = np.concatenate(meas_data_cat[i], axis=0)
             meas_data_cat[i] = meas_data_cat[i].transpose((1, 0))
 
-        return sensors_data_cat, meas_data_cat[0]
+        return sensors_data_cat, meas_data_cat[0], metadata_targets
 
 
 
