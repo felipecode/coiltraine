@@ -13,19 +13,14 @@ from sklearn import preprocessing
 
 import scipy
 from Queue import Queue
-from Queue import Empty
-from Queue import Full
-from threading import Thread
-import tensorflow as tf
-from ConfigParser import ConfigParser
 
-#slim = tf.contrib.slim
 
 
 from carla.benchmarks.agent import Agent
 from PIL import Image
 
 
+#TODO: The network is defined and toguether there is as forward pass operation to be used for testing, depending on the configuration
 import drive_interfaces.machine_output_functions as machine_output_functions
 
 from carla.autopilot.autopilot import Autopilot
@@ -83,21 +78,21 @@ def convert_to_car_coord(goal_x, goal_y, pos_x, pos_y, car_heading_x, car_headin
 
 class CoILAgent(Agent):
 
-    def __init__(self, experiment_name='None', driver_conf=None, memory_fraction=0.18,
-                 image_cut=[115, 510]):
+    def __init__(self, checkpoint):
+
+
+
+                 #experiment_name='None', driver_conf=None, memory_fraction=0.18,
+                 #image_cut=[115, 510]):
 
         # use_planner=False,graph_file=None,map_file=None,augment_left_right=False,image_cut = [170,518]):
 
-        Agent.__init__(self, driver_conf.city_name)
-        self.use_planner = driver_conf.use_planner
-        conf_module = __import__(experiment_name)
-        self._config = conf_module.configInput()
-        self._config_train = conf_module.configTrain()
+        Agent.__init__(self)
+        # This should likely come from global
+        #config_gpu = tf.ConfigProto()
+        #config_gpu.gpu_options.visible_device_list = '0'
 
-        config_gpu = tf.ConfigProto()
-        config_gpu.gpu_options.visible_device_list = '0'
-
-        config_gpu.gpu_options.per_process_gpu_memory_fraction = memory_fraction
+        #config_gpu.gpu_options.per_process_gpu_memory_fraction = memory_fraction
         self._sess = tf.Session(config=config_gpu)
 
         # THIS DOES NOT WORK FOR FUSED PLUS LSTM
@@ -106,20 +101,20 @@ class CoILAgent(Agent):
         else:
             self._config_train.batch_size = self._config.number_frames_fused
 
-        self._train_manager = load_system(self._config_train)
-        self._config.train_segmentation = False
+        #self._train_manager = load_system(self._config_train)
+        #self._config.train_segmentation = False
 
-        self._sess.run(tf.global_variables_initializer())
+        model.load_network(checkpoint)
+        #self._sess.run(tf.global_variables_initializer())
 
         self._control_function = getattr(machine_output_functions,
                                          self._train_manager._config.control_mode)
-        self._agent = Autopilot(ConfigAutopilot(driver_conf.city_name))
+        # More elegant way to merge with autopilot
+        #self._agent = Autopilot(ConfigAutopilot(driver_conf.city_name))
 
         self._image_cut = driver_conf.image_cut
         self._auto_pilot = driver_conf.use_planner
-        self._straight_button = False
-        self._left_button = False
-        self._right_button = False
+
         self._recording = False
         self._start_time = 0
 
@@ -145,31 +140,7 @@ class CoILAgent(Agent):
         saver = tf.train.Saver(variables_to_restore)
         cpkt = restore_session(self._sess, saver, self._config.models_path, checkpoint_number)
 
-    def _get_direction_buttons(self):
-        # with suppress_stdout():if keys[K_LEFT]:
-        keys = pygame.key.get_pressed()
 
-        if (keys[K_s]):
-            self._left_button = False
-            self._right_button = False
-            self._straight_button = False
-
-        if (keys[K_a]):
-            self._left_button = True
-            self._right_button = False
-            self._straight_button = False
-
-        if (keys[K_d]):
-            self._right_button = True
-            self._left_button = False
-            self._straight_button = False
-
-        if (keys[K_w]):
-            self._straight_button = True
-            self._left_button = False
-            self._right_button = False
-
-        return [self._left_button, self._right_button, self._straight_button]
 
     def compute_goal(self, pos, ori):  # Return the goal selected
         pos, point = self.planner.get_defined_point(pos, ori, (

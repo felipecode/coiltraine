@@ -13,9 +13,9 @@ import time
 
 from carla import image_converter
 
-from drive_interfaces.carla.comercial_cars.test_carla_machine import TestCarlaMachine
-from drive_interfaces.carla.comercial_cars.data_benchmark import DataBenchmark
-from drive_interfaces.carla.comercial_cars.generalization_benchmark import GeneralizationBenchmark
+#from drive_interfaces.carla.comercial_cars.test_carla_machine import TestCarlaMachine
+#from drive_interfaces.carla.comercial_cars.data_benchmark import DataBenchmark
+#from drive_interfaces.carla.comercial_cars.generalization_benchmark import GeneralizationBenchmark
 
 #from drive_interfaces.carla.comercial_cars.lightbenchmark import LightBenchmark
 #from drive_interfaces.carla.comercial_cars.test_benchmark import TestBenchmark
@@ -28,11 +28,49 @@ def frame2numpy(frame, frameSize):
     return np.resize(np.fromstring(frame, dtype='uint8'), (frameSize[1], frameSize[0], 3))
 
 
+
 def maximun_checkpoint_reach():
+    if self._current_checkpoint_number >= len(self._checkpoint_schedule):
+        return True
+    else:
+        return False
 
 
-    return 0
 
+def next_check_point_ready():
+    """
+    Looks at every checkpoint file in the folder. And for each of
+    then tries to find the one that matches EXACTLY with the one in the schedule
+
+    :return:
+    """
+
+    checkpoint_files = sorted(os.listdir(self._config_input.models_path))
+    for f in checkpoint_files:
+
+        match = re.search('model.ckpt-(\d+)', f)
+        if match:
+            checkpoint_number = match.group(1)
+
+            if int(checkpoint_number) == (self._checkpoint_schedule[self._current_checkpoint_number]):
+                self._checkpoint_number_to_test = str(self._checkpoint_schedule[self._current_checkpoint_number])
+
+                return True
+    logging.info('Checkpoint Not Found, Will wait for %d' % self._checkpoint_schedule[self._current_checkpoint_number] )
+    return False
+
+def get_test_name():
+
+    return str(self._checkpoint_number_to_test)
+
+def finish_model():
+    """
+    Increment and go to the next model
+
+    :return None:
+
+    """
+    self._current_checkpoint_number += 1
 
 
 
@@ -65,7 +103,7 @@ def execute(host, port, experiment_name, city_name='Town01', weather_used=1, mem
 
 
                 # While the checkpoint is not there
-                while not .maximun_checkpoint_reach():
+                while not maximun_checkpoint_reach():
 
                     coil_agent = CoILAgent(checkpoint)
 
