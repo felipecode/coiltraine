@@ -45,7 +45,18 @@ def partition_keys_by_percentiles(steering_unordered, steerings, keys, percentil
 
 
 def select_data_sequence(control, selected_data):
-    i = 0
+    """
+    The policy is to check if the majority of images are of a certain label.
+
+    Args:
+        control:
+        selected_data:
+
+    Returns:
+
+        The valid keys
+    """
+
     break_sequence = False
 
     count = 0
@@ -55,19 +66,22 @@ def select_data_sequence(control, selected_data):
     while count * g_conf.param.MISC.SEQUENCE_STRIDE <= (
             len(control) - g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE):
 
-        # print 'sequence starting on : ', count*self._sequence_stride
+        #print ('sequence starting on : ', count*g_conf.param.MISC.SEQUENCE_STRIDE)
+        # We count the number of positions not corresponding to a label
+        eliminated_positions = 0
         for iter_sequence in range((count * g_conf.param.MISC.SEQUENCE_STRIDE),
                                    (count * g_conf.param.MISC.SEQUENCE_STRIDE) +
                                    g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE):
 
-            # print ' control ', control[iter_sequence], ' selected ', selected_data
+            #print (' control ', control[iter_sequence], ' selected ', selected_data)
+            #print ("IMAGES SEQUENCE ", g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE )
             # The position is one
-            # print control.shape
-            if control[iter_sequence] not in selected_data:
-                # print control[j,iter_sequence]
-                # print 'OUT'
-                del_pos.append(count * g_conf.param.MISC.SEQUENCE_STRIDE)
 
+            if control[iter_sequence] not in selected_data:
+                eliminated_positions += 1
+
+            if (eliminated_positions) > g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE/2:
+                del_pos.append(count * g_conf.param.MISC.SEQUENCE_STRIDE)
                 break_sequence = True
                 break
 
@@ -98,7 +112,6 @@ def label_split(labels, keys, selected_data):
 
     keys_for_divison = []  # The set of all possible keys for each division
     sorted_steering_division = []
-    # TODO: here we divide keys in the same way as for float split .
 
     for j in range(len(selected_data)):
         keys_to_delete = select_data_sequence(labels, selected_data[j])
@@ -107,6 +120,10 @@ def label_split(labels, keys, selected_data):
         #                           g_conf.param.MISC.SEQUENCE_STRIDE)
 
         keys_for_this_part = list(set(keys) - set(keys_to_delete))
+        # If it is empty, kindly ask the user to change the label division
+        if not keys_for_this_part:
+            raise RuntimeError("No Element found of the key ", selected_data[j],
+                               "please select other keys")
 
         keys_for_divison.append(keys_for_this_part)
 
@@ -125,7 +142,6 @@ def float_split(output_to_split, keys, percentiles):
 
     """
 
-    # TODO: test the number of parts that the splitter keys have.
 
     # We use this keys to grab the steerings we want... divided into groups
     # TODO: Test the spliting based on median.
@@ -134,8 +150,7 @@ def float_split(output_to_split, keys, percentiles):
 
     # we get new keys and order steering, each steering group
     sorted_outputs = [average_outputs[j] for j in keys_ordered]
-    corresponding_keys =[keys[j] for j in keys_ordered]
-
+    corresponding_keys = [keys[j] for j in keys_ordered]
 
     # We split each group...
     if len(keys_ordered) > 0:
@@ -143,5 +158,6 @@ def float_split(output_to_split, keys, percentiles):
                                                       corresponding_keys, percentiles)
     else:
         splitted_keys = []
+
 
     return splitted_keys

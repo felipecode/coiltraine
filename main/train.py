@@ -17,7 +17,10 @@ def check_integrity():
 
 
 # The main function maybe we could call it with a default name
-def execute():
+def execute(gpu, params):
+
+
+
 
     #Define the dataset. This structure is has the __get_item__ redefined in a way
     #that you can access the HDFILES positions from the root directory as a in a vector.
