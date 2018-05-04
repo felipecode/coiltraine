@@ -15,31 +15,19 @@ from carla.settings import CarlaSettings
 from carla.driving_benchmark.experiment_suite.experiment_suite import ExperimentSuite
 
 
+#TODO: maybe add aditional tasks ( NO dynamic obstacles for instace !)
 
 class CoRL2017(ExperimentSuite):
 
     @property
     def train_weathers(self):
-        return [1, 3, 6, 8]
+        return [1]
     @property
     def test_weathers(self):
-        return [4, 14]
-
-    def _poses_town01(self):
-        """
-        Each matrix is a new task. We have all the four tasks
-
-        """
+        return []
 
 
-        return [[[105, 29], [27, 130], [102, 87], [132, 27], [24, 44],
-                [96, 26], [34, 67], [28, 1], [140, 134], [105, 9],
-                [148, 129], [65, 18], [21, 16], [147, 97], [42, 51],
-                [30, 41], [18, 107], [69, 45], [102, 95], [18, 145],
-                [111, 64], [79, 45], [84, 69], [73, 31], [37, 81]]]
-
-
-    def _poses_town02(self):
+    def _poses(self):
 
 
         return [[[19, 66], [79, 14], [19, 57], [23, 1],
@@ -69,13 +57,13 @@ class CoRL2017(ExperimentSuite):
         camera.set_rotation(-15.0, 0, 0)
 
         if self._city_name == 'Town01':
-            poses_tasks = self._poses_town01()
-            vehicles_tasks = [0, 0, 0, 20]
-            pedestrians_tasks = [0, 0, 0, 50]
-        else:
-            poses_tasks = self._poses_town02()
+            poses_tasks = self._poses()
             vehicles_tasks = [0, 0, 0, 15]
             pedestrians_tasks = [0, 0, 0, 50]
+        else:
+            raise ValueError("Using Town01 for a town02 experiment")
+
+
 
         experiments_vector = []
 
