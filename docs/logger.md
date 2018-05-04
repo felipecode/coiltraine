@@ -25,3 +25,22 @@ The folder organization for logging is as following:
         * Experiment Name
             * Logs
 
+
+
+The messages are JSON
+
+For our system the following message types exist.
+
+Loading messages
+
+Running Messages
+From the running messages it has three types
+
+1. Reading
+2. Network
+3. Optimization
+
+
+
+
+

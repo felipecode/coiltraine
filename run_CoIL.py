@@ -1,10 +1,39 @@
 
 import multiprocessing
 from importlib.machinery import SourceFileLoader
+# Import all the test libraries.
 
+from testing.unit_tests.structural_test.multiprocessing_test import test_drive
+from testing.unit_tests.structural_test.multiprocessing_test import test_train
+from testing.unit_tests.structural_test.multiprocessing_test import test_validate
 
 # You could send the module to be executed and they could have the same interface.
-def execute(gpu, module_name, exp_alias, path):
+
+def check_integrity():
+
+    # Check the entire execution sample for integrity.
+    pass
+
+
+def execute_train(gpu, exp_alias):
+    """
+
+    Args:
+        gpu: The gpu being used for this execution.
+        module_name: The module name, if it is train, drive or evaluate
+        exp_alias: The experiment alias, file name, to be executed.
+        path: The path were the datasets are
+
+    Returns:
+
+    """
+
+    #module = SourceFileLoader(module_name,'testing/unit_tests/structural_test/multiprocessing_test/'+module_name +'.py')
+    #module = module.load_module()
+    p = multiprocessing.Process(target=test_train.execute, args=(gpu, exp_alias,))
+    p.start()
+
+def execute_validation(gpu, exp_alias):
     """
 
     Args:
@@ -20,18 +49,16 @@ def execute(gpu, module_name, exp_alias, path):
     #    raise ValueError("Invalid module to execute")
 
 
-    module = SourceFileLoader(module_name,'testing/unit_tests/structural_test/multiprocessing_test/'+module_name +'.py')
-    module = module.load_module()
-    p = multiprocessing.Process(target=module.execute, args=(gpu, exp_alias,))
+    #module = SourceFileLoader(module_name,'testing/unit_tests/structural_test/multiprocessing_test/'+module_name +'.py')
+    #module = module.load_module()
+    # The difference between train and validation is the
+    p = multiprocessing.Process(target=test_validate.execute, args=(gpu, exp_alias, False))
     p.start()
-
-
-    # The dataset is set inside the configuration file, however the path is manually set.
 
 
 #TODO: set before the dataset path as environment variables
 
-def execute_drive(gpu, module_name, exp_alias, city_name):
+def execute_drive(gpu, exp_alias, city_name):
     """
 
     Args:
@@ -47,7 +74,8 @@ def execute_drive(gpu, module_name, exp_alias, city_name):
     #    raise ValueError("Invalid module to execute")
 
 
-    module = SourceFileLoader(module_name,'testing/unit_tests/structural_test/multiprocessing_test/'+module_name +'.py')
+    #module = SourceFileLoader(module_name,
+    #                          'testing/unit_tests/structural_test/multiprocessing_test/'+ module_name +'.py')
     module = module.load_module()
     p = multiprocessing.Process(target=module.execute, args=(gpu, exp_alias, city_name,))
     p.start()
@@ -82,6 +110,6 @@ def folder_execute(folder,gpus,param):
 
 if __name__ == '__main__':
 
-    execute("0", "test_train", "experiment_1", 'Datasets')
-    execute_drive("1", "test_drive", "experiment_2", 'Town01')
-    execute_drive("2", "test_drive", "experiment_3", 'Town02')
+    execute_train("0", "experiment_1", 'Datasets')
+    execute_drive("1", "experiment_2", 'Town01')
+    execute_drive("2", "experiment_3", 'Town02')

@@ -1,4 +1,5 @@
 from configs import g_conf
+import numpy as np
 
 
 def order_sequence(steerings, keys_sequence):
@@ -161,3 +162,32 @@ def float_split(output_to_split, keys, percentiles):
 
 
     return splitted_keys
+
+
+
+
+
+def control_steer_split(measurements, meta_data):
+
+    steerings = measurements[0, :]
+
+    # TODO: read meta data and turn into a coool dictionary ?
+    #print(np.where(dataset.meta_data[:, 0] == 'control'))
+    labels = measurements[np.where(meta_data[:, 0] == 'control'), :]
+
+    print(np.unique(labels))
+
+    keys = range(0, len(steerings))
+
+    splitted_labels = label_split(labels, keys, g_conf.param.INPUT.LABELS_DIVISION)
+
+    # print (splitted_labels)
+    # Another level of splitting
+    splitted_steer_labels = []
+    for keys in splitted_labels:
+        splitter_steer = float_split(steerings, keys,
+                                              g_conf.param.INPUT.STEERING_DIVISION)
+
+        splitted_steer_labels.append(splitter_steer)
+
+    return splitted_steer_labels

@@ -6,6 +6,7 @@
 # Check the log and also put it to tensorboard
 
 
+
 def check_if_done(exp):
 
     # TODO:
