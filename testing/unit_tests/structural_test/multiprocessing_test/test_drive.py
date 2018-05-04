@@ -28,8 +28,10 @@ def execute(gpu, exp_alias, city_name):
     port = find_free_port()
     carla_path = os.environ['CARLA_PATH']
 
-    subprocess.call(['SDL_VIDEODRIVER=offscreen', 'SDL_HINT_CUDA_DEVICE=' + str(gpu),
-                     carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4/' + city_name,
+    os.environ['SDL_VIDEODRIVER'] = 'offscreen'
+    os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
+
+    subprocess.call([carla_path + './CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + city_name,
                      '-benchmark', '-fps=10', '-world-port='+str(port)])
 
 
