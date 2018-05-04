@@ -49,7 +49,7 @@ def execute_drive(gpu, module_name, exp_alias, city_name):
 
     module = SourceFileLoader(module_name,'testing/unit_tests/structural_test/multiprocessing_test/'+module_name +'.py')
     module = module.load_module()
-    p = multiprocessing.Process(target=module.execute, args=(gpu, exp_alias,))
+    p = multiprocessing.Process(target=module.execute, args=(gpu, exp_alias, city_name,))
     p.start()
 
 
