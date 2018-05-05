@@ -10,11 +10,12 @@ import datetime
 import numpy as np
 import os
 import time
+import subprocess
 
 from carla import image_converter
 
 
-# MAKE A SYSTEM TO CONTROL CHeckpoint
+# TODO: MAKE A SYSTEM TO CONTROL CHeckpoint
 
 from carla.tcp import TCPConnectionError
 from carla.client import make_carla_client
@@ -70,6 +71,7 @@ def finish_model():
 
 
 def find_free_port():
+
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
         s.bind(('', 0))
         return s.getsockname()[1]
@@ -105,7 +107,8 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
                      '-benchmark', '-fps=10', '-world-port='+str(port)])
 
 
-    test_agent = CarlaDrive(experiment_name)
+    #test_agent = CarlaDrive(experiment_name)
+
 
 
 
