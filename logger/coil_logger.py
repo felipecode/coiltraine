@@ -41,7 +41,7 @@ def create_log(exp_batch_name, exp_name, process_name):
         os.mkdir(os.path.join(root_path, exp_batch_name, exp_name))
 
     dir_name = os.path.join(root_path, exp_batch_name, exp_name)
-
+    print ("logger dir name ", dir_name)
     full_name = os.path.join(dir_name, process_name)
 
     flog = filelogger(exp_name + '_' + process_name , [], full_name)

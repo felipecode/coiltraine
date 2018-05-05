@@ -24,17 +24,18 @@ from __future__ import unicode_literals
 from ast import literal_eval
 from utils import AttributeDict
 import copy
-import logging
 import numpy as np
 import os
 import os.path as osp
 import yaml
 
 
-from logger.coil_logger import create_log
+from logger.coil_logger import create_log, add_message
 
 import imgauggpu as iag
 
+
+# TODO: How do we KEEP A GOOD ITERATION COUNTER ??
 
 class GlobalConfig(object):
 
@@ -46,23 +47,27 @@ class GlobalConfig(object):
         self.param.INPUT.MEASUREMENTS = {'targets': (31)}
         self.param.INPUT.STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
         self.param.INPUT.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
-        self.param.INPUT.AUGMENTATION = [iag.Add(0, 0)]
-        self.param.INPUT.DATASET_NAME = 'None'
+        # TODO: Need to be added to gpu
+        self.param.INPUT.AUGMENTATION_SUITE = [iag.ToGPU(), iag.Add(0, 0)]
+        self.param.INPUT.DATASET_NAME = 'SmallTest'
 
 
 
         #TODO: Why is misc misc ??
-        self.param.MISC = AttributeDict
+        self.param.MISC = AttributeDict()
         self.param.TRAIN_EXPERIMENT_BATCH_NAME = "eccv"
         self.param.TRAIN_EXPERIMENT_NAME = "default"
         # TODO: not necessarily the configuration need to know about this
         self.param.PROCESS_NAME = "None"
-        self.param.MISC.NUMBER_ITERATIONS = 50000
+        self.param.MISC.NUMBER_ITERATIONS = 500
         self.param.MISC.NUMBER_FRAMES_FUSION = 1
         self.param.MISC.NUMBER_IMAGES_SEQUENCE = 1
         self.param.MISC.SEQUENCE_STRIDE = 1
         self.param.MISC.DATASET_SIZE = 2000
         #self.param.MISC.DATASET_SIZE
+
+        self.param.NETWORK = AttributeDict()
+        self.param.NETWORK.MODEL_DEFINITION = [23]
 
 
 
@@ -81,24 +86,23 @@ class GlobalConfig(object):
         #    yaml_cfg = AttributeDict(yaml.load(f))
         #_merge_a_into_b(yaml_cfg, __C)
         #TODO: HERE IT IS NOT MUTABLE
+        #TODO: Merging is missing
 
         path_parts = os.path.split(yaml_filename)
-        g_conf.param.TRAIN_EXPERIMENT_BATCH_NAME = os.path.split(path_parts[-2])[-1]
-        g_conf.param.TRAIN_EXPERIMENT_NAME = path_parts[-1].split('.')[-2]
+        self.param.TRAIN_EXPERIMENT_BATCH_NAME = os.path.split(path_parts[-2])[-1]
+        self.param.TRAIN_EXPERIMENT_NAME = path_parts[-1].split('.')[-2]
 
-        print (g_conf.param.TRAIN_EXPERIMENT_BATCH_NAME)
-        print (g_conf.param.TRAIN_EXPERIMENT_NAME)
 
 
 
     # TODO: is name really inside the configuration ??
-    def set_type_of_process(self, type):
+    def set_type_of_process(self, process_type):
         """
         This function is used to set which is the type of the current process, test, train or val
         and also the details of each since there could be many vals and tests for a single
         experiment.
 
-        NOTE: AFTER CALLING THIS FUNCTIONS THE CONFIGURATION CLOSES
+        NOTE: AFTER CALLING THIS FUNCTION, THE CONFIGURATION CLOSES
 
         Args:
             type:
@@ -110,13 +114,22 @@ class GlobalConfig(object):
         if self.param.PROCESS_NAME == "default":
             raise RuntimeError(" You should merge with some exp file before setting the type")
 
-        if type == "train" or type == "validation":
-            self.param.PROCESS_NAME = type + '_' + self.param.INPUT.DATASET_NAME
+        if process_type == "train" or process_type == "validation":
+            self.param.PROCESS_NAME = process_type + '_' + self.param.INPUT.DATASET_NAME
         #else:  # FOr the test case we join with the name of the experimental suite.
 
-        create_log(g_conf.param.TRAIN_EXPERIMENT_BATCH_NAME,
-                   g_conf.param.TRAIN_EXPERIMENT_NAME,
-                   g_conf.param.PROCESS_NAME)
+        create_log(self.param.TRAIN_EXPERIMENT_BATCH_NAME,
+                   self.param.TRAIN_EXPERIMENT_NAME,
+                   self.param.PROCESS_NAME)
+
+
+
+
+        # We assure ourselves that the configuration file added does not kill things
+        self._check_integrity()
+
+        add_message('Loading', {'ProcessName': self.generate_name(),
+                                'FullConfiguration': self.generate_param_dict()})
 
         self.param.immutable(True)
 
@@ -128,7 +141,13 @@ class GlobalConfig(object):
         pass
 
     def generate_name(self):
-        pass
+        # TODO: Make a cool name generator, maybe in another class
+        return self.param.INPUT.DATASET_NAME + str(202)
+
+    def generate_param_dict(self):
+        # TODO IMPLEMENT ! generate a cool param dictionary USE
+        # https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable
+        return self.param.INPUT.DATASET_NAME + 'dict'
 
 
 

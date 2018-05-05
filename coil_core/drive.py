@@ -13,12 +13,8 @@ import time
 
 from carla import image_converter
 
-#from drive_interfaces.carla.comercial_cars.test_carla_machine import TestCarlaMachine
-#from drive_interfaces.carla.comercial_cars.data_benchmark import DataBenchmark
-#from drive_interfaces.carla.comercial_cars.generalization_benchmark import GeneralizationBenchmark
 
-#from drive_interfaces.carla.comercial_cars.lightbenchmark import LightBenchmark
-#from drive_interfaces.carla.comercial_cars.test_benchmark import TestBenchmark
+# MAKE A SYSTEM TO CONTROL CHeckpoint
 
 from carla.tcp import TCPConnectionError
 from carla.client import make_carla_client
@@ -73,14 +69,41 @@ def finish_model():
     self._current_checkpoint_number += 1
 
 
+def find_free_port():
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(('', 0))
+        return s.getsockname()[1]
 
-# TODO: Go for that KWARGS stuff.
+# TODO: note, for now carla and carla test are in the same GPU
+
+# TODO: Go for that KWARGS stuff .... MAYBE
 # TODO: Add all the necessary logging.
 
-def execute(host, port, experiment_name, city_name='Town01', weather_used=1, memory_use=0.2):
+# OBS : I AM FIXING host as localhost now
+# OBS : Memory use should also be adaptable lets leave it fixed for now
+
+def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host='127.0.0.1'):
     # host,port,gpu_number,path,show_screen,resolution,noise_type,config_path,type_of_driver,experiment_name,city_name,game,drivers_name
     #drive_config.city_name = city_name
     # TODO Eliminate drive config.
+
+    print("Running ", __file__, " On GPU ",gpu, "of experiment name ", exp_alias)
+    os.environ["CUDA_VISIBLE_DEVICES"] = gpu
+
+
+    #vglrun - d:7.$GPU $CARLA_PATH / CarlaUE4 / Binaries / Linux / CarlaUE4 / Game / Maps /$TOWN - windowed - benchmark - fps = 10 - world - port =$PORT;
+    #sleep    100000
+
+
+    port = find_free_port()
+    carla_path = os.environ['CARLA_PATH']
+
+    os.environ['SDL_VIDEODRIVER'] = 'offscreen'
+    os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
+
+    subprocess.call([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + city_name,
+                     '-benchmark', '-fps=10', '-world-port='+str(port)])
+
 
     test_agent = CarlaDrive(experiment_name)
 
@@ -119,14 +142,14 @@ def execute(host, port, experiment_name, city_name='Town01', weather_used=1, mem
                                                                                          + '_' + experiment_name+'auto',
                                                        camera_set=drive_config.camera_set, continue_experiment=True,
                                                        )
-                            print "DATA BENCH"
+
                         else:
                             data_bench = GeneralizationBenchmark(city_name=city_name,
                                                                  name_to_save=test_agent.get_test_name()
                                                         + '_' + experiment_name+'auto',
                                                        continue_experiment=True,
                                                        )
-                            print "GEN BENCH"
+
 
                         test_agent.load_model()
 

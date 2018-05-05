@@ -10,27 +10,31 @@ from input import CoILDataset, CoILSampler, splitter
 import imgauggpu as iag
 from logger import monitorer
 
+from torchvision import transforms
 
 
 # The main function maybe we could call it with a default name
-def execute(gpu, exp_alias, compute_loss=True):
+def execute(gpu, exp_batch, exp_alias):
     # We set the visible cuda devices
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
     # At this point the log file with the correct naming is created.
-    g_conf.merge_with_parameters(exp_alias)
-    g_conf.set_type_of_process('train') if compute_loss else g_conf.set_type_of_process('validate')
+    g_conf.merge_with_yaml(os.path.join(exp_batch,exp_alias+'.yaml'))
+    g_conf.set_type_of_process('train')
+
 
     #TODO: Get THe experiment folder somehow
 
-    if monitorer.get_status(exp_alias) == "Finished":
+
+    if monitorer.get_status(exp_batch, exp_alias, g_conf.param.PROCESS_NAME)[0] == "Finished":
+        # TODO: print some cool summary or not ?
         return
 
     #Define the dataset. This structure is has the __get_item__ redefined in a way
     #that you can access the HDFILES positions from the root directory as a in a vector.
-    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.param.dataset_folder_name)
+    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.param.INPUT.DATASET_NAME)
 
-    dataset = CoILDataset(full_dataset)
+    dataset = CoILDataset(full_dataset, transform=transforms.Compose([transforms.ToTensor()]))
 
     # Creates the sampler, this part is responsible for managing the keys. It divides
     # all keys depending on the measurements and produces a set of keys for each bach.
@@ -38,7 +42,7 @@ def execute(gpu, exp_alias, compute_loss=True):
 
     # The data loader is the multi threaded module from pytorch that release a number of
     # workers to get all the data.
-    # TODO: batch size an number of workers go to
+    # TODO: batch size an number of workers go to some configuration file
     data_loader = torch.utils.data.DataLoader(dataset, sampler=sampler, batch_size=120,
                                               shuffle=False, num_workers=12, pin_memory=True)
     # By instanciating the augmenter we get a callable that augment images and transform them
@@ -50,7 +54,8 @@ def execute(gpu, exp_alias, compute_loss=True):
 
     criterion = Loss()
 
-    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    # TODO: DATASET SIZE SEEMS WEIRD
+    #optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 
     #TODO: Probably there is more differences between train and validation that justify a new file.
@@ -59,17 +64,18 @@ def execute(gpu, exp_alias, compute_loss=True):
 
         input_data, labels = data
         #TODO we have to divide the input with other data.
+        print (input_data['rgb'].shape)
 
-        input_data = augmenter(input_data)
+        # TODO, ADD ITERATION SCHEDULE
+        input_data = augmenter(0, input_data['rgb'])
 
         output = model(input_data)
 
-        if compute_loss:
-            loss = criterion(output, labels)
+        loss = criterion(output, labels)
 
-            loss.backward()
+        #loss.backward()
 
-            optimizer.step()
+        #optimizer.step()
 
 
     # TODO: DO ALL THE AMAZING LOGGING HERE, as a way to very the status in paralell.

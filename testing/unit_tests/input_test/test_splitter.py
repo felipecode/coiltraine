@@ -100,13 +100,14 @@ class testSpliter(unittest.TestCase):
         print (dataset.meta_data)
         # TODO: read meta data and turn into a coool dictionary ?
         print (np.where(dataset.meta_data[:, 0] == 'control'))
-        labels = dataset.measurements[24, :]
+        labels = dataset.measurements[np.where(dataset.meta_data[:, 0] == 'control'), :]
+        print (labels)
 
         print (np.unique(labels))
 
         keys = range(0, len(steerings))
 
-        splitted_labels = splitter.label_split(labels, keys, g_conf.param.INPUT.LABELS_DIVISION)
+        splitted_labels = splitter.label_split(labels[0][0], keys, g_conf.param.INPUT.LABELS_DIVISION)
 
         print (splitted_labels)
         # Another level of splitting
@@ -137,6 +138,8 @@ class testSpliter(unittest.TestCase):
 
             # We assert if the new key is always bigger than the previous one
 
+
+
     def test_split_real_data_sequence(self):
 
         root_test_dir = 'testing/unit_tests/data'
@@ -148,16 +151,14 @@ class testSpliter(unittest.TestCase):
         print (dataset.meta_data)
         # TODO: read meta data and turn into a coool dictionary ?
         print (np.where(dataset.meta_data[:, 0] == 'control'))
-        labels = dataset.measurements[24, :]
+        labels = dataset.measurements[np.where(dataset.meta_data[:, 0] == 'control'), :]
 
         print ("SEQUENCE LABELS ")
-        np.set_printoptions(threshold=np.nan)
         print (labels)
         keys = range(0, len(steerings) - g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE)
 
-        splitted_labels = splitter.label_split(labels, keys, g_conf.param.INPUT.LABELS_DIVISION)
+        splitted_labels = splitter.label_split(labels[0][0], keys, g_conf.param.INPUT.LABELS_DIVISION)
 
-        print (splitted_labels)
         # Another level of splitting
         splitted_steer_labels = []
         for keys in splitted_labels:

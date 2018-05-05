@@ -1,6 +1,9 @@
 from configs import g_conf
+from logger import coil_logger
 import numpy as np
 
+
+# TODO: --- WARNING--- NOT WORKING AFTER ADDING SEQUENCES.
 
 def order_sequence(steerings, keys_sequence):
     sequence_average = []
@@ -60,6 +63,7 @@ def select_data_sequence(control, selected_data):
 
     break_sequence = False
 
+
     count = 0
     del_pos = []
     # print "SELECTED"
@@ -74,7 +78,7 @@ def select_data_sequence(control, selected_data):
                                    (count * g_conf.param.MISC.SEQUENCE_STRIDE) +
                                    g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE):
 
-            #print (' control ', control[iter_sequence], ' selected ', selected_data)
+
             #print ("IMAGES SEQUENCE ", g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE )
             # The position is one
 
@@ -115,6 +119,8 @@ def label_split(labels, keys, selected_data):
     sorted_steering_division = []
 
     for j in range(len(selected_data)):
+        print (labels)
+        print (selected_data[j])
         keys_to_delete = select_data_sequence(labels, selected_data[j])
         # print got_keys_for_divison
         # keys_for_this_part = range(0, len(labels) - g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE,
@@ -137,9 +143,6 @@ def float_split(output_to_split, keys, percentiles):
     Everything is splitted with respect to the percentages.
 
     Arguments :
-
-
-
 
     """
 
@@ -178,16 +181,20 @@ def control_steer_split(measurements, meta_data):
     print(np.unique(labels))
 
     keys = range(0, len(steerings))
+    print (labels)
+    print (keys)
+    splitted_labels = label_split(labels[0][0], keys, g_conf.param.INPUT.LABELS_DIVISION)
 
-    splitted_labels = label_split(labels, keys, g_conf.param.INPUT.LABELS_DIVISION)
-
-    # print (splitted_labels)
     # Another level of splitting
     splitted_steer_labels = []
+
+
     for keys in splitted_labels:
         splitter_steer = float_split(steerings, keys,
                                               g_conf.param.INPUT.STEERING_DIVISION)
 
         splitted_steer_labels.append(splitter_steer)
+
+    coil_logger.add_message('Loading', {'KeysDivision': splitted_steer_labels} )
 
     return splitted_steer_labels

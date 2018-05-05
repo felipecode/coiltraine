@@ -49,3 +49,7 @@ class AttributeDict(dict):
 
     def is_immutable(self):
         return self.__dict__[AttributeDict.IMMUTABLE]
+
+
+    def __repr__(self):
+        return str(self.__dict__)

@@ -4,10 +4,12 @@ import h5py
 import traceback
 import sys
 import numpy as np
-from PIL import Image
+
 
 from torch.utils.data import Dataset
-import torch
+
+
+from logger import coil_logger
 
 # TODO: Warning, maybe this does not need to be included everywhere.
 from configs import g_conf
@@ -76,18 +78,14 @@ class CoILDataset(Dataset):
 
                         if chosen_key >= es and chosen_key < ee:
                             """ We found the part of the data to open """
-                            # print x[]
-                            #first_enter = False
 
                             pos_inside = chosen_key - es
-
                             sensor_image = np.array(x[pos_inside, :, :, :])
 
                             try:
                                 sensor_image = self.transform(sensor_image)
                             except:
                                 sensor_image = self.transform(0, sensor_image)
-
 
 
                             batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
@@ -97,6 +95,13 @@ class CoILDataset(Dataset):
 
                 count += 1
 
+
+        # TODO: iteration is wrong
+        coil_logger.add_message('Reading', {'Iteration': 25, 'ReadKeys': used_ids})
+        # TODO: add tensorboard image adding
+        # TODO: Do we need to limit the number of iterations the images are saved ??
+        # TODO: ADD GROUND TRUTH CONTROL IN SOME META CONFIGURATION FOR THE DATASET
+        # TODO: SO if the data read and manipulate is outside some range, it should report error
         return batch_sensors, self.measurements[:, used_ids]
 
     # file_names, image_dataset_names, dataset_names
@@ -133,11 +138,12 @@ class CoILDataset(Dataset):
         # We open one dataset to get the metadata for targets
         # that is important to be able to reference variables in a more legible way
         dataset = h5py.File(folder_file_names[0], "r")
-        metadata_targets = np.array(dataset['metadata_'+meas_names[0]])
+        metadata_targets = np.array(dataset['metadata_'+ meas_names[0]])
 
-        # TODO: Add to the logger the status of dataload.
         lastidx = 0
         count = 0
+        # TODO: More logs to be added ??
+        coil_logger.add_message('Loading', {'FilesLoaded': folder_file_names})
 
         for file_name in folder_file_names:
             try:
