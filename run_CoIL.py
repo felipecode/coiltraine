@@ -95,7 +95,7 @@ def folder_execute(folder,gpus,param):
     #TODO: it is likely that the monitorer classes is not actually necessary.
 
     #for all methods in the folder
-    #    logger.check_if_done() # TODO: should we call this logger or monitorer ??
+    #    if monitorer.get_status(folder, methods) == "Finished" # TODO: should we call this logger or monitorer ??
     #        if not done or executing  get to the list
 
 

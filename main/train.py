@@ -8,6 +8,7 @@ from configs import g_conf
 from network import Model, Loss
 from input import CoILDataset, CoILSampler, splitter
 import imgauggpu as iag
+from logger import monitorer
 
 
 
@@ -20,8 +21,10 @@ def execute(gpu, exp_alias, compute_loss=True):
     g_conf.merge_with_parameters(exp_alias)
     g_conf.set_type_of_process('train') if compute_loss else g_conf.set_type_of_process('validate')
 
-    #TODO: CHECK HERE IF FINISHED
+    #TODO: Get THe experiment folder somehow
 
+    if monitorer.get_status(exp_alias) == "Finished":
+        return
 
     #Define the dataset. This structure is has the __get_item__ redefined in a way
     #that you can access the HDFILES positions from the root directory as a in a vector.
@@ -49,6 +52,8 @@ def execute(gpu, exp_alias, compute_loss=True):
 
     optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
+
+    #TODO: Probably there is more differences between train and validation that justify a new file.
 
     for data in data_loader:
 

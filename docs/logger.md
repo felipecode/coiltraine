@@ -12,8 +12,11 @@ The logger is global and accessible at any moment.
 The experiments have a set of status for each part of
 the logging. The general status is the last one that stopped.
 
+* Not existent
 * To Run
 * Running
+    * Loading
+    * Iterating on Iter()
 * Error
 * Finished
 
