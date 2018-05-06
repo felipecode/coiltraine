@@ -4,7 +4,7 @@ import multiprocessing
 import sys
 import os
 
-from coil_core import train, validate, drive
+from coil_core import train, validate, run_drive
 
 
 
@@ -65,7 +65,7 @@ def execute_drive(gpu, exp_batch, exp_alias, city_name):
 
     """
 
-    p = multiprocessing.Process(target=drive.execute, args=(gpu, exp_batch, exp_alias, city_name,))
+    p = multiprocessing.Process(target=run_drive.execute, args=(gpu, exp_batch, exp_alias, city_name,))
     p.start()
 
 

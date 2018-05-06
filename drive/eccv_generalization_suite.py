@@ -16,7 +16,7 @@ from carla.driving_benchmark.experiment_suite.experiment_suite import Experiment
 
 
 
-class CoRL2017(ExperimentSuite):
+class ECCVGeneralizationSuite(ExperimentSuite):
 
     @property
     def train_weathers(self):

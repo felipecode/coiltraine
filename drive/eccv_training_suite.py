@@ -17,7 +17,7 @@ from carla.driving_benchmark.experiment_suite.experiment_suite import Experiment
 
 #TODO: maybe add aditional tasks ( NO dynamic obstacles for instace !)
 
-class CoRL2017(ExperimentSuite):
+class ECCVTrainingSuite(ExperimentSuite):
 
     @property
     def train_weathers(self):
