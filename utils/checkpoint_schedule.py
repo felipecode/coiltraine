@@ -39,10 +39,12 @@ def get_latest_saved_checkpoint(exp_batch, exp_alias):
         Returns the , latest checkpoint number that was saved
 
     """
-    checkpoint_files = os.listdir(os.path.join(exp_batch, exp_alias, 'checkpoints'))
-
-    sort_nicely(checkpoint_files)
-    return checkpoint_files[-1]
+    checkpoint_files = os.listdir(os.path.join('_logs', exp_batch, exp_alias, 'checkpoints'))
+    if checkpoint_files == []:
+        return None
+    else:
+        sort_nicely(checkpoint_files)
+        return checkpoint_files[-1]
 
 
 """ FUNCTIONS FOR GETTING THE CHECKPOINTS"""
@@ -51,15 +53,9 @@ def get_latest_evaluated_checkpoint(exp_batch, exp_alias, process_name):
     """
         Get the latest checkpoint that was validated or tested.
     Args:
-        exp_batch:
-        exp_alias:
-        process_name:
-
-    Returns:
-
     """
 
-    return monitor.get_latest_checkpoint(exp_batch, exp_alias, process_name)
+    return monitorer.get_latest_checkpoint(exp_batch, exp_alias, process_name)
 
 def is_next_checkpoint_ready(exp_batch, exp_alias, process_name, checkpoint_schedule):
 
@@ -67,7 +63,8 @@ def is_next_checkpoint_ready(exp_batch, exp_alias, process_name, checkpoint_sche
 
     next_check = checkpoint_schedule[checkpoint_schedule.index(ltst_check)+1]
 
-    return str(next_check) + '.pth' in os.listdir(os.path.join(exp_batch, exp_alias, 'checkpoints'))
+    # Check if the file is in the checkpoints list.
+    return str(next_check) + '.pth' in os.listdir(os.path.join('_logs', exp_batch, exp_alias, 'checkpoints'))
 
 
 def get_next_checkpoint(exp_batch, exp_alias, process_name, checkpoint_schedule):

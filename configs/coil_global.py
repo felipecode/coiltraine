@@ -67,6 +67,7 @@ class GlobalConfig(object):
         self.param.MISC.NUMBER_FRAMES_FUSION = 1
         self.param.MISC.NUMBER_IMAGES_SEQUENCE = 1
         self.param.MISC.SEQUENCE_STRIDE = 1
+        self.param.MISC.TEST_SCHEDULE = range(0, 2000, 200)
 
 
         #self.param.MISC.DATASET_SIZE
@@ -128,14 +129,22 @@ class GlobalConfig(object):
                    self.param.PROCESS_NAME)
 
 
-        if os.path.exists(os.path.join( self.param.TRAIN_EXPERIMENT_BATCH_NAME,
+        if not os.path.exists(os.path.join('_logs', self.param.TRAIN_EXPERIMENT_BATCH_NAME,
                                         self.param.TRAIN_EXPERIMENT_NAME,
                                         'checkpoints') ):
-            os.mkdir(os.path.join( self.param.TRAIN_EXPERIMENT_BATCH_NAME,
+            os.mkdir(os.path.join( '_logs', self.param.TRAIN_EXPERIMENT_BATCH_NAME,
                                         self.param.TRAIN_EXPERIMENT_NAME,
                                         'checkpoints'))
 
 
+
+        if process_type == "validation":
+            if not os.path.exists(os.path.join('_logs', self.param.TRAIN_EXPERIMENT_BATCH_NAME,
+                                               self.param.TRAIN_EXPERIMENT_NAME,
+                                               self.param.PROCESS_NAME + '_csv')):
+                os.mkdir(os.path.join('_logs', self.param.TRAIN_EXPERIMENT_BATCH_NAME,
+                                            self.param.TRAIN_EXPERIMENT_NAME,
+                                            self.param.PROCESS_NAME + '_csv'))
 
 
 

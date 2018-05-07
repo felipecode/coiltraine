@@ -9,7 +9,7 @@ from configs import g_conf
 from network import CoILModel, Loss
 from input import CoILDataset, CoILSampler, splitter
 from logger import monitorer
-from utils.checkpoint_schedule import is_iteration_for_saving, get_next_checkpoint
+from utils.checkpoint_schedule import is_iteration_for_saving, get_latest_saved_checkpoint
 from torchvision import transforms
 
 
@@ -22,8 +22,6 @@ def execute(gpu, exp_batch, exp_alias):
     g_conf.merge_with_yaml(os.path.join(exp_batch, exp_alias+'.yaml'))
     g_conf.set_type_of_process('train')
 
-
-    #TODO: Get THe experiment folder somehow
 
 
     if monitorer.get_status(exp_batch, exp_alias, g_conf.param.PROCESS_NAME)[0] == "Finished":
@@ -54,15 +52,20 @@ def execute(gpu, exp_batch, exp_alias):
 
     criterion = Loss()
 
-    # TODO: DATASET SIZE SEEMS WEIRD
     #optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 
     #TODO: Probably there is more differences between train and validation that justify a new file.
 
-    #checkpoint = torch.load(get_next_checkpoint())
+    checkpoint_file = get_latest_saved_checkpoint()
+    if checkpoint_file != None:
+        checkpoint = torch.load(get_latest_saved_checkpoint())
+        iteration = checkpoint['iteration']
+    else:
+        iteration = 0
+
     # TODO: The checkpoint will continue, so the logs should restart ??? OR continue were it was
-    #iteration = checkpoint['iteration']
+
     print (dataset.meta_data)
     for data in data_loader:
 
@@ -71,10 +74,10 @@ def execute(gpu, exp_batch, exp_alias):
         print (input_data['rgb'].shape)
 
         # TODO, ADD ITERATION SCHEDULE
-        print (labels[11])
+        print (labels.shape)
         input_rgb_data = augmenter(0, input_data['rgb'])
 
-        output = model(input_rgb_data, labels[11]) # is this the right way to get the speed data??
+        output = model(input_rgb_data, labels[:, 11])
 
         loss = criterion(output, labels)
 
@@ -83,16 +86,16 @@ def execute(gpu, exp_batch, exp_alias):
         #optimizer.step()
 
         # TODO: save also the optimizer state dictionary
-        #if is_iteration_for_saving(iteration):
+        if is_iteration_for_saving(iteration):
 
-        #    state = {
-        #        'iteration': iteration,
-        #        'state_dict': model.state_dict()
-        #    }
-        #    # TODO : maybe already summarize the best model ???
-        #    torch.save(state, os.path.join(exp_batch, exp_alias, str(iteration) + '.pth'))
+            state = {
+                'iteration': iteration,
+                'state_dict': model.state_dict()
+            }
+            # TODO : maybe already summarize the best model ???
+            torch.save(state, os.path.join(exp_batch, exp_alias, str(iteration) + '.pth'))
 
-        #    iteration += 1
+        iteration += 1
 
         #shutil.copyfile(filename, 'model_best.pth.tar')
 

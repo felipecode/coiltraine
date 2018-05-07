@@ -69,9 +69,24 @@ def add_message(phase, message):
     g_logger.info({phase: message})
 
 
+
+
 # TODO: the logger should also interface with tensorboard.
 
 # TODO: Maybe an add scalar, message ??
+
+# TODO: make a single log file but hierarquical ??
+
+def write_on_csv(exp_batch, exp_alias, process_name, checkpoint_name):
+    """
+    We also create the posibility to write on a csv file. So it is faster to load
+    and check.
+
+    Returns:
+
+    """
+    return
+
 
 def add_scalar():
 
@@ -80,9 +95,10 @@ def add_scalar():
     Returns:
 
     """
+    return
 
 
-    pass
+
 def add_image(some_image):
     # Add the image to a log, the monitorer is the module responsible by checking this
     # and eventually put some of the images to tensorboard.

@@ -1,6 +1,9 @@
 import os
+import re
+
 from logger import json_formatter
 from configs import g_conf
+from utils.general import sort_nicely
 # Check the log and also put it to tensorboard
 
 
@@ -25,10 +28,24 @@ def get_latest_checkpoint(exp_batch, exp_alias, process_name):
 
 
     # The path for log
-    log_file_path = os.path.join('_logs', exp_batch, exp_alias, process_name)
+
+    csv_file_path = os.path.join('_logs', exp_batch, exp_alias, process_name + '_csv')
+
+    csv_files = os.listdir(csv_file_path)
+
+    if csv_files == []:
+        return 0
+
+    sort_nicely(csv_files)
+
+    #data = json_formatter.readJSONlog(open(log_file_path, 'r'))
+
+    return int(re.findall('\d+', csv_files[-1])[0])
 
 
-    data = json_formatter.readJSONlog(open(log_file_path, 'r'))
+
+
+
 
 
 def get_status(exp_batch, experiment, process_name):

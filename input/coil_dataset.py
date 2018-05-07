@@ -32,7 +32,7 @@ class CoILDataset(Dataset):
 
     def __len__(self):
         # This is seems to be the entire dataset size
-        return g_conf.param.MISC.DATASET_SIZE
+        return g_conf.param.MISC.NUMBER_ITERATIONS
 
     def __getitem__(self, used_ids):
         """
