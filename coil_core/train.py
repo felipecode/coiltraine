@@ -60,10 +60,10 @@ def execute(gpu, exp_batch, exp_alias):
 
     #TODO: Probably there is more differences between train and validation that justify a new file.
 
-    checkpoint = torch.load(get_next_checkpoint())
+    #checkpoint = torch.load(get_next_checkpoint())
     # TODO: The checkpoint will continue, so the logs should restart ??? OR continue were it was
-    iteration = checkpoint['iteration']
-
+    #iteration = checkpoint['iteration']
+    print (dataset.meta_data)
     for data in data_loader:
 
         input_data, labels = data
@@ -71,9 +71,10 @@ def execute(gpu, exp_batch, exp_alias):
         print (input_data['rgb'].shape)
 
         # TODO, ADD ITERATION SCHEDULE
-        input_data = augmenter(0, input_data['rgb'])
+        print (labels[11])
+        input_rgb_data = augmenter(0, input_data['rgb'])
 
-        output = model(input_data)
+        output = model(input_rgb_data, labels[11]) # is this the right way to get the speed data??
 
         loss = criterion(output, labels)
 
@@ -82,16 +83,16 @@ def execute(gpu, exp_batch, exp_alias):
         #optimizer.step()
 
         # TODO: save also the optimizer state dictionary
-        if is_iteration_for_saving(iteration):
+        #if is_iteration_for_saving(iteration):
 
-            state = {
-                'iteration': iteration,
-                'state_dict': model.state_dict()
-            }
-            # TODO : maybe already summarize the best model ???
-            torch.save(state, os.path.join(exp_batch, exp_alias, str(iteration) + '.pth'))
+        #    state = {
+        #        'iteration': iteration,
+        #        'state_dict': model.state_dict()
+        #    }
+        #    # TODO : maybe already summarize the best model ???
+        #    torch.save(state, os.path.join(exp_batch, exp_alias, str(iteration) + '.pth'))
 
-            iteration += 1
+        #    iteration += 1
 
         #shutil.copyfile(filename, 'model_best.pth.tar')
 

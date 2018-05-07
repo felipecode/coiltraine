@@ -25,7 +25,7 @@ from logger import monitorer
 
 from drive import coil_agent
 # TODO: MAKE A SYSTEM TO CONTROL CHeckpoint
-from utils.checkpoint_schedule import next_check_point_ready, maximun_checkpoint_reach, get_next_checkpoint
+from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkpoint
 
 
 
