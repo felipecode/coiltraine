@@ -100,4 +100,4 @@ if __name__ == '__main__':
 
     execute_train("0", "eccv", "experiment_1")
     #execute_validation("1", "experiment_2", 'Town01')
-    execute_drive("2", "eccv", "experiment_3", 'Town02')
+    #execute_drive("2", "eccv", "experiment_3", 'Town02')
