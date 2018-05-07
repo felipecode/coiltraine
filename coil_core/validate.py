@@ -5,7 +5,7 @@ import torch.optim as optim
 # What do we define as a parameter what not.
 
 from configs import g_conf
-from network import Model, Loss
+from network import CoILModel, Loss
 from input import CoILDataset, CoILSampler, splitter
 import imgauggpu as iag
 from logger import monitorer

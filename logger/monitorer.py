@@ -5,7 +5,7 @@ from configs import g_conf
 
 
 
-def get_number_iterations(exp):
+def get_current_iteration(exp):
     """
 
     Args:
@@ -19,6 +19,9 @@ def get_number_iterations(exp):
     # TODO:
 
     pass
+
+
+
 
 
 def get_status(exp_batch, experiment, process_name):
@@ -91,5 +94,14 @@ def get_status(exp_batch, experiment, process_name):
 
     return None
 
+def export_results(benchmark_results_folder):
 
+    """
+        Reads some data and export the csv file as a result file somewhere so it
+        can be read by the visualization module.
+    Returns:
+
+    """
+
+    pass
 

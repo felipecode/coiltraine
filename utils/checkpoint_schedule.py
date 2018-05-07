@@ -1,5 +1,10 @@
+import os
+
 
 def maximun_checkpoint_reach():
+
+
+
     if self._current_checkpoint_number >= len(self._checkpoint_schedule):
         return True
     else:
@@ -15,6 +20,7 @@ def next_check_point_ready():
     :return:
     """
 
+    """
     checkpoint_files = sorted(os.listdir(self._config_input.models_path))
     for f in checkpoint_files:
 
@@ -27,7 +33,25 @@ def next_check_point_ready():
 
                 return True
     logging.info('Checkpoint Not Found, Will wait for %d' % self._checkpoint_schedule[self._current_checkpoint_number] )
+    """
+
     return False
+
+
+def get_current_checkpoint():
+
+    return 'first'
+
+def get_next_checkpoint():
+    """
+    Look at the last checkpoint saved, and get the next on by looking at the scheduler
+    Returns:
+
+    """
+
+    return self._current_checkpoint_number
+
+
 
 def get_test_name():
 
@@ -43,3 +67,7 @@ def finish_model():
     self._current_checkpoint_number += 1
 
 
+def is_iteration_for_saving():
+
+
+    return True

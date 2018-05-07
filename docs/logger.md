@@ -45,5 +45,15 @@ From the running messages it has three types
 
 
 
+When the agent is testing there are several mesages
+
+
+
+1.Control Output
+2.Image Input # TODO: a way to take images inputs very fast
+3.Full measurements
+4.Directions
+5.Activation images.
+
 
 

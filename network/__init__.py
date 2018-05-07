@@ -1,2 +1,2 @@
 from .loss import Loss
-from .model import Model
+from .coil_model import CoILModel

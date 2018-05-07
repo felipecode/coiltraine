@@ -2,14 +2,14 @@ import os
 
 import torch
 import torch.optim as optim
+import imgauggpu as iag
 # What do we define as a parameter what not.
 
 from configs import g_conf
-from network import Model, Loss
+from network import CoILModel, Loss
 from input import CoILDataset, CoILSampler, splitter
-import imgauggpu as iag
 from logger import monitorer
-
+from utils.checkpoint_schedule import is_iteration_for_saving, get_next_checkpoint
 from torchvision import transforms
 
 
@@ -19,7 +19,7 @@ def execute(gpu, exp_batch, exp_alias):
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
     # At this point the log file with the correct naming is created.
-    g_conf.merge_with_yaml(os.path.join(exp_batch,exp_alias+'.yaml'))
+    g_conf.merge_with_yaml(os.path.join(exp_batch, exp_alias+'.yaml'))
     g_conf.set_type_of_process('train')
 
 
@@ -50,7 +50,7 @@ def execute(gpu, exp_batch, exp_alias):
     augmenter = iag.Augmenter(g_conf.param.INPUT.AUGMENTATION_SUITE)
 
     # TODO: here there is clearly a posibility to make a cool "conditioning" system.
-    model = Model(g_conf.param.NETWORK.MODEL_DEFINITION)
+    model = CoILModel(g_conf.param.NETWORK.MODEL_DEFINITION)
 
     criterion = Loss()
 
@@ -59,6 +59,10 @@ def execute(gpu, exp_batch, exp_alias):
 
 
     #TODO: Probably there is more differences between train and validation that justify a new file.
+
+    checkpoint = torch.load(get_next_checkpoint())
+    # TODO: The checkpoint will continue, so the logs should restart ??? OR continue were it was
+    iteration = checkpoint['iteration']
 
     for data in data_loader:
 
@@ -77,6 +81,19 @@ def execute(gpu, exp_batch, exp_alias):
 
         #optimizer.step()
 
+        # TODO: save also the optimizer state dictionary
+        if is_iteration_for_saving(iteration):
+
+            state = {
+                'iteration': iteration,
+                'state_dict': model.state_dict()
+            }
+            # TODO : maybe already summarize the best model ???
+            torch.save(state, os.path.join(exp_batch, exp_alias, str(iteration) + '.pth'))
+
+            iteration += 1
+
+        #shutil.copyfile(filename, 'model_best.pth.tar')
 
     # TODO: DO ALL THE AMAZING LOGGING HERE, as a way to very the status in paralell.
     # THIS SHOULD BE AN INTERELY PARALLEL PROCESS

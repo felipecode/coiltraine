@@ -53,6 +53,7 @@ class GlobalConfig(object):
 
 
 
+
         #TODO: Why is misc misc ??
         self.param.MISC = AttributeDict()
         self.param.TRAIN_EXPERIMENT_BATCH_NAME = "eccv"
@@ -60,6 +61,7 @@ class GlobalConfig(object):
         # TODO: not necessarily the configuration need to know about this
         self.param.PROCESS_NAME = "None"
         self.param.MISC.NUMBER_ITERATIONS = 500
+        self.param.MISC.SAVE_SCHEDULE = range(0, 2000, 200)
         self.param.MISC.NUMBER_FRAMES_FUSION = 1
         self.param.MISC.NUMBER_IMAGES_SEQUENCE = 1
         self.param.MISC.SEQUENCE_STRIDE = 1

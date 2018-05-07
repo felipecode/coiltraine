@@ -31,7 +31,8 @@ class CoILDataset(Dataset):
         self.transform = transform
 
     def __len__(self):
-        return len(self.measurements)
+        # This is seems to be the entire dataset size
+        return g_conf.param.MISC.DATASET_SIZE
 
     def __getitem__(self, used_ids):
         """
@@ -40,8 +41,6 @@ class CoILDataset(Dataset):
         Arguments
             us
         """
-
-
         # We test here directly and include the other images here.
         batch_sensors = {}
 

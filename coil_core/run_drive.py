@@ -3,7 +3,7 @@ import traceback
 
 import sys
 import logging
-
+import json
 import datetime
 
 import numpy as np
@@ -12,15 +12,21 @@ import time
 import subprocess
 
 
-from drive import ECCVTrainingSuite
-from drive import ECCVGeneralizationSuite
-
-# TODO: MAKE A SYSTEM TO CONTROL CHeckpoint
-from utils.checkpoint_schedule import next_check_point_ready, maximun_checkpoint_reach
-
 
 from carla.tcp import TCPConnectionError
 from carla.client import make_carla_client
+from carla.driving_benchmark import run_driving_benchmark
+
+from drive import CoILAgent
+from drive import ECCVTrainingSuite
+from drive import ECCVGeneralizationSuite
+from logger import coil_logger
+from logger import monitorer
+
+from drive import coil_agent
+# TODO: MAKE A SYSTEM TO CONTROL CHeckpoint
+from utils.checkpoint_schedule import next_check_point_ready, maximun_checkpoint_reach, get_next_checkpoint
+
 
 
 def frame2numpy(frame, frameSize):
@@ -103,16 +109,20 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
                                               exp_batch+'_'+exp_alias +'iteration', True,
                                               host, port)
 
+                        # Read the resulting dictionary
+                        with open(os.path.join('_benchmark_results', exp_batch+'_'+exp_alias +'iteration', 'metrics.json'), 'r') as f:
+                            summary_dict = json.loads(f.read())
 
-                        test_agent.finish_model()
+                        # TODO: When you add the message you need to check if the experiment continues properly
+                        coil_logger.add_message({'Running': {"DBSummary": summary_dict}})
+                        #test_agent.finish_model()
 
-                        test_agent.write(results)
+                        #test_agent.write(results)
 
                     else:
                         time.sleep(0.1)
 
-
-                test_agent.export_results(str(weather_used))
+                monitorer.export_results(os.path.join('_benchmark_results', exp_batch+'_'+exp_alias +'iteration'))
                 break
 
 

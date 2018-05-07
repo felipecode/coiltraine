@@ -68,15 +68,21 @@ def add_message(phase, message):
     # We can monitor the status based on error message. An error should mean the exp is not working
     g_logger.info({phase: message})
 
-    pass
 
 # TODO: the logger should also interface with tensorboard.
 
 # TODO: Maybe an add scalar, message ??
 
-#def add_scalar() ???
+def add_scalar():
+
+    """
+    For raw output  logging. Also saves as a CSV for future visualization
+    Returns:
+
+    """
 
 
+    pass
 def add_image(some_image):
     # Add the image to a log, the monitorer is the module responsible by checking this
     # and eventually put some of the images to tensorboard.
