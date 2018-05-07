@@ -1,5 +1,13 @@
 import os
 
+from configs import g_conf
+from logger import monitorer
+
+from utils.general import sort_nicely
+
+
+
+
 
 def maximun_checkpoint_reach(iteration, checkpoint_schedule):
     if iteration >= max(checkpoint_schedule):
@@ -9,13 +17,19 @@ def maximun_checkpoint_reach(iteration, checkpoint_schedule):
 
 
 
+
+
+
+
+
 """ FUNCTIONS FOR SAVING THE CHECKPOINTS """
 
+
 def is_ready_to_save(iteration):
-    """ Rerturns if the iteration is a iteration for saving a checkpoint
+    """ Returns if the iteration is a iteration for saving a checkpoint
 
     """
-    if iteration in g_conf.param.SAVE_SCHEDULE():
+    if iteration in g_conf.param.MISC.SAVE_SCHEDULE:
         return True
     else:
         return False
@@ -25,8 +39,9 @@ def get_latest_saved_checkpoint(exp_batch, exp_alias):
         Returns the , latest checkpoint number that was saved
 
     """
-    checkpoint_files = sorted(os.listdir(self._config_input.models_path))
+    checkpoint_files = os.listdir(os.path.join(exp_batch, exp_alias, 'checkpoints'))
 
+    sort_nicely(checkpoint_files)
     return checkpoint_files[-1]
 
 

@@ -21,7 +21,14 @@ def get_current_iteration(exp):
     pass
 
 
+def get_latest_checkpoint(exp_batch, exp_alias, process_name):
 
+
+    # The path for log
+    log_file_path = os.path.join('_logs', exp_batch, exp_alias, process_name)
+
+
+    data = json_formatter.readJSONlog(open(log_file_path, 'r'))
 
 
 def get_status(exp_batch, experiment, process_name):

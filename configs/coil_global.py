@@ -41,6 +41,8 @@ class GlobalConfig(object):
 
     def __init__(self):
 
+        # TODO: this param thing is annoying change to something better
+
         self.param = AttributeDict()
         self.param.INPUT = AttributeDict()
         self.param.INPUT.SENSORS = {'rgb': (3, 88, 200)}
@@ -60,12 +62,13 @@ class GlobalConfig(object):
         self.param.TRAIN_EXPERIMENT_NAME = "default"
         # TODO: not necessarily the configuration need to know about this
         self.param.PROCESS_NAME = "None"
-        self.param.MISC.NUMBER_ITERATIONS = 500
+        self.param.MISC.NUMBER_ITERATIONS = 2000
         self.param.MISC.SAVE_SCHEDULE = range(0, 2000, 200)
         self.param.MISC.NUMBER_FRAMES_FUSION = 1
         self.param.MISC.NUMBER_IMAGES_SEQUENCE = 1
         self.param.MISC.SEQUENCE_STRIDE = 1
-        self.param.MISC.DATASET_SIZE = 2000
+
+
         #self.param.MISC.DATASET_SIZE
 
         self.param.NETWORK = AttributeDict()
@@ -123,6 +126,15 @@ class GlobalConfig(object):
         create_log(self.param.TRAIN_EXPERIMENT_BATCH_NAME,
                    self.param.TRAIN_EXPERIMENT_NAME,
                    self.param.PROCESS_NAME)
+
+
+        if os.path.exists(os.path.join( self.param.TRAIN_EXPERIMENT_BATCH_NAME,
+                                        self.param.TRAIN_EXPERIMENT_NAME,
+                                        'checkpoints') ):
+            os.mkdir(os.path.join( self.param.TRAIN_EXPERIMENT_BATCH_NAME,
+                                        self.param.TRAIN_EXPERIMENT_NAME,
+                                        'checkpoints'))
+
 
 
 
