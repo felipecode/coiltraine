@@ -5,11 +5,11 @@ import torch.optim as optim
 import imgauggpu as iag
 # What do we define as a parameter what not.
 
-from configs import g_conf
+from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss
 from input import CoILDataset, CoILSampler, splitter
 from logger import monitorer
-from utils.checkpoint_schedule import is_iteration_for_saving, get_latest_saved_checkpoint
+from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
 from torchvision import transforms
 
 
@@ -19,18 +19,18 @@ def execute(gpu, exp_batch, exp_alias):
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
     # At this point the log file with the correct naming is created.
-    g_conf.merge_with_yaml(os.path.join(exp_batch, exp_alias+'.yaml'))
-    g_conf.set_type_of_process('train')
+    merge_with_yaml(os.path.join(exp_batch, exp_alias+'.yaml'))
+    set_type_of_process('train')
 
 
 
-    if monitorer.get_status(exp_batch, exp_alias, g_conf.param.PROCESS_NAME)[0] == "Finished":
+    if monitorer.get_status(exp_batch, exp_alias, g_conf.PROCESS_NAME)[0] == "Finished":
         # TODO: print some cool summary or not ?
         return
 
     #Define the dataset. This structure is has the __get_item__ redefined in a way
     #that you can access the HDFILES positions from the root directory as a in a vector.
-    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.param.INPUT.DATASET_NAME)
+    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.DATASET_NAME)
 
     dataset = CoILDataset(full_dataset, transform=transforms.Compose([transforms.ToTensor()]))
 
@@ -45,21 +45,20 @@ def execute(gpu, exp_batch, exp_alias):
                                               shuffle=False, num_workers=12, pin_memory=True)
     # By instanciating the augmenter we get a callable that augment images and transform them
     # into tensors.
-    augmenter = iag.Augmenter(g_conf.param.INPUT.AUGMENTATION_SUITE)
+    augmenter = iag.Augmenter(g_conf.AUGMENTATION_SUITE)
 
     # TODO: here there is clearly a posibility to make a cool "conditioning" system.
-    model = CoILModel(g_conf.param.NETWORK.MODEL_DEFINITION)
+    model = CoILModel(g_conf.MODEL_DEFINITION)
 
     criterion = Loss()
 
     #optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 
-    #TODO: Probably there is more differences between train and validation that justify a new file.
-
     checkpoint_file = get_latest_saved_checkpoint()
     if checkpoint_file != None:
-        checkpoint = torch.load(get_latest_saved_checkpoint())
+        checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias,
+                                 'checkpoints', str(get_latest_saved_checkpoint())))
         iteration = checkpoint['iteration']
     else:
         iteration = 0
@@ -67,33 +66,37 @@ def execute(gpu, exp_batch, exp_alias):
     # TODO: The checkpoint will continue, so the logs should restart ??? OR continue were it was
 
     print (dataset.meta_data)
+
     for data in data_loader:
 
         input_data, labels = data
         #TODO we have to divide the input with other data.
-        print (input_data['rgb'].shape)
+
 
         # TODO, ADD ITERATION SCHEDULE
-        print (labels.shape)
+
         input_rgb_data = augmenter(0, input_data['rgb'])
 
-        output = model(input_rgb_data, labels[:, 11])
+        #output = model(input_rgb_data, labels[:, 11])
 
-        loss = criterion(output, labels)
+        #loss = criterion(output, labels)
 
         #loss.backward()
 
         #optimizer.step()
+        print (iteration)
+        print (input_rgb_data.shape)
 
         # TODO: save also the optimizer state dictionary
-        if is_iteration_for_saving(iteration):
+        if is_ready_to_save(iteration):
 
             state = {
                 'iteration': iteration,
                 'state_dict': model.state_dict()
             }
             # TODO : maybe already summarize the best model ???
-            torch.save(state, os.path.join(exp_batch, exp_alias, str(iteration) + '.pth'))
+            torch.save(state, os.path.join('_logs', exp_batch, exp_alias
+                                           , 'checkpoints', str(iteration) + '.pth'))
 
         iteration += 1
 

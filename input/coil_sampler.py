@@ -34,20 +34,20 @@ class CoILSampler(Sampler):
 
             weights = torch.tensor([1.0/float(len(self.keys))]*len(self.keys), dtype=torch.double)
 
-            idx = torch.multinomial(weights, g_conf.param.MISC.NUMBER_ITERATIONS, True)
+            idx = torch.multinomial(weights, g_conf.NUMBER_ITERATIONS, True)
             idx = idx.tolist()
             return iter([random.choice(self.keys[i]) for i in idx])
         elif len(np.shape(self.keys)) == 2:
             weights = torch.tensor([1.0 / float(len(self.keys))] * len(self.keys),
                                    dtype=torch.double)
-            idx = torch.multinomial(weights, g_conf.param.MISC.NUMBER_ITERATIONS, True)
+            idx = torch.multinomial(weights, g_conf.NUMBER_ITERATIONS, True)
             idx = idx.tolist()
             weights = torch.tensor([1.0 / float(len(self.keys[0]))] * len(self.keys[0]),
                                    dtype=torch.double)
-            idy = torch.multinomial(weights, g_conf.param.MISC.NUMBER_ITERATIONS, True)
+            idy = torch.multinomial(weights, g_conf.NUMBER_ITERATIONS, True)
             idy = idy.tolist()
 
-            return iter([random.choice(self.keys[i][j]) for i,j in zip(idx,idy)])
+            return iter([random.choice(self.keys[i][j]) for i, j in zip(idx,idy)])
 
         else:
             raise ValueError("Keys have invalid rank")
@@ -56,4 +56,4 @@ class CoILSampler(Sampler):
 
 
     def __len__(self):
-        return g_conf.param.MISC.NUMBER_ITERATIONS
+        return g_conf.NUMBER_ITERATIONS

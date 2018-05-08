@@ -24,17 +24,18 @@ def get_current_iteration(exp):
     pass
 
 
-def get_latest_checkpoint(exp_batch, exp_alias, process_name):
+def get_latest_checkpoint():
 
 
     # The path for log
 
-    csv_file_path = os.path.join('_logs', exp_batch, exp_alias, process_name + '_csv')
+    csv_file_path = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
+                                 g_conf.EXPERIMENT_NAME, g_conf.PROCESS_NAME + '_csv')
 
     csv_files = os.listdir(csv_file_path)
 
     if csv_files == []:
-        return 0
+        return None
 
     sort_nicely(csv_files)
 
