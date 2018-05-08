@@ -51,13 +51,13 @@ def start_carla_simulator(gpu, exp_batch, exp_alias, city_name):
     port = find_free_port()
     carla_path = os.environ['CARLA_PATH']
 
-    os.environ['SDL_VIDEODRIVER'] = 'offscreen'
-    os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
+    #os.environ['SDL_VIDEODRIVER'] = 'offscreen'
+    #os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
 
     #subprocess.call()
 
-    sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + city_name,
-                           '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
+    sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + city_name
+                           , '-windowed', '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return sp, port
 
@@ -87,7 +87,7 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
 
 
     merge_with_yaml(os.path.join(exp_batch, exp_alias+'.yaml'))
-    set_type_of_process('train')
+    set_type_of_process('test')
 
     #test_agent = CarlaDrive(experiment_name)
 
@@ -102,7 +102,7 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
     else:
         experiment_suite = ECCVGeneralizationSuite()
     """
-    experiment_suite = TestSuite(city_name)
+    experiment_suite = TestSuite()
 
 
     while True:
@@ -116,8 +116,6 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
                 latest = 0
                 # While the checkpoint is not there
                 while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
-
-                    #TODO DO we redo the agent here ?
 
 
                     # Get the correct checkpoint
@@ -162,6 +160,9 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
             carla_process.kill()
 
         except KeyboardInterrupt:
+            carla_process.kill()
+        except:
+            traceback.print_exc()
             carla_process.kill()
 
     carla_process.kill()

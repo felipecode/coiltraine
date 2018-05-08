@@ -19,6 +19,9 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 class TestSuite(ExperimentSuite):
 
+    def __init__(self):
+        super(TestSuite, self).__init__('Town02')
+
     @property
     def train_weathers(self):
         return [1]
@@ -45,18 +48,15 @@ class TestSuite(ExperimentSuite):
         # We set the camera
         # This single RGB camera is used on every experiment
 
-        camera = Camera('CameraRGB')
+        camera = Camera('RGB')
         camera.set(FOV=100)
         camera.set_image_size(800, 600)
         camera.set_position(2.0, 0.0, 1.4)
         camera.set_rotation(-15.0, 0, 0)
 
-        if self._city_name == 'Town01':
-            poses_tasks = self._poses()
-            vehicles_tasks = [0, 0, 0, 15]
-            pedestrians_tasks = [0, 0, 0, 50]
-        else:
-            raise ValueError("Using Town01 for a town02 experiment")
+        poses_tasks = self._poses()
+        vehicles_tasks = [0, 0, 0, 15]
+        pedestrians_tasks = [0, 0, 0, 50]
 
 
 

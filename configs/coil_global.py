@@ -51,7 +51,6 @@ _g_conf.DATASET_NAME = 'SmallTest'
 
 
 
-#TODO: Why is misc misc ??
 _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
 _g_conf.EXPERIMENT_NAME = "default"
 # TODO: not necessarily the configuration need to know about this
@@ -68,6 +67,9 @@ _g_conf.TEST_SCHEDULE = range(0, 2000, 200)
 
 _g_conf.MODEL_DEFINITION = [23]
 
+
+"""#### Simulation Related Parameters ####"""
+_g_conf.CITY_NAME = 'Town01'
 
 
 
@@ -114,6 +116,9 @@ def set_type_of_process(process_type):
 
     if process_type == "train" or process_type == "validation":
         _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.DATASET_NAME
+    if process_type == "test":
+        _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.CITY_NAME
+
     #else:  # FOr the test case we join with the name of the experimental suite.
 
     create_log(_g_conf.EXPERIMENT_BATCH_NAME,
@@ -130,13 +135,13 @@ def set_type_of_process(process_type):
 
 
 
-    if process_type == "validation":
+    if process_type == "validation" or process_type == 'test':
         if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
                                            _g_conf.EXPERIMENT_NAME,
                                            _g_conf.PROCESS_NAME + '_csv')):
             os.mkdir(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
-                                        _g_conf.EXPERIMENT_NAME,
-                                        _g_conf.PROCESS_NAME + '_csv'))
+                                          _g_conf.EXPERIMENT_NAME,
+                                          _g_conf.PROCESS_NAME + '_csv'))
 
 
 

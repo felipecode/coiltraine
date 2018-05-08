@@ -58,12 +58,10 @@ class ECCVGeneralizationSuite(ExperimentSuite):
         camera.set_position(2.0, 0.0, 1.4)
         camera.set_rotation(-15.0, 0, 0)
 
-        if self._city_name == 'Town01':
-            raise ValueError("Using Town01 for a town02 experiment")
-        else:
-            poses_tasks = self._poses_town02()
-            vehicles_tasks = [0, 0, 0, 15]
-            pedestrians_tasks = [0, 0, 0, 50]
+
+        poses_tasks = self._poses()
+        vehicles_tasks = [0, 0, 0, 15]
+        pedestrians_tasks = [0, 0, 0, 50]
 
         experiments_vector = []
 
