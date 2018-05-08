@@ -51,11 +51,12 @@ def execute(gpu, exp_batch, exp_alias):
 
     # TODO: here there is clearly a posibility to make a cool "conditioning" system.
     model = CoILModel(g_conf.param.NETWORK.MODEL_DEFINITION)
+    model.cuda()
 
     criterion = Loss()
 
     # TODO: DATASET SIZE SEEMS WEIRD
-    #optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 
     #TODO: Probably there is more differences between train and validation that justify a new file.
@@ -63,24 +64,35 @@ def execute(gpu, exp_batch, exp_alias):
     #checkpoint = torch.load(get_next_checkpoint())
     # TODO: The checkpoint will continue, so the logs should restart ??? OR continue were it was
     #iteration = checkpoint['iteration']
-    print (dataset.meta_data)
-    for data in data_loader:
 
+    print(dataset.meta_data)
+
+    for data in data_loader:
         input_data, labels = data
+
         #TODO we have to divide the input with other data.
-        print (input_data['rgb'].shape)
 
         # TODO, ADD ITERATION SCHEDULE
-        print (labels[11])
         input_rgb_data = augmenter(0, input_data['rgb'])
 
-        output = model(input_rgb_data, labels[11]) # is this the right way to get the speed data??
+        # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
+        model.zero_grad()
+        branches = model(input_rgb_data, labels.cuda())
 
-        loss = criterion(output, labels)
+        # get the steer, gas and brake ground truth from labels
+        steer_gt = labels[:,0,:]
+        gas_gt = labels[:,1,:]
+        brake_gt = labels[:,2,:]
+        targets = torch.cat([steer_gt, gas_gt, brake_gt], 1)
 
-        #loss.backward()
+        #get the contro commands from labels, size = [120,1]
+        controls = labels[:,24,:]
 
-        #optimizer.step()
+        loss = criterion.MSELoss(branches, targets.cuda(), controls.cuda())
+        print(loss)
+
+        loss.backward()
+        optimizer.step()
 
         # TODO: save also the optimizer state dictionary
         #if is_iteration_for_saving(iteration):

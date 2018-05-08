@@ -21,7 +21,7 @@ class CoILModel(nn.Module):
 
         """ conv2 + batch normalization + dropout + relu """
         self.im_conv2 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, stride=1)
-        init.xavier_uniform_(self.im_conv2.weight)
+        init.xavier_uniform_(self.im_conv2.weight).cuda()
         init.constant_(self.im_conv2.bias, 0.1)
         self.im_conv2_bn = nn.BatchNorm2d(32)
         self.im_conv2_drop = nn.Dropout2d(p=0.2)
@@ -117,13 +117,13 @@ class CoILModel(nn.Module):
         self.branch_fc_1out = nn.Linear(256, 1)
         init.xavier_uniform_(self.branch_fc_1out.weight)
         init.constant_(self.branch_fc_1out.bias, 0.1)
-        pass
+
 
     # TODO: iteration control should go inside the logger, somehow
 
-    def forward(self, x, speed):
-
-        # TODO: assign the rgb images and the measurement(speed)
+    def forward(self, x, labels):
+        # get only the speeds from measurement labels
+        speed = labels[:,10,:]
 
         # TODO: TRACK NANS OUTPUTS
         # TODO: Maybe change the name
@@ -189,8 +189,14 @@ class CoILModel(nn.Module):
                 branch_output = self.branch_fc2_drop(self.branch_fc2(branch_output))
                 branch_results = self.branch_fc_3out(branch_output)
             branches.append(branch_results)
-        print(branches)
         return branches
+
+    def num_flat_features(self, x):
+        size = x.size()[1:]  # all dimensions except the batch dimension
+        num_features = 1
+        for s in size:
+            num_features *= s
+        return num_features
 
     def load_network(self, checkpoint):
         """
