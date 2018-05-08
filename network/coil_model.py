@@ -8,6 +8,7 @@ import torch.nn.functional as F
 class CoILModel(nn.Module):
 
     def __init__(self, MODEL_DEFINITION):
+        # TODO: Make an auto naming function for this.
 
         super(CoILModel, self).__init__()
         # TODO: MAKE THE model
@@ -22,7 +23,7 @@ class CoILModel(nn.Module):
 
         """ conv2 + batch normalization + dropout + relu """
         self.im_conv2 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, stride=1)
-        init.xavier_uniform_(self.im_conv2.weight).cuda()
+        init.xavier_uniform_(self.im_conv2.weight)
         init.constant_(self.im_conv2.bias, 0.1)
         self.im_conv2_bn = nn.BatchNorm2d(32)
         self.im_conv2_drop = nn.Dropout2d(p=0.2)
@@ -125,7 +126,7 @@ class CoILModel(nn.Module):
 
     def forward(self, x, labels):
         # get only the speeds from measurement labels
-        speed = labels[:,10,:]
+        speed = labels[:, 10, :]
 
         # TODO: TRACK NANS OUTPUTS
         # TODO: Maybe change the name
