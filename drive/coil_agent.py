@@ -35,8 +35,6 @@ except ImportError:
     raise RuntimeError(
         'cannot import "carla_server_pb2.py", run the protobuf compiler to generate this file')
 
-
-"""
 number_of_seg_classes = 5
 classes_join = {0: 2, 1: 2, 2: 2, 3: 2, 5: 2, 12: 2, 9: 2, 11: 2, 4: 0, 10: 1, 8: 3, 6: 3, 7: 4}
 
@@ -47,6 +45,9 @@ def join_classes(labels_image):
         compressed_labels_image[np.where(labels_image == key)] = value
 
     return compressed_labels_image
+
+
+"""
 
 
 def restore_session(sess, saver, models_path, checkpoint_number):
@@ -70,15 +71,6 @@ def restore_session(sess, saver, models_path, checkpoint_number):
 """ Initializing Session as variables that control the session """
 
 
-def convert_to_car_coord(goal_x, goal_y, pos_x, pos_y, car_heading_x, car_heading_y):
-    start_to_goal = (goal_x - pos_x, goal_y - pos_y)
-
-    car_goal_x = -(-start_to_goal[0] * car_heading_y + start_to_goal[1] * car_heading_x)
-    car_goal_y = start_to_goal[0] * car_heading_x + start_to_goal[1] * car_heading_y
-
-    return [car_goal_x, car_goal_y]
-
-#TODO , this should drastically change.
 
 class CoILAgent(Agent):
 
@@ -107,8 +99,8 @@ class CoILAgent(Agent):
 
         #self._train_manager = load_system(self._config_train)
         #self._config.train_segmentation = False
-        self.model = Model(g_conf.param.NETWORK.MODEL_DEFINITION)
-        self.model.load_network(checkpoint)
+        self.model = CoILModel(g_conf.MODEL_DEFINITION)
+        #self.model.load_network(checkpoint)
 
         #self._sess.run(tf.global_variables_initializer())
 
@@ -136,8 +128,7 @@ class CoILAgent(Agent):
 
         #control_agent = self._agent.run_step(measurements, None, target)
 
-
-        for name in g_conf.param.SENSORS.keys():
+        for name in g_conf.SENSORS.keys():
             if name == 'rgb':
                 sensors.append(sensor_data['RGB'].data)
             elif name == 'labels':
@@ -164,6 +155,7 @@ class CoILAgent(Agent):
 
         sensor_pack = []
 
+        """
         for i in range(len(sensors)):
 
             sensor = sensors[i]
@@ -197,10 +189,15 @@ class CoILAgent(Agent):
 
         image_input = image_input.astype(np.float32)
         image_input = np.multiply(image_input, 1.0 / 255.0)
+        
+        """
+        image_input = sensors[0]
 
+        image_input = image_input.astype(np.float32)
+        image_input = np.multiply(image_input, 1.0 / 255.0)
         # TODO: This will of course depend on the model , if it is based on sequences there are
         # TODO: different requirements
-        tensor = self.model(image_input)
+        #tensor = self.model(image_input)
 
         """
         if brake < 0.2:

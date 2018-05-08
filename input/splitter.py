@@ -11,7 +11,7 @@ def order_sequence(steerings, keys_sequence):
     # print keys_sequence
 
     for i in keys_sequence:
-        sampled_sequence = steerings[(i):(i + g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE)]
+        sampled_sequence = steerings[(i):(i + g_conf.NUMBER_IMAGES_SEQUENCE)]
 
         sequence_average.append(sum(sampled_sequence) / len(sampled_sequence))
 
@@ -68,25 +68,25 @@ def select_data_sequence(control, selected_data):
     del_pos = []
     # print "SELECTED"
     # print selected_data
-    while count * g_conf.param.MISC.SEQUENCE_STRIDE <= (
-            len(control) - g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE):
+    while count * g_conf.SEQUENCE_STRIDE <= (
+            len(control) - g_conf.NUMBER_IMAGES_SEQUENCE):
 
-        #print ('sequence starting on : ', count*g_conf.param.MISC.SEQUENCE_STRIDE)
+        #print ('sequence starting on : ', count*g_conf.SEQUENCE_STRIDE)
         # We count the number of positions not corresponding to a label
         eliminated_positions = 0
-        for iter_sequence in range((count * g_conf.param.MISC.SEQUENCE_STRIDE),
-                                   (count * g_conf.param.MISC.SEQUENCE_STRIDE) +
-                                   g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE):
+        for iter_sequence in range((count * g_conf.SEQUENCE_STRIDE),
+                                   (count * g_conf.SEQUENCE_STRIDE) +
+                                   g_conf.NUMBER_IMAGES_SEQUENCE):
 
 
-            #print ("IMAGES SEQUENCE ", g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE )
+            #print ("IMAGES SEQUENCE ", g_conf.NUMBER_IMAGES_SEQUENCE )
             # The position is one
 
             if control[iter_sequence] not in selected_data:
                 eliminated_positions += 1
 
-            if (eliminated_positions) > g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE/2:
-                del_pos.append(count * g_conf.param.MISC.SEQUENCE_STRIDE)
+            if (eliminated_positions) > g_conf.NUMBER_IMAGES_SEQUENCE/2:
+                del_pos.append(count * g_conf.SEQUENCE_STRIDE)
                 break_sequence = True
                 break
 
@@ -123,8 +123,8 @@ def label_split(labels, keys, selected_data):
         print (selected_data[j])
         keys_to_delete = select_data_sequence(labels, selected_data[j])
         # print got_keys_for_divison
-        # keys_for_this_part = range(0, len(labels) - g_conf.param.MISC.NUMBER_IMAGES_SEQUENCE,
-        #                           g_conf.param.MISC.SEQUENCE_STRIDE)
+        # keys_for_this_part = range(0, len(labels) - g_conf.NUMBER_IMAGES_SEQUENCE,
+        #                           g_conf.SEQUENCE_STRIDE)
 
         keys_for_this_part = list(set(keys) - set(keys_to_delete))
         # If it is empty, kindly ask the user to change the label division
@@ -183,7 +183,7 @@ def control_steer_split(measurements, meta_data):
     keys = range(0, len(steerings))
     print (labels)
     print (keys)
-    splitted_labels = label_split(labels[0][0], keys, g_conf.param.INPUT.LABELS_DIVISION)
+    splitted_labels = label_split(labels[0][0], keys, g_conf.LABELS_DIVISION)
 
     # Another level of splitting
     splitted_steer_labels = []
@@ -191,7 +191,7 @@ def control_steer_split(measurements, meta_data):
 
     for keys in splitted_labels:
         splitter_steer = float_split(steerings, keys,
-                                              g_conf.param.INPUT.STEERING_DIVISION)
+                                              g_conf.STEERING_DIVISION)
 
         splitted_steer_labels.append(splitter_steer)
 

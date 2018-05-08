@@ -37,126 +37,141 @@ import imgauggpu as iag
 
 # TODO: How do we KEEP A GOOD ITERATION COUNTER ??
 
-class GlobalConfig(object):
+# TODO: NAMing conventions ?
 
-    def __init__(self):
-
-        self.param = AttributeDict()
-        self.param.INPUT = AttributeDict()
-        self.param.INPUT.SENSORS = {'rgb': (3, 88, 200)}
-        self.param.INPUT.MEASUREMENTS = {'targets': (31)}
-        self.param.INPUT.STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
-        self.param.INPUT.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
-        # TODO: Need to be added to gpu
-        self.param.INPUT.AUGMENTATION_SUITE = [iag.ToGPU(), iag.Add(0, 0)]
-        self.param.INPUT.DATASET_NAME = 'SmallTest'
+_g_conf = AttributeDict()
+_g_conf.SENSORS = {'rgb': (3, 88, 200)}
+_g_conf.MEASUREMENTS = {'targets': (31)}
+_g_conf.STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
+_g_conf.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
+# TODO: Need to be added to gpu
+_g_conf.AUGMENTATION_SUITE = [iag.ToGPU(), iag.Add(0, 0)]
+_g_conf.DATASET_NAME = 'SmallTest'
 
 
 
 
-        #TODO: Why is misc misc ??
-        self.param.MISC = AttributeDict()
-        self.param.TRAIN_EXPERIMENT_BATCH_NAME = "eccv"
-        self.param.TRAIN_EXPERIMENT_NAME = "default"
-        # TODO: not necessarily the configuration need to know about this
-        self.param.PROCESS_NAME = "None"
-        self.param.MISC.NUMBER_ITERATIONS = 500
-        self.param.MISC.SAVE_SCHEDULE = range(0, 2000, 200)
-        self.param.MISC.NUMBER_FRAMES_FUSION = 1
-        self.param.MISC.NUMBER_IMAGES_SEQUENCE = 1
-        self.param.MISC.SEQUENCE_STRIDE = 1
-        self.param.MISC.DATASET_SIZE = 2000
-        #self.param.MISC.DATASET_SIZE
-
-        self.param.NETWORK = AttributeDict()
-        self.param.NETWORK.MODEL_DEFINITION = [23]
+_g_conf.EXPERIMENT_BATCH_NAME = "eccv"
+_g_conf.EXPERIMENT_NAME = "default"
+# TODO: not necessarily the configuration need to know about this
+_g_conf.PROCESS_NAME = "None"
+_g_conf.NUMBER_ITERATIONS = 2000*120
+_g_conf.SAVE_SCHEDULE = range(0, 2000, 200)
+_g_conf.NUMBER_FRAMES_FUSION = 1
+_g_conf.NUMBER_IMAGES_SEQUENCE = 1
+_g_conf.SEQUENCE_STRIDE = 1
+_g_conf.TEST_SCHEDULE = range(0, 2000, 200)
 
 
+#self.param.MISC.DATASET_SIZE
+
+_g_conf.MODEL_DEFINITION = [23]
 
 
-
-    def _check_integrity(self):
-
-
-        pass
-
-
-
-    def merge_with_yaml(self, yaml_filename):
-        """Load a yaml config file and merge it into the global config object"""
-        #with open(yaml_filename, 'r') as f:
-        #    yaml_cfg = AttributeDict(yaml.load(f))
-        #_merge_a_into_b(yaml_cfg, __C)
-        #TODO: HERE IT IS NOT MUTABLE
-        #TODO: Merging is missing
-
-        path_parts = os.path.split(yaml_filename)
-        self.param.TRAIN_EXPERIMENT_BATCH_NAME = os.path.split(path_parts[-2])[-1]
-        self.param.TRAIN_EXPERIMENT_NAME = path_parts[-1].split('.')[-2]
+"""#### Simulation Related Parameters ####"""
+_g_conf.CITY_NAME = 'Town01'
 
 
 
 
-    # TODO: is name really inside the configuration ??
-    def set_type_of_process(self, process_type):
-        """
-        This function is used to set which is the type of the current process, test, train or val
-        and also the details of each since there could be many vals and tests for a single
-        experiment.
+def _check_integrity():
 
-        NOTE: AFTER CALLING THIS FUNCTION, THE CONFIGURATION CLOSES
 
-        Args:
-            type:
+    pass
 
-        Returns:
 
-        """
 
-        if self.param.PROCESS_NAME == "default":
-            raise RuntimeError(" You should merge with some exp file before setting the type")
+def merge_with_yaml(yaml_filename):
+    """Load a yaml config file and merge it into the global config object"""
+    #with open(yaml_filename, 'r') as f:
+    #    yaml_cfg = AttributeDict(yaml.load(f))
+    #_merge_a_into_b(yaml_cfg, __C)
 
-        if process_type == "train" or process_type == "validation":
-            self.param.PROCESS_NAME = process_type + '_' + self.param.INPUT.DATASET_NAME
-        #else:  # FOr the test case we join with the name of the experimental suite.
+    #TODO: Merging is missing
 
-        create_log(self.param.TRAIN_EXPERIMENT_BATCH_NAME,
-                   self.param.TRAIN_EXPERIMENT_NAME,
-                   self.param.PROCESS_NAME)
+    path_parts = os.path.split(yaml_filename)
+    _g_conf.EXPERIMENT_BATCH_NAME = os.path.split(path_parts[-2])[-1]
+    _g_conf.EXPERIMENT_NAME = path_parts[-1].split('.')[-2]
 
 
 
 
-        # We assure ourselves that the configuration file added does not kill things
-        self._check_integrity()
+def set_type_of_process(process_type):
+    """
+    This function is used to set which is the type of the current process, test, train or val
+    and also the details of each since there could be many vals and tests for a single
+    experiment.
 
-        add_message('Loading', {'ProcessName': self.generate_name(),
-                                'FullConfiguration': self.generate_param_dict()})
+    NOTE: AFTER CALLING THIS FUNCTION, THE CONFIGURATION CLOSES
 
-        self.param.immutable(True)
+    Args:
+        type:
 
+    Returns:
 
+    """
 
+    if _g_conf.PROCESS_NAME == "default":
+        raise RuntimeError(" You should merge with some exp file before setting the type")
 
+    if process_type == "train" or process_type == "validation":
+        _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.DATASET_NAME
+    if process_type == "test":
+        _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.CITY_NAME
 
-    def merge_with_parameters(self):
-        pass
+    #else:  # FOr the test case we join with the name of the experimental suite.
 
-    def generate_name(self):
-        # TODO: Make a cool name generator, maybe in another class
-        return self.param.INPUT.DATASET_NAME + str(202)
-
-    def generate_param_dict(self):
-        # TODO IMPLEMENT ! generate a cool param dictionary USE
-        # https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable
-        return self.param.INPUT.DATASET_NAME + 'dict'
-
-
-
-
+    create_log(_g_conf.EXPERIMENT_BATCH_NAME,
+               _g_conf.EXPERIMENT_NAME,
+               _g_conf.PROCESS_NAME)
 
 
-_g_conf = GlobalConfig()
+    if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
+                                    _g_conf.EXPERIMENT_NAME,
+                                    'checkpoints') ):
+        os.mkdir(os.path.join( '_logs', _g_conf.EXPERIMENT_BATCH_NAME,
+                                    _g_conf.EXPERIMENT_NAME,
+                                    'checkpoints'))
+
+
+
+    if process_type == "validation" or process_type == 'test':
+        if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
+                                           _g_conf.EXPERIMENT_NAME,
+                                           _g_conf.PROCESS_NAME + '_csv')):
+            os.mkdir(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
+                                          _g_conf.EXPERIMENT_NAME,
+                                          _g_conf.PROCESS_NAME + '_csv'))
+
+
+
+    # We assure ourselves that the configuration file added does not kill things
+    _check_integrity()
+
+    add_message('Loading', {'ProcessName': generate_name(),
+                            'FullConfiguration': generate_param_dict()})
+
+    _g_conf.immutable(True)
+
+
+
+
+
+def merge_with_parameters():
+    pass
+
+def generate_name():
+    # TODO: Make a cool name generator, maybe in another class
+    return _g_conf.DATASET_NAME + str(202)
+
+def generate_param_dict():
+    # TODO IMPLEMENT ! generate a cool param dictionary USE
+    # https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable
+    return _g_conf.DATASET_NAME + 'dict'
+
+
+
+
 
 g_conf = _g_conf
 

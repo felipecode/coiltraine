@@ -1,5 +1,13 @@
 import os
 
+from configs import g_conf
+from logger import monitorer
+
+from utils.general import sort_nicely
+
+
+
+
 
 def maximun_checkpoint_reach(iteration, checkpoint_schedule):
     if iteration >= max(checkpoint_schedule):
@@ -8,55 +16,64 @@ def maximun_checkpoint_reach(iteration, checkpoint_schedule):
         return False
 
 
-
 """ FUNCTIONS FOR SAVING THE CHECKPOINTS """
 
+
 def is_ready_to_save(iteration):
-    """ Rerturns if the iteration is a iteration for saving a checkpoint
+    """ Returns if the iteration is a iteration for saving a checkpoint
 
     """
-    if iteration in g_conf.param.SAVE_SCHEDULE():
+    if iteration in set(g_conf.SAVE_SCHEDULE):
         return True
     else:
         return False
 
-def get_latest_saved_checkpoint(exp_batch, exp_alias):
+def get_latest_saved_checkpoint():
     """
         Returns the , latest checkpoint number that was saved
 
     """
-    checkpoint_files = sorted(os.listdir(self._config_input.models_path))
-
-    return checkpoint_files[-1]
+    checkpoint_files = os.listdir(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
+                                               g_conf.EXPERIMENT_NAME, 'checkpoints'))
+    if checkpoint_files == []:
+        return None
+    else:
+        sort_nicely(checkpoint_files)
+        return checkpoint_files[-1]
 
 
 """ FUNCTIONS FOR GETTING THE CHECKPOINTS"""
-def get_latest_evaluated_checkpoint(exp_batch, exp_alias, process_name):
+def get_latest_evaluated_checkpoint():
 
     """
         Get the latest checkpoint that was validated or tested.
     Args:
-        exp_batch:
-        exp_alias:
-        process_name:
-
-    Returns:
-
     """
 
-    return monitor.get_latest_checkpoint(exp_batch, exp_alias, process_name)
+    return monitorer.get_latest_checkpoint()
 
-def is_next_checkpoint_ready(exp_batch, exp_alias, process_name, checkpoint_schedule):
+def is_next_checkpoint_ready( checkpoint_schedule):
 
-    ltst_check = get_latest_evaluated_checkpoint(exp_batch, exp_alias, process_name)
+    ltst_check = get_latest_evaluated_checkpoint()
+    if ltst_check is None:  # This means no checkpoints were evaluated
+        next_check = checkpoint_schedule[0]  # Return the first one
+    else:
+        next_check = checkpoint_schedule[checkpoint_schedule.index(ltst_check)+1]
 
-    next_check = checkpoint_schedule[checkpoint_schedule.index(ltst_check)+1]
+    # Check if the file is in the checkpoints list.
+    return str(next_check) + '.pth' in os.listdir(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
+                                                               g_conf.EXPERIMENT_NAME, 'checkpoints'))
 
-    return str(next_check) + '.pth' in os.listdir(os.path.join(exp_batch, exp_alias, 'checkpoints'))
+
+def get_next_checkpoint(checkpoint_schedule):
+    ltst_check = get_latest_evaluated_checkpoint()
+    if ltst_check is None:
+        return checkpoint_schedule[0]
 
 
-def get_next_checkpoint(exp_batch, exp_alias, process_name, checkpoint_schedule):
-    ltst_check = get_latest_evaluated_checkpoint(exp_batch, exp_alias, process_name)
+
+    if checkpoint_schedule.index(ltst_check) + 1 == len(checkpoint_schedule):
+        raise RuntimeError("Not able to get next checkpoint, maximum checkpoint is reach")
 
     return checkpoint_schedule[checkpoint_schedule.index(ltst_check) + 1]
 

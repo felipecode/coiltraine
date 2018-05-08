@@ -17,11 +17,11 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 #TODO: maybe add aditional tasks ( NO dynamic obstacles for instace !)
 
-class ECCVTrainingSuite(ExperimentSuite):
+class TestSuite(ExperimentSuite):
 
     def __init__(self):
-        super(ECCVTrainingSuite, self).__init__('Town01')
-        
+        super(TestSuite, self).__init__('Town02')
+
     @property
     def train_weathers(self):
         return [1]
@@ -33,12 +33,7 @@ class ECCVTrainingSuite(ExperimentSuite):
     def _poses(self):
 
 
-        return [[[19, 66], [79, 14], [19, 57], [23, 1],
-                [53, 76], [42, 13], [31, 71], [33, 5],
-                [54, 30], [10, 61], [66, 3], [27, 12],
-                [79, 19], [2, 29], [16, 14], [5, 57],
-                [70, 73], [46, 67], [57, 50], [61, 49], [21, 12],
-                [51, 81], [77, 68], [56, 65], [43, 54]]]
+        return [[[19, 66], [79, 14]]]
 
 
 
@@ -53,7 +48,7 @@ class ECCVTrainingSuite(ExperimentSuite):
         # We set the camera
         # This single RGB camera is used on every experiment
 
-        camera = Camera('CameraRGB')
+        camera = Camera('RGB')
         camera.set(FOV=100)
         camera.set_image_size(800, 600)
         camera.set_position(2.0, 0.0, 1.4)
@@ -62,7 +57,6 @@ class ECCVTrainingSuite(ExperimentSuite):
         poses_tasks = self._poses()
         vehicles_tasks = [0, 0, 0, 15]
         pedestrians_tasks = [0, 0, 0, 50]
-
 
 
 

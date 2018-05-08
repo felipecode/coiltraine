@@ -32,7 +32,7 @@ class CoILDataset(Dataset):
 
     def __len__(self):
         # This is seems to be the entire dataset size
-        return g_conf.param.MISC.DATASET_SIZE
+        return self.measurements.shape[1]
 
     def __getitem__(self, used_ids):
         """
@@ -53,10 +53,10 @@ class CoILDataset(Dataset):
             used_ids = [used_ids]
 
         # Initialization of the numpy arrays
-        for sensor_name, sensor_size in g_conf.param.INPUT.SENSORS.items():
+        for sensor_name, sensor_size in g_conf.SENSORS.items():
             sensor_data = np.zeros(
                 (number_of_position, sensor_size[0], sensor_size[1],
-                 sensor_size[2] * g_conf.param.MISC.NUMBER_FRAMES_FUSION),
+                 sensor_size[2] * g_conf.NUMBER_FRAMES_FUSION),
                  dtype='float32'
             )
 
@@ -66,11 +66,11 @@ class CoILDataset(Dataset):
 
 
 
-        for sensor_name, sensor_size in g_conf.param.INPUT.SENSORS.items():
+        for sensor_name, sensor_size in g_conf.SENSORS.items():
             count = 0
             for chosen_key in used_ids:
 
-                for i in range(g_conf.param.MISC.NUMBER_FRAMES_FUSION):
+                for i in range(g_conf.NUMBER_FRAMES_FUSION):
                     chosen_key = chosen_key + i * 3
 
                     for es, ee, x in self.sensor_data[count]:
@@ -117,9 +117,9 @@ class CoILDataset(Dataset):
         """
 
         # Take the names of all measurements from the dataset
-        meas_names = list(g_conf.param.INPUT.MEASUREMENTS.keys())
+        meas_names = list(g_conf.MEASUREMENTS.keys())
         # take the names for all sensors
-        sensors_names = list(g_conf.param.INPUT.SENSORS.keys())
+        sensors_names = list(g_conf.SENSORS.keys())
 
         # From the determined path take all the possible file names.
         # TODO: Add more flexibility for the file base names ??

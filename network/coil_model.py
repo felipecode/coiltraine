@@ -8,6 +8,7 @@ import torch.nn.functional as F
 class CoILModel(nn.Module):
 
     def __init__(self, MODEL_DEFINITION):
+
         super(CoILModel, self).__init__()
         # TODO: MAKE THE model
         """" ------------------ IMGAE MODULE ---------------- """
@@ -119,6 +120,7 @@ class CoILModel(nn.Module):
         init.constant_(self.branch_fc_1out.bias, 0.1)
 
 
+
     # TODO: iteration control should go inside the logger, somehow
 
     def forward(self, x, labels):
@@ -189,6 +191,7 @@ class CoILModel(nn.Module):
                 branch_output = self.branch_fc2_drop(self.branch_fc2(branch_output))
                 branch_results = self.branch_fc_3out(branch_output)
             branches.append(branch_results)
+
         return branches
 
     def num_flat_features(self, x):
