@@ -55,7 +55,7 @@ def execute(gpu, exp_batch, exp_alias):
     criterion = Loss()
 
     # TODO: DATASET SIZE SEEMS WEIRD
-    #optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 
     checkpoint_file = get_latest_saved_checkpoint()
@@ -71,6 +71,7 @@ def execute(gpu, exp_batch, exp_alias):
 
     print (dataset.meta_data)
 
+    print (model)
 
     for data in data_loader:
         input_data, labels = data
@@ -83,6 +84,8 @@ def execute(gpu, exp_batch, exp_alias):
         # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
         model.zero_grad()
         branches = model(input_rgb_data, labels[:, 10, :].cuda())
+
+        print ("len ",len(branches))
 
         # get the steer, gas and brake ground truth from labels
         steer_gt = labels[:,0,:]
@@ -100,7 +103,8 @@ def execute(gpu, exp_batch, exp_alias):
 
         loss = criterion.MSELoss(branches, targets.cuda(), controls.cuda())
         print(loss)
-
+        loss.backward()
+        optimizer.step()
 
 
         # TODO: save also the optimizer state dictionary

@@ -90,7 +90,7 @@ class CoILICRA(nn.Module):
         speed_branch_output = self.speed_branch(x)
 
         # We concatenate speed with the rest.
-        return [branch_outputs, speed_branch_output]
+        return branch_outputs + [speed_branch_output]
 
 
     def load_network(self, checkpoint):
