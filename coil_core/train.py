@@ -49,13 +49,13 @@ def execute(gpu, exp_batch, exp_alias):
 
     # TODO: here there is clearly a posibility to make a cool "conditioning" system.
 
-    model = CoILModel(g_conf.MODEL_DEFINITION)
+    model = CoILModel(g_conf.MODEL_NAME)
     model.cuda()
 
     criterion = Loss()
 
     # TODO: DATASET SIZE SEEMS WEIRD
-    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    #optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 
     checkpoint_file = get_latest_saved_checkpoint()
@@ -82,7 +82,7 @@ def execute(gpu, exp_batch, exp_alias):
 
         # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
         model.zero_grad()
-        branches = model(input_rgb_data, labels.cuda())
+        branches = model(input_rgb_data, labels[:, 10, :].cuda())
 
         # get the steer, gas and brake ground truth from labels
         steer_gt = labels[:,0,:]
