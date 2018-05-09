@@ -20,7 +20,7 @@ class Loss(object):
 
 
 
-    def MSELoss(self, branches, targets, controls, size_average=True, reduce=True):
+    def MSELoss(self, branches, targets, controls, speed_gt, size_average=True, reduce=True, weights=None):
         """
         Args:
               branches - A list contains 5 branches results
@@ -32,10 +32,26 @@ class Loss(object):
               reduce - By default, the losses are averaged over observations for each minibatch, or summed,
                        depending on size_average. When reduce is ``False``, returns a loss per input/target
                        element instead and ignores size_average. Default: ``True``
+              *argv: weights - By default, the weights are all set to 1.0. To set different weights for different
+                               outputs, a list containing different lambda for each target item is required.
+                               The number of lambdas should be the same as the target items.
 
         return: MSE Loss
 
         """
+
+        # weight different target items with lambdas
+        if weights:
+            if len(weights) != targets.shape[1]:
+                raise ValueError('The input number of weight lambdas is '+ str(len(weights)) + ', while the number of the target items is '+ str(targets.shape[1]))
+            else:
+                lambda_matrix = torch.zeros(targets.shape).cuda()
+                for i in range(targets.shape[1]):
+                    lambda_matrix[:,i] = weights[i]
+        else:
+            lambda_matrix = torch.ones(targets.shape).cuda()
+
+
         # command flags: 2 - follow lane; 3 - turn left; 4 - turn right; 5 - go strange
 
         # when command = 2, branch 1 (follow lane) is activated
@@ -55,24 +71,29 @@ class Loss(object):
         controls_b4 = torch.tensor(controls_b4, dtype = torch.float32).cuda()
         controls_b4 = torch.cat([controls_b4, controls_b4, controls_b4], 1)
 
+        # Normalize with the maximum speed from the training set (40 km/h)
+        speed_gt = speed_gt / 40.0
+
         # calculate loss for each branch with specific activation
-        loss_b1 = ((branches[0] - targets) * controls_b1) ** 2
-        loss_b2 = (branches[1] * controls_b2 - targets * controls_b2) ** 2
-        loss_b3 = (branches[2] * controls_b3 - targets * controls_b3) ** 2
-        loss_b4 = (branches[3] * controls_b4 - targets * controls_b4) ** 2
+        loss_b1 = ((branches[0] - targets) * controls_b1) ** 2 * lambda_matrix
+        loss_b2 = ((branches[1] - targets) * controls_b2) ** 2 * lambda_matrix
+        loss_b3 = ((branches[2] - targets) * controls_b3) ** 2 * lambda_matrix
+        loss_b4 = ((branches[3] - targets) * controls_b4) ** 2 * lambda_matrix
+        loss_b5 = (branches[4] - speed_gt) ** 2
 
         # add all branches losses together
         mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4
+        print(mse_loss)
 
         if reduce:
             if size_average:
-                mse_loss = torch.sum(mse_loss)/(mse_loss.shape[0] * mse_loss.shape[1])
+                mse_loss = torch.sum(mse_loss)/(mse_loss.shape[0] * mse_loss.shape[1]) + torch.sum(loss_b5)/mse_loss.shape[0]
             else:
-                mse_loss = torch.sum(mse_loss)
+                mse_loss = torch.sum(mse_loss) + torch.sum(loss_b5)
         else:
             if size_average:
                 raise RuntimeError(" size_average can not be applies when reduce is set to 'False' ")
             else:
-                mse_loss = mse_loss
+                mse_loss =torch.cat([mse_loss,loss_b5],1)
 
         return mse_loss

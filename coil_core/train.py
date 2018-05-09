@@ -51,11 +51,12 @@ def execute(gpu, exp_batch, exp_alias):
 
     model = CoILModel(g_conf.MODEL_DEFINITION)
     model.cuda()
+    print(model)
 
     criterion = Loss()
 
     # TODO: DATASET SIZE SEEMS WEIRD
-    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
 
 
     checkpoint_file = get_latest_saved_checkpoint()
@@ -68,17 +69,17 @@ def execute(gpu, exp_batch, exp_alias):
 
     # TODO: The checkpoint will continue, so the logs should restart ??? OR continue were it was
 
-
-    print (dataset.meta_data)
-
-
     for data in data_loader:
+
         input_data, labels = data
 
         #TODO we have to divide the input with other data.
 
-        # TODO, ADD ITERATION SCHEDULE
+        #TODO, ADD ITERATION SCHEDULE
         input_rgb_data = augmenter(0, input_data['rgb'])
+
+        # get the control commands from labels, size = [120,1]
+        controls = labels[:, 24, :]
 
         # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
         model.zero_grad()
@@ -88,20 +89,14 @@ def execute(gpu, exp_batch, exp_alias):
         steer_gt = labels[:,0,:]
         gas_gt = labels[:,1,:]
         brake_gt = labels[:,2,:]
+        speed_gt = labels[:,10,:]
+
         targets = torch.cat([steer_gt, gas_gt, brake_gt], 1)
 
-        #get the contro commands from labels, size = [120,1]
-        controls = labels[:,24,:]
+        loss = criterion.MSELoss(branches, targets.cuda(), controls.cuda(), speed_gt.cuda())
 
-        #output = model(input_rgb_data, labels[:, 11])
-
-        #loss = criterion(output, labels)
-
-
-        loss = criterion.MSELoss(branches, targets.cuda(), controls.cuda())
-        print(loss)
-
-
+        loss.backward()
+        optimizer.step()
 
         # TODO: save also the optimizer state dictionary
         if is_ready_to_save(iteration):
@@ -113,11 +108,15 @@ def execute(gpu, exp_batch, exp_alias):
             # TODO : maybe already summarize the best model ???
             torch.save(state, os.path.join('_logs', exp_batch, exp_alias
                                            , 'checkpoints', str(iteration) + '.pth'))
-
         iteration += 1
 
         #shutil.copyfile(filename, 'model_best.pth.tar')
 
     # TODO: DO ALL THE AMAZING LOGGING HERE, as a way to very the status in paralell.
     # THIS SHOULD BE AN INTERELY PARALLEL PROCESS
+
+    #torch.save(model, os.path.join(os.environ["COIL_TRAINED_MODEL_PATH"], exp_alias))
+    #print('------------------- Trainind Done! --------------------------')
+    #print('The trained model has been saved in ' + os.path.join(os.environ["COIL_TRAINED_MODEL_PATH"], exp_alias))
+
 

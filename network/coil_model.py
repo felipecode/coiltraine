@@ -124,8 +124,8 @@ class CoILModel(nn.Module):
     # TODO: iteration control should go inside the logger, somehow
 
     def forward(self, x, labels):
-        # get only the speeds from measurement labels
-        speed = labels[:,10,:]
+        # get the speeds and the hight level control commands from measurement labels
+        speed = labels[:, 10, :]
 
         # TODO: TRACK NANS OUTPUTS
         # TODO: Maybe change the name
@@ -136,7 +136,6 @@ class CoILModel(nn.Module):
                                 )
         branches = []
         """ conv1 + batch normalization + dropout + relu """
-
         x = F.relu(self.im_conv1_drop(self.im_conv1_bn(self.im_conv1(x))))
 
         """ conv2 + batch normalization + dropout + relu """
@@ -191,7 +190,6 @@ class CoILModel(nn.Module):
                 branch_output = self.branch_fc2_drop(self.branch_fc2(branch_output))
                 branch_results = self.branch_fc_3out(branch_output)
             branches.append(branch_results)
-
         return branches
 
     def num_flat_features(self, x):

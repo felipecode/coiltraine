@@ -44,11 +44,6 @@ def get_latest_checkpoint():
     return int(re.findall('\d+', csv_files[-1])[0])
 
 
-
-
-
-
-
 def get_status(exp_batch, experiment, process_name):
 
     """
