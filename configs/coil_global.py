@@ -65,7 +65,7 @@ _g_conf.TEST_SCHEDULE = range(0, 2000, 200)
 
 #self.param.MISC.DATASET_SIZE
 
-_g_conf.MODEL_DEFINITION = [23]
+_g_conf.MODEL_NAME = 'coil_icra'
 
 
 """#### Simulation Related Parameters ####"""

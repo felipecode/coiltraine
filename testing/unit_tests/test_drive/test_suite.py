@@ -27,7 +27,7 @@ class TestSuite(ExperimentSuite):
         return [1]
     @property
     def test_weathers(self):
-        return []
+        return [1]
 
 
     def _poses(self):

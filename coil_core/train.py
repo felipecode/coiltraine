@@ -49,7 +49,7 @@ def execute(gpu, exp_batch, exp_alias):
 
     # TODO: here there is clearly a posibility to make a cool "conditioning" system.
 
-    model = CoILModel(g_conf.MODEL_DEFINITION)
+    model = CoILModel(g_conf.MODEL_NAME)
     model.cuda()
     print(model)
 
@@ -69,6 +69,12 @@ def execute(gpu, exp_batch, exp_alias):
 
     # TODO: The checkpoint will continue, so the logs should restart ??? OR continue were it was
 
+
+
+    print (dataset.meta_data)
+
+    print (model)
+
     for data in data_loader:
 
         input_data, labels = data
@@ -83,7 +89,9 @@ def execute(gpu, exp_batch, exp_alias):
 
         # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
         model.zero_grad()
-        branches = model(input_rgb_data, labels.cuda())
+        branches = model(input_rgb_data, labels[:, 10, :].cuda())
+
+        print ("len ",len(branches))
 
         # get the steer, gas and brake ground truth from labels
         steer_gt = labels[:,0,:]
