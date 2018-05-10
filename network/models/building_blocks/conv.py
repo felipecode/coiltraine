@@ -56,7 +56,7 @@ class Conv(nn.Module):
             self.layers.append(layer)
 
         self.layers = nn.Sequential(*self.layers)
-        self.end_layer = params['end_layer']
+        self.module_name = module_name
 
 
 

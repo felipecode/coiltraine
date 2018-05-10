@@ -84,14 +84,15 @@ def execute(gpu, exp_batch, exp_alias):
 
                 input_data, labels = data
 
+                output = model(input_data['rgb'], labels[:, 10, :])
                 for i in range(input_data['rgb'].shape[0]):
 
-                    coil_logger.write_on_csv(checkpoint_iteration, [labels[i, 0],
-                                                                    labels[i, 1],
-                                                                    labels[i, 2]])
+                    coil_logger.write_on_csv(checkpoint_iteration, [output[i, 0],
+                                                                    output[i, 1],
+                                                                    output[i, 2]])
 
 
-                #output = model(input_rgb_data, labels[:, 11])
+
 
                 #loss = criterion(output, labels)
 

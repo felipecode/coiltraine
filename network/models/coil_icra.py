@@ -92,6 +92,21 @@ class CoILICRA(nn.Module):
         # We concatenate speed with the rest.
         return branch_outputs + [speed_branch_output]
 
+    def forward_branch(self, x, a, branch_number):
+        """
+        DO a forward operation and return a single branch.
+
+        Args:
+            x: the image input
+            a: speed measurement
+            branch_number: the branch number to be returned
+
+        Returns:
+
+        """
+
+        return self.forward(x, a)[branch_number]
+
 
     def load_network(self, checkpoint):
         """

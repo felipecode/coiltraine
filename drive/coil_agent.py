@@ -100,6 +100,7 @@ class CoILAgent(Agent):
         #self._train_manager = load_system(self._config_train)
         #self._config.train_segmentation = False
         self.model = CoILModel(g_conf.MODEL_DEFINITION)
+        self.model.load_state_dict(checkpoint['state_dict'])
         #self.model.load_network(checkpoint)
 
         #self._sess.run(tf.global_variables_initializer())
@@ -198,28 +199,23 @@ class CoILAgent(Agent):
         # TODO: This will of course depend on the model , if it is based on sequences there are
         # TODO: different requirements
         #tensor = self.model(image_input)
+        outputs = self.model.forward_branch(image_input, speed, direction)
 
-        """
+        steer, throttle, brake = outputs[0], outputs[1], outputs[2]
         if brake < 0.2:
             brake = 0.0
 
-        if acc > brake:
+        if throttle > brake:
             brake = 0.0
         else:
-            acc = acc * 2
+            acc = throttle * 2
         if speed > 35.0 and brake == 0.0:
             acc = 0.0
-        """
+
         control = carla_protocol.Control()
-        control.steer = 0.0
-        control.throttle = 0.6
-        control.brake = 0.0
-        # print brake
-
-
-
-        control.hand_brake = 0
-        control.reverse = 0
+        control.steer = steer
+        control.throttle = throttle
+        control.brake = brake
 
         return control  # ,machine_output_functions.get_intermediate_rep(image_input,speed,self._config,self._sess,self._train_manager)
 
