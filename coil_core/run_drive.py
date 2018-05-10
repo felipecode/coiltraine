@@ -126,7 +126,6 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
                                                              , 'checkpoints', str(latest) + '.pth'))
 
                         coil_agent = CoILAgent(checkpoint)
-
                         run_driving_benchmark(coil_agent, experiment_suite, city_name,
                                               exp_batch + '_' + exp_alias + 'iteration', False,
                                               host, port)

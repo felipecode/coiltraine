@@ -91,13 +91,13 @@ def execute(gpu, exp_batch, exp_alias):
         model.zero_grad()
         branches = model(input_rgb_data, labels[:, 10, :].cuda())
 
-        print ("len ",len(branches))
+        #print ("len ",len(branches))
 
         # get the steer, gas and brake ground truth from labels
-        steer_gt = labels[:,0,:]
-        gas_gt = labels[:,1,:]
-        brake_gt = labels[:,2,:]
-        speed_gt = labels[:,10,:]
+        steer_gt = labels[:, 0, :]
+        gas_gt = labels[:, 1, :]
+        brake_gt = labels[:, 2, :]
+        speed_gt = labels[:, 10, :]
 
         targets = torch.cat([steer_gt, gas_gt, brake_gt], 1)
 

@@ -1,7 +1,8 @@
 from logger import coil_logger
 import torch.nn as nn
+import torch
 
-import torch.nn.functional as F
+from utils.general import command_number_to_index
 
 from .building_blocks import Conv
 from .building_blocks import Branching
@@ -104,9 +105,30 @@ class CoILICRA(nn.Module):
         Returns:
 
         """
+        # Convert to integer just in case .
 
-        return self.forward(x, a)[branch_number]
+        #print (self.forward(x, a))
+        # TODO: do this function vectorized....
+        output_vec = torch.stack(self.forward(x, a)[0:4])
 
+        branch_number = command_number_to_index(branch_number)
+        if len(branch_number) > 1:
+            branch_number =torch.squeeze(branch_number.type(torch.cuda.LongTensor))
+        else:
+            branch_number = branch_number.type(torch.cuda.LongTensor)
+
+
+        print (branch_number)
+        branch_number = torch.stack([branch_number,
+                                     torch.cuda.LongTensor(range(0, len(branch_number)))])
+
+
+        #branch_output_vector = []
+        #for i in range(len(branch_number)):
+        #    branch_output_vector.append(output_vec[branch_number[i]][i])
+
+
+        return output_vec[branch_number[0], branch_number[1], :]
 
     def load_network(self, checkpoint):
         """

@@ -68,9 +68,10 @@ _g_conf.TEST_SCHEDULE = range(0, 2000, 200)
 _g_conf.MODEL_NAME = 'coil_icra'
 
 
+
 """#### Simulation Related Parameters ####"""
 _g_conf.CITY_NAME = 'Town01'
-
+_g_conf.IMAGE_CUT = [115, 510]  # How you should cut the input image that is received from the server
 
 
 

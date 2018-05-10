@@ -52,7 +52,7 @@ class ECCVGeneralizationSuite(ExperimentSuite):
         # We set the camera
         # This single RGB camera is used on every experiment
 
-        camera = Camera('CameraRGB')
+        camera = Camera('rgb')
         camera.set(FOV=100)
         camera.set_image_size(800, 600)
         camera.set_position(2.0, 0.0, 1.4)

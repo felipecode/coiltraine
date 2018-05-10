@@ -12,7 +12,6 @@ import random
 #from sklearn import preprocessing
 
 import scipy
-#from Queue import Queue
 
 
 #from carla.autopilot.autopilot import Autopilot
@@ -27,6 +26,9 @@ from PIL import Image
 from network import CoILModel
 from configs import g_conf
 from logger import coil_logger
+from torchvision import transforms
+import imgauggpu as iag
+import torch
 
 
 try:
@@ -38,7 +40,7 @@ except ImportError:
 number_of_seg_classes = 5
 classes_join = {0: 2, 1: 2, 2: 2, 3: 2, 5: 2, 12: 2, 9: 2, 11: 2, 4: 0, 10: 1, 8: 3, 6: 3, 7: 4}
 
-
+# TODO: implement this as a torch operation.
 def join_classes(labels_image):
     compressed_labels_image = np.copy(labels_image)
     for key, value in classes_join.iteritems():
@@ -99,8 +101,13 @@ class CoILAgent(Agent):
 
         #self._train_manager = load_system(self._config_train)
         #self._config.train_segmentation = False
-        self.model = CoILModel(g_conf.MODEL_DEFINITION)
+        self.model = CoILModel(g_conf.MODEL_NAME)
+
         self.model.load_state_dict(checkpoint['state_dict'])
+
+        self.model.cuda()
+
+
         #self.model.load_network(checkpoint)
 
         #self._sess.run(tf.global_variables_initializer())
@@ -125,29 +132,105 @@ class CoILAgent(Agent):
         # pos,point = self.planner.get_defined_point(pos,ori,(target[0],target[1],22),(1.0,0.02,-0.001),self._select_goal)
         # direction = convert_to_car_coord(point[0],point[1],pos[0],pos[1],ori[0],ori[1])
         # image_filename_format = '_images/episode_{:0>3d}/{:s}/image_{:0>5d}.png'
-        sensors = []
+
 
         #control_agent = self._agent.run_step(measurements, None, target)
+        print (" RUnning STEP ")
+        speed = torch.cuda.FloatTensor([measurements.player_measurements.forward_speed]).unsqueeze(0)
+        print ("Speed shape ", speed)
+        directions_tensor = torch.cuda.LongTensor([directions])
+        model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), speed,
+                                                  directions_tensor)
 
-        for name in g_conf.SENSORS.keys():
-            if name == 'rgb':
-                sensors.append(sensor_data['RGB'].data)
-            elif name == 'labels':
-                sensors.append(sensor_data['Labels'].data)
+        print (model_outputs)
 
-        control = self.compute_action(sensors, measurements.player_measurements.forward_speed,
-                                      directions)
-
+        steer, throttle, brake = self._process_model_outputs(model_outputs[0],
+                                         measurements.player_measurements.forward_speed)
+        #control = self.compute_action(,
+        #                              ,
+        #                              directions)
+        control = carla_protocol.Control()
+        control.steer = steer
+        control.throttle = throttle
+        control.brake = brake
         # if self._auto_pilot:
         #    control.steer = control_agent.steer
-        # TODO: adapt the client side agent for the new version.
+        # TODO: adapt the client side agent for the new version. ( PROBLEM )
         #control.throttle = control_agent.throttle
         #control.brake = control_agent.brake
 
         # TODO: maybe change to a more meaningfull message ??
-
-
         return control
+
+
+    def _process_sensors(self, sensors):
+
+
+        iteration = 0
+        for name, size in g_conf.SENSORS.items():
+
+            sensor = sensors[name].data[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
+            if  sensors[name].type == 'SemanticSegmentation':
+
+
+                # TODO: the camera name has to be sincronized with what is in the experiment...
+                sensor = join_classes(sensor)
+
+                sensor = sensor[:, :, np.newaxis]
+
+                image_transform = transforms.Compose([transforms.ToTensor(),
+                                   transforms.Resize((size[1], size[2]), interpolation=Image.NEAREST),
+                                   iag.ToGPU(), iag.Multiply((1 / (number_of_seg_classes - 1)))])
+            else:
+
+                image_transform = transforms.Compose([transforms.ToPILImage(),
+                                   transforms.Resize((size[1], size[2])),
+                                   transforms.ToTensor(), transforms.Normalize((0, 0 ,0), (255, 255, 255)),
+                                   iag.ToGPU()])
+
+
+            sensor = np.swapaxes(sensor, 0, 1)
+            print ("Sensor Previous SHape")
+            print (sensor.shape)
+            sensor = np.flip(sensor.transpose((2, 0, 1)), axis=0)
+            print ("Sensor Previous SHape PT2")
+            print (sensor.shape)
+            if iteration == 0:
+                image_input = image_transform(sensor)
+            else:
+                image_input = torch.cat((image_input, sensor), 0)
+
+            iteration += 1
+
+        print (image_input.shape)
+        image_input  = image_input.unsqueeze(0)
+        print (image_input.shape)
+
+        return image_input
+
+
+    def _process_model_outputs(self,outputs, speed):
+        """
+         A bit of heuristics in the control, to eventually make car faster, for instance.
+        Returns:
+
+        """
+        steer, throttle, brake = outputs[0], outputs[1], outputs[2]
+        if brake < 0.2:
+            brake = 0.0
+
+        if throttle > brake:
+            brake = 0.0
+        else:
+            throttle = throttle * 2
+        if speed > 35.0 and brake == 0.0:
+            throttle = 0.0
+
+
+        return steer, throttle, brake
+
+
+    """
 
     def compute_action(self, sensors, speed, direction):
 
@@ -156,20 +239,21 @@ class CoILAgent(Agent):
 
         sensor_pack = []
 
-        """
+
+
         for i in range(len(sensors)):
 
             sensor = sensors[i]
+
+            sensor = sensor[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], :]
+
             if g_conf.param.SENSORS.keys()[i] == 'rgb':
 
-                sensor = sensor[self._image_cut[0]:self._image_cut[1], :]
                 sensor = scipy.misc.imresize(sensor, [self._config.sensors_size[i][0],
                                                       self._config.sensors_size[i][1]])
 
 
             elif g_conf.param.SENSORS.keys()[i] == 'labels':
-
-                sensor = sensor[self._image_cut[0]:self._image_cut[1], :]
 
                 sensor = scipy.misc.imresize(sensor, [self._config.sensors_size[i][0],
                                                       self._config.sensors_size[i][1]],
@@ -191,7 +275,7 @@ class CoILAgent(Agent):
         image_input = image_input.astype(np.float32)
         image_input = np.multiply(image_input, 1.0 / 255.0)
         
-        """
+
         image_input = sensors[0]
 
         image_input = image_input.astype(np.float32)
@@ -201,25 +285,11 @@ class CoILAgent(Agent):
         #tensor = self.model(image_input)
         outputs = self.model.forward_branch(image_input, speed, direction)
 
-        steer, throttle, brake = outputs[0], outputs[1], outputs[2]
-        if brake < 0.2:
-            brake = 0.0
 
-        if throttle > brake:
-            brake = 0.0
-        else:
-            acc = throttle * 2
-        if speed > 35.0 and brake == 0.0:
-            acc = 0.0
-
-        control = carla_protocol.Control()
-        control.steer = steer
-        control.throttle = throttle
-        control.brake = brake
 
         return control  # ,machine_output_functions.get_intermediate_rep(image_input,speed,self._config,self._sess,self._train_manager)
 
-
+    """
     """
     def compute_perception_activations(self, sensor, speed):
 

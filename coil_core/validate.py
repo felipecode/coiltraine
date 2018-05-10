@@ -1,9 +1,10 @@
 import os
 import time
 
+import numpy as np
 import torch
 import torch.optim as optim
-import imgauggpu as iag
+
 # What do we define as a parameter what not.
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
@@ -47,27 +48,18 @@ def execute(gpu, exp_batch, exp_alias):
 
 
     # TODO: here there is clearly a posibility to make a cool "conditioning" system.
-    model = CoILModel(g_conf.MODEL_DEFINITION)
+    model = CoILModel(g_conf.MODEL_NAME)
+    model.cuda()
 
-    criterion = Loss()
 
-    #optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-
-    """
-    checkpoint_file = get_latest_saved_checkpoint()
-    if checkpoint_file != None:
-        checkpoint = torch.load(get_latest_saved_checkpoint())
-        iteration = checkpoint['iteration']
-    else:
-        iteration = 0
-
-    """
 
     # TODO: The checkpoint will continue, so the logs should restart ??? OR continue were it was
 
     latest = get_latest_evaluated_checkpoint()
     if latest is None:  # When nothing was tested, get latest returns none, we fix that.
         latest = 0
+
+    print (dataset.meta_data)
 
     while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
@@ -83,13 +75,24 @@ def execute(gpu, exp_batch, exp_alias):
             for data in data_loader:
 
                 input_data, labels = data
+                control_position = np.where(dataset.meta_data[:, 0] == 'control')[0][0]
+                speed_position = np.where(dataset.meta_data[:, 0] == 'speed_module')[0][0]
+                print (torch.squeeze(input_data['rgb']).shape)
 
-                output = model(input_data['rgb'], labels[:, 10, :])
+                print (control_position)
+                print (speed_position)
+                # Obs : Maybe we could also check for other branches ??
+                output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
+                                              labels[:, speed_position, :].cuda(),
+                                              labels[:, control_position, :].cuda())
+                # TODO: clean this squeeze and dimension things
+
+
                 for i in range(input_data['rgb'].shape[0]):
 
-                    coil_logger.write_on_csv(checkpoint_iteration, [output[i, 0],
-                                                                    output[i, 1],
-                                                                    output[i, 2]])
+                    coil_logger.write_on_csv(checkpoint_iteration, [output[i][0],
+                                                                    output[i][1],
+                                                                    output[i][2]])
 
 
 

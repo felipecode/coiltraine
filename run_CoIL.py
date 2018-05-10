@@ -66,6 +66,7 @@ def execute_drive(gpu, exp_batch, exp_alias, city_name):
     """
 
     p = multiprocessing.Process(target=run_drive.execute, args=(gpu, exp_batch, exp_alias, city_name,))
+    #p.daemon = True
     p.start()
 
 
@@ -98,6 +99,7 @@ def folder_execute(folder,gpus,param):
 
 if __name__ == '__main__':
 
+
     execute_train("0", "eccv", "experiment_1")
-    #execute_validation("0", "eccv", "experiment_1")
-    #execute_drive("0", "eccv", "experiment_1", 'Town02')
+    execute_validation("0", "eccv", "experiment_1")
+    execute_drive("0", "eccv", "experiment_1", 'Town02')
