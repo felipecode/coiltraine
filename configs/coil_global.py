@@ -44,7 +44,7 @@ _g_conf.SENSORS = {'rgb': (3, 88, 200)}
 _g_conf.MEASUREMENTS = {'targets': (31)}
 _g_conf.STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
 _g_conf.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
-# TODO: Need to be added to gpu
+
 _g_conf.AUGMENTATION_SUITE = [iag.ToGPU(), iag.Add(0, 0)]
 _g_conf.DATASET_NAME = 'SmallTest'
 
@@ -55,7 +55,7 @@ _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
 _g_conf.EXPERIMENT_NAME = "default"
 # TODO: not necessarily the configuration need to know about this
 _g_conf.PROCESS_NAME = "None"
-_g_conf.NUMBER_ITERATIONS = 2000
+_g_conf.NUMBER_ITERATIONS = 2000*120
 _g_conf.SAVE_SCHEDULE = range(0, 2000, 200)
 _g_conf.NUMBER_FRAMES_FUSION = 1
 _g_conf.NUMBER_IMAGES_SEQUENCE = 1

@@ -80,6 +80,10 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
 
+
+    sys.stdout = open(str(os.getpid()) + ".out", "a", buffering=1)
+
+
     #vglrun - d:7.$GPU $CARLA_PATH / CarlaUE4 / Binaries / Linux / CarlaUE4 / Game / Maps /$TOWN - windowed - benchmark - fps = 10 - world - port =$PORT;
     #sleep    100000
 

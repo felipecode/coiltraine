@@ -66,8 +66,6 @@ class CoILICRA(nn.Module):
         # get only the speeds from measurement labels
         #speed = labels[:, 10, :]
 
-        # TODO: TRACK NANS OUTPUTS
-        # TODO: Maybe change the name
         #coil_logger.add_message('Model', {
         #    "Iteration": 765,
         #    "Output": [1.0, 12.3, 124.29]
@@ -108,7 +106,7 @@ class CoILICRA(nn.Module):
         # Convert to integer just in case .
 
         #print (self.forward(x, a))
-        # TODO: do this function vectorized....
+        # TODO: unit test this function
         output_vec = torch.stack(self.forward(x, a)[0:4])
 
         branch_number = command_number_to_index(branch_number)
@@ -118,7 +116,6 @@ class CoILICRA(nn.Module):
             branch_number = branch_number.type(torch.cuda.LongTensor)
 
 
-        print (branch_number)
         branch_number = torch.stack([branch_number,
                                      torch.cuda.LongTensor(range(0, len(branch_number)))])
 

@@ -1,5 +1,6 @@
 import os
 import time
+import sys
 
 import numpy as np
 import torch
@@ -26,6 +27,9 @@ def execute(gpu, exp_batch, exp_alias):
     set_type_of_process('validation')
 
 
+
+
+    sys.stdout = open(str(os.getpid()) + ".out", "a", buffering=1)
 
     if monitorer.get_status(exp_batch, exp_alias, g_conf.PROCESS_NAME)[0] == "Finished":
         # TODO: print some cool summary or not ?

@@ -83,7 +83,7 @@ class Loss(object):
 
         # add all branches losses together
         mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4
-        print(mse_loss)
+
 
         if reduce:
             if size_average:

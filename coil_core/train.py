@@ -1,4 +1,5 @@
 import os
+import sys
 
 import torch
 import torch.optim as optim
@@ -21,6 +22,9 @@ def execute(gpu, exp_batch, exp_alias):
     # At this point the log file with the correct naming is created.
     merge_with_yaml(os.path.join(exp_batch, exp_alias+'.yaml'))
     set_type_of_process('train')
+
+
+    sys.stdout = open(str(os.getpid()) + ".out", "a", buffering=1)
 
 
 
