@@ -9,7 +9,7 @@ import imgauggpu as iag
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss
 from input import CoILDataset, CoILSampler, splitter
-from logger import monitorer
+from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
 from torchvision import transforms
 
@@ -71,8 +71,7 @@ def execute(gpu, exp_batch, exp_alias):
     else:
         iteration = 0
 
-    # TODO: The checkpoint will continue, so the logs should restart ??? OR continue were it was
-
+    # TODO: The checkpoint will continue, so it should erase everything up to the iteration
 
 
     print (dataset.meta_data)
@@ -106,6 +105,17 @@ def execute(gpu, exp_batch, exp_alias):
         targets = torch.cat([steer_gt, gas_gt, brake_gt], 1)
 
         loss = criterion.MSELoss(branches, targets.cuda(), controls.cuda(), speed_gt.cuda())
+
+
+        coil_logger.add_message('Running',
+                                {'Iteration':iteration, 'Current Loss':loss,
+                                 'Best Loss':get_best_loss(), 'Some Output',
+                                 'Some Ground Truth','Error'
+                                 'Speed:'})
+
+        # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
+
+        coil_logger.add_scalars('Loss','Error')
 
         loss.backward()
         optimizer.step()

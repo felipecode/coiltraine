@@ -101,18 +101,23 @@ def get_status(exp_batch, experiment, process_name):
 
     # Then we check if finished or is going on
 
-    if 'Model' in data[-1] or 'Reading' in data[-1] or 'Loss' in data[-1]:
+    if 'Inference' in data[-1] or 'Reading' in data[-1] or 'Loss' in data[-1] or 'Iterating' in data[-1]:
+
 
         if list(data[-1].values())[0]['Iteration'] >= g_conf.param.MISC.NUMBER_OF_ITERATIONS:
             return ['Finished', ' ']
         else:
             return ['Iterating', ' ']
 
+
     if 'Error' in data[-1]:
         return ['Error', ' ']
 
 
     return None
+
+
+# TODO: monitorer should read carla benchmark logging system.
 
 def export_results(benchmark_results_folder):
 

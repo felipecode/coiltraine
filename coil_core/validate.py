@@ -98,8 +98,10 @@ def execute(gpu, exp_batch, exp_alias):
                                                                     output[i][1],
                                                                     output[i][2]])
 
+                coil_logger.add_message('Running',{'CurrentValidation'})
 
 
+            coil_logger.add_message('Running',{'CompletedValidation':{'Iteration':latest}})
 
                 #loss = criterion(output, labels)
 

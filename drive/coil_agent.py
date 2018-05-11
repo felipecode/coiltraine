@@ -127,12 +127,6 @@ class CoILAgent(Agent):
     def run_step(self, measurements, sensor_data, directions, target):
 
 
-        # pos = (rewards.player_x,rewards.player_y,22)
-        # ori =(rewards.ori_x,rewards.ori_y,rewards.ori_z)
-        # pos,point = self.planner.get_defined_point(pos,ori,(target[0],target[1],22),(1.0,0.02,-0.001),self._select_goal)
-        # direction = convert_to_car_coord(point[0],point[1],pos[0],pos[1],ori[0],ori[1])
-        # image_filename_format = '_images/episode_{:0>3d}/{:s}/image_{:0>5d}.png'
-
 
         #control_agent = self._agent.run_step(measurements, None, target)
         print (" RUnning STEP ")
@@ -146,6 +140,9 @@ class CoILAgent(Agent):
 
         steer, throttle, brake = self._process_model_outputs(model_outputs[0],
                                          measurements.player_measurements.forward_speed)
+
+
+
         #control = self.compute_action(,
         #                              ,
         #                              directions)
