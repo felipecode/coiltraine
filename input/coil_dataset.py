@@ -86,7 +86,6 @@ class CoILDataset(Dataset):
                             except:
                                 sensor_image = self.transform(0, sensor_image)
 
-
                             batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
                             ] = sensor_image
 

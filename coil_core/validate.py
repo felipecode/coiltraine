@@ -57,8 +57,6 @@ def execute(gpu, exp_batch, exp_alias):
 
 
 
-    # TODO: The checkpoint will continue, so the logs should restart ??? OR continue were it was
-
     latest = get_latest_evaluated_checkpoint()
     if latest is None:  # When nothing was tested, get latest returns none, we fix that.
         latest = 0
@@ -98,6 +96,7 @@ def execute(gpu, exp_batch, exp_alias):
                                                                     output[i][1],
                                                                     output[i][2]])
 
+                # For this case the iteration is something internal.
                 coil_logger.add_message('Running',{'CurrentValidation'})
 
 
