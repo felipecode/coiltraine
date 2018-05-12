@@ -50,7 +50,7 @@ class CoILICRA(nn.Module):
 
         self.branches = Branching([FC(params={'kernel_sizes': [512, 256, 256, 3],
                                                'dropouts': [0.5, 0.5, 0.0],
-                                               'end_layer': True})]*4)
+                                               'end_layer': True})]*4) #  Here we set branching automatically
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):

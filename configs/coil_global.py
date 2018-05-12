@@ -33,6 +33,7 @@ import yaml
 from logger.coil_logger import create_log, add_message
 
 import imgauggpu as iag
+import imgaug.augmenters as ia
 
 
 # TODO: How do we KEEP A GOOD ITERATION COUNTER ??
@@ -45,7 +46,14 @@ _g_conf.MEASUREMENTS = {'targets': (31)}
 _g_conf.STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
 _g_conf.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
 
-_g_conf.AUGMENTATION_SUITE = [iag.ToGPU(), iag.Add(0, 0)]
+_g_conf.AUGMENTATION_SUITE = [iag.ToGPU()]#, iag.Add((0, 0)), iag.Dropout(0, 0), iag.Multiply((1, 1.04)),
+                              #iag.GaussianBlur(sigma=(0.0, 3.0)),
+ #                             iag.ContrastNormalization((0.5, 1.5))
+ #                             ]
+#_g_conf.AUGMENTATION_SUITE_CPU = [ ia.Add((0, 0)), ia.Dropout(0, 0),
+#                              ia.GaussianBlur(sigma=(0.0, 3.0)),
+#                              ia.ContrastNormalization((0.5, 1.5))
+#                              ]
 _g_conf.DATASET_NAME = 'SmallTest'
 
 

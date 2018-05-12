@@ -4,7 +4,9 @@ import sys
 import torch
 import torch.optim as optim
 import imgauggpu as iag
+
 import random
+import time
 # What do we define as a parameter what not.
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
@@ -25,7 +27,7 @@ def execute(gpu, exp_batch, exp_alias):
     set_type_of_process('train')
 
 
-    sys.stdout = open(str(os.getpid()) + ".out", "a", buffering=1)
+    #sys.stdout = open(str(os.getpid()) + ".out", "a", buffering=1)
 
 
 
@@ -36,6 +38,8 @@ def execute(gpu, exp_batch, exp_alias):
     #Define the dataset. This structure is has the __get_item__ redefined in a way
     #that you can access the HDFILES positions from the root directory as a in a vector.
     full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.DATASET_NAME)
+
+    #augmenter_cpu = iag.AugmenterCPU(g_conf.AUGMENTATION_SUITE_CPU)
 
     dataset = CoILDataset(full_dataset, transform=transforms.Compose([transforms.ToTensor()]))
 
@@ -78,8 +82,10 @@ def execute(gpu, exp_batch, exp_alias):
     print (dataset.meta_data)
 
     print (model)
-
+    accumulated_time = 0  # We acumulate iteration time and keep the average speed
+    capture_time = time.time()
     for data in data_loader:
+
 
         input_data, labels = data
 
@@ -92,6 +98,7 @@ def execute(gpu, exp_batch, exp_alias):
         controls = labels[:, 24, :]
 
         # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
+
         model.zero_grad()
         branches = model(input_rgb_data, labels[:, 10, :].cuda())
 
@@ -121,8 +128,23 @@ def execute(gpu, exp_batch, exp_alias):
 
         coil_logger.add_scalars('Loss','Error')
 
+
         loss.backward()
         optimizer.step()
+
+        accumulated_time += time.time() - capture_time
+        capture_time = time.time()
+
+
+        #coil_logger.add_message('Running',
+        #                        {'Iteration':iteration, 'Current Loss':loss,
+        #                         'Best Loss':get_best_loss(), 'Some Output',
+        #                         'Some Ground Truth','Error'
+        #                         'Speed:'})
+
+        # TODO: For now we are computing the error for just the correct branch, it could be multi-branch,
+
+        #coil_logger.add_scalars('Loss','Error')
 
         # TODO: save also the optimizer state dictionary
         if is_ready_to_save(iteration):
@@ -137,8 +159,10 @@ def execute(gpu, exp_batch, exp_alias):
             torch.save(state, os.path.join('_logs', exp_batch, exp_alias
                                            , 'checkpoints', str(iteration) + '.pth'))
         iteration += 1
+        print ((iteration*120)/accumulated_time)
 
         #shutil.copyfile(filename, 'model_best.pth.tar')
+
 
     #torch.save(model, os.path.join(os.environ["COIL_TRAINED_MODEL_PATH"], exp_alias))
     #print('------------------- Trainind Done! --------------------------')
