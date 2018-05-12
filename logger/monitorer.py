@@ -109,9 +109,13 @@ def get_status(exp_batch, experiment, process_name):
         else:
             return ['Iterating', ' ']
 
-
+    # TODO: there is the posibility of some race conditions on not having error as last
     if 'Error' in data[-1]:
         return ['Error', ' ']
+
+
+
+    # TODO: Needs to return if the proccess is actively executing or stoped.
 
 
     return None
