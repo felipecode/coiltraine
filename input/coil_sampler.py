@@ -53,7 +53,5 @@ class CoILSampler(Sampler):
             raise ValueError("Keys have invalid rank")
 
 
-
-
     def __len__(self):
-        return g_conf.NUMBER_ITERATIONS
+        return g_conf.NUMBER_ITERATIONS * 120

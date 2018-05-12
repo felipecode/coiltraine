@@ -40,10 +40,10 @@ def partition_keys_by_percentiles(steering_unordered, steerings, keys, percentil
             splited_keys.append(keys[iter_index:i])
             iter_index = i
             quad_pos += 1
-            # TODO This could be very important log information
-            print('split on ', i, 'with ', steerings[i])
-            print(len(splited_keys))
-            print(len(splited_keys[-1]))
+            # THe value of steering splitted
+            # The number of keys for this split
+            coil_logger.add_message('Loading', {'SplitPoints': [steerings[i], len(splited_keys)]})
+
 
     return splited_keys
 

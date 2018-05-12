@@ -55,7 +55,7 @@ _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
 _g_conf.EXPERIMENT_NAME = "default"
 # TODO: not necessarily the configuration need to know about this
 _g_conf.PROCESS_NAME = "None"
-_g_conf.NUMBER_ITERATIONS = 2000*120
+_g_conf.NUMBER_ITERATIONS = 2000
 _g_conf.SAVE_SCHEDULE = range(0, 2000, 200)
 _g_conf.NUMBER_FRAMES_FUSION = 1
 _g_conf.NUMBER_IMAGES_SEQUENCE = 1

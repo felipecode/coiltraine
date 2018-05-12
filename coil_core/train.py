@@ -4,6 +4,7 @@ import sys
 import torch
 import torch.optim as optim
 import imgauggpu as iag
+import random
 # What do we define as a parameter what not.
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
@@ -97,6 +98,7 @@ def execute(gpu, exp_batch, exp_alias):
         #print ("len ",len(branches))
 
         # get the steer, gas and brake ground truth from labels
+        # TODO: THERE IS A DICTONARY TO SELECT THE OUTPUTS
         steer_gt = labels[:, 0, :]
         gas_gt = labels[:, 1, :]
         brake_gt = labels[:, 2, :]
@@ -106,12 +108,14 @@ def execute(gpu, exp_batch, exp_alias):
 
         loss = criterion.MSELoss(branches, targets.cuda(), controls.cuda(), speed_gt.cuda())
 
-
+        # Log a random position
+        position = random.randint(0,len(labels))
+        # TODO: Get only the  labels that are actually generating output
         coil_logger.add_message('Running',
                                 {'Iteration':iteration, 'Current Loss':loss,
-                                 'Best Loss':get_best_loss(), 'Some Output',
-                                 'Some Ground Truth','Error'
-                                 'Speed:'})
+                                 'Best Loss':get_best_loss(), 'Some Output':output[position],
+                                 'GroundTruth':labels[position], 'Error':abs(output[position]- labels[position])
+                                 'Speed':labels[position, 10, :]})
 
         # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
 
@@ -125,7 +129,9 @@ def execute(gpu, exp_batch, exp_alias):
 
             state = {
                 'iteration': iteration,
-                'state_dict': model.state_dict()
+                'state_dict': model.state_dict(),
+                'best_loss': best_loss
+
             }
             # TODO : maybe already summarize the best model ???
             torch.save(state, os.path.join('_logs', exp_batch, exp_alias
@@ -133,9 +139,6 @@ def execute(gpu, exp_batch, exp_alias):
         iteration += 1
 
         #shutil.copyfile(filename, 'model_best.pth.tar')
-
-    # TODO: DO ALL THE AMAZING LOGGING HERE, as a way to very the status in paralell.
-    # THIS SHOULD BE AN INTERELY PARALLEL PROCESS
 
     #torch.save(model, os.path.join(os.environ["COIL_TRAINED_MODEL_PATH"], exp_alias))
     #print('------------------- Trainind Done! --------------------------')

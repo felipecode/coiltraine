@@ -20,6 +20,7 @@ from torchvision import transforms
 # The main function maybe we could call it with a default name
 def execute(gpu, exp_batch, exp_alias):
     # We set the visible cuda devices
+
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
     # At this point the log file with the correct naming is created.
@@ -98,7 +99,7 @@ def execute(gpu, exp_batch, exp_alias):
                                                                     output[i][1],
                                                                     output[i][2]])
 
-                coil_logger.add_message('Running',{'CurrentValidation'})
+                coil_logger.add_message('Running', {'CurrentValidation'})
 
 
             coil_logger.add_message('Running',{'CompletedValidation':{'Iteration':latest}})

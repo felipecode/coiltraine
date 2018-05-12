@@ -29,6 +29,7 @@ class CoILDataset(Dataset):
 
         self.sensor_data, self.measurements, self.meta_data = self.pre_load_hdf5_files(root_dir)
         self.transform = transform
+        self.batch_read_number = 0
 
     def __len__(self):
         # This is seems to be the entire dataset size
@@ -95,8 +96,10 @@ class CoILDataset(Dataset):
                 count += 1
 
 
-        # TODO: iteration is wrong
-        coil_logger.add_message('Reading', {'Iteration': 25, 'ReadKeys': used_ids})
+
+        coil_logger.add_message('Running', {'Reading':{'Iteration': self.batch_read_number,
+                                                       'ReadKeys': used_ids}})
+        self.batch_read_number += 1
         # TODO: add tensorboard image adding
         # TODO: Do we need to limit the number of iterations the images are saved ??
         # TODO: ADD GROUND TRUTH CONTROL IN SOME META CONFIGURATION FOR THE DATASET
@@ -142,7 +145,8 @@ class CoILDataset(Dataset):
         lastidx = 0
         count = 0
         # TODO: More logs to be added ??
-        coil_logger.add_message('Loading', {'FilesLoaded': folder_file_names})
+        coil_logger.add_message('Loading', {'FilesLoaded': folder_file_names,
+                                            'NumberOfImages': len(folder_file_names)})
 
         for file_name in folder_file_names:
             try:
