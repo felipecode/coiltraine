@@ -73,8 +73,11 @@ def execute(gpu, exp_batch, exp_alias):
         checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias,
                                  'checkpoints', str(get_latest_saved_checkpoint())))
         iteration = checkpoint['iteration']
+        accumulated_time = checkpoint['total_time']
     else:
         iteration = 0
+
+        accumulated_time = 0  # We accumulate iteration time and keep the average speed
 
     # TODO: The checkpoint will continue, so it should erase everything up to the iteration
 
@@ -82,51 +85,52 @@ def execute(gpu, exp_batch, exp_alias):
     print (dataset.meta_data)
 
     print (model)
-    accumulated_time = 0  # We acumulate iteration time and keep the average speed
     capture_time = time.time()
     for data in data_loader:
 
 
         input_data, labels = data
 
-        #TODO we have to divide the input with other data.
 
         #TODO, ADD ITERATION SCHEDULE
         input_rgb_data = augmenter(0, input_data['rgb'])
+        coil_logger.add_images(input_rgb_data)
 
         # get the control commands from labels, size = [120,1]
-        controls = labels[:, 24, :]
+        controls = labels[:, CoILDataset.controls_position, :]
 
         # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
         model.zero_grad()
-        branches = model(input_rgb_data, labels[:, 10, :].cuda())
+        branches = model(input_rgb_data,CoILDataset.extract_inputs(labels).cuda())
 
         #print ("len ",len(branches))
 
         # get the steer, gas and brake ground truth from labels
         # TODO: THERE IS A DICTONARY TO SELECT THE OUTPUTS
-        steer_gt = labels[:, 0, :]
-        gas_gt = labels[:, 1, :]
-        brake_gt = labels[:, 2, :]
-        speed_gt = labels[:, 10, :]
+        #steer_gt = labels[:, 0, :]
+        #gas_gt = labels[:, 1, :]
+        #brake_gt = labels[:, 2, :]
+        #speed_gt = labels[:, 10, :]
 
-        targets = torch.cat([steer_gt, gas_gt, brake_gt], 1)
+        #targets = torch.cat([steer_gt, gas_gt, brake_gt], 1)
 
-        loss = criterion.MSELoss(branches, targets.cuda(), controls.cuda(), speed_gt.cuda())
+        loss = criterion.MSELoss(branches, CoILDataset.extract_targets(labels).cuda(),
+                                 controls.cuda(), CoILDataset.extract_inputs.cuda())
 
         # Log a random position
-        position = random.randint(0,len(labels))
+        position = random.randint(0, len(labels))
         # TODO: Get only the  labels that are actually generating output
         coil_logger.add_message('Running',
                                 {'Iteration':iteration, 'Current Loss':loss,
                                  'Best Loss':get_best_loss(), 'Some Output':output[position],
-                                 'GroundTruth':labels[position], 'Error':abs(output[position]- labels[position])
+                                 'GroundTruth': CoILDataset.extract_targets(labels[position]),
+                                 'Error': abs(output[position]- labels[position]),
                                  'Speed':labels[position, 10, :]})
 
         # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
 
-        coil_logger.add_scalars('Loss','Error')
+        coil_logger.add_scalars('Loss', 'Error')
 
 
         loss.backward()
@@ -152,7 +156,8 @@ def execute(gpu, exp_batch, exp_alias):
             state = {
                 'iteration': iteration,
                 'state_dict': model.state_dict(),
-                'best_loss': best_loss
+                'best_loss': best_loss,
+                'total_time': accumulated_time
 
             }
             # TODO : maybe already summarize the best model ???

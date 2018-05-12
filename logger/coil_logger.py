@@ -13,6 +13,7 @@ g_logger = filelogger('None')
 EXPERIMENT_NAME = ''
 EXPERIMENT_BATCH_NAME = ''
 PROCESS_NAME = ''
+LOG_FREQUENCY = 1
 
 # This next bit is to ensure the script runs unchanged on 2.x and 3.x
 
@@ -22,7 +23,7 @@ PROCESS_NAME = ''
 
 #logging.info(SM('message 1', set_value={1, 2, 3}, snowman='\u2603'))
 
-def create_log(exp_batch_name, exp_name, process_name):
+def create_log(exp_batch_name, exp_name, process_name, log_frequency=1):
 
     """
 
@@ -36,6 +37,7 @@ def create_log(exp_batch_name, exp_name, process_name):
     global EXPERIMENT_BATCH_NAME
     global EXPERIMENT_NAME
     global PROCESS_NAME
+    global LOG_FREQUENCY
 
     root_path = "_logs"
     if not os.path.exists(root_path):
@@ -55,15 +57,16 @@ def create_log(exp_batch_name, exp_name, process_name):
 
 
 
-    # TODO: This needs to be updated after a while.
+    # TODO: This needs to be updated after a while. ???
     g_logger = flog
     EXPERIMENT_BATCH_NAME = exp_batch_name
     EXPERIMENT_NAME = exp_name
     PROCESS_NAME = process_name
+    LOG_FREQUENCY = log_frequency
 
 
 
-def add_message(phase, message):
+def add_message(phase, message, iteration=None):
     """
     For the normal case
     Args:
@@ -73,13 +76,19 @@ def add_message(phase, message):
     Returns:
 
     """
+    if iteration is not None:
+        if iteration % LOG_FREQUENCY == 0:
+            g_logger.info({phase: message})
 
-    if phase != 'Loading' and 'Iteration' not in message:
-        raise ValueError(" Non loading messages should have the iteration.")
+    else:
+        g_logger.info({phase: message})
+
+    #if phase != 'Loading' and 'Iteration' not in message:
+    #    raise ValueError(" Non loading messages should have the iteration.")
 
     # What if it is an error message ?
     # We can monitor the status based on error message. An error should mean the exp is not working
-    g_logger.info({phase: message})
+
 
 
 
@@ -88,7 +97,6 @@ def add_message(phase, message):
 
 # TODO: Maybe an add scalar, message ??
 
-# TODO: make a single log file but hierarquical ??
 
 def write_on_csv(checkpoint_name, output):
     """

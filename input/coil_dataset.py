@@ -7,7 +7,7 @@ import numpy as np
 
 
 from torch.utils.data import Dataset
-
+import torch
 
 from logger import coil_logger
 
@@ -184,5 +184,44 @@ class CoILDataset(Dataset):
 
         return sensors_data_cat, meas_data_cat[0], metadata_targets
 
+    # TODO: MAKE AN "EXTRACT" method used by both of the functions above.
 
+    @staticmethod
+    def extract_targets(self, float_data):
+        """
+        Method used to get to know which positions from the dataset are the targets
+        for this experiments
+        Args:
+            labels: the set of all float data got from the dataset
 
+        Returns:
+            the float data that is actually targets
+
+        Raises
+            value error when the configuration set targets that didn't exist in metadata
+        """
+        targets_vec = []
+        for target_name in g_conf.TARGETS:
+            targets_vec.append(float_data[:, np.where(self.meta_data[:, 0] == target_name), :])
+
+        return torch.cat(targets_vec, 1)
+
+    @staticmethod
+    def extract_inputs(self, float_data):
+        """
+        Method used to get to know which positions from the dataset are the inputs
+        for this experiments
+        Args:
+            labels: the set of all float data got from the dataset
+
+        Returns:
+            the float data that is actually targets
+
+        Raises
+            value error when the configuration set targets that didn't exist in metadata
+        """
+        inputs_vec = []
+        for input_name in g_conf.INPUTS:
+            inputs_vec.append(float_data[:, np.where(self.meta_data[:, 0] == input_name), :])
+
+        return torch.cat(inputs_vec, 1)

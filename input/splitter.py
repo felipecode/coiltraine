@@ -176,6 +176,7 @@ def control_steer_split(measurements, meta_data):
 
     # TODO: read meta data and turn into a coool dictionary ?
     #print(np.where(dataset.meta_data[:, 0] == 'control'))
+    #TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
     labels = measurements[np.where(meta_data[:, 0] == 'control'), :]
 
     print(np.unique(labels))

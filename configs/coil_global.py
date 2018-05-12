@@ -43,6 +43,8 @@ import imgaug.augmenters as ia
 _g_conf = AttributeDict()
 _g_conf.SENSORS = {'rgb': (3, 88, 200)}
 _g_conf.MEASUREMENTS = {'targets': (31)}
+_g_conf.TARGETS = ['steer', 'throttle', 'brake']
+_g_conf.INPUTS = ['speed_module']
 _g_conf.STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
 _g_conf.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
 
@@ -56,8 +58,8 @@ _g_conf.AUGMENTATION_SUITE = [iag.ToGPU()]#, iag.Add((0, 0)), iag.Dropout(0, 0),
 #                              ]
 _g_conf.DATASET_NAME = 'SmallTest'
 
-
-
+_g_conf.LOG_SCALAR_WRITING_FREQUENCY = 2   # TODO NEEDS TO BE ADDED TO THE LOGGING FUNCTION ON  CREATE LOG
+_g_conf.LOG_IMAGE_WRITING_FREQUENCY = 15
 
 _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
 _g_conf.EXPERIMENT_NAME = "default"
@@ -72,6 +74,9 @@ _g_conf.TEST_SCHEDULE = range(0, 2000, 200)
 
 
 #self.param.MISC.DATASET_SIZE
+
+"""#### Network Related Parameters ####"""
+
 
 _g_conf.MODEL_NAME = 'coil_icra'
 
