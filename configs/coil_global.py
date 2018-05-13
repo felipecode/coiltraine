@@ -56,7 +56,7 @@ _g_conf.AUGMENTATION_SUITE = [iag.ToGPU()]#, iag.Add((0, 0)), iag.Dropout(0, 0),
 #                              ia.GaussianBlur(sigma=(0.0, 3.0)),
 #                              ia.ContrastNormalization((0.5, 1.5))
 #                              ]
-_g_conf.DATASET_NAME = 'SmallTest'
+_g_conf.TRAIN_DATASET_NAME = 'SmallTest'  # We only set the dataset in configuration for training
 
 _g_conf.LOG_SCALAR_WRITING_FREQUENCY = 2   # TODO NEEDS TO BE ADDED TO THE LOGGING FUNCTION ON  CREATE LOG
 _g_conf.LOG_IMAGE_WRITING_FREQUENCY = 15

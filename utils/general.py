@@ -1,4 +1,5 @@
 import re
+import monitorer
 
 def tryint(s):
     try:
@@ -22,4 +23,6 @@ def sort_nicely(l):
 def command_number_to_index(command_vector):
 
     return command_vector-2
+
+
 

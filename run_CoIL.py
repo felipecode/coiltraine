@@ -3,10 +3,14 @@ import multiprocessing
 # Import all the test libraries.
 import sys
 import os
+from logger import monitorer
+import time
 
 from coil_core import train, validate, run_drive
 
+from experiment_schedule import get_free_gpus
 
+import heapq
 
 # You could send the module to be executed and they could have the same interface.
 
@@ -28,7 +32,7 @@ def execute_train(gpu, exp_batch, exp_alias):
     p = multiprocessing.Process(target=train.execute, args=(gpu, exp_batch, exp_alias,))
     p.start()
 
-def execute_validation(gpu, exp_batch, exp_alias):
+def execute_validation(gpu, exp_batch, exp_alias, dataset):
     """
 
     Args:
@@ -46,7 +50,7 @@ def execute_validation(gpu, exp_batch, exp_alias):
 
 
     # The difference between train and validation is the
-    p = multiprocessing.Process(target=validate.execute, args=(gpu, exp_batch, exp_alias, ))
+    p = multiprocessing.Process(target=validate.execute, args=(gpu, exp_batch, exp_alias, dataset))
     p.start()
 
 
@@ -72,7 +76,7 @@ def execute_drive(gpu, exp_batch, exp_alias, city_name):
 
 
 
-def folder_execute(folder,gpus,param):
+def folder_execute(folder, alocated_gpus, param):
     """
     On this mode the training software keeps all
     It forks a process to run the monitor over the training logs.
@@ -83,17 +87,63 @@ def folder_execute(folder,gpus,param):
 
     #TODO: it is likely that the monitorer classes is not actually necessary.
 
-    #for all methods in the folder
-    #    if monitorer.get_status(folder, methods) == "Finished" # TODO: should we call this logger or monitorer ??
-    #        if not done or executing  get to the list
+    experiments_list = os.listdir(folder)
 
 
-    #Allocate all the gpus
-    #for i in gpu:
-    #    for a process and
-    #    execute()
-    #Check
-    pass
+    validation_datasets = ['SmallTest', 'OtherSmallTest']
+    drive_environments = ['Town01', 'Town02']
+
+
+    # TODO: for now the number of gpus used per process is hardcoded, train 1, val 0.5, drive 0.5
+
+    executing_processes = []
+
+    free_gpus, number_of_free_gpus = get_free_gpus(alocated_gpus, executing_processes)
+
+    # Is a queue of tasks to be executed. The priority is always train.
+    # then test then val.
+    # TODO: change the priority to test the ones that have already been trained.
+    tasks_queue = mount_experiment_heap(folder, experiments_list,
+                                        validation_datasets, drive_environments)
+
+    # No process is executing right now.
+
+
+    while True:
+        #        if not done or executing  get to the list
+        while len(free_gpus) > 0:
+            #Allocate all the gpus
+
+            process_specs = heapq.heappop(tasks_queue)[1]  # To get directly the dict
+
+
+            if process_specs['type'] == 'train' and number_of_free_gpus >=1:
+                free_gpus, number_of_free_gpus, gpu_number = get_two_free(free_gpus)
+                execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
+                process_specs.update({'gpu': gpu_number})
+                executing_processes.append(process_specs)
+
+            elif process_specs['type'] == 'validation':
+                free_gpus, number_of_free_gpus, gpu_number = get_one_free(free_gpus)
+                execute_validation(gpu_number, process_specs['folder'], process_specs['experiment'],
+                                   process_specs['dataset'])
+                process_specs.update({'gpu': gpu_number})
+                executing_processes.append(process_specs)
+
+            else:  # == test
+
+                free_gpus, number_of_free_gpus, gpu_number = get_one_free(free_gpus)
+                execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
+                                   process_specs['environment'])
+                process_specs.update({'gpu': gpu_number})
+                executing_processes.append(process_specs)
+
+        else:
+            time.sleep(1)
+
+        # Check allocated process, and look which ones finished.
+        free_gpus = get_free_gpus(executing_processes)
+        #Check
 
 
 
@@ -101,5 +151,5 @@ if __name__ == '__main__':
 
 
     execute_train("0", "eccv", "experiment_1")
-    #execute_validation("0", "eccv", "experiment_1")
+    #execute_validation("0", "eccv", "experiment_1","SmallTest")
     #execute_drive("0", "eccv", "experiment_1", 'Town02')

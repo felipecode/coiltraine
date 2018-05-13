@@ -18,7 +18,7 @@ from torchvision import transforms
 
 
 # The main function maybe we could call it with a default name
-def execute(gpu, exp_batch, exp_alias):
+def execute(gpu, exp_batch, exp_alias, dataset_name):
     # We set the visible cuda devices
 
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
@@ -38,7 +38,7 @@ def execute(gpu, exp_batch, exp_alias):
 
     #Define the dataset. This structure is has the __get_item__ redefined in a way
     #that you can access the HDFILES positions from the root directory as a in a vector.
-    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.DATASET_NAME)
+    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name)
 
     dataset = CoILDataset(full_dataset, transform=transforms.Compose([transforms.ToTensor()]))
 
