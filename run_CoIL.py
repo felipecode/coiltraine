@@ -76,7 +76,7 @@ def execute_drive(gpu, exp_batch, exp_alias, city_name):
 
 
 
-def folder_execute(folder, allocated_gpus, param):
+def folder_execute(folder, allocated_gpus, param=None):
     """
     On this mode the training software keeps all
     It forks a process to run the monitor over the training logs.
