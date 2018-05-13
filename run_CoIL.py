@@ -8,7 +8,7 @@ import time
 
 from coil_core import train, validate, run_drive
 
-from experiment_schedule import get_free_gpus
+from experiment_schedule import get_free_gpus, pop_half_gpu, pop_one_gpu, mount_experiment_heap
 
 import heapq
 
@@ -76,7 +76,7 @@ def execute_drive(gpu, exp_batch, exp_alias, city_name):
 
 
 
-def folder_execute(folder, alocated_gpus, param):
+def folder_execute(folder, allocated_gpus, param):
     """
     On this mode the training software keeps all
     It forks a process to run the monitor over the training logs.
@@ -89,6 +89,9 @@ def folder_execute(folder, alocated_gpus, param):
 
     experiments_list = os.listdir(folder)
 
+    # Each gpu has maximun 2 slots
+
+    allocated_gpus = [[gpu] * 2 for gpu in allocated_gpus]
 
     validation_datasets = ['SmallTest', 'OtherSmallTest']
     drive_environments = ['Town01', 'Town02']
@@ -98,7 +101,7 @@ def folder_execute(folder, alocated_gpus, param):
 
     executing_processes = []
 
-    free_gpus, number_of_free_gpus = get_free_gpus(alocated_gpus, executing_processes)
+    free_gpus, number_of_free_gpus = get_free_gpus(allocated_gpus, executing_processes)
 
     # Is a queue of tasks to be executed. The priority is always train.
     # then test then val.
@@ -114,17 +117,17 @@ def folder_execute(folder, alocated_gpus, param):
         while len(free_gpus) > 0:
             #Allocate all the gpus
 
-            process_specs = heapq.heappop(tasks_queue)[1]  # To get directly the dict
+            process_specs = heapq.heappop(tasks_queue)[2]  # To get directly the dict
 
 
             if process_specs['type'] == 'train' and number_of_free_gpus >=1:
-                free_gpus, number_of_free_gpus, gpu_number = get_two_free(free_gpus)
+                free_gpus, number_of_free_gpus, gpu_number = pop_one_gpu(free_gpus)
                 execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 
             elif process_specs['type'] == 'validation':
-                free_gpus, number_of_free_gpus, gpu_number = get_one_free(free_gpus)
+                free_gpus, number_of_free_gpus, gpu_number = pop_half_gpu(free_gpus)
                 execute_validation(gpu_number, process_specs['folder'], process_specs['experiment'],
                                    process_specs['dataset'])
                 process_specs.update({'gpu': gpu_number})
@@ -132,7 +135,7 @@ def folder_execute(folder, alocated_gpus, param):
 
             else:  # == test
 
-                free_gpus, number_of_free_gpus, gpu_number = get_one_free(free_gpus)
+                free_gpus, number_of_free_gpus, gpu_number = pop_half_gpu(free_gpus)
                 execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
                                    process_specs['environment'])
                 process_specs.update({'gpu': gpu_number})
@@ -150,6 +153,7 @@ def folder_execute(folder, alocated_gpus, param):
 if __name__ == '__main__':
 
 
-    execute_train("0", "eccv", "experiment_1")
+    #execute_train("0", "eccv", "experiment_1")
     #execute_validation("0", "eccv", "experiment_1","SmallTest")
     #execute_drive("0", "eccv", "experiment_1", 'Town02')
+    folder_execute('eccv', "0,1,2")

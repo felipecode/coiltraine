@@ -74,10 +74,13 @@ def execute(gpu, exp_batch, exp_alias):
                                  'checkpoints', str(get_latest_saved_checkpoint())))
         iteration = checkpoint['iteration']
         accumulated_time = checkpoint['total_time']
+        best_loss = checkpoint['best_loss']
+        best_loss_iter = checkpoint['best_loss_iter']
     else:
         iteration = 0
-
+        best_loss = 10000.0
         accumulated_time = 0  # We accumulate iteration time and keep the average speed
+        best_loss_iter = 0
 
     # TODO: The checkpoint will continue, so it should erase everything up to the iteration
 
@@ -102,7 +105,7 @@ def execute(gpu, exp_batch, exp_alias):
         # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
         model.zero_grad()
-        branches = model(input_rgb_data,CoILDataset.extract_inputs(labels).cuda())
+        branches = model(input_rgb_data, CoILDataset.extract_inputs(labels).cuda())
 
         #print ("len ",len(branches))
 
@@ -118,15 +121,24 @@ def execute(gpu, exp_batch, exp_alias):
         loss = criterion.MSELoss(branches, CoILDataset.extract_targets(labels).cuda(),
                                  controls.cuda(), CoILDataset.extract_inputs.cuda())
 
+        # TODO: All these logging things could go out to clean up the main
+        if loss < best_loss:
+            best_loss = loss
+            best_loss_iter = iteration
+
         # Log a random position
         position = random.randint(0, len(labels))
+
+        output = model.extract_branch(branches, controls)
+
         # TODO: Get only the  labels that are actually generating output
         coil_logger.add_message('Running',
-                                {'Iteration':iteration, 'Current Loss':loss,
-                                 'Best Loss':get_best_loss(), 'Some Output':output[position],
+                                {'Iteration': iteration, 'Current Loss': loss,
+                                 'Best Loss': best_loss, 'Best Loss Iteration': best_loss_iter,
+                                 'Some Output': output[position],
                                  'GroundTruth': CoILDataset.extract_targets(labels[position]),
-                                 'Error': abs(output[position]- labels[position]),
-                                 'Speed':labels[position, 10, :]})
+                                 'Error': abs(output[position] - labels[position]),
+                                 'Inputs': CoILDataset.extract_targets(labels[position, 10, :])})
 
         # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
 

@@ -109,21 +109,24 @@ class CoILICRA(nn.Module):
         # TODO: unit test this function
         output_vec = torch.stack(self.forward(x, a)[0:4])
 
+        return self.extract_branch(output_vec, branch_number)
+
+
+
+    def extract_branch(self, output_vec, branch_number):
+
         branch_number = command_number_to_index(branch_number)
         if len(branch_number) > 1:
-            branch_number =torch.squeeze(branch_number.type(torch.cuda.LongTensor))
+            branch_number = torch.squeeze(branch_number.type(torch.cuda.LongTensor))
         else:
             branch_number = branch_number.type(torch.cuda.LongTensor)
-
 
         branch_number = torch.stack([branch_number,
                                      torch.cuda.LongTensor(range(0, len(branch_number)))])
 
-
-        #branch_output_vector = []
-        #for i in range(len(branch_number)):
+        # branch_output_vector = []
+        # for i in range(len(branch_number)):
         #    branch_output_vector.append(output_vec[branch_number[i]][i])
-
 
         return output_vec[branch_number[0], branch_number[1], :]
 

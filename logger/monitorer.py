@@ -71,12 +71,11 @@ def get_status(exp_batch, experiment, process_name):
 
 
     # Configuration file path
-    config_file_path = os.path.join('configs', exp_batch, experiment + '.yaml')
+    config_file_path = os.path.join('configs', exp_batch, experiment)
 
     # The path for log
     log_file_path = os.path.join('_logs', exp_batch, experiment, process_name)
 
-    print(config_file_path, log_file_path)
     # First we check if the experiment exist
 
     if not os.path.exists(config_file_path):
