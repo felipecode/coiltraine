@@ -129,7 +129,7 @@ def set_type_of_process(process_type):
         raise RuntimeError(" You should merge with some exp file before setting the type")
 
     if process_type == "train" or process_type == "validation":
-        _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.DATASET_NAME
+        _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.TRAIN_DATASET_NAME
     if process_type == "test":
         _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.CITY_NAME
 
@@ -176,12 +176,12 @@ def merge_with_parameters():
 
 def generate_name():
     # TODO: Make a cool name generator, maybe in another class
-    return _g_conf.DATASET_NAME + str(202)
+    return _g_conf.TRAIN_DATASET_NAME + str(202)
 
 def generate_param_dict():
     # TODO IMPLEMENT ! generate a cool param dictionary USE
     # https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable
-    return _g_conf.DATASET_NAME + 'dict'
+    return _g_conf.TRAIN_DATASET_NAME + 'dict'
 
 
 

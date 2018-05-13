@@ -24,6 +24,11 @@ def get_current_iteration(exp):
     pass
 
 
+def get_summary(data):
+
+    # Find the
+    data
+
 def get_latest_checkpoint():
 
 
@@ -84,7 +89,7 @@ def get_status(exp_batch, experiment, process_name):
 
 
     # The experiment exist ! However, check if the log file exist.
-
+    print ("log path ", log_file_path)
     if not os.path.exists(log_file_path):
 
         return ['Not Started', '']
@@ -100,13 +105,13 @@ def get_status(exp_batch, experiment, process_name):
 
     # Then we check if finished or is going on
 
-    if 'Inference' in data[-1] or 'Reading' in data[-1] or 'Loss' in data[-1] or 'Iterating' in data[-1]:
+    if 'Iterating' in data[-1]:
 
 
         if list(data[-1].values())[0]['Iteration'] >= g_conf.param.MISC.NUMBER_OF_ITERATIONS:
             return ['Finished', ' ']
         else:
-            return ['Iterating', ' ']
+            return ['Iterating', get_summary(data)]
 
     # TODO: there is the posibility of some race conditions on not having error as last
     if 'Error' in data[-1]:
@@ -120,16 +125,13 @@ def get_status(exp_batch, experiment, process_name):
     return None
 
 
-# TODO: monitorer should read carla benchmark logging system.
 
-def export_results(benchmark_results_folder):
 
-    """
-        Reads some data and export the csv file as a result file somewhere so it
-        can be read by the visualization module.
-    Returns:
+def plot_folder_summaries(exp_batch):
 
-    """
 
+    # For each on the folder
+    # Get the status.
+    # Plot it nicely  in terminal.
     pass
 

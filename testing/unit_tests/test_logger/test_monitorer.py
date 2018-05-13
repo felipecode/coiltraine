@@ -78,7 +78,7 @@ class testMonitorer(unittest.TestCase):
 
 
     def test_check_status_running_iter(self):
-        g_conf = GlobalConfig()
+
         g_conf.param.NAME = 'experiment_running_iter'
         # TODO: this merge is weird.
         g_conf.merge_with_yaml('configs/monitor_test/experiment_running_iter.yaml')
@@ -98,15 +98,17 @@ class testMonitorer(unittest.TestCase):
 
         for i in range(0, 10):
 
-            coil_logger.add_message('Reading', {
+            coil_logger.add_message('Iterating', {
                                         "Iteration": i,
                                         "ReadKeys": [1, 123, 5, 1, 34, 1, 23]
 
-                                    })
-            coil_logger.add_message('Model', {
+                                    },
+                                    i)
+            coil_logger.add_message('Iterating', {
                                         "Iteration": i,
                                         "Output": ["output"]
-                                    })
+                                    },
+                                    i)
 
 
         # TODO: Check how the alias will work.
@@ -114,6 +116,7 @@ class testMonitorer(unittest.TestCase):
                                       g_conf.param.PROCESS_NAME)
 
         self.assertEqual(status[0], "Iterating")
+        print(status[1])
 
 
 
@@ -163,6 +166,9 @@ class testMonitorer(unittest.TestCase):
                                       g_conf.param.PROCESS_NAME)
 
         self.assertEqual(status[0], "Error")
+        print(status[1])
+
+
 
     def test_check_status_finished(self):
         g_conf = GlobalConfig()
@@ -194,11 +200,14 @@ class testMonitorer(unittest.TestCase):
                                         "Iteration": i,
                                         "ReadKeys": [1, 123, 5, 1, 34, 1, 23]
 
-                                    })
+                                    },
+                                    i)
             coil_logger.add_message('Model', {
                                         "Iteration": i,
                                         "Output": ["output"]
-                                    })
+                                    },
+                                    i
+                                    )
 
 
         # TODO: Check how the alias will work.
@@ -207,3 +216,9 @@ class testMonitorer(unittest.TestCase):
                                       g_conf.param.PROCESS_NAME)
 
         self.assertEqual(status[0], "Finished")
+        print(status[1])
+
+
+    def test_plot_of_folders(self):
+
+        pass

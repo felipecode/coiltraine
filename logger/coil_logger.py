@@ -6,6 +6,8 @@ import os
 
 from .json_formatter import filelogger
 
+
+
 g_logger = filelogger('None')
 
 # We keep the file names saved here in the glogger to avoid including global
@@ -133,21 +135,39 @@ def write_on_csv(checkpoint_name, output):
 
 
 
-def add_scalar():
+def add_scalar(tag, value, iteration=None):
 
     """
-    For raw output  logging. Also saves as a CSV for future visualization
-    Returns:
+    For raw output  logging on tensorboard.
+
 
     """
-    return
+    if iteration is not None:
+        if iteration % LOG_FREQUENCY == 0:
+            tl.scalar_summary(tag, value, iteration + 1)
+
+    else:
+        tl.scalar_summary(tag, value, iteration + 1)
 
 
 
-def add_image(some_image):
+
+
+
+
+def add_image(tag, images, iteration=None):
     # Add the image to a log, the monitorer is the module responsible by checking this
     # and eventually put some of the images to tensorboard.
-    pass
 
+
+    if iteration is not None:
+        if iteration % LOG_FREQUENCY == 0:
+            images = images.view(-1, 28, 28)[:10].cpu().numpy()
+            tl.image_summary(tag, images, iteration + 1)
+
+
+    else:
+        images = images.view(-1, 28, 28)[:10].cpu().numpy()
+        tl.image_summary(tag, images, iteration + 1)
 
 

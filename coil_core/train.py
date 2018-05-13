@@ -37,7 +37,7 @@ def execute(gpu, exp_batch, exp_alias):
 
     #Define the dataset. This structure is has the __get_item__ redefined in a way
     #that you can access the HDFILES positions from the root directory as a in a vector.
-    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.DATASET_NAME)
+    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
 
     #augmenter_cpu = iag.AugmenterCPU(g_conf.AUGMENTATION_SUITE_CPU)
 
@@ -132,13 +132,14 @@ def execute(gpu, exp_batch, exp_alias):
         output = model.extract_branch(branches, controls)
 
         # TODO: Get only the  labels that are actually generating output
-        coil_logger.add_message('Running',
-                                {'Iteration': iteration, 'Current Loss': loss,
+        coil_logger.add_message('Iterating',
+                                {'Current Loss': loss,
                                  'Best Loss': best_loss, 'Best Loss Iteration': best_loss_iter,
                                  'Some Output': output[position],
                                  'GroundTruth': CoILDataset.extract_targets(labels[position]),
                                  'Error': abs(output[position] - labels[position]),
-                                 'Inputs': CoILDataset.extract_targets(labels[position, 10, :])})
+                                 'Inputs': CoILDataset.extract_targets(labels[position, 10, :])},
+                                iteration)
 
         # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
 
