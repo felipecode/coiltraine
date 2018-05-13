@@ -145,7 +145,7 @@ def folder_execute(folder, allocated_gpus, param=None):
             time.sleep(1)
 
         # Check allocated process, and look which ones finished.
-        free_gpus = get_free_gpus(executing_processes)
+        free_gpus = get_free_gpus(allocated_gpus, executing_processes)
         #Check
 
 
