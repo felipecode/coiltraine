@@ -87,7 +87,7 @@ def folder_execute(folder, allocated_gpus, param=None):
 
     #TODO: it is likely that the monitorer classes is not actually necessary.
 
-    experiments_list = os.listdir(folder)
+    experiments_list = os.listdir(os.path.join('configs', folder))
 
     # Each gpu has maximun 2 slots
 
