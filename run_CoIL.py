@@ -8,7 +8,7 @@ import time
 
 from coil_core import train, validate, run_drive
 
-from experiment_schedule import get_free_gpus, pop_half_gpu, pop_one_gpu, mount_experiment_heap
+from utils import get_free_gpus, pop_half_gpu, pop_one_gpu, mount_experiment_heap
 
 import heapq
 
