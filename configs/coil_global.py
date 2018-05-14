@@ -46,6 +46,7 @@ _g_conf.TARGETS = ['steer', 'throttle', 'brake']
 _g_conf.INPUTS = ['speed_module']
 _g_conf.STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
 _g_conf.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
+_g_conf.BATCH_SIZE = 120
 
 _g_conf.AUGMENTATION_SUITE = [iag.ToGPU()]#, iag.Add((0, 0)), iag.Dropout(0, 0), iag.Multiply((1, 1.04)),
                               #iag.GaussianBlur(sigma=(0.0, 3.0)),
@@ -64,7 +65,7 @@ _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
 _g_conf.EXPERIMENT_NAME = "default"
 # TODO: not necessarily the configuration need to know about this
 _g_conf.PROCESS_NAME = "None"
-_g_conf.NUMBER_ITERATIONS = 2000
+_g_conf.NUMBER_ITERATIONS = 2000 *_g_conf.BATCH_SIZE
 _g_conf.SAVE_SCHEDULE = range(0, 2000, 200)
 _g_conf.NUMBER_FRAMES_FUSION = 1
 _g_conf.NUMBER_IMAGES_SEQUENCE = 1

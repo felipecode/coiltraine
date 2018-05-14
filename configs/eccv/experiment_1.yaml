@@ -1,47 +1,44 @@
+PARAMS:
+  #### General Configuration Parameters ####
+  SAVE_MODEL_INTERVAL: range(0, 2000, 200)
+  NUMBER_OF_LOADING_WORKS: 12   # Number of threads used in the data loader
 
-""" #### General Configuration Parameters ####"""
-SAVE_MODEL_INTERVAL: range(0, 2000, 200)
-NUMBER_OF_LOADING_WORKS = 12   # Number of threads used in the data loader
+  #### Input related parameters ####
+  SENSORS: {'rgb': (3, 88, 200)}
+  MEASUREMENTS: {'targets': (31)}
+  BATCH_SIZE: 120
+  NUMBER_ITERATIONS: 500000
+  NUMBER_FRAMES_FUSION: 3
+  STEERING_DIVISION: [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
+  LABELS_DIVISION: [[0, 2, 5], [3], [4]]
+  TARGETS: ['steer', 'throttle', 'brake']
+  INPUTS: ['speed_module']
+  NUMBER_FRAMES_FUSION: 1
+  NUMBER_IMAGES_SEQUENCE: 1
+  SEQUENCE_STRIDE: 1
+  AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
+  SPEED_FACTOR: 40.0
 
-"""#### Input related parameters ####"""
-SENSORS = {'rgb': (3, 88, 200)}
-MEASUREMENTS = {'targets': (31)}
-BATCH_SIZE=120
-NUMBER_ITERATIONS=500000
-NUMBER_FRAMES_FUSION=3
-STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
-LABELS_DIVISION = [[0, 2, 5], [3], [4]]
-TARGETS = ['steer', 'throttle', 'brake']
-INPUTS = ['speed_module']
-NUMBER_FRAMES_FUSION = 1
-NUMBER_IMAGES_SEQUENCE = 1
-SEQUENCE_STRIDE = 1
-AUGMENT_LATERAL_STEERINGS = 6  # Depending on this value there is a constant multiplying lateral steers
-self.speed_factor = 40.0
-
-# TEST RELATED PARAMETERS
-TEST_SCHEDULE = range(0, 2000, 200)  # The frequency the model is actually tested.
-
-
-
-"""#### Network Related Parameters ####"""
+  #### Testing Related Parameters ####
+  TEST_SCHEDULE: range(0, 2000, 200)  # The frequency the model is actually tested.
 
 
-MODEL_NAME = 'coil_icra'
-LEARNING_RATE = 0.0002  # First
-TRAINING_SCHEDEULE = [[50000, 0.5], [100000, 0.5 * 0.5], [150000, 0.5 * 0.5 * 0.5],
-                                  [200000, 0.5 * 0.5 * 0.5 * 0.5],
-                                  [250000, 0.5 * 0.5 * 0.5 * 0.5 * 0.5]]  # Number of iterations, multiplying factor
-
-#TODO check how to use this part
-self.branch_loss_weight = [0.95, 0.95, 0.95, 0.95, 0.05]
-self.variable_weight = {'Steer': 0.5, 'Gas': 0.45, 'Brake': 0.05, 'Speed': 1.0}
+  #### Network Related Parameters ####
 
 
-"""#### Simulation Related Parameters ####"""
-CITY_NAME = 'Town01'
-IMAGE_CUT = [115, 510]  # How you should cut the input image that is received from the server
-USE_ORACLE = False
+  MODEL_NAME: 'coil_icra'
+  LEARNING_RATE: 0.0002  # First
+  TRAINING_SCHEDEULE: [[50000, 0.5], [100000, 0.5 * 0.5], [150000, 0.5 * 0.5 * 0.5], [200000, 0.5 * 0.5 * 0.5 * 0.5],[250000, 0.5 * 0.5 * 0.5 * 0.5 * 0.5]]  # Number of iterations, multiplying factor
+
+  #TODO check how to use this part
+  BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05]
+  VARIABLE_WEIGHT: {'Steer': 0.5, 'Gas': 0.45, 'Brake': 0.05, 'Speed': 1.0}
+
+
+  #### Simulation Related Parameters ####
+  CITY_NAME: 'Town01'
+  IMAGE_CUT: [115, 510]  # How you should cut the input image that is received from the server
+  USE_ORACLE: False
 
 
 

@@ -23,7 +23,7 @@ def execute(gpu, exp_batch, exp_alias):
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
     # At this point the log file with the correct naming is created.
-    merge_with_yaml(os.path.join(exp_batch, exp_alias+'.yaml'))
+    merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
     set_type_of_process('train')
 
 
@@ -31,7 +31,7 @@ def execute(gpu, exp_batch, exp_alias):
 
 
 
-    if monitorer.get_status(exp_batch, exp_alias, g_conf.PROCESS_NAME)[0] == "Finished":
+    if monitorer.get_status(exp_batch, exp_alias+'.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
         # TODO: print some cool summary or not ?
         return
 
@@ -124,7 +124,7 @@ def execute(gpu, exp_batch, exp_alias):
             best_loss_iter = iteration
 
         # Log a random position
-        position = random.randint(0, len(float_data))
+        position = random.randint(0, len(float_data)-1)
 
         output = model.extract_branch(torch.stack(branches[0:4]), controls)
 
@@ -167,7 +167,8 @@ def execute(gpu, exp_batch, exp_alias):
                 'iteration': iteration,
                 'state_dict': model.state_dict(),
                 'best_loss': best_loss,
-                'total_time': accumulated_time
+                'total_time': accumulated_time,
+                'best_loss_iter': best_loss_iter
 
             }
             # TODO : maybe already summarize the best model ???
