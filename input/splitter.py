@@ -20,7 +20,7 @@ def order_sequence(steerings, keys_sequence):
     return [i[0] for i in sorted(enumerate(sequence_average), key=lambda x: x[1])], sequence_average
 
 
-def partition_keys_by_percentiles(steering_unordered, steerings, keys, percentiles):
+def partition_keys_by_percentiles(steerings, keys, percentiles):
     iter_index = 0
     quad_pos = 0
     splited_keys = []
@@ -42,6 +42,7 @@ def partition_keys_by_percentiles(steering_unordered, steerings, keys, percentil
             quad_pos += 1
             # THe value of steering splitted
             # The number of keys for this split
+            print ([steerings[i], len(splited_keys)])
             coil_logger.add_message('Loading', {'SplitPoints': [steerings[i], len(splited_keys)]})
 
 
@@ -158,7 +159,7 @@ def float_split(output_to_split, keys, percentiles):
 
     # We split each group...
     if len(keys_ordered) > 0:
-        splitted_keys = partition_keys_by_percentiles(average_outputs, sorted_outputs,
+        splitted_keys = partition_keys_by_percentiles(sorted_outputs,
                                                       corresponding_keys, percentiles)
     else:
         splitted_keys = []
@@ -170,20 +171,20 @@ def float_split(output_to_split, keys, percentiles):
 
 
 
-def control_steer_split(measurements, meta_data):
+def control_steer_split(float_data, meta_data):
 
-    steerings = measurements[0, :]
+    # TODO: WARNING , HARD CODE !
+    steerings = float_data[0, :]
 
     # TODO: read meta data and turn into a coool dictionary ?
     #print(np.where(dataset.meta_data[:, 0] == 'control'))
     #TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
-    labels = measurements[np.where(meta_data[:, 0] == 'control'), :]
+    labels = float_data[np.where(meta_data[:, 0] == 'control'), :]
 
     print(np.unique(labels))
 
     keys = range(0, len(steerings))
-    print (labels)
-    print (keys)
+
     splitted_labels = label_split(labels[0][0], keys, g_conf.LABELS_DIVISION)
 
     # Another level of splitting

@@ -153,7 +153,7 @@ def folder_execute(folder, allocated_gpus, param=None):
 if __name__ == '__main__':
 
 
-    #execute_train("0", "eccv", "experiment_1")
+    execute_train("0", "eccv", "experiment_1")
     #execute_validation("0", "eccv", "experiment_1","SmallTest")
     #execute_drive("0", "eccv", "experiment_1", 'Town02')
-    folder_execute('eccv', "0,1,2")
+    #folder_execute('eccv', "0,1,2")
