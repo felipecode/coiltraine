@@ -27,7 +27,8 @@ def get_current_iteration(exp):
 def get_summary(data):
 
     # Find the
-    data
+    return data[-1]
+
 
 def get_latest_checkpoint():
 
@@ -79,7 +80,7 @@ def get_status(exp_batch, experiment, process_name):
     config_file_path = os.path.join('configs', exp_batch, experiment)
 
     # The path for log
-    log_file_path = os.path.join('_logs', exp_batch, experiment, process_name)
+    log_file_path = os.path.join('_logs', exp_batch, experiment.split('.')[-2], process_name)
 
     # First we check if the experiment exist
 
@@ -89,7 +90,7 @@ def get_status(exp_batch, experiment, process_name):
 
 
     # The experiment exist ! However, check if the log file exist.
-    print ("log path ", log_file_path)
+
     if not os.path.exists(log_file_path):
 
         return ['Not Started', '']
@@ -97,7 +98,6 @@ def get_status(exp_batch, experiment, process_name):
     # Read the full json file.
     data = json_formatter.readJSONlog(open(log_file_path, 'r'))
 
-    print (data)
 
     # Now check if the latest data is loading
     if 'Loading' in data[-1]:
@@ -106,9 +106,7 @@ def get_status(exp_batch, experiment, process_name):
     # Then we check if finished or is going on
 
     if 'Iterating' in data[-1]:
-
-
-        if list(data[-1].values())[0]['Iteration'] >= g_conf.param.MISC.NUMBER_OF_ITERATIONS:
+        if list(data[-1].values())[0]['Iteration'] >= g_conf.NUMBER_ITERATIONS:
             return ['Finished', ' ']
         else:
             return ['Iterating', get_summary(data)]
@@ -118,20 +116,29 @@ def get_status(exp_batch, experiment, process_name):
         return ['Error', ' ']
 
 
-
-    # TODO: Needs to return if the proccess is actively executing or stoped.
-
-
-    return None
+    raise ValueError(" No valid status found")
 
 
 
 
-def plot_folder_summaries(exp_batch):
+
+def plot_folder_summaries(exp_batch, process_names):
+
+    experiment_list = os.listdir(os.path.join('configs', exp_batch))
+
+    for experiment in experiment_list:
+
+
+        print ('For ', experiment)
+
+        for process in process_names:
+
+            print (process, get_status(exp_batch, experiment, process))
+
 
 
     # For each on the folder
     # Get the status.
-    # Plot it nicely  in terminal.
-    pass
+    # TODO: Plot it nicely  in terminal.
+
 

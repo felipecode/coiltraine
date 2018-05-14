@@ -7,11 +7,11 @@ def get_free_gpus(allocated_gpus, executing_processes):
     free_gpus = allocated_gpus
 
     for process_specs in executing_processes:
-        print("STATUS", monitorer.get_status(process_specs['folder'], process_specs['experiment'],
-                             process_specs['type']))
 
-        if monitorer.get_status(process_specs['folder'], process_specs['experiment'],
-                                     process_specs['type']) == "Finished":
+        status = monitorer.get_status(process_specs['folder'], process_specs['experiment'],
+                                     process_specs['type'])[0]
+        print (status)
+        if  status == "Finished":
             print ("finished")
             free_gpus.append([process_specs['gpu'], process_specs['gpu']])
 

@@ -86,8 +86,7 @@ class testExpSched(unittest.TestCase):
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 
-            print (free_gpus)
-            print (executing_processes)
+
 
 
 
@@ -100,7 +99,7 @@ class testExpSched(unittest.TestCase):
         # JUST A TRICK TO CONTAIN THE CURRENT LIMITATIONS
         set_type_of_process('train')
 
-        coil_logger.add_message('Iterating', {'Current Loss': 3,
+        coil_logger.add_message('Iterating', {'Iteration': 2000, 'Current Loss': 3,
                                  'Best Loss': 1, 'Best Loss Iteration': 1,
                                  'Some Output': 2,
                                  'GroundTruth': 3,

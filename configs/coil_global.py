@@ -73,8 +73,6 @@ _g_conf.SEQUENCE_STRIDE = 1
 _g_conf.TEST_SCHEDULE = range(0, 2000, 200)
 
 
-#self.param.MISC.DATASET_SIZE
-
 """#### Network Related Parameters ####"""
 
 
@@ -97,8 +95,10 @@ def _check_integrity():
 
 def merge_with_yaml(yaml_filename):
     """Load a yaml config file and merge it into the global config object"""
-    #with open(yaml_filename, 'r') as f:
-    #    yaml_cfg = AttributeDict(yaml.load(f))
+    with open(yaml_filename, 'r') as f:
+        yaml_cfg = AttributeDict(yaml.load(f))
+
+    print (yaml_cfg)
     #_merge_a_into_b(yaml_cfg, __C)
 
     #TODO: Merging is missing
@@ -128,7 +128,9 @@ def set_type_of_process(process_type):
     if _g_conf.PROCESS_NAME == "default":
         raise RuntimeError(" You should merge with some exp file before setting the type")
 
-    if process_type == "train" or process_type == "validation":
+    if process_type == 'train':
+        _g_conf.PROCESS_NAME = process_type
+    elif process_type == "validation":
         _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.TRAIN_DATASET_NAME
     if process_type == "test":
         _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.CITY_NAME
