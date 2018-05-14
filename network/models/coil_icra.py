@@ -109,7 +109,6 @@ class CoILICRA(nn.Module):
         # TODO: unit test this function
         output_vec = torch.stack(self.forward(x, a)[0:4])
 
-        print (" OUTPUT VEC ", output_vec)
 
         return self.extract_branch(output_vec, branch_number)
 

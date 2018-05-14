@@ -5,6 +5,7 @@ import sys
 import numpy as np
 import torch
 import torch.optim as optim
+import random
 
 # What do we define as a parameter what not.
 
@@ -24,7 +25,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
     # At this point the log file with the correct naming is created.
-    merge_with_yaml(os.path.join(exp_batch, exp_alias+'.yaml'))
+    merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
     set_type_of_process('validation')
 
 
@@ -32,7 +33,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
 
     sys.stdout = open(str(os.getpid()) + ".out", "a", buffering=1)
 
-    if monitorer.get_status(exp_batch, exp_alias, g_conf.PROCESS_NAME)[0] == "Finished":
+    if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
         # TODO: print some cool summary or not ?
         return
 
@@ -57,6 +58,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
     model.cuda()
 
 
+    criterion = Loss()
+
 
     latest = get_latest_evaluated_checkpoint()
     if latest is None:  # When nothing was tested, get latest returns none, we fix that.
@@ -75,9 +78,12 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
             checkpoint_iteration = checkpoint['iteration']
             print ("Validation loaded ", checkpoint_iteration)
 
+            best_loss = 1000
+            best_error = 1000
+
             for data in data_loader:
 
-                input_data, labels = data
+                input_data, float_data = data
                 control_position = np.where(dataset.meta_data[:, 0] == 'control')[0][0]
                 speed_position = np.where(dataset.meta_data[:, 0] == 'speed_module')[0][0]
                 print (torch.squeeze(input_data['rgb']).shape)
@@ -86,8 +92,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
                 print (speed_position)
                 # Obs : Maybe we could also check for other branches ??
                 output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
-                                              labels[:, speed_position, :].cuda(),
-                                              labels[:, control_position, :].cuda())
+                                              float_data[:, speed_position, :].cuda(),
+                                              float_data[:, control_position, :].cuda())
                 # TODO: clean this squeeze and dimension things
 
 
@@ -98,19 +104,42 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
                                                                     output[i][2]])
 
 
-                coil_logger.add_message('Running', {'CurrentValidation'})
+                # TODO: Change this a functional standard using the loss functions.
+                loss = torch.mean((output - dataset.extract_targets(float_data).cuda())**2)
+
+
+                error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda()))
 
 
 
-            coil_logger.add_message('Running',{'CompletedValidation':{'Iteration':latest}})
+                # Log a random position
+                position = random.randint(0, len(float_data) - 1)
+                print (output[position].data.tolist())
+                coil_logger.add_message('Iterating',
+                    {'CurrentValidation': {
+                     'Some Output': output[position].data.tolist(),
+                     'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist(),
+                     'Error': error.data.tolist(),
+                     'Loss': loss.data.tolist(),
+                     'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()}})
 
-                #loss = criterion(output, labels)
 
-                #loss.backward()
 
-                #optimizer.step()
 
-                #shutil.copyfile(filename, 'model_best.pth.tar')
+
+
+
+
+            coil_logger.add_message('Iterating', {'CompletedValidation': {'Iteration': latest}})
+
+            #loss = criterion(output, labels)
+
+            #loss.backward()
+
+            #optimizer.step()
+
+            #shutil.copyfile(filename, 'model_best.pth.tar')
+
         else:
             time.sleep(1)
             print ("Waiting for the next Validation")

@@ -69,16 +69,7 @@ class Conv(nn.Module):
 
         # TODO: TRACK NANS OUTPUTS
         # TODO: Maybe change the name
-
-        # TODO: Control the frequency of postion log
-        coil_logger.add_message('Model', {
-            'Perception': {
-                            "Output": [1.0, 12.3, 124.29]
-                           },
-            "Iteration": 765
-
-            }
-        )
+        # TODO: Maybe add internal logs !
 
         """ conv1 + batch normalization + dropout + relu """
         x = self.layers(x)

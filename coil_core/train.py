@@ -130,12 +130,12 @@ def execute(gpu, exp_batch, exp_alias):
 
         # TODO: Get only the  float_data that are actually generating output
         coil_logger.add_message('Iterating',
-                                {'Current Loss': loss,
-                                 'Best Loss': best_loss, 'Best Loss Iteration': best_loss_iter,
-                                 'Some Output': output[position],
-                                 'GroundTruth': dataset.extract_targets(float_data)[position],
+                                {'Current Loss': loss.data,
+                                 'Best Loss': best_loss.data, 'Best Loss Iteration': best_loss_iter.data,
+                                 'Some Output': output[position].data,
+                                 'GroundTruth': dataset.extract_targets(float_data)[position].data,
                                  #'Error': abs(output[position][0] - dataset.extract_targets(float_data)[position]),
-                                 'Inputs': dataset.extract_inputs(float_data)[position]},
+                                 'Inputs': dataset.extract_inputs(float_data)[position].data},
                                 iteration)
 
         # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
