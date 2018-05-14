@@ -5,7 +5,7 @@ import logging
 import os
 
 from .json_formatter import filelogger
-
+from .tensorboard_logger import Logger
 
 
 g_logger = filelogger('None')
@@ -16,7 +16,7 @@ EXPERIMENT_NAME = ''
 EXPERIMENT_BATCH_NAME = ''
 PROCESS_NAME = ''
 LOG_FREQUENCY = 1
-
+tl = ''
 # This next bit is to ensure the script runs unchanged on 2.x and 3.x
 
 
@@ -40,6 +40,7 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1):
     global EXPERIMENT_NAME
     global PROCESS_NAME
     global LOG_FREQUENCY
+    global tl
 
     root_path = "_logs"
     if not os.path.exists(root_path):
@@ -65,6 +66,7 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1):
     EXPERIMENT_NAME = exp_name
     PROCESS_NAME = process_name
     LOG_FREQUENCY = log_frequency
+    tl = Logger(os.path.join(root_path, exp_batch_name, exp_name, 'tensorboard_logs_'+process_name))
 
 
 
@@ -147,7 +149,7 @@ def add_scalar(tag, value, iteration=None):
             tl.scalar_summary(tag, value, iteration + 1)
 
     else:
-        tl.scalar_summary(tag, value, iteration + 1)
+        tl.scalar_summary(tag, value, 0)
 
 
 

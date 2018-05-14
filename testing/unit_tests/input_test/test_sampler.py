@@ -17,7 +17,7 @@ class testSampler(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         super(testSampler, self).__init__(*args, **kwargs)
-        self.root_test_dir = 'testing/unit_tests/data'
+        self.root_test_dir = '/home/felipe/Datasets/CVPR02Noise/SeqTrain'
         self.test_images_write_path = 'testing/unit_tests/_test_images_'
 
 
@@ -64,7 +64,7 @@ class testSampler(unittest.TestCase):
         steerings = dataset.measurements[0, :]
         print (dataset.meta_data)
         # TODO: read meta data and turn into a coool dictionary ?
-        print (np.where(dataset.meta_data[:, 0] == 'control'))
+        print (np.where(dataset.meta_data[:, 0] == b'control'))
         labels = dataset.measurements[24, :]
 
         print (np.unique(labels))
@@ -72,19 +72,19 @@ class testSampler(unittest.TestCase):
         keys = range(0, len(steerings))
 
 
-        splitted_labels = splitter.label_split(labels, keys, g_conf.param.INPUT.LABELS_DIVISION)
+        splitted_labels = splitter.label_split(labels, keys, g_conf.LABELS_DIVISION)
 
         # print (splitted_labels)
         # Another level of splitting
         splitted_steer_labels = []
         for keys in splitted_labels:
             splitter_steer = splitter.float_split(steerings, keys,
-                                                  g_conf.param.INPUT.STEERING_DIVISION)
+                                                  g_conf.STEERING_DIVISION)
 
             splitted_steer_labels.append(splitter_steer)
 
 
-        #weights = [1.0/len(g_conf.param.INPUT.STEERING_DIVISION)]*len(g_conf.param.INPUT.STEERING_DIVISION)
+        #weights = [1.0/len(g_conf.STEERING_DIVISION)]*len(g_conf.STEERING_DIVISION)
 
         sampler = CoILSampler(splitted_steer_labels)
 

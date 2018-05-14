@@ -92,34 +92,31 @@ def execute(gpu, exp_batch, exp_alias):
     for data in data_loader:
 
 
-        input_data, labels = data
+        input_data, float_data = data
 
 
         #TODO, ADD ITERATION SCHEDULE
         input_rgb_data = augmenter(0, input_data['rgb'])
-        coil_logger.add_images(input_rgb_data)
+        #coil_logger.add_images(input_rgb_data)
 
-        # get the control commands from labels, size = [120,1]
-        controls = labels[:, CoILDataset.controls_position, :]
+        # get the control commands from float_data, size = [120,1]
 
+        controls = float_data[:, dataset.controls_position(), :]
+        print(" CONTROLS  ", controls.shape)
         # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
         model.zero_grad()
-        branches = model(input_rgb_data, CoILDataset.extract_inputs(labels).cuda())
+        print ( 'INPUTS', dataset.extract_inputs(float_data).shape )
+        branches = model(input_rgb_data, dataset.extract_inputs(float_data).cuda())
 
         #print ("len ",len(branches))
 
-        # get the steer, gas and brake ground truth from labels
-        # TODO: THERE IS A DICTONARY TO SELECT THE OUTPUTS
-        #steer_gt = labels[:, 0, :]
-        #gas_gt = labels[:, 1, :]
-        #brake_gt = labels[:, 2, :]
-        #speed_gt = labels[:, 10, :]
+
 
         #targets = torch.cat([steer_gt, gas_gt, brake_gt], 1)
-
-        loss = criterion.MSELoss(branches, CoILDataset.extract_targets(labels).cuda(),
-                                 controls.cuda(), CoILDataset.extract_inputs.cuda())
+        print ("Extracted targets ", dataset.extract_targets(float_data).shape[0])
+        loss = criterion.MSELoss(branches, dataset.extract_targets(float_data).cuda(),
+                                 controls.cuda(), dataset.extract_inputs(float_data).cuda())
 
         # TODO: All these logging things could go out to clean up the main
         if loss < best_loss:
@@ -127,23 +124,23 @@ def execute(gpu, exp_batch, exp_alias):
             best_loss_iter = iteration
 
         # Log a random position
-        position = random.randint(0, len(labels))
+        position = random.randint(0, len(float_data))
 
-        output = model.extract_branch(branches, controls)
+        output = model.extract_branch(torch.stack(branches[0:4]), controls)
 
-        # TODO: Get only the  labels that are actually generating output
+        # TODO: Get only the  float_data that are actually generating output
         coil_logger.add_message('Iterating',
                                 {'Current Loss': loss,
                                  'Best Loss': best_loss, 'Best Loss Iteration': best_loss_iter,
                                  'Some Output': output[position],
-                                 'GroundTruth': CoILDataset.extract_targets(labels[position]),
-                                 'Error': abs(output[position] - labels[position]),
-                                 'Inputs': CoILDataset.extract_targets(labels[position, 10, :])},
+                                 'GroundTruth': dataset.extract_targets(float_data)[position],
+                                 #'Error': abs(output[position][0] - dataset.extract_targets(float_data)[position]),
+                                 'Inputs': dataset.extract_inputs(float_data)[position]},
                                 iteration)
 
         # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
 
-        coil_logger.add_scalars('Loss', 'Error')
+        coil_logger.add_scalar('Loss', loss.data, iteration)
 
 
         loss.backward()

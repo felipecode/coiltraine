@@ -186,7 +186,11 @@ class CoILDataset(Dataset):
 
     # TODO: MAKE AN "EXTRACT" method used by both of the functions above.
 
-    @staticmethod
+    # TODO: Turn into a static property
+
+    def controls_position(self):
+        return np.where(self.meta_data[:, 0] == 'control')[0][0]
+
     def extract_targets(self, float_data):
         """
         Method used to get to know which positions from the dataset are the targets
@@ -202,11 +206,10 @@ class CoILDataset(Dataset):
         """
         targets_vec = []
         for target_name in g_conf.TARGETS:
-            targets_vec.append(float_data[:, np.where(self.meta_data[:, 0] == target_name), :])
+            targets_vec.append(float_data[:, np.where(self.meta_data[:, 0] == target_name)[0][0], :])
 
         return torch.cat(targets_vec, 1)
 
-    @staticmethod
     def extract_inputs(self, float_data):
         """
         Method used to get to know which positions from the dataset are the inputs
@@ -222,6 +225,6 @@ class CoILDataset(Dataset):
         """
         inputs_vec = []
         for input_name in g_conf.INPUTS:
-            inputs_vec.append(float_data[:, np.where(self.meta_data[:, 0] == input_name), :])
+            inputs_vec.append(float_data[:, np.where(self.meta_data[:, 0] == input_name)[0][0], :])
 
         return torch.cat(inputs_vec, 1)

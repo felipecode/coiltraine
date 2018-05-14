@@ -36,7 +36,6 @@ import imgauggpu as iag
 import imgaug.augmenters as ia
 
 
-# TODO: How do we KEEP A GOOD ITERATION COUNTER ??
 
 # TODO: NAMing conventions ?
 
@@ -58,7 +57,7 @@ _g_conf.AUGMENTATION_SUITE = [iag.ToGPU()]#, iag.Add((0, 0)), iag.Dropout(0, 0),
 #                              ]
 _g_conf.TRAIN_DATASET_NAME = 'SmallTest'  # We only set the dataset in configuration for training
 
-_g_conf.LOG_SCALAR_WRITING_FREQUENCY = 2   # TODO NEEDS TO BE ADDED TO THE LOGGING FUNCTION ON  CREATE LOG
+_g_conf.LOG_SCALAR_WRITING_FREQUENCY = 2   # TODO NEEDS TO BE TESTED ON THE LOGGING FUNCTION ON  CREATE LOG
 _g_conf.LOG_IMAGE_WRITING_FREQUENCY = 15
 
 _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
@@ -110,6 +109,7 @@ def merge_with_yaml(yaml_filename):
 
 
 
+
 def set_type_of_process(process_type):
     """
     This function is used to set which is the type of the current process, test, train or val
@@ -145,7 +145,7 @@ def set_type_of_process(process_type):
     if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
                                     _g_conf.EXPERIMENT_NAME,
                                     'checkpoints') ):
-        os.mkdir(os.path.join( '_logs', _g_conf.EXPERIMENT_BATCH_NAME,
+        os.mkdir(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
                                     _g_conf.EXPERIMENT_NAME,
                                     'checkpoints'))
 
