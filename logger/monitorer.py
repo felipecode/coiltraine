@@ -24,10 +24,25 @@ def get_current_iteration(exp):
     pass
 
 
+def get_latest_output(data):
+
+    # Find the one that has an iteration .........
+    if 'Iteration' in data[-1]:
+        return data[-1]
+    else:
+        return data[-2]
+
+
 def get_summary(data):
 
-    # Find the
-    return data[-1]
+
+    # IT HAS TO BE ITERATING  ! ! !  ! ! !
+    for i in range(1, len(data)):
+        # Find the
+        if 'Summary' in data[-i]['Iterating']:
+            return data[-i]
+    else:  # NO SUMMARY YET COMPUTED
+        return ''
 
 
 def get_latest_checkpoint():
@@ -106,10 +121,18 @@ def get_status(exp_batch, experiment, process_name):
     # Then we check if finished or is going on
 
     if 'Iterating' in data[-1]:
-        if list(data[-1].values())[0]['Iteration'] >= g_conf.NUMBER_ITERATIONS:
+        try:
+            iteration_number = list(data[-1].values())[0]['Checkpoint']
+        except KeyError:
+            iteration_number = list(data[-1].values())[0]['Iteration']
+
+        if iteration_number >= g_conf.NUMBER_ITERATIONS:
             return ['Finished', ' ']
         else:
-            return ['Iterating', get_summary(data)]
+            if 'validation' in process_name:
+                return ['Iterating', [get_latest_output(data), get_summary(data)]]
+            elif 'train' in process_name:
+                return ['Iterating', get_latest_output(data)]
 
     # TODO: there is the posibility of some race conditions on not having error as last
     if 'Error' in data[-1]:
@@ -121,8 +144,74 @@ def get_status(exp_batch, experiment, process_name):
 
 
 
+"""
+COLOR CODINGS
+"""
+BOLD = '\033[1m'
+UNDERLINE = '\033[4m'
+ITALIC = '\033[3m'
+RED = '\033[91m'
+LIGHT_GREEN = '\033[32m'
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+DARK_BLUE = '\033[94m'
+BLUE = '\033[94m'
+END = '\033[0m'
 
-def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environments):
+
+def print_train_summary(summary):
+
+    if summary == '':
+        return
+    print ('        SUMMARY:')
+    print ('            Iteration: ', BLUE + str(summary['Iteration']) + END)
+    print ('            Images/s: ', BOLD + str(summary['Images/s']) + END)
+    print ('            Loss: ', UNDERLINE + str(summary['Loss']) + END)
+    print ('            Best Loss: ', LIGHT_GREEN + UNDERLINE + str(summary['BestLoss']) + END)
+    print ('            Best Loss Iteration: ', BLUE + UNDERLINE + str(summary['BestLossIteration']) + END)
+    #print ('            Best Error: ',UNDERLINE + str(summary['BestError']) + END)
+    print ('            Outputs: ', UNDERLINE + str(summary['Output']) + END)
+    print ('            Ground Truth: ', UNDERLINE + str(summary['GroundTruth']) + END)
+    print ('            Error: ', UNDERLINE + str(summary['Error']) + END)
+
+
+
+def print_validation_summary(current, latest, verbose):
+
+    if current == '':
+        return
+
+
+
+
+    print ('        CHECKPOINT: ', DARK_BLUE + str(current['Checkpoint']) + END)
+    if  verbose:
+        print ('        CURRENT: ')
+        print ('            Iteration: ', BLUE + str(current['Iteration']) + END)
+        print ('            Mean Error: ', UNDERLINE + str(current['MeanError']) + END)
+        print ('            Loss: ', UNDERLINE + str(current['Loss']) + END)
+        print ('            Outputs: ', UNDERLINE + str(current['Output']) + END)
+        print ('            Ground Truth: ', UNDERLINE + str(current['GroundTruth']) + END)
+        print ('            Error: ', UNDERLINE + str(current['Error']) + END)
+
+    if latest == '':
+        return
+
+    print ('        LATEST: ')
+    print ('            Loss: ', UNDERLINE + str(latest['Loss']) + END)
+    print ('            Best Loss: ', LIGHT_GREEN + UNDERLINE + str(latest['BestLoss']) + END)
+    print ('            Best Loss Checkpoint: ', BLUE + UNDERLINE + str(latest['BestLossCheckpoint']) + END)
+    print ('            Error: ', UNDERLINE + str(latest['Error']) + END)
+    print ('            Best Error: ', LIGHT_GREEN + UNDERLINE + str(latest['BestError']) + END)
+    print ('            Best Error Checkpoint: ', BLUE + UNDERLINE + str(latest['BestErrorCheckpoint']) + END)
+
+
+def print_drive_summary(summary):
+
+    pass
+
+
+def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environments, verbose=False):
 
     # TODO: if train is not running the user should be warned
 
@@ -146,16 +235,45 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
     for experiment in experiments_list:
 
 
-        print ('For ', experiment)
+        # TODO: DO THE EXPERIMENT NAMER
+        print (BOLD + experiment + END)
 
         for process in process_names:
+            output = get_status(exp_batch, experiment, process)
+            status  = output[0]
+            summary = output[1]
+            print ('    ', process)
 
-            print (process, get_status(exp_batch, experiment, process))
+            if status == 'Not Started':
+
+                print ('       STATUS: ', BOLD + status + END)
+
+            elif status == 'Iterating' or status == 'Loading':
+
+                print('        STATUS: ', YELLOW + status + END)
+
+            elif status == 'Finished':
+
+                print('        STATUS: ', GREEN + status + END)
+
+            elif status == 'Error':
+
+                print('        STATUS: ', RED + status + END)
+
+
+            if status == 'Iterating':
+                if 'train' in process:
+                    print_train_summary(summary[status])
+                if 'validation' in process:
+                    print_validation_summary(summary[0][status], summary[1][status]['Summary'], verbose)
+                if 'drive' in process:
+                    print_drive_summary(summary[status])
+
+
 
 
 
     # For each on the folder
     # Get the status.
-    # TODO: Plot it nicely  in terminal.
 
 

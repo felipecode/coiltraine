@@ -41,7 +41,7 @@ def allocate_gpu_resources(gpu_resources, amount_to_allocate):
     """
 
     for gpu, resource in gpu_resources.items():
-        if resource > amount_to_allocate:
+        if resource >= amount_to_allocate:
             gpu_resources[gpu] -= amount_to_allocate
             return gpu_resources, max(gpu_resources.values()), gpu
 

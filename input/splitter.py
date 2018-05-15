@@ -3,7 +3,7 @@ from logger import coil_logger
 import numpy as np
 
 
-# TODO: --- WARNING--- NOT WORKING AFTER ADDING SEQUENCES.
+# TODO: --- WARNING--- NOT WORKING FOR SEQUENCES ! ! ! ! !  ! ! ! ! ! ! ! ! ! ! !!
 
 def order_sequence(steerings, keys_sequence):
     sequence_average = []

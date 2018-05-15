@@ -65,6 +65,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
     if latest is None:  # When nothing was tested, get latest returns none, we fix that.
         latest = 0
 
+
     print (dataset.meta_data)
     best_loss = 1000
     best_error = 1000
@@ -97,10 +98,12 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
                 print (control_position)
                 print (speed_position)
                 # Obs : Maybe we could also check for other branches ??
+
                 output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
                                               float_data[:, speed_position, :].cuda(),
                                               float_data[:, control_position, :].cuda())
-                # TODO: clean this squeeze and dimension things
+
+
 
 
                 for i in range(input_data['rgb'].shape[0]):
@@ -112,24 +115,26 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
 
                 # TODO: Change this a functional standard using the loss functions.
 
-                loss = torch.mean((output - dataset.extract_targets(float_data).cuda())**2)
-                error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda()))
-                accumulated_error += error
+                loss = torch.mean((output - dataset.extract_targets(float_data).cuda())**2).data.tolist()
+                mean_error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
+                accumulated_error += mean_error
                 accumulated_loss += loss
+                error = torch.abs(output - dataset.extract_targets(float_data).cuda())
 
 
                 # Log a random position
                 position = random.randint(0, len(float_data) - 1)
                 #print (output[position].data.tolist())
                 coil_logger.add_message('Iterating',
-                     {'Iteration': latest,
-                      'Internal': (str(iteration_on_checkpoint)+'/'+str(len(dataset))),
-                      'Some Output': output[position].data.tolist(),
+                     {'Checkpoint': latest,
+                      'Iteration': (str(iteration_on_checkpoint*120)+'/'+str(len(dataset))),
+                      'MeanError': mean_error,
+                      'Loss': loss,
+                      'Output': output[position].data.tolist(),
                       'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist(),
-                      'Error': error.data.tolist(),
-                      'Loss': loss.data.tolist(),
+                      'Error': error[position].data.tolist(),
                       'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()})
-
+                iteration_on_checkpoint += 1
 
             checkpoint_average_loss = accumulated_loss/len(dataset)
             checkpoint_average_error = accumulated_error/len(dataset)
@@ -148,27 +153,15 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
 
                  {'Summary':
                      {
-                      'Error': checkpoint_average_error.data.tolist(),
-                      'Loss': checkpoint_average_loss.data.tolist(),
-                      'BestError': best_error.data.tolist(),
-                      'BestLoss': best_loss.data.tolist(),
-                      'BestLossIter': best_loss_iter,
-                      'BestErrorIter': best_error_iter
+                      'Error': checkpoint_average_error,
+                      'Loss': checkpoint_average_loss,
+                      'BestError': best_error,
+                      'BestLoss': best_loss,
+                      'BestLossCheckpoint': best_loss_iter,
+                      'BestErrorCheckpoint': best_error_iter
                      },
 
-                 'Iteration': latest})
-
-
-
-
-
-            #loss = criterion(output, labels)
-
-            #loss.backward()
-
-            #optimizer.step()
-
-            #shutil.copyfile(filename, 'model_best.pth.tar')
+                 'Checkpoint': latest})
 
         else:
             time.sleep(1)

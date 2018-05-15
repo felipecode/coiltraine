@@ -119,18 +119,20 @@ def folder_execute(params=None):
 
     # No process is executing right now.
 
+    print (tasks_queue)
+
 
     while True:
         #        if not done or executing  get to the list
         # If amount of resources is smaller than a threshold.
-        while resources_on_most_free_gpu > min([allocation_parameters['train_cost'],
+        while resources_on_most_free_gpu >= min([allocation_parameters['train_cost'],
                                             allocation_parameters['validation_cost'],
                                             allocation_parameters['drive_cost']]):
             #Allocate all the gpus
 
             process_specs = heapq.heappop(tasks_queue)[2]  # To get directly the dict
-
-
+            print ("process ", process_specs)
+            print (free_gpus, resources_on_most_free_gpu)
             if process_specs['type'] == 'train' and resources_on_most_free_gpu >= allocation_parameters['train_cost']:
                 free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
                                                              free_gpus,
@@ -159,6 +161,8 @@ def folder_execute(params=None):
                 executing_processes.append(process_specs)
 
 
+
+
         time.sleep(5)
 
 
@@ -175,7 +179,12 @@ def folder_execute(params=None):
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description=__doc__)
 
-    # TODO: add a single experiment run option.
+
+    argparser.add_argument(
+        '--single_process',
+        default=None,
+        type=str
+    )
     argparser.add_argument(
         '--gpus',
         nargs='+',
@@ -211,9 +220,6 @@ if __name__ == '__main__':
 
 
 
-    #execute_train("0", "eccv", "experiment_1")
-    #execute_validation("0", "eccv", "experiment_1", "SmallTest")
-    #execute_drive("0", "eccv", "experiment_1", 'Town02')
 
     for gpu in args.gpus:
         try:
@@ -228,20 +234,34 @@ if __name__ == '__main__':
     # TODO: of course this change from gpu to gpu , but for now we just assume at least a K40
     # Maybe the latest voltas will be underused
 
-    allocation_parameters = {'gpu_value': 3.5,
-                             'train_cost': 2,
-                             'validation_cost': 1.5,
-                             'drive_cost': 1.5}
 
-    params = {
-        'folder': args.folder,
-        'gpus': list(args.gpus),
-        'is_training': args.is_training,
-        'validation_datasets': list(args.validation_datasets),
-        'driving_environments': list(args.driving_environments),
-        'allocation_parameters': allocation_parameters
-    }
+    # TODO: Divide maybe into different executables.
+    if args.single_process is not None:
+        if args.single_process == 'train':
+            execute_train("0", "eccv", "experiment_1")
 
-    print (params)
+        if args.single_process == 'validation':
+            execute_validation("0", "eccv", "experiment_1", "SmallTest")
 
-    folder_execute(params)
+        if args.single_process == 'drive':
+            execute_drive("0", "eccv", "experiment_1", 'Town02')
+
+
+    else:
+        allocation_parameters = {'gpu_value': 3.5,
+                                 'train_cost': 2,
+                                 'validation_cost': 1.5,
+                                 'drive_cost': 1.5}
+
+        params = {
+            'folder': args.folder,
+            'gpus': list(args.gpus),
+            'is_training': args.is_training,
+            'validation_datasets': list(args.validation_datasets),
+            'driving_environments': list(args.driving_environments),
+            'allocation_parameters': allocation_parameters
+        }
+
+        print (params)
+
+        folder_execute(params)

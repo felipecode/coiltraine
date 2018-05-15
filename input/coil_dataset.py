@@ -175,6 +175,7 @@ class CoILDataset(Dataset):
                                           limit=2, file=sys.stdout)
                 print("failed to open", file_name )
 
+        # TODO: ADD THE STEERING MULTIPLE CAMERA AUGMENTATION
 
         # For the number of datasets names that are going to be used for measurements cat all.
         for i in range(len(meas_names)):

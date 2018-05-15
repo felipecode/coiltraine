@@ -28,7 +28,7 @@ def execute(gpu, exp_batch, exp_alias):
 
     coil_logger.add_message('Loading', {'GPU': gpu})
 
-    sys.stdout = open(str(os.getpid()) + ".out", "a", buffering=1)
+    sys.stdout = open(g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out", "a", buffering=1)
 
 
 
@@ -128,18 +128,9 @@ def execute(gpu, exp_batch, exp_alias):
         position = random.randint(0, len(float_data)-1)
 
         output = model.extract_branch(torch.stack(branches[0:4]), controls)
+        error = torch.abs(output - dataset.extract_targets(float_data).cuda())
 
-        # TODO: Get only the  float_data that are actually generating output
-        # TODO: itearation is repeating , and that is dumb
-        coil_logger.add_message('Iterating',
-                                {'Iteration': iteration,
-                                 'Current Loss': loss.data.tolist(),
-                                 'Best Loss': best_loss, 'Best Loss Iteration': best_loss_iter,
-                                 'Some Output': output[position].data.tolist(),
-                                 'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist()[0],
-                                 #'Error': abs(output[position][0] - dataset.extract_targets(float_data)[position]),
-                                 'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()[0]},
-                                iteration)
+
 
         # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
 
@@ -153,15 +144,21 @@ def execute(gpu, exp_batch, exp_alias):
         capture_time = time.time()
 
 
-        #coil_logger.add_message('Running',
-        #                        {'Iteration':iteration, 'Current Loss':loss,
-        #                         'Best Loss':get_best_loss(), 'Some Output',
-        #                         'Some Ground Truth','Error'
-        #                         'Speed:'})
+        # TODO: Get only the  float_data that are actually generating output
+        # TODO: itearation is repeating , and that is dumb
+        coil_logger.add_message('Iterating',
+                                {'Iteration': iteration,
+                                 'Loss': loss.data.tolist(),
+                                 'Images/s': (iteration*g_conf.BATCH_SIZE)/accumulated_time,
+                                 'BestLoss': best_loss, 'BestLossIteration': best_loss_iter,
+                                 'Output': output[position].data.tolist(),
+                                 'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist(),
+                                 'Error': error[position].data.tolist(),
+                                 'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()},
+                                iteration)
 
         # TODO: For now we are computing the error for just the correct branch, it could be multi-branch,
 
-        #coil_logger.add_scalars('Loss','Error')
 
         # TODO: save also the optimizer state dictionary
         if is_ready_to_save(iteration):
@@ -177,14 +174,7 @@ def execute(gpu, exp_batch, exp_alias):
             # TODO : maybe already summarize the best model ???
             torch.save(state, os.path.join('_logs', exp_batch, exp_alias
                                            , 'checkpoints', str(iteration) + '.pth'))
+
         iteration += 1
-        print ((iteration*120)/accumulated_time)
-
-        #shutil.copyfile(filename, 'model_best.pth.tar')
-
-
-    #torch.save(model, os.path.join(os.environ["COIL_TRAINED_MODEL_PATH"], exp_alias))
-    #print('------------------- Trainind Done! --------------------------')
-    #print('The trained model has been saved in ' + os.path.join(os.environ["COIL_TRAINED_MODEL_PATH"], exp_alias))
 
 
