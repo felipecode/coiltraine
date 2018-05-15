@@ -96,11 +96,10 @@ class CoILDataset(Dataset):
 
 
 
-        coil_logger.add_message('Running', {'Reading':{'Iteration': self.batch_read_number,
-                                                       'ReadKeys': used_ids}})
+        #coil_logger.add_message('Running', {'Reading':{'Iteration': self.batch_read_number,
+        #                                               'ReadKeys': used_ids}})
         self.batch_read_number += 1
-        # TODO: add tensorboard image adding
-        # TODO: Do we need to limit the number of iterations the images are saved ??
+        # TODO: IMPORTANT !!!
         # TODO: ADD GROUND TRUTH CONTROL IN SOME META CONFIGURATION FOR THE DATASET
         # TODO: SO if the data read and manipulate is outside some range, it should report error
         return batch_sensors, self.measurements[:, used_ids]

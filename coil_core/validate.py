@@ -66,6 +66,10 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
         latest = 0
 
     print (dataset.meta_data)
+    best_loss = 1000
+    best_error = 1000
+    best_loss_iter = 0
+    best_error_iter = 0
 
     while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
@@ -78,9 +82,11 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
             checkpoint_iteration = checkpoint['iteration']
             print ("Validation loaded ", checkpoint_iteration)
 
-            best_loss = 1000
-            best_error = 1000
 
+
+            accumulated_loss = 0
+            accumulated_error = 0
+            iteration_on_checkpoint = 0
             for data in data_loader:
 
                 input_data, float_data = data
@@ -105,32 +111,56 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
 
 
                 # TODO: Change this a functional standard using the loss functions.
+
                 loss = torch.mean((output - dataset.extract_targets(float_data).cuda())**2)
-
-
                 error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda()))
-
+                accumulated_error += error
+                accumulated_loss += loss
 
 
                 # Log a random position
                 position = random.randint(0, len(float_data) - 1)
-                print (output[position].data.tolist())
+                #print (output[position].data.tolist())
                 coil_logger.add_message('Iterating',
-                    {'CurrentValidation': {
-                     'Some Output': output[position].data.tolist(),
-                     'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist(),
-                     'Error': error.data.tolist(),
-                     'Loss': loss.data.tolist(),
-                     'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()}})
+                     {'Iteration': latest,
+                      'Internal': (str(iteration_on_checkpoint)+'/'+str(len(dataset))),
+                      'Some Output': output[position].data.tolist(),
+                      'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist(),
+                      'Error': error.data.tolist(),
+                      'Loss': loss.data.tolist(),
+                      'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()})
+
+
+            checkpoint_average_loss = accumulated_loss/len(dataset)
+            checkpoint_average_error = accumulated_error/len(dataset)
+            coil_logger.add_scalar('Loss', checkpoint_average_loss, latest)
+            coil_logger.add_scalar('Error', checkpoint_average_error, latest)
+
+            if checkpoint_average_loss < best_loss:
+                best_loss = loss
+                best_loss_iter = latest
+
+            if checkpoint_average_error < best_loss:
+                best_error = loss
+                best_error_iter = latest
+
+            coil_logger.add_message('Iterating',
+
+                 {'Summary':
+                     {
+                      'Error': checkpoint_average_error.data.tolist(),
+                      'Loss': checkpoint_average_loss.data.tolist(),
+                      'BestError': best_error.data.tolist(),
+                      'BestLoss': best_loss.data.tolist(),
+                      'BestLossIter': best_loss_iter,
+                      'BestErrorIter': best_error_iter
+                     },
+
+                 'Iteration': latest})
 
 
 
 
-
-
-
-
-            coil_logger.add_message('Iterating', {'CompletedValidation': {'Iteration': latest}})
 
             #loss = criterion(output, labels)
 

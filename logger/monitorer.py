@@ -77,10 +77,10 @@ def get_status(exp_batch, experiment, process_name):
 
 
     # Configuration file path
-    config_file_path = os.path.join('configs', exp_batch, experiment)
+    config_file_path = os.path.join('configs', exp_batch, experiment + '.yaml')
 
     # The path for log
-    log_file_path = os.path.join('_logs', exp_batch, experiment.split('.')[-2], process_name)
+    log_file_path = os.path.join('_logs', exp_batch, experiment, process_name)
 
     # First we check if the experiment exist
 
@@ -122,11 +122,28 @@ def get_status(exp_batch, experiment, process_name):
 
 
 
-def plot_folder_summaries(exp_batch, process_names):
+def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environments):
 
-    experiment_list = os.listdir(os.path.join('configs', exp_batch))
+    # TODO: if train is not running the user should be warned
 
-    for experiment in experiment_list:
+    os.system('clear')
+    process_names = []
+    if train:
+        process_names.append('train')
+
+    for val in validation_datasets:
+        process_names.append('validation' + '_' + val)
+
+
+    for drive in drive_environments:
+        process_names.append('drive' + '_' + drive)
+
+
+    experiments_list = os.listdir(os.path.join('configs', exp_batch))
+
+    experiments_list = [experiment.split('.')[-2] for experiment in experiments_list]
+
+    for experiment in experiments_list:
 
 
         print ('For ', experiment)

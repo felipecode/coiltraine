@@ -23,15 +23,16 @@ def execute(gpu, exp_batch, exp_alias):
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
     # At this point the log file with the correct naming is created.
-    merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
+    merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
     set_type_of_process('train')
 
+    coil_logger.add_message('Loading', {'GPU': gpu})
 
-    #sys.stdout = open(str(os.getpid()) + ".out", "a", buffering=1)
+    sys.stdout = open(str(os.getpid()) + ".out", "a", buffering=1)
 
 
 
-    if monitorer.get_status(exp_batch, exp_alias+'.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
+    if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
         # TODO: print some cool summary or not ?
         return
 
@@ -119,8 +120,8 @@ def execute(gpu, exp_batch, exp_alias):
                                  controls.cuda(), dataset.extract_inputs(float_data).cuda())
 
         # TODO: All these logging things could go out to clean up the main
-        if loss < best_loss:
-            best_loss = loss
+        if loss.data < best_loss:
+            best_loss = loss.data.tolist()
             best_loss_iter = iteration
 
         # Log a random position
@@ -129,13 +130,15 @@ def execute(gpu, exp_batch, exp_alias):
         output = model.extract_branch(torch.stack(branches[0:4]), controls)
 
         # TODO: Get only the  float_data that are actually generating output
+        # TODO: itearation is repeating , and that is dumb
         coil_logger.add_message('Iterating',
-                                {'Current Loss': loss.data,
-                                 'Best Loss': best_loss.data, 'Best Loss Iteration': best_loss_iter.data,
-                                 'Some Output': output[position].data,
-                                 'GroundTruth': dataset.extract_targets(float_data)[position].data,
+                                {'Iteration': iteration,
+                                 'Current Loss': loss.data.tolist(),
+                                 'Best Loss': best_loss, 'Best Loss Iteration': best_loss_iter,
+                                 'Some Output': output[position].data.tolist(),
+                                 'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist()[0],
                                  #'Error': abs(output[position][0] - dataset.extract_targets(float_data)[position]),
-                                 'Inputs': dataset.extract_inputs(float_data)[position].data},
+                                 'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()[0]},
                                 iteration)
 
         # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,

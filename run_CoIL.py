@@ -1,4 +1,4 @@
-
+import argparse
 import multiprocessing
 # Import all the test libraries.
 import sys
@@ -8,7 +8,10 @@ import time
 
 from coil_core import train, validate, run_drive
 
-from utils import get_free_gpus, pop_half_gpu, pop_one_gpu, mount_experiment_heap
+from utils.experiment_schedule import get_gpu_resources, allocate_gpu_resources, mount_experiment_heap
+
+
+#pop_half_gpu, pop_one_gpu, mount_experiment_heap
 
 import heapq
 
@@ -76,7 +79,7 @@ def execute_drive(gpu, exp_batch, exp_alias, city_name):
 
 
 
-def folder_execute(folder, allocated_gpus, param=None):
+def folder_execute(params=None):
     """
     On this mode the training software keeps all
     It forks a process to run the monitor over the training logs.
@@ -84,78 +87,161 @@ def folder_execute(folder, allocated_gpus, param=None):
         param, prioritize training, prioritize test, prioritize
     """
 
+    folder = params['folder']
+    allocated_gpus = params['gpus']
+    validation_datasets = params['validation_datasets']
+    driving_environments = params['driving_environments']
+    allocation_parameters = params['allocation_parameters']
 
     #TODO: it is likely that the monitorer classes is not actually necessary.
 
     experiments_list = os.listdir(os.path.join('configs', folder))
+    experiments_list = [experiment.split('.')[-2] for experiment in experiments_list]
 
     # Each gpu has maximun 2 slots
 
-    allocated_gpus = [[gpu] * 2 for gpu in allocated_gpus]
+    allocated_gpus = {gpu: allocation_parameters['gpu_value']   for gpu in allocated_gpus}
 
-    validation_datasets = ['SmallTest', 'OtherSmallTest']
-    drive_environments = ['Town01', 'Town02']
-
+    print (allocated_gpus)
 
     # TODO: for now the number of gpus used per process is hardcoded, train 1, val 0.5, drive 0.5
 
     executing_processes = []
 
-    free_gpus, number_of_free_gpus = get_free_gpus(allocated_gpus, executing_processes)
+    free_gpus, resources_on_most_free_gpu = get_gpu_resources(allocated_gpus, executing_processes,
+                                                           allocation_parameters)
 
     # Is a queue of tasks to be executed. The priority is always train.
     # then test then val.
     # TODO: change the priority to test the ones that have already been trained.
-    tasks_queue = mount_experiment_heap(folder, experiments_list,
-                                        validation_datasets, drive_environments)
+    tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
+                                        validation_datasets, driving_environments)
 
     # No process is executing right now.
 
 
     while True:
         #        if not done or executing  get to the list
-        while len(free_gpus) > 0:
+        # If amount of resources is smaller than a threshold.
+        while resources_on_most_free_gpu > min([allocation_parameters['train_cost'],
+                                            allocation_parameters['validation_cost'],
+                                            allocation_parameters['drive_cost']]):
             #Allocate all the gpus
 
             process_specs = heapq.heappop(tasks_queue)[2]  # To get directly the dict
 
 
-            if process_specs['type'] == 'train' and number_of_free_gpus >=1:
-                free_gpus, number_of_free_gpus, gpu_number = pop_one_gpu(free_gpus)
+            if process_specs['type'] == 'train' and resources_on_most_free_gpu >= allocation_parameters['train_cost']:
+                free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
+                                                             free_gpus,
+                                                             allocation_parameters['train_cost'])
                 execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 
-            elif process_specs['type'] == 'validation':
-                free_gpus, number_of_free_gpus, gpu_number = pop_half_gpu(free_gpus)
+            elif process_specs['type'] == 'validation' and resources_on_most_free_gpu >= allocation_parameters['validation_cost']:
+                free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
+                                                             free_gpus,
+                                                             allocation_parameters['validation_cost'])
                 execute_validation(gpu_number, process_specs['folder'], process_specs['experiment'],
-                                   process_specs['dataset'])
+                                        process_specs['dataset'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 
-            else:  # == test
+            elif process_specs['type'] == 'drive' and resources_on_most_free_gpu >= allocation_parameters['drive_cost']:
 
-                free_gpus, number_of_free_gpus, gpu_number = pop_half_gpu(free_gpus)
+                free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
+                                                             free_gpus,
+                                                             allocation_parameters['drive_cost'])
                 execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
                                    process_specs['environment'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 
-        else:
-            time.sleep(1)
 
+        time.sleep(5)
+
+
+        monitorer.plot_folder_summaries(folder,
+                                        params['is_training'],
+                                        validation_datasets,
+                                        driving_environments)
         # Check allocated process, and look which ones finished.
-        free_gpus = get_free_gpus(allocated_gpus, executing_processes)
+        free_gpus = get_gpu_resources(allocated_gpus, executing_processes,allocation_parameters)
         #Check
 
 
 
 if __name__ == '__main__':
+    argparser = argparse.ArgumentParser(description=__doc__)
+
+    # TODO: add a single experiment run option.
+    argparser.add_argument(
+        '--gpus',
+        nargs='+',
+        dest='gpus',
+        type=str
+    )
+    argparser.add_argument(
+        '-f',
+        '--folder',
+        type=str
+    )
+    argparser.add_argument(
+        '-vd',
+        '--val_datasets',
+        dest='validation_datasets',
+        nargs='+',
+        default=[]
+    )
+    argparser.add_argument(
+        '--no-train',
+        dest='is_training',
+        action='store_false'
+    )
+    argparser.add_argument(
+        '-de',
+        '--drive_envs',
+        dest='driving_environments',
+        nargs='+',
+        default=[]
+    )
+
+    args = argparser.parse_args()
+
 
 
     #execute_train("0", "eccv", "experiment_1")
-    execute_validation("0", "eccv", "experiment_1", "SmallTest")
+    #execute_validation("0", "eccv", "experiment_1", "SmallTest")
     #execute_drive("0", "eccv", "experiment_1", 'Town02')
-    #folder_execute('eccv', "0,1,2")
 
-    #monitorer.plot_folder_summaries()
+    for gpu in args.gpus:
+        try:
+            int(gpu)
+        except:
+            raise ValueError(" Gpu is not a valid int number")
+
+
+
+    # Obs this is like a fixed parameter, how much a validation and a train and drives ocupies
+
+    # TODO: of course this change from gpu to gpu , but for now we just assume at least a K40
+    # Maybe the latest voltas will be underused
+
+    allocation_parameters = {'gpu_value': 3.5,
+                             'train_cost': 2,
+                             'validation_cost': 1.5,
+                             'drive_cost': 1.5}
+
+    params = {
+        'folder': args.folder,
+        'gpus': list(args.gpus),
+        'is_training': args.is_training,
+        'validation_datasets': list(args.validation_datasets),
+        'driving_environments': list(args.driving_environments),
+        'allocation_parameters': allocation_parameters
+    }
+
+    print (params)
+
+    folder_execute(params)
