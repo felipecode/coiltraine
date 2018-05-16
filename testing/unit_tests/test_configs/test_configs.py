@@ -16,7 +16,6 @@ class testConfigs(unittest.TestCase):
 
 
         g_conf.NAME = 'experiment_1'
-        # TODO: this merge is weird.
         merge_with_yaml('configs/eccv/experiment_1.yaml')
         # JUST A TRICK TO CONTAIN THE CURRENT LIMITATIONS
         set_type_of_process('train')

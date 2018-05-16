@@ -206,9 +206,21 @@ def print_validation_summary(current, latest, verbose):
     print ('            Best Error Checkpoint: ', BLUE + UNDERLINE + str(latest['BestErrorCheckpoint']) + END)
 
 
-def print_drive_summary(summary):
+def print_drive_summary(summary, current, verbose):
 
-    pass
+
+    print ('        CHECKPOINT: ', DARK_BLUE + str(current['Checkpoint']) + END)
+    if verbose:
+        print ('        CURRENT: ')
+        print ('            Episode: ', BLUE + str(current['Iteration']) + END)
+        print ('            Completed: ', GREEN + UNDERLINE + str(current['MeanError']) + END)
+
+    print ('        LATEST: ')
+
+    print ('            Episode: ', BLUE + str(current['Iteration']) + END)
+    print ('            Completed: ', GREEN + UNDERLINE + str(current['MeanError']) + END)
+    print ('            Episode: ', BLUE + str(current['Iteration']) + END)
+    print ('            Completed: ', GREEN + UNDERLINE + str(current['MeanError']) + END)
 
 
 def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environments, verbose=False):

@@ -151,9 +151,7 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
 
                     else:
                         time.sleep(0.1)
-                # TODO: is this really needed ??? I believe not.
-                #monitorer.export_results(os.path.join('_benchmark_results',
-                #                                      exp_batch + '_' +exp_alias +'iteration'))
+
                 break
 
 
