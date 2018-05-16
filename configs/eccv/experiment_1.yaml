@@ -1,11 +1,15 @@
 
 #### General Configuration Parameters ####
 SAVE_SCHEDULE: range(0, 2000, 200)
-NUMBER_OF_LOADING_WORKS: 12   # Number of threads used in the data loader
+
+NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
 
 #### Input related parameters ####
-SENSORS: {'rgb': (3, 88, 200)}
-MEASUREMENTS: {'targets': (31)}
+SENSORS:
+  rgb: (3, 88, 200)
+MEASUREMENTS:
+  targets: (31)
+
 BATCH_SIZE: 120
 NUMBER_ITERATIONS: 500000
 NUMBER_FRAMES_FUSION: 3
@@ -32,7 +36,13 @@ TRAINING_SCHEDEULE: [[50000, 0.5], [100000, 0.5 * 0.5], [150000, 0.5 * 0.5 * 0.5
 
 #TODO check how to use this part
 BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05]
-VARIABLE_WEIGHT: {'Steer': 0.5, 'Gas': 0.45, 'Brake': 0.05, 'Speed': 1.0}
+
+VARIABLE_WEIGHT:
+  Steer: 0.5
+  Gas: 0.45
+  Brake: 0.05
+  Speed: 1.0
+
 
 
 #### Simulation Related Parameters ####

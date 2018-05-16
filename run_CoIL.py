@@ -87,13 +87,13 @@ def folder_execute(params=None):
         param, prioritize training, prioritize test, prioritize
     """
 
+    # TODO: BUG, the experiments dont continue when they stoped. IT NEED TO MARK ERROR.
+
     folder = params['folder']
     allocated_gpus = params['gpus']
     validation_datasets = params['validation_datasets']
     driving_environments = params['driving_environments']
     allocation_parameters = params['allocation_parameters']
-
-    #TODO: it is likely that the monitorer classes is not actually necessary.
 
     experiments_list = os.listdir(os.path.join('configs', folder))
     experiments_list = [experiment.split('.')[-2] for experiment in experiments_list]

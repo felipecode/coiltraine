@@ -40,6 +40,11 @@ import imgaug.augmenters as ia
 # TODO: NAMing conventions ?
 
 _g_conf = AttributeDict()
+
+
+
+"""#### GENERAL CONFIGURATION PARAMETERS ####"""
+_g_conf.NUMBER_OF_LOADING_WORKERS = 12
 _g_conf.SENSORS = {'rgb': (3, 88, 200)}
 _g_conf.MEASUREMENTS = {'targets': (31)}
 _g_conf.TARGETS = ['steer', 'throttle', 'brake']
@@ -65,25 +70,36 @@ _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
 _g_conf.EXPERIMENT_NAME = "default"
 # TODO: not necessarily the configuration need to know about this
 _g_conf.PROCESS_NAME = "None"
-_g_conf.NUMBER_ITERATIONS = 2000 *_g_conf.BATCH_SIZE
+_g_conf.NUMBER_ITERATIONS = 2000
 _g_conf.SAVE_SCHEDULE = range(0, 2000, 200)
 _g_conf.NUMBER_FRAMES_FUSION = 1
 _g_conf.NUMBER_IMAGES_SEQUENCE = 1
 _g_conf.SEQUENCE_STRIDE = 1
 _g_conf.TEST_SCHEDULE = range(0, 2000, 200)
+_g_conf.SPEED_FACTOR = 40.0
+_g_conf.AUGMENT_LATERAL_STEERINGS = 6
 
 
 """#### Network Related Parameters ####"""
 
 
 _g_conf.MODEL_NAME = 'coil_icra'
+_g_conf.TRAINING_SCHEDEULE = [[50000, 0.5], [100000, 0.5 * 0.5], [150000, 0.5 * 0.5 * 0.5],
+                              [200000, 0.5 * 0.5 * 0.5 * 0.5],
+                              [250000, 0.5 * 0.5 * 0.5 * 0.5 * 0.5]]  # Number of iterations, multiplying factor
+#TODO check how to use this part
+
+_g_conf.LEARNING_RATE = 0.0002  # First
+_g_conf.BRANCH_LOSS_WEIGHT = [0.95, 0.95, 0.95, 0.95, 0.05]
+_g_conf.VARIABLE_WEIGHT = {'Steer': 0.5, 'Gas': 0.45, 'Brake': 0.05, 'Speed': 1.0}
+
 
 
 
 """#### Simulation Related Parameters ####"""
 _g_conf.CITY_NAME = 'Town01'
 _g_conf.IMAGE_CUT = [115, 510]  # How you should cut the input image that is received from the server
-
+_g_conf.USE_ORACLE = False
 
 
 def _check_integrity():
@@ -105,6 +121,7 @@ def merge_with_yaml(yaml_filename):
     print ("yaml here", yaml_cfg)
 
     print ("batch size ", yaml_cfg.BATCH_SIZE)
+
     _merge_a_into_b(yaml_cfg, _g_conf)
 
     #TODO: Merging is missing
@@ -200,8 +217,10 @@ def _merge_a_into_b(a, b, stack=None):
     """Merge config dictionary a into config dictionary b, clobbering the
     options in b whenever they are also specified in a.
     """
-    assert isinstance(a, AttributeDict), 'Argument `a` must be an AttrDict'
-    assert isinstance(b, AttributeDict), 'Argument `b` must be an AttrDict'
+
+    assert isinstance(a, AttributeDict) or isinstance(a, dict), 'Argument `a` must be an AttrDict'
+    assert isinstance(b, AttributeDict) or isinstance(a, dict), 'Argument `b` must be an AttrDict'
+
 
     for k, v_ in a.items():
         full_key = '.'.join(stack) + '.' + k if stack is not None else k
@@ -214,7 +233,8 @@ def _merge_a_into_b(a, b, stack=None):
         v = _check_and_coerce_cfg_value_type(v, b[k], k, full_key)
 
         # Recursively merge dicts
-        if isinstance(v, AttributeDict):
+
+        if isinstance(v, dict):
             try:
                 stack_push = [k] if stack is None else stack + [k]
                 _merge_a_into_b(v, b[k], stack=stack_push)
@@ -231,10 +251,10 @@ def _decode_cfg_value(v):
     """
     # Configs parsed from raw yaml will contain dictionary keys that need to be
     # converted to AttrDict objects
-    if isinstance(v, dict):
-        return AttributeDict(v)
+
+
     # All remaining processing is only applied to strings
-    if not isinstance(v, basestring):
+    if not isinstance(v, str):
         return v
     # Try to interpret `v` as a:
     #   string, number, tuple, list, dict, boolean, or None
@@ -272,12 +292,18 @@ def _check_and_coerce_cfg_value_type(value_a, value_b, key, full_key):
     # Exceptions: numpy arrays, strings, tuple<->list
     if isinstance(value_b, np.ndarray):
         value_a = np.array(value_a, dtype=value_b.dtype)
-    elif isinstance(value_b, basestring):
+
+    elif isinstance(value_b, str):
+
         value_a = str(value_a)
     elif isinstance(value_a, tuple) and isinstance(value_b, list):
         value_a = list(value_a)
     elif isinstance(value_a, list) and isinstance(value_b, tuple):
         value_a = tuple(value_a)
+    elif isinstance(value_b, range):
+        value_a = eval(value_a)
+    elif isinstance(value_b, dict):
+        value_a = eval(value_a)
     else:
         raise ValueError(
             'Type mismatch ({} vs. {}) with values ({} vs. {}) for config '
