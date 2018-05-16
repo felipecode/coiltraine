@@ -54,4 +54,4 @@ class CoILSampler(Sampler):
 
 
     def __len__(self):
-        return g_conf.NUMBER_ITERATIONS * 120
+        return g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE
