@@ -69,7 +69,7 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1):
     tl = Logger(os.path.join(root_path, exp_batch_name, exp_name, 'tensorboard_logs_'+process_name))
 
 
-
+# TODO: iteration is required ! Assert that
 def add_message(phase, message, iteration=None):
     """
     For the normal case
@@ -79,16 +79,20 @@ def add_message(phase, message, iteration=None):
 
     Returns:
 
+
     """
+
+
+    if phase == 'Iterating' and iteration is None:
+        raise ValueError(" Iterating messages should have the iteration/checkpoint.")
+
     if iteration is not None:
         if iteration % LOG_FREQUENCY == 0:
+
             g_logger.info({phase: message})
 
     else:
         g_logger.info({phase: message})
-
-    #if phase != 'Loading' and 'Iteration' not in message:
-    #    raise ValueError(" Non loading messages should have the iteration.")
 
     # What if it is an error message ?
     # We can monitor the status based on error message. An error should mean the exp is not working

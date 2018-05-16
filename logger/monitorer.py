@@ -4,9 +4,20 @@ import re
 from logger import json_formatter
 from configs import g_conf
 from utils.general import sort_nicely
+
+from .carla_metrics_parser import get_averaged_metrics
+
+from visualization.data_reading import read_control_csv
+
 # Check the log and also put it to tensorboard
 
 
+def static_vars(**kwargs):
+    def decorate(func):
+        for k in kwargs:
+            setattr(func, k, kwargs[k])
+        return func
+    return decorate
 
 def get_current_iteration(exp):
     """
@@ -24,10 +35,25 @@ def get_current_iteration(exp):
     pass
 
 
+#### Get things from CARLA benchmark directly to plot as logs #####
+def get_episode_number(benchmark_log_name):
+    """ Get the current episode"""
+    control_dict = read_control_csv(os.path.join('_benchmark_results',benchmark_log_name,'summary.csv'))
+    return len(control_dict['result']) -1
+
+
+def get_number_episodes_completed(benchmark_log_name):
+    """ Get the number of episodes that where completed"""
+    control_dict = read_control_csv(os.path.join('_benchmark_results',benchmark_log_name,'summary.csv'))
+    return sum(control_dict['result'])
+
+
+
+
 def get_latest_output(data):
 
     # Find the one that has an iteration .........
-    if 'Iteration' in data[-1]:
+    if 'Iterating' in data[-1]:
         return data[-1]
     else:
         return data[-2]
@@ -43,6 +69,7 @@ def get_summary(data):
             return data[-i]
     else:  # NO SUMMARY YET COMPUTED
         return ''
+
 
 
 def get_latest_checkpoint():
@@ -113,7 +140,6 @@ def get_status(exp_batch, experiment, process_name):
     # Read the full json file.
     data = json_formatter.readJSONlog(open(log_file_path, 'r'))
 
-
     # Now check if the latest data is loading
     if 'Loading' in data[-1]:
         return ['Loading', '']
@@ -133,6 +159,10 @@ def get_status(exp_batch, experiment, process_name):
                 return ['Iterating', [get_latest_output(data), get_summary(data)]]
             elif 'train' in process_name:
                 return ['Iterating', get_latest_output(data)]
+            elif 'drive' in process_name:
+                return ['Iterating', get_latest_output(data)]  # We in theory just return
+            else:
+                raise ValueError("Not Valid Experiment name")
 
     # TODO: there is the posibility of some race conditions on not having error as last
     if 'Error' in data[-1]:
@@ -206,21 +236,34 @@ def print_validation_summary(current, latest, verbose):
     print ('            Best Error Checkpoint: ', BLUE + UNDERLINE + str(latest['BestErrorCheckpoint']) + END)
 
 
-def print_drive_summary(summary, current, verbose):
+@static_vars(previous_checkpoint=0)
+def print_drive_summary(path, summary, checkpoint, verbose=True):
 
 
-    print ('        CHECKPOINT: ', DARK_BLUE + str(current['Checkpoint']) + END)
+
+
+    print ('        CHECKPOINT: ', DARK_BLUE + str(summary['Checkpoint']) + END)
     if verbose:
         print ('        CURRENT: ')
-        print ('            Episode: ', BLUE + str(current['Iteration']) + END)
-        print ('            Completed: ', GREEN + UNDERLINE + str(current['MeanError']) + END)
+        print ('            Episode: ', BLUE + str(get_episode_number(path)) + END)
+        print ('            Completed: ', GREEN + UNDERLINE + str(get_number_episodes_completed(path)) + END)
 
-    print ('        LATEST: ')
 
-    print ('            Episode: ', BLUE + str(current['Iteration']) + END)
-    print ('            Completed: ', GREEN + UNDERLINE + str(current['MeanError']) + END)
-    print ('            Episode: ', BLUE + str(current['Iteration']) + END)
-    print ('            Completed: ', GREEN + UNDERLINE + str(current['MeanError']) + END)
+    if print_drive_summary.previous_checkpoint !=checkpoint:
+        print_drive_summary.previous_checkpoint = checkpoint
+
+    if checkpoint == 0: # TODO: CRITICAL, CHANGE THIS TO "FIRST CHECKPOINT INSTEAD "
+        return
+
+    # TODO: we need to get the previous checkpoint
+
+    get_averaged_metrics(path)
+
+
+    print ('        SUMMARY: ')
+    print ('            Average Completion: ', LIGHT_GREEN + UNDERLINE + str(current['Iteration']) + END)
+    print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE + str(current['MeanError']) + END)
+
 
 
 def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environments, verbose=False):
@@ -279,13 +322,9 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                 if 'validation' in process:
                     print_validation_summary(summary[0][status], summary[1][status]['Summary'], verbose)
                 if 'drive' in process:
-                    print_drive_summary(summary[status])
+                    checkpoint = summary[status]['Checkpoint']  # Get the sta
+                    path = exp_batch + '_' + experiment + '_' + str(checkpoint) + process
+                    print_drive_summary(path, summary[status], checkpoint)
 
-
-
-
-
-    # For each on the folder
-    # Get the status.
 
 

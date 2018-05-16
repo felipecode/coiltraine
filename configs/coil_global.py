@@ -98,6 +98,7 @@ _g_conf.VARIABLE_WEIGHT = {'Steer': 0.5, 'Gas': 0.45, 'Brake': 0.05, 'Speed': 1.
 
 """#### Simulation Related Parameters ####"""
 _g_conf.CITY_NAME = 'Town01'
+_g_conf.EXPERIMENTAL_SUITE_NAME = 'TestSuite'
 _g_conf.IMAGE_CUT = [115, 510]  # How you should cut the input image that is received from the server
 _g_conf.USE_ORACLE = False
 
@@ -134,7 +135,9 @@ def merge_with_yaml(yaml_filename):
 
 
 
-def set_type_of_process(process_type):
+
+# TODO: Make this nicer, now it receives only one parameter
+def set_type_of_process(process_type, param=None):
     """
     This function is used to set which is the type of the current process, test, train or val
     and also the details of each since there could be many vals and tests for a single
@@ -155,9 +158,10 @@ def set_type_of_process(process_type):
     if process_type == 'train':
         _g_conf.PROCESS_NAME = process_type
     elif process_type == "validation":
-        _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.TRAIN_DATASET_NAME
-    if process_type == "test":
-        _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.CITY_NAME
+        _g_conf.PROCESS_NAME = process_type + '_' + param
+    if process_type == "drive":  # FOR drive param is city name.
+        _g_conf.CITY_NAME = param
+        _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.CITY_NAME + '_' + _g_conf.EXPERIMENTAL_SUITE_NAME
 
     #else:  # FOr the test case we join with the name of the experimental suite.
 
@@ -175,7 +179,7 @@ def set_type_of_process(process_type):
 
 
 
-    if process_type == "validation" or process_type == 'test':
+    if process_type == "validation" or process_type == 'drive':
         if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
                                            _g_conf.EXPERIMENT_NAME,
                                            _g_conf.PROCESS_NAME + '_csv')):

@@ -59,6 +59,11 @@ def start_carla_simulator(gpu, exp_batch, exp_alias, city_name):
     sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + city_name
                            , '-windowed', '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+
+    coil_logger.add_message('Loading', {'CARLA': carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4' + '/Game/Maps/' + city_name
+                           + '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
+
     return sp, port
 
 
@@ -81,7 +86,7 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
 
 
 
-    sys.stdout = open(str(os.getpid()) + ".out", "a", buffering=1)
+    sys.stdout = open('drive_' + city_name + '_' + str(os.getpid()) + ".out", "a", buffering=1)
 
 
     #vglrun - d:7.$GPU $CARLA_PATH / CarlaUE4 / Binaries / Linux / CarlaUE4 / Game / Maps /$TOWN - windowed - benchmark - fps = 10 - world - port =$PORT;
@@ -90,13 +95,15 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
     carla_process, port = start_carla_simulator(gpu, exp_batch, exp_alias, city_name)
 
 
-    merge_with_yaml(os.path.join(exp_batch, exp_alias+'.yaml'))
-    set_type_of_process('test')
-
-    #test_agent = CarlaDrive(experiment_name)
+    merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
+    set_type_of_process('drive', city_name)
 
 
 
+    log_level = logging.WARNING
+
+    logging.StreamHandler(stream=None)
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
     # TODO we have some external class that control this weather thing.
 
@@ -108,10 +115,13 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
     """
     experiment_suite = TestSuite()
 
+    coil_logger.add_message('Loading', {'Poses': experiment_suite._poses()})
+
+
 
     while True:
         try:
-
+            coil_logger.add_message('Loading', {'CARLAClient': host+':'+str(port)})
             with make_carla_client(host, port) as client:
 
 
@@ -130,20 +140,23 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
                                                              , 'checkpoints', str(latest) + '.pth'))
 
                         coil_agent = CoILAgent(checkpoint)
+                        coil_logger.add_message({'Iterating': {"Checkpoint": latest}})
+                        # TODO: Change alias to actual experiment name.
                         run_driving_benchmark(coil_agent, experiment_suite, city_name,
-                                              exp_batch + '_' + exp_alias + 'iteration', False,
-                                              host, port)
+                                              exp_batch + '_' + exp_alias + '_' + str(latest)
+                                              , False, host, port)
 
                         # Read the resulting dictionary
-                        with open(os.path.join('_benchmark_results',
-                                               exp_batch+'_'+exp_alias + 'iteration', 'metrics.json')
-                                  , 'r') as f:
-                            summary_dict = json.loads(f.read())
+                        #with open(os.path.join('_benchmark_results',
+                        #                       exp_batch+'_'+exp_alias + 'iteration', 'metrics.json')
+                        #          , 'r') as f:
+                        #    summary_dict = json.loads(f.read())
 
                         # TODO: When you add the message you need to check if the experiment continues properly
-                        coil_logger.add_message({'Running': {"DBSummary": summary_dict}})
 
 
+
+                        # TODO: WRITE AN EFICIENT PARAMETRIZED OUTPUT SUMMARY FOR TEST.
 
                         #test_agent.finish_model()
 
@@ -159,12 +172,16 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
             logging.error(error)
             time.sleep(1)
             carla_process.kill()
-
+            break
         except KeyboardInterrupt:
             carla_process.kill()
+            coil_logger.add_message('Error', {'Message': 'Killed By User'})
+            break
         except:
             traceback.print_exc()
             carla_process.kill()
+            coil_logger.add_message('Error', {'Message': 'Something Happened'})
+            break
 
     carla_process.kill()
 

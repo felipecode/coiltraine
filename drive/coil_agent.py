@@ -78,29 +78,9 @@ class CoILAgent(Agent):
 
     def __init__(self, checkpoint):
 
-
-
-        #experiment_name='None', driver_conf=None, memory_fraction=0.18,
-        #image_cut=[115, 510]):
-
-        # use_planner=False,graph_file=None,map_file=None,augment_left_right=False,image_cut = [170,518]):
-
         Agent.__init__(self)
-        # This should likely come from global
-        #config_gpu = tf.ConfigProto()
-        #config_gpu.gpu_options.visible_device_list = '0'
 
-        #config_gpu.gpu_options.per_process_gpu_memory_fraction = memory_fraction
-        #self._sess = tf.Session(config=config_gpu)
-
-        # THIS DOES NOT WORK FOR FUSED PLUS LSTM
-        #if self._config.number_frames_sequenced > self._config.number_frames_fused:
-        #    self._config_train.batch_size = self._config.number_frames_sequenced
-        #else:
-        #    self._config_train.batch_size = self._config.number_frames_fused
-
-        #self._train_manager = load_system(self._config_train)
-        #self._config.train_segmentation = False
+        self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
         self.model = CoILModel(g_conf.MODEL_NAME)
 
         self.model.load_state_dict(checkpoint['state_dict'])
@@ -108,20 +88,6 @@ class CoILAgent(Agent):
         self.model.cuda()
 
 
-        #self.model.load_network(checkpoint)
-
-        #self._sess.run(tf.global_variables_initializer())
-
-        #self._control_function = getattr(machine_output_functions,
-        #                                 self._train_manager._config.control_mode)
-        # More elegant way to merge with autopilot
-        #self._agent = Autopilot(ConfigAutopilot(driver_conf.city_name))
-
-        #self._image_cut = driver_conf.image_cut
-        #self._auto_pilot = driver_conf.use_planner
-
-        #self._recording = False
-        #self._start_time = 0
 
 
     def run_step(self, measurements, sensor_data, directions, target):
@@ -129,7 +95,7 @@ class CoILAgent(Agent):
 
 
         #control_agent = self._agent.run_step(measurements, None, target)
-        print (" RUnning STEP ")
+
         speed = torch.cuda.FloatTensor([measurements.player_measurements.forward_speed]).unsqueeze(0)
         print ("Speed shape ", speed)
         directions_tensor = torch.cuda.LongTensor([directions])
@@ -140,8 +106,6 @@ class CoILAgent(Agent):
 
         steer, throttle, brake = self._process_model_outputs(model_outputs[0],
                                          measurements.player_measurements.forward_speed)
-
-
 
         #control = self.compute_action(,
         #                              ,
@@ -187,11 +151,9 @@ class CoILAgent(Agent):
 
 
             sensor = np.swapaxes(sensor, 0, 1)
-            print ("Sensor Previous SHape")
-            print (sensor.shape)
+
             sensor = np.flip(sensor.transpose((2, 0, 1)), axis=0)
-            print ("Sensor Previous SHape PT2")
-            print (sensor.shape)
+
             if iteration == 0:
                 image_input = image_transform(sensor)
             else:
@@ -199,9 +161,8 @@ class CoILAgent(Agent):
 
             iteration += 1
 
-        print (image_input.shape)
-        image_input  = image_input.unsqueeze(0)
-        print (image_input.shape)
+        image_input = image_input.unsqueeze(0)
+
 
         return image_input
 

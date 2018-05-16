@@ -26,7 +26,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
 
     # At this point the log file with the correct naming is created.
     merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
-    set_type_of_process('validation')
+    set_type_of_process('validation', dataset_name)
 
 
 
