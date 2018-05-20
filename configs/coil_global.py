@@ -50,6 +50,7 @@ _g_conf.MEASUREMENTS = {'targets': (31)}
 _g_conf.TARGETS = ['steer', 'throttle', 'brake']
 _g_conf.INPUTS = ['speed_module']
 _g_conf.STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
+#_g_conf.STEERING_DIVISION = [0.01, 0.02, 0.07, 0.4, 0.4, 0.07, 0.02, 0.01]  # Forcing curves alot
 _g_conf.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
 _g_conf.BATCH_SIZE = 120
 

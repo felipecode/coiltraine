@@ -11,7 +11,7 @@ import time
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss
-from input import CoILDataset, CoILSampler, splitter
+from input import CoILDataset, BatchSequenceSampler, splitter
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
 from torchvision import transforms
@@ -46,12 +46,13 @@ def execute(gpu, exp_batch, exp_alias):
 
     # Creates the sampler, this part is responsible for managing the keys. It divides
     # all keys depending on the measurements and produces a set of keys for each bach.
-    sampler = CoILSampler(splitter.control_steer_split(dataset.measurements, dataset.meta_data))
+    sampler = BatchSequenceSampler(splitter.control_steer_split(dataset.measurements, dataset.meta_data),
+                          g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE)
 
     # The data loader is the multi threaded module from pytorch that release a number of
     # workers to get all the data.
     # TODO: batch size an number of workers go to some configuration file
-    data_loader = torch.utils.data.DataLoader(dataset, sampler=sampler, batch_size=120,
+    data_loader = torch.utils.data.DataLoader(dataset, sampler=sampler,
                                               shuffle=False, num_workers=12, pin_memory=True)
     # By instanciating the augmenter we get a callable that augment images and transform them
     # into tensors.

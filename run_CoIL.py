@@ -104,7 +104,6 @@ def folder_execute(params=None):
 
     print (allocated_gpus)
 
-    # TODO: for now the number of gpus used per process is hardcoded, train 1, val 0.5, drive 0.5
 
     executing_processes = []
 
@@ -121,6 +120,7 @@ def folder_execute(params=None):
 
     print (tasks_queue)
 
+    # TODO: the while should go outside, so the monitorer process is independent of the type of execution
 
     while True:
         #        if not done or executing  get to the list

@@ -3,11 +3,11 @@ from logger import coil_logger
 import numpy as np
 
 
-# TODO: --- WARNING--- NOT WORKING FOR SEQUENCES ! ! ! ! !  ! ! ! ! ! ! ! ! ! ! !!
 
 def order_sequence(steerings, keys_sequence):
     sequence_average = []
     # print 'keys'
+    #print (" NUMBER OF IMAGES IN A SEQUENCE ", g_conf.NUMBER_IMAGES_SEQUENCE)
     # print keys_sequence
 
     for i in keys_sequence:
@@ -38,11 +38,13 @@ def partition_keys_by_percentiles(steerings, keys, percentiles):
             # We split
 
             splited_keys.append(keys[iter_index:i])
+            if keys[iter_index:i] == []:
+                raise RuntimeError("Reach into an empty bin.")
             iter_index = i
             quad_pos += 1
             # THe value of steering splitted
             # The number of keys for this split
-            print ([steerings[i], len(splited_keys)])
+            # print ([steerings[i], len(splited_keys)])
             coil_logger.add_message('Loading', {'SplitPoints': [steerings[i], len(splited_keys)]})
 
 
@@ -120,8 +122,7 @@ def label_split(labels, keys, selected_data):
     sorted_steering_division = []
 
     for j in range(len(selected_data)):
-        print (labels)
-        print (selected_data[j])
+
         keys_to_delete = select_data_sequence(labels, selected_data[j])
         # print got_keys_for_divison
         # keys_for_this_part = range(0, len(labels) - g_conf.NUMBER_IMAGES_SEQUENCE,
@@ -173,19 +174,20 @@ def float_split(output_to_split, keys, percentiles):
 
 def control_steer_split(float_data, meta_data):
 
-    # TODO: WARNING , HARD CODE !
-    steerings = float_data[0, :]
+
+    steerings = float_data[np.where(meta_data[:, 0] == 'steer'), :][0][0] # TODO: WHY EVERY WHERE MAKE THIS TO BE USED ??
+
+    print ("steer shape", steerings.shape)
 
     # TODO: read meta data and turn into a coool dictionary ?
     #print(np.where(dataset.meta_data[:, 0] == 'control'))
     #TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
-    labels = float_data[np.where(meta_data[:, 0] == 'control'), :]
+    labels = float_data[np.where(meta_data[:, 0] == 'control'), :][0][0]
 
-    print(np.unique(labels))
+    print ("labels shape ", labels.shape)
+    keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
 
-    keys = range(0, len(steerings))
-
-    splitted_labels = label_split(labels[0][0], keys, g_conf.LABELS_DIVISION)
+    splitted_labels = label_split(labels, keys, g_conf.LABELS_DIVISION)
 
     # Another level of splitting
     splitted_steer_labels = []

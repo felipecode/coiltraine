@@ -5,7 +5,7 @@ import traceback
 import collections
 
 
-
+"""
 
 speed_labels_1 = np.array(map(int, map(float, open('speed_file_Town01_1.txt'))))
 
@@ -16,6 +16,8 @@ speed_labels_2 = np.array(map(int, map(float, open('speed_file_Town02_14.txt')))
 
 
 speed_labels_2_noise = np.array(map(int, map(float, open('speed_file_Town02_14_noise.txt'))))
+"""
+
 
 def read_control_csv(control_csv_file):
 
