@@ -74,7 +74,7 @@ def start_carla_simulator(gpu, exp_batch, exp_alias, city_name):
 # TODO: Add all the necessary logging.
 
 # OBS : I AM FIXING host as localhost now
-# OBS : Memory use should also be adaptable lets leave it fixed for now
+# TODO :  Memory use should also be adaptable with a limit, for now that seems to be doing fine in PYtorch
 
 def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host='127.0.0.1'):
     # host,port,gpu_number,path,show_screen,resolution,noise_type,config_path,type_of_driver,experiment_name,city_name,game,drivers_name
@@ -85,8 +85,12 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
 
+    if not os.path.exists('_output_logs'):
+        os.mkdir('_output_logs')
 
-    sys.stdout = open('drive_' + city_name + '_' + str(os.getpid()) + ".out", "a", buffering=1)
+
+    sys.stdout = open(os.path.join('_output_logs',
+                      g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
 
 
     #vglrun - d:7.$GPU $CARLA_PATH / CarlaUE4 / Binaries / Linux / CarlaUE4 / Game / Maps /$TOWN - windowed - benchmark - fps = 10 - world - port =$PORT;

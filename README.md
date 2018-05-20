@@ -35,11 +35,15 @@ The training dataset must be set on the experiment file directly.
 Since training is strictly associated with the experiment.
 The validation datasets are passed as parameter.
 There are two modes of running.
+
 Running a simple process:
 This mode is for basically just running a single process that can be
 a training/ validation or drive proccess.
 
 Running a folder
+
+    python3 --folder <folder_name>  --gpus < list of gpus > -vd < list of validation datasets >
+     -de < List of driving environments >
 
 
 Drive Mode:
@@ -48,3 +52,4 @@ For driving and testing in CARLA the path to the CARLA
 folder must be specified.
 
     export CARLA_PATH=<pathtocarla/CARLA/
+    

@@ -11,10 +11,10 @@ import random
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss
-from input import CoILDataset, CoILSampler, splitter
+from input import CoILDataset
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_checkpoint_ready,\
-    maximun_checkpoint_reach, get_next_checkpoint, get_latest_saved_checkpoint
+    maximun_checkpoint_reach, get_next_checkpoint
 from torchvision import transforms
 
 
@@ -28,10 +28,12 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
     merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
     set_type_of_process('validation', dataset_name)
 
+    if not os.path.exists('_output_logs'):
+        os.mkdir('_output_logs')
 
 
-
-    sys.stdout = open(str(os.getpid()) + ".out", "a", buffering=1)
+    sys.stdout = open(os.path.join('_output_logs',
+                      g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
 
     if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
         # TODO: print some cool summary or not ?

@@ -28,7 +28,11 @@ def execute(gpu, exp_batch, exp_alias):
 
     coil_logger.add_message('Loading', {'GPU': gpu})
 
-    sys.stdout = open(g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out", "a", buffering=1)
+    if not os.path.exists('_output_logs'):
+        os.mkdir('_output_logs')
+
+    sys.stdout = open(os.path.join('_output_logs',
+                      g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
 
 
 
