@@ -80,7 +80,7 @@ class PreSplittedSampler(Sampler):
         return g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE
 
 
-class BatchSequenceSampler(Sampler):
+class BatchSequenceSampler(object):
     r"""Wraps another sampler to yield a mini-batch of indices taking a certain sequence size
 
     Args:

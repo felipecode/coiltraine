@@ -56,7 +56,7 @@ def execute(gpu, exp_batch, exp_alias):
     # The data loader is the multi threaded module from pytorch that release a number of
     # workers to get all the data.
     # TODO: batch size an number of workers go to some configuration file
-    data_loader = torch.utils.data.DataLoader(dataset, sampler=sampler,
+    data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
                                               shuffle=False, num_workers=12, pin_memory=True)
     # By instanciating the augmenter we get a callable that augment images and transform them
     # into tensors.
