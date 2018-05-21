@@ -104,6 +104,5 @@ if __name__ == '__main__':
             'allocation_parameters': allocation_parameters
         }
 
-        print (params)
 
         folder_execute(params)
