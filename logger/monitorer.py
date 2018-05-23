@@ -64,9 +64,10 @@ def get_summary(data):
 
     # IT HAS TO BE ITERATING  ! ! !  ! ! !
     for i in range(1, len(data)):
-        # Find the
-        if 'Summary' in data[-i]['Iterating']:
-            return data[-i]
+        # Find the summary log in the logging file
+        if 'Iterating' in data[-i]:  # Test if it is an iterating log
+            if 'Summary' in data[-i]['Iterating']: 
+                return data[-i] # found the summary.
     else:  # NO SUMMARY YET COMPUTED
         return ''
 
