@@ -145,11 +145,11 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
             coil_logger.add_scalar('Error', checkpoint_average_error, latest)
 
             if checkpoint_average_loss < best_loss:
-                best_loss = loss
+                best_loss = checkpoint_average_loss
                 best_loss_iter = latest
 
             if checkpoint_average_error < best_loss:
-                best_error = loss
+                best_error = checkpoint_average_error
                 best_error_iter = latest
 
             coil_logger.add_message('Iterating',
