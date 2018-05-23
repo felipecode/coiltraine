@@ -171,10 +171,11 @@ def set_type_of_process(process_type, param=None):
                _g_conf.PROCESS_NAME)
 
 
+
     if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
                                     _g_conf.EXPERIMENT_NAME,
                                     'checkpoints') ):
-        os.makedirs(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
+        os.mkdir(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
                                     _g_conf.EXPERIMENT_NAME,
                                     'checkpoints'))
 
@@ -184,7 +185,7 @@ def set_type_of_process(process_type, param=None):
         if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
                                            _g_conf.EXPERIMENT_NAME,
                                            _g_conf.PROCESS_NAME + '_csv')):
-            os.makedirs(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
+            os.mkdir(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
                                           _g_conf.EXPERIMENT_NAME,
                                            _g_conf.PROCESS_NAME + '_csv'))
 
