@@ -66,7 +66,7 @@ def get_summary(data):
     for i in range(1, len(data)):
         # Find the summary log in the logging file
         if 'Iterating' in data[-i]:  # Test if it is an iterating log
-            if 'Summary' in data[-i]['Iterating']: 
+            if 'Summary' in data[-i]['Iterating']:
                 return data[-i] # found the summary.
     else:  # NO SUMMARY YET COMPUTED
         return ''
@@ -321,7 +321,12 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                 if 'train' in process:
                     print_train_summary(summary[status])
                 if 'validation' in process:
-                    print_validation_summary(summary[0][status], summary[1][status]['Summary'], verbose)
+                    if summary[1] != '':   # If it has no summary we dont plot
+                        print_validation_summary(summary[0][status], summary[1][status]['Summary'],
+                                                 verbose)
+                    else:
+                        print_validation_summary(summary[0][status], '',
+                                                 verbose)
                 if 'drive' in process:
                     checkpoint = summary[status]['Checkpoint']  # Get the sta
                     path = exp_batch + '_' + experiment + '_' + str(checkpoint) + process
