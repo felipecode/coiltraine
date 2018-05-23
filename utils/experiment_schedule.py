@@ -79,6 +79,8 @@ def mount_experiment_heap(folder, experiments_list, is_training, validation_data
 
 
         # Train is always priority. # TODO: some system to check priority depending on iterations
+
+        # TODO: One thing is error other thing is stop. However at a first step we can try to restart all error things
         if is_training:
             if monitorer.get_status(folder, experiment, 'train')[0] == "Not Started" or \
                     monitorer.get_status(folder, experiment, 'train')[0] == "Error":
