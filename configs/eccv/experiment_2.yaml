@@ -1,6 +1,6 @@
 
 #### General Configuration Parameters ####
-SAVE_SCHEDULE: range(0, 2000, 200)
+SAVE_SCHEDULE: range(0, 500000, 200)
 NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
 
 #### Input related parameters ####
@@ -23,7 +23,8 @@ SPEED_FACTOR: 40.0
 TRAIN_DATASET_NAME: '1HoursW1-3-6-8'
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: range(0, 2000, 200)  # The frequency the model is actually tested.
+TEST_SCHEDULE: [2000, 4000, 8000, 16000, 32000, 64000, 100000,
+                              200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
