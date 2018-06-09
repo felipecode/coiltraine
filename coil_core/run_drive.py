@@ -46,7 +46,7 @@ def find_free_port():
         s.bind(('', 0))
         return s.getsockname()[1]
 
-def start_carla_simulator(gpu, exp_batch, exp_alias, city_name):
+def start_carla_simulator(gpu, exp_batch, exp_alias):
 
     port = find_free_port()
     carla_path = os.environ['CARLA_PATH']
@@ -56,13 +56,13 @@ def start_carla_simulator(gpu, exp_batch, exp_alias, city_name):
 
     #subprocess.call()
 
-    sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + city_name
-                           , '-windowed', '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
+    sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '-windowed',
+                           '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
-    coil_logger.add_message('Loading', {'CARLA': carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4' + '/Game/Maps/' + city_name
-                           + '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
+    coil_logger.add_message('Loading', {'CARLA': carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4' 
+                           '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
 
     return sp, port
 
@@ -88,19 +88,17 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
     if not os.path.exists('_output_logs'):
         os.mkdir('_output_logs')
 
-
-    sys.stdout = open(os.path.join('_output_logs',
-                      g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
-
-
-    #vglrun - d:7.$GPU $CARLA_PATH / CarlaUE4 / Binaries / Linux / CarlaUE4 / Game / Maps /$TOWN - windowed - benchmark - fps = 10 - world - port =$PORT;
-    #sleep    100000
-
-    carla_process, port = start_carla_simulator(gpu, exp_batch, exp_alias, city_name)
-
-
-    merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
+    merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
     set_type_of_process('drive', city_name)
+
+
+    #sys.stdout = open(os.path.join('_output_logs',
+    #                  g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+
+
+
+    carla_process, port = start_carla_simulator(gpu, exp_batch, exp_alias)
+
 
 
 
@@ -121,53 +119,48 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
 
     coil_logger.add_message('Loading', {'Poses': experiment_suite._poses()})
 
-
+    coil_logger.add_message('Loading', {'CARLAClient': host + ':' + str(port)})
 
     while True:
         try:
-            coil_logger.add_message('Loading', {'CARLAClient': host+':'+str(port)})
-            with make_carla_client(host, port) as client:
+
+            # Now actually run the driving_benchmark
+
+            latest = 0
+            # While the checkpoint is not there
+            while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
 
-                # Now actually run the driving_benchmark
+                # Get the correct checkpoint
+                if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
 
-                latest = 0
-                # While the checkpoint is not there
-                while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
+                    latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
+                    checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
+                                                         , 'checkpoints', str(latest) + '.pth'))
 
+                    coil_agent = CoILAgent(checkpoint)
+                    coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
+                    # TODO: Change alias to actual experiment name.
 
-                    # Get the correct checkpoint
-                    if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
+                    run_driving_benchmark(coil_agent, experiment_suite, city_name,
+                                          exp_batch + '_' + exp_alias + '_' + str(latest)
+                                          , False, host, port)
 
-                        latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
-                        checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
-                                                             , 'checkpoints', str(latest) + '.pth'))
+                    # Read the resulting dictionary
+                    #with open(os.path.join('_benchmark_results',
+                    #                       exp_batch+'_'+exp_alias + 'iteration', 'metrics.json')
+                    #          , 'r') as f:
+                    #    summary_dict = json.loads(f.read())
 
-                        coil_agent = CoILAgent(checkpoint)
-                        coil_logger.add_message({'Iterating': {"Checkpoint": latest}})
-                        # TODO: Change alias to actual experiment name.
-                        run_driving_benchmark(coil_agent, experiment_suite, city_name,
-                                              exp_batch + '_' + exp_alias + '_' + str(latest)
-                                              , False, host, port)
-
-                        # Read the resulting dictionary
-                        #with open(os.path.join('_benchmark_results',
-                        #                       exp_batch+'_'+exp_alias + 'iteration', 'metrics.json')
-                        #          , 'r') as f:
-                        #    summary_dict = json.loads(f.read())
-
-                        # TODO: When you add the message you need to check if the experiment continues properly
+                    # TODO: When you add the message you need to check if the experiment continues properly
 
 
 
-                        # TODO: WRITE AN EFICIENT PARAMETRIZED OUTPUT SUMMARY FOR TEST.
+                    # TODO: WRITE AN EFICIENT PARAMETRIZED OUTPUT SUMMARY FOR TEST.
 
-                        #test_agent.finish_model()
 
-                        #test_agent.write(results)
-
-                    else:
-                        time.sleep(0.1)
+                else:
+                    time.sleep(0.1)
 
                 break
 

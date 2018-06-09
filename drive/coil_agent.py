@@ -119,7 +119,7 @@ class CoILAgent(Agent):
                 sensor = sensor[:, :, np.newaxis]
 
 
-                sensor = transforms.resize(sensor, (size[1], size[2]), interpolation=Image.NEAREST)
+                sensor = scipy.misc.imresize(sensor, (size[1], size[2]), interp='nearest')
                 sensor = sensor * (1 / (number_of_seg_classes - 1))
 
                 sensor = torch.from_numpy(sensor).type(torch.FloatTensor).cuda()
@@ -128,16 +128,17 @@ class CoILAgent(Agent):
 
             else:
 
-                sensor = transforms.resize(sensor, (size[1], size[2]))
+                sensor = scipy.misc.imresize(sensor, (size[1], size[2]))
+
+                sensor = np.swapaxes(sensor, 0, 1)
+
+                sensor = np.transpose(sensor, (2, 0, 1))
 
                 sensor = torch.from_numpy(sensor).type(torch.FloatTensor).cuda()
 
 
 
 
-            sensor = np.swapaxes(sensor, 0, 1)
-
-            sensor = sensor.transpose((2, 0, 1))
 
             if iteration == 0:
                 image_input = sensor

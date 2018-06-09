@@ -148,24 +148,20 @@ def get_status(exp_batch, experiment, process_name):
     # Then we check if finished or is going on
 
     if 'Iterating' in data[-1]:
-        try:
-            iteration_number = list(data[-1].values())[0]['Checkpoint']
-        except KeyError:
-            iteration_number = list(data[-1].values())[0]['Iteration']
 
-        if iteration_number >= g_conf.NUMBER_ITERATIONS:
-            return ['Finished', ' ']
+        if 'validation' in process_name:
+            return ['Iterating', [get_latest_output(data), get_summary(data)]]
+        elif 'train' in process_name:
+            return ['Iterating', get_latest_output(data)]
+        elif 'drive' in process_name:
+            return ['Iterating', get_latest_output(data)]  # We in theory just return
         else:
-            if 'validation' in process_name:
-                return ['Iterating', [get_latest_output(data), get_summary(data)]]
-            elif 'train' in process_name:
-                return ['Iterating', get_latest_output(data)]
-            elif 'drive' in process_name:
-                return ['Iterating', get_latest_output(data)]  # We in theory just return
-            else:
-                raise ValueError("Not Valid Experiment name")
+            raise ValueError("Not Valid Experiment name")
 
     # TODO: there is the posibility of some race conditions on not having error as last
+
+    if 'Finished' in data[-1]:
+        return ['Finished', ' ']
     if 'Error' in data[-1]:
         return ['Error', ' ']
 

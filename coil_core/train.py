@@ -46,38 +46,6 @@ def execute(gpu, exp_batch, exp_alias):
             # TODO: print some cool summary or not ?
             return
 
-        #Define the dataset. This structure is has the __get_item__ redefined in a way
-        #that you can access the HDFILES positions from the root directory as a in a vector.
-        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
-
-        #augmenter_cpu = iag.AugmenterCPU(g_conf.AUGMENTATION_SUITE_CPU)
-
-        dataset = CoILDataset(full_dataset, transform=transforms.Compose([transforms.ToTensor()]))
-
-        # Creates the sampler, this part is responsible for managing the keys. It divides
-        # all keys depending on the measurements and produces a set of keys for each bach.
-        sampler = BatchSequenceSampler(splitter.control_steer_split(dataset.measurements, dataset.meta_data),
-                              g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE)
-
-        # The data loader is the multi threaded module from pytorch that release a number of
-        # workers to get all the data.
-        # TODO: batch size an number of workers go to some configuration file
-        data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
-                                                  shuffle=False, num_workers=12, pin_memory=True)
-        # By instanciating the augmenter we get a callable that augment images and transform them
-        # into tensors.
-        augmenter = iag.Augmenter(g_conf.AUGMENTATION_SUITE)
-
-        # TODO: here there is clearly a posibility to make a cool "conditioning" system.
-
-        model = CoILModel(g_conf.MODEL_NAME)
-        model.cuda()
-        print(model)
-
-        criterion = Loss()
-
-        # TODO: DATASET SIZE SEEMS WEIRD
-        optimizer = optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
 
 
         checkpoint_file = get_latest_saved_checkpoint()
@@ -88,6 +56,7 @@ def execute(gpu, exp_batch, exp_alias):
             accumulated_time = checkpoint['total_time']
             best_loss = checkpoint['best_loss']
             best_loss_iter = checkpoint['best_loss_iter']
+
         else:
             iteration = 0
             best_loss = 10000.0
@@ -96,10 +65,47 @@ def execute(gpu, exp_batch, exp_alias):
 
         # TODO: The checkpoint will continue, so it should erase everything up to the iteration
 
+        #Define the dataset. This structure is has the __get_item__ redefined in a way
+        #that you can access the HDFILES positions from the root directory as a in a vector.
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
+
+        #augmenter_cpu = iag.AugmenterCPU(g_conf.AUGMENTATION_SUITE_CPU)
+
+        dataset = CoILDataset(full_dataset, transform=transforms.Compose([transforms.ToTensor()]))
+
+        # Creates the sampler, this part is responsible for managing the keys. It divides
+        # all keys depending on the measurements and produces a set of keys for each bach.
+        sampler = BatchSequenceSampler(
+                splitter.control_steer_split(dataset.measurements, dataset.meta_data),
+                iteration * g_conf.BATCH_SIZE,
+                g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE
+        )
+
+        # The data loader is the multi threaded module from pytorch that release a number of
+        # workers to get all the data.
+        # TODO: batch size an number of workers go to some configuration file
+        data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
+                                                  shuffle=False, num_workers=12,
+                                                  pin_memory=True)
+        # By instanciating the augmenter we get a callable that augment images and transform them
+        # into tensors.
+
+        augmenter = iag.Augmenter(g_conf.AUGMENTATION_SUITE)
+
+        # TODO: here there is clearly a posibility to make a cool "conditioning" system.
+
+        model = CoILModel(g_conf.MODEL_NAME)
+        model.cuda()
+        print(model)
+
+        criterion = Loss()
+
+        optimizer = optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
 
         print (dataset.meta_data)
 
         print (model)
+        #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
         capture_time = time.time()
         for data in data_loader:
 
@@ -114,19 +120,16 @@ def execute(gpu, exp_batch, exp_alias):
             # get the control commands from float_data, size = [120,1]
 
             controls = float_data[:, dataset.controls_position(), :]
-            print(" CONTROLS  ", controls.shape)
+
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
             model.zero_grad()
-            print ( 'INPUTS', dataset.extract_inputs(float_data).shape )
+
             branches = model(input_rgb_data, dataset.extract_inputs(float_data).cuda())
 
             #print ("len ",len(branches))
 
 
-
-            #targets = torch.cat([steer_gt, gas_gt, brake_gt], 1)
-            print ("Extracted targets ", dataset.extract_targets(float_data).shape[0])
             loss = criterion.MSELoss(branches, dataset.extract_targets(float_data).cuda(),
                                      controls.cuda(), dataset.extract_inputs(float_data).cuda())
 
@@ -187,6 +190,11 @@ def execute(gpu, exp_batch, exp_alias):
                                                , 'checkpoints', str(iteration) + '.pth'))
 
             iteration += 1
+
+        coil_logger.add_message('Finished', {})
+
+
+
 
     except KeyboardInterrupt:
         coil_logger.add_message('Error', {'Message': 'Killed By User'})

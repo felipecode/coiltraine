@@ -32,7 +32,7 @@ class testSampler(unittest.TestCase):
 
         weight = [0.2, 0.2, 0.2]
 
-        sampler = BatchSequenceSampler(keys, 120, g_conf.NUMBER_IMAGES_SEQUENCE,
+        sampler = BatchSequenceSampler(keys, 0, 120, g_conf.NUMBER_IMAGES_SEQUENCE,
                                       g_conf.SEQUENCE_STRIDE, False)
 
         for i in sampler:
@@ -49,7 +49,7 @@ class testSampler(unittest.TestCase):
 
         weight = [0.2, 0.2, 0.2]
 
-        sampler = BatchSequenceSampler(keys, 120, g_conf.NUMBER_IMAGES_SEQUENCE,
+        sampler = BatchSequenceSampler(keys, 0, 120, g_conf.NUMBER_IMAGES_SEQUENCE,
                                       g_conf.SEQUENCE_STRIDE, False)
 
         for i in sampler:
@@ -147,12 +147,13 @@ class testSampler(unittest.TestCase):
 
 
 
-        dataset = CoILDataset('/Users/felipecode/Datasets/ValTrainSmall/')
+        dataset = CoILDataset('/home/felipe/Datasets/1HoursW1-3-6-8')
 
-        g_conf.NUMBER_IMAGES_SEQUENCE = 20
-        g_conf.SEQUENCE_STRIDE = 5
+        g_conf.NUMBER_IMAGES_SEQUENCE = 1
+        g_conf.SEQUENCE_STRIDE = 1
         #g_conf.LABELS_DIVISION = [[0,2,5], [0,2,5], [0,2,5]]
         g_conf.NUMBER_ITERATIONS = 1200
+        g_conf.BATCH_SIZE = 120
 
         steerings = dataset.measurements[0, :]
 
@@ -168,14 +169,16 @@ class testSampler(unittest.TestCase):
 
         #weights = [1.0/len(g_conf.STEERING_DIVISION)]*len(g_conf.STEERING_DIVISION)
 
-        sampler = BatchSequenceSampler(splitted_steer_labels, 120, g_conf.NUMBER_IMAGES_SEQUENCE,
+        sampler = BatchSequenceSampler(splitted_steer_labels, 0, 120, g_conf.NUMBER_IMAGES_SEQUENCE,
                                       g_conf.SEQUENCE_STRIDE, False)
 
 
         #sampler = BatchSampler(RandomSampler(keys), 120, False)
 
         big_steer_vec = []
-
+        count =0
         for i in sampler:
-            print (i)
+            print(count)
+            print("len", len(i))
+            count += 1
             #big_steer_vec += list(steerings[i])

@@ -189,7 +189,7 @@ class CoILDataset(Dataset):
     # TODO: Turn into a static property
 
     def controls_position(self):
-        return np.where(self.meta_data[:, 0] == 'control')[0][0]
+        return np.where(self.meta_data[:, 0] == b'control')[0][0]
 
     def extract_targets(self, float_data):
         """
@@ -206,7 +206,8 @@ class CoILDataset(Dataset):
         """
         targets_vec = []
         for target_name in g_conf.TARGETS:
-            targets_vec.append(float_data[:, np.where(self.meta_data[:, 0] == target_name)[0][0], :])
+            targets_vec.append(float_data[:, np.where(self.meta_data[:, 0] == target_name.encode())
+                                             [0][0], :])
 
         return torch.cat(targets_vec, 1)
 
@@ -225,6 +226,7 @@ class CoILDataset(Dataset):
         """
         inputs_vec = []
         for input_name in g_conf.INPUTS:
-            inputs_vec.append(float_data[:, np.where(self.meta_data[:, 0] == input_name)[0][0], :])
+            inputs_vec.append(float_data[:, np.where(self.meta_data[:, 0] == input_name.encode())
+                                            [0][0], :])
 
         return torch.cat(inputs_vec, 1)

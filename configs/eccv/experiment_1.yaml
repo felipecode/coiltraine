@@ -25,8 +25,7 @@ SPEED_FACTOR: 40.0
 TRAIN_DATASET_NAME: '1HoursW1-3-6-8'
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [2000, 4000, 8000, 16000, 32000, 64000, 100000,
-                              200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [0, 2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####

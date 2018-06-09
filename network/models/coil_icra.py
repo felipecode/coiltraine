@@ -129,7 +129,6 @@ class CoILICRA(nn.Module):
         # for i in range(len(branch_number)):
         #    branch_output_vector.append(output_vec[branch_number[i]][i])
 
-        print ( " BRANCH NUMBER  ", branch_number[0])
 
         return output_vec[branch_number[0], branch_number[1], :]
 

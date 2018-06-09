@@ -1,9 +1,5 @@
 import argparse
-import multiprocessing
-# Import all the test libraries.
-import sys
-import os
-import time
+import logging
 
 
 from coil_core import execute_train, execute_validation, execute_drive, folder_execute
@@ -54,10 +50,17 @@ if __name__ == '__main__':
         nargs='+',
         default=[]
     )
+    argparser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        dest='debug',
+        help='print debug information')
 
     args = argparser.parse_args()
 
 
+    log_level = logging.DEBUG if args.debug else logging.INFO
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
 
     for gpu in args.gpus:

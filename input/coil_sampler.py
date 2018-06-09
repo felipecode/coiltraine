@@ -5,7 +5,6 @@ import torch
 
 from torch.utils.data.sampler import Sampler
 
-# TODO: Warning, maybe this does not need to be included everywhere.
 from configs import g_conf
 
 
@@ -29,10 +28,10 @@ class PreSplittedSampler(Sampler):
     """
 
 
-    def __init__(self, keys):
+    def __init__(self, keys, executed_iterations):
 
         self.keys = keys
-
+        self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE - executed_iterations
         self.replacement = True
 
     def __iter__(self):
@@ -55,18 +54,18 @@ class PreSplittedSampler(Sampler):
 
             weights = torch.tensor([1.0/float(len(self.keys))]*len(self.keys), dtype=torch.double)
 
-            idx = torch.multinomial(weights, g_conf.NUMBER_ITERATIONS, True)
+            idx = torch.multinomial(weights, self.iterations_to_execute, True)
             idx = idx.tolist()
             return iter([random.choice(self.keys[i]) for i in idx])
 
         elif rank_keys == 3:
             weights = torch.tensor([1.0 / float(len(self.keys))] * len(self.keys),
                                    dtype=torch.double)
-            idx = torch.multinomial(weights, g_conf.NUMBER_ITERATIONS, True)
+            idx = torch.multinomial(weights, self.iterations_to_execute, True)
             idx = idx.tolist()
             weights = torch.tensor([1.0 / float(len(self.keys[0]))] * len(self.keys[0]),
                                    dtype=torch.double)
-            idy = torch.multinomial(weights, g_conf.NUMBER_ITERATIONS, True)
+            idy = torch.multinomial(weights, self.iterations_to_execute, True)
             idy = idy.tolist()
 
 
@@ -77,7 +76,7 @@ class PreSplittedSampler(Sampler):
 
 
     def __len__(self):
-        return g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE
+        return self.iterations_to_execute
 
 
 class BatchSequenceSampler(object):
@@ -89,15 +88,11 @@ class BatchSequenceSampler(object):
         drop_last (bool): If ``True``, the sampler will drop the last batch if
             its size would be less than ``batch_size``
 
-    Example:
-        >>> list(BatchSampler(range(10), batch_size=3, drop_last=False))
-        [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]
-        >>> list(BatchSampler(range(10), batch_size=3, drop_last=True))
-        [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
     """
 
-    def __init__(self, keys, batch_size, sequence_size, sequence_stride, drop_last=True):
-        sampler = PreSplittedSampler(keys)
+    def __init__(self, keys, executed_iterations,
+                 batch_size, sequence_size, sequence_stride, drop_last=True):
+        sampler = PreSplittedSampler(keys, executed_iterations)
 
         if not isinstance(sampler, Sampler):
             raise ValueError("sampler should be an instance of "
@@ -118,7 +113,6 @@ class BatchSequenceSampler(object):
 
     def __iter__(self):
 
-
         batch = []
         for idx in self.sampler:
             for seq in range(0, self.sequence_size * self.sequence_stride, self.sequence_stride):
@@ -135,8 +129,8 @@ class BatchSequenceSampler(object):
 
     def __len__(self):
         if self.drop_last:
-            return len(self.sampler) // self.batch_size
+            return len(self.sampler) // self.sequence_size
         else:
-            return (len(self.sampler) + self.batch_size - 1) // self.batch_size
+            return (len(self.sampler) + self.sequence_size - 1) // self.sequence_size
 
 

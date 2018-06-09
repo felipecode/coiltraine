@@ -71,7 +71,7 @@ _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
 _g_conf.EXPERIMENT_NAME = "default"
 # TODO: not necessarily the configuration need to know about this
 _g_conf.PROCESS_NAME = "None"
-_g_conf.NUMBER_ITERATIONS = 2000
+_g_conf.NUMBER_ITERATIONS = 200
 _g_conf.SAVE_SCHEDULE = range(0, 2000, 200)
 _g_conf.NUMBER_FRAMES_FUSION = 1
 _g_conf.NUMBER_IMAGES_SEQUENCE = 1
@@ -162,7 +162,7 @@ def set_type_of_process(process_type, param=None):
         _g_conf.PROCESS_NAME = process_type + '_' + param
     if process_type == "drive":  # FOR drive param is city name.
         _g_conf.CITY_NAME = param
-        _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.CITY_NAME + '_' + _g_conf.EXPERIMENTAL_SUITE_NAME
+        _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.EXPERIMENTAL_SUITE_NAME
 
     #else:  # FOr the test case we join with the name of the experimental suite.
 
@@ -306,8 +306,10 @@ def _check_and_coerce_cfg_value_type(value_a, value_b, key, full_key):
         value_a = list(value_a)
     elif isinstance(value_a, list) and isinstance(value_b, tuple):
         value_a = tuple(value_a)
-    elif isinstance(value_b, range):
+    elif isinstance(value_b, range) and not isinstance(value_a, list):
         value_a = eval(value_a)
+    elif isinstance(value_b, range) and isinstance(value_a, list):
+        value_a = list(value_a)
     elif isinstance(value_b, dict):
         value_a = eval(value_a)
     else:

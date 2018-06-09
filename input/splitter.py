@@ -175,14 +175,14 @@ def float_split(output_to_split, keys, percentiles):
 def control_steer_split(float_data, meta_data):
 
 
-    steerings = float_data[np.where(meta_data[:, 0] == 'steer'), :][0][0] # TODO: WHY EVERY WHERE MAKE THIS TO BE USED ??
+    steerings = float_data[np.where(meta_data[:, 0] == b'steer'), :][0][0] # TODO: WHY EVERY WHERE MAKE THIS TO BE USED ??
 
     print ("steer shape", steerings.shape)
 
     # TODO: read meta data and turn into a coool dictionary ?
     #print(np.where(dataset.meta_data[:, 0] == 'control'))
     #TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
-    labels = float_data[np.where(meta_data[:, 0] == 'control'), :][0][0]
+    labels = float_data[np.where(meta_data[:, 0] == b'control'), :][0][0]
 
     print ("labels shape ", labels.shape)
     keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
