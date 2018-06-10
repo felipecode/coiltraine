@@ -21,7 +21,7 @@ class FC(nn.Module):
         """" ---------------------- FC ----------------------- """
         if params is None:
             raise ValueError("Creating a NULL fully connected block")
-        if 'kernel_sizes' not in params:
+        if 'neurons' not in params:
             raise ValueError(" Missing the kernel sizes parameter ")
         if 'dropouts' not in params:
             raise ValueError(" Missing the dropouts parameter ")
@@ -35,13 +35,13 @@ class FC(nn.Module):
         self.layers = []
 
 
-        for i in range(0, len(params['kernel_sizes']) -1):
+        for i in range(0, len(params['neurons']) -1):
 
-            fc = nn.Linear(params['kernel_sizes'][i], params['kernel_sizes'][i+1])
+            fc = nn.Linear(params['neurons'][i], params['neurons'][i+1])
             dropout = nn.Dropout2d(p=params['dropouts'][i])
             relu = nn.ReLU(inplace=True)
 
-            if i == len(params['kernel_sizes'])-2 and params['end_layer']:
+            if i == len(params['neurons'])-2 and params['end_layer']:
                 self.layers.append(nn.Sequential(*[fc, dropout]))
             else:
                 self.layers.append(nn.Sequential(*[fc, dropout, relu]))

@@ -16,9 +16,9 @@ class Conv(nn.Module):
 
         if params is None:
             raise ValueError("Creating a NULL fully connected block")
-        if 'channel_sizes' not in params:
+        if 'channels' not in params:
             raise ValueError(" Missing the channel sizes parameter ")
-        if 'kernel_sizes' not in params:
+        if 'kernels' not in params:
             raise ValueError(" Missing the kernel sizes parameter ")
         if 'strides' not in params:
             raise ValueError(" Missing the strides parameter ")
@@ -40,16 +40,16 @@ class Conv(nn.Module):
         self.layers = []
 
         # TODO: need to log the loaded networks
-        for i in range(0, len(params['channel_sizes'])-1):
+        for i in range(0, len(params['channels'])-1):
 
-            conv = nn.Conv2d(in_channels=params['channel_sizes'][i], out_channels=params['channel_sizes'][i+1],
-                             kernel_size=params['kernel_sizes'][i], stride=params['strides'][i])
+            conv = nn.Conv2d(in_channels=params['channels'][i], out_channels=params['channels'][i+1],
+                             kernel_size=params['kernels'][i], stride=params['strides'][i])
             #init.xavier_uniform_(conv.weight)
             #init.constant_(conv.bias, 0.1)
 
             dropout = nn.Dropout2d(p=params['dropouts'][i])
             relu = nn.ReLU(inplace=True)
-            bn = nn.BatchNorm2d(params['channel_sizes'][i+1])
+            bn = nn.BatchNorm2d(params['channels'][i+1])
 
             layer = nn.Sequential(*[conv, bn, dropout, relu])
 

@@ -16,6 +16,7 @@ Detectron supports a lot of different model types, each of which has a lot of
 different options. The result is a HUGE set of configuration options.
 """
 
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -36,6 +37,9 @@ import imgauggpu as iag
 import imgaug.augmenters as ia
 
 
+""" RULE ! 
+    all the names inside cannot have underscore.
+"""
 
 # TODO: NAMing conventions ?
 
@@ -49,19 +53,25 @@ _g_conf.SENSORS = {'rgb': (3, 88, 200)}
 _g_conf.MEASUREMENTS = {'targets': (31)}
 _g_conf.TARGETS = ['steer', 'throttle', 'brake']
 _g_conf.INPUTS = ['speed_module']
+_g_conf.BALANCE_DATA = True
 _g_conf.STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
 #_g_conf.STEERING_DIVISION = [0.01, 0.02, 0.07, 0.4, 0.4, 0.07, 0.02, 0.01]  # Forcing curves alot
 _g_conf.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
 _g_conf.BATCH_SIZE = 120
 
-_g_conf.AUGMENTATION_SUITE = [iag.ToGPU()]#, iag.Add((0, 0)), iag.Dropout(0, 0), iag.Multiply((1, 1.04)),
-                              #iag.GaussianBlur(sigma=(0.0, 3.0)),
- #                             iag.ContrastNormalization((0.5, 1.5))
- #                             ]
+#_g_conf.AUGMENTATION_SUITE = [iag.ToGPU()]#, iag.Add((0, 0)), iag.Dropout(0, 0), iag.Multiply((1, 1.04)),
+#                             #iag.GaussianBlur(sigma=(0.0, 3.0)),
+#                             iag.ContrastNormalization((0.5, 1.5))
+#                             ]
+
+_g_conf.AUGMENTATION = None
+
 #_g_conf.AUGMENTATION_SUITE_CPU = [ ia.Add((0, 0)), ia.Dropout(0, 0),
 #                              ia.GaussianBlur(sigma=(0.0, 3.0)),
 #                              ia.ContrastNormalization((0.5, 1.5))
 #                              ]
+_g_conf.DATA_USED = 'all' #  central, all, sides,
+_g_conf.USE_NOISE_DATA = True
 _g_conf.TRAIN_DATASET_NAME = '1HoursW1-3-6-8'  # We only set the dataset in configuration for training
 
 _g_conf.LOG_SCALAR_WRITING_FREQUENCY = 2   # TODO NEEDS TO BE TESTED ON THE LOGGING FUNCTION ON  CREATE LOG
@@ -69,6 +79,7 @@ _g_conf.LOG_IMAGE_WRITING_FREQUENCY = 15
 
 _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
 _g_conf.EXPERIMENT_NAME = "default"
+_g_conf.EXPERIMENT_GENERATED_NAME = None
 # TODO: not necessarily the configuration need to know about this
 _g_conf.PROCESS_NAME = "None"
 _g_conf.NUMBER_ITERATIONS = 200
@@ -84,7 +95,10 @@ _g_conf.AUGMENT_LATERAL_STEERINGS = 6
 """#### Network Related Parameters ####"""
 
 
-_g_conf.MODEL_NAME = 'coil_icra'
+_g_conf.MODEL_TYPE = 'coil_icra'
+_g_conf.MODEL_CONFIGURATION = {}
+
+
 _g_conf.TRAINING_SCHEDEULE = [[50000, 0.5], [100000, 0.5 * 0.5], [150000, 0.5 * 0.5 * 0.5],
                               [200000, 0.5 * 0.5 * 0.5 * 0.5],
                               [250000, 0.5 * 0.5 * 0.5 * 0.5 * 0.5]]  # Number of iterations, multiplying factor
@@ -93,6 +107,7 @@ _g_conf.TRAINING_SCHEDEULE = [[50000, 0.5], [100000, 0.5 * 0.5], [150000, 0.5 * 
 _g_conf.LEARNING_RATE = 0.0002  # First
 _g_conf.BRANCH_LOSS_WEIGHT = [0.95, 0.95, 0.95, 0.95, 0.05]
 _g_conf.VARIABLE_WEIGHT = {'Steer': 0.5, 'Gas': 0.45, 'Brake': 0.05, 'Speed': 1.0}
+_g_conf.LOSS_FUNCTION = 'MSE'
 
 
 
@@ -120,17 +135,15 @@ def merge_with_yaml(yaml_filename):
 
         yaml_cfg = AttributeDict(yaml_file)
 
-    print ("yaml here", yaml_cfg)
 
-    print ("batch size ", yaml_cfg.BATCH_SIZE)
 
     _merge_a_into_b(yaml_cfg, _g_conf)
 
-    #TODO: Merging is missing
 
     path_parts = os.path.split(yaml_filename)
     _g_conf.EXPERIMENT_BATCH_NAME = os.path.split(path_parts[-2])[-1]
     _g_conf.EXPERIMENT_NAME = path_parts[-1].split('.')[-2]
+    _g_conf.EXPERIMENT_GENERATED_NAME = _generate_name()
 
 
 
@@ -194,8 +207,11 @@ def set_type_of_process(process_type, param=None):
     # We assure ourselves that the configuration file added does not kill things
     _check_integrity()
 
-    add_message('Loading', {'ProcessName': generate_name(),
+
+
+    add_message('Loading', {'ProcessName': _g_conf.EXPERIMENT_GENERATED_NAME,
                             'FullConfiguration': generate_param_dict()})
+
 
     _g_conf.immutable(True)
 
@@ -206,9 +222,91 @@ def set_type_of_process(process_type, param=None):
 def merge_with_parameters():
     pass
 
-def generate_name():
+def _generate_name():
     # TODO: Make a cool name generator, maybe in another class
-    return _g_conf.TRAIN_DATASET_NAME + str(202)
+    """
+
+        The name generator is currently formed by the following parts
+        Dataset_name.
+        THe type of network used, got directly from the class.
+        The regularization
+        The strategy with respect to time
+        The type of output
+        The preprocessing made in the data
+        The type of loss function
+        The parts  of data that where used.
+
+        Take into account if the variable was not set, it set the default name, from the global conf
+
+
+
+    Returns:
+        a string containing the name
+
+
+    """
+
+    final_name_string = ""
+    # Addind dataset
+    final_name_string += _g_conf.TRAIN_DATASET_NAME
+    # Model type
+    final_name_string += '_' + _g_conf.MODEL_TYPE
+    # Model Size
+    #TODO: for now is just saying the number of convs, add a layer counting
+    final_name_string += '_' + str(len(_g_conf.MODEL_CONFIGURATION['perception']['conv']['kernels'])) +'conv'
+
+    # Model Regularization
+    # We start by checking if there is some kind of augmentation, and the schedule name.
+
+    if _g_conf.AUGMENTATION is not None:
+        final_name_string += '_' + _g_conf.AUGMENTATION
+    else:
+        # We check if there is dropout
+        if sum(_g_conf.MODEL_CONFIGURATION['branches']['fc']['dropouts']) > 0:
+            final_name_string += '_dropout'
+        else:
+            final_name_string += '_none'
+
+    # Temporal
+
+    if _g_conf.NUMBER_FRAMES_FUSION > 1 and _g_conf.NUMBER_IMAGES_SEQUENCE > 1:
+        final_name_string += '_lstm_fusion'
+    elif _g_conf.NUMBER_FRAMES_FUSION > 1:
+        final_name_string += '_fusion'
+    elif _g_conf.NUMBER_IMAGES_SEQUENCE > 1:
+        final_name_string += '_lstm'
+    else:
+        final_name_string += '_single'
+
+    # THe type of output
+
+    if 'W1A' in set(_g_conf.TARGETS):
+
+        final_name_string += '_waypoints'
+    else:
+        final_name_string += '_control'
+
+    # The pre processing ( Balance or not )
+    if _g_conf.BALANCE_DATA:
+        final_name_string += '_balance'
+    else:
+        final_name_string += '_sequential'
+
+    # The type of loss function
+
+    final_name_string += '_'+_g_conf.LOSS_FUNCTION
+
+    # the parts of the data that were used.
+
+    if _g_conf.USE_NOISE_DATA:
+        final_name_string += '_noise'
+    else:
+        final_name_string += '_'
+
+    final_name_string += _g_conf.DATA_USED
+
+
+    return final_name_string
 
 def generate_param_dict():
     # TODO IMPLEMENT ! generate a cool param dictionary USE
@@ -232,10 +330,15 @@ def _merge_a_into_b(a, b, stack=None):
         full_key = '.'.join(stack) + '.' + k if stack is not None else k
         # a must specify keys that are in b
         if k not in b:
-            raise KeyError('Non-existent config key: {}'.format(full_key))
+            # if is it more than second stack
+            if stack is not None:
+                b[k] = v_
+            else:
+                raise KeyError('Non-existent config key: {}'.format(full_key))
 
         v = copy.deepcopy(v_)
         v = _decode_cfg_value(v)
+
         v = _check_and_coerce_cfg_value_type(v, b[k], k, full_key)
 
         # Recursively merge dicts
@@ -296,11 +399,11 @@ def _check_and_coerce_cfg_value_type(value_a, value_b, key, full_key):
         return value_a
 
     # Exceptions: numpy arrays, strings, tuple<->list
-    if isinstance(value_b, np.ndarray):
+    if isinstance(value_b, type(None)):
+        value_a = value_a
+    elif isinstance(value_b, np.ndarray):
         value_a = np.array(value_a, dtype=value_b.dtype)
-
     elif isinstance(value_b, str):
-
         value_a = str(value_a)
     elif isinstance(value_a, tuple) and isinstance(value_b, list):
         value_a = list(value_a)
@@ -325,109 +428,3 @@ def _check_and_coerce_cfg_value_type(value_a, value_b, key, full_key):
 
 g_conf = _g_conf
 
-
-
-
-"""
-# Random note: avoid using '.ON' as a config key since yaml converts it to True;
-# prefer 'ENABLED' instead
-
-
-# Miscelaneous configuration
-__C.
-
-
-# Configuration for training
-__C.TRAIN = AttributeDict()
-
-MISC:
-  SAVE_MODEL_INTERVAL:
-  BATCH_SIZE=120
-  NUMBER_ITERATIONS:
-
-LOGGING:
-
-INPUT:
-  DATASET:
-
-
-TRAINING:
-
-
-EVALUATION:
-  NUMBER_BATCHES: 1800
-  #NUMBER_IMAGES: 1800* # Number of images. ALL DERIVATED METRICS ARE COMPUTED INSIDE THE MODULUES
-
-TEST:
-
-"""
-
-
-
-"""
-
-
-# ---------------------------------------------------------------------------- #
-# Deprecated options
-# If an option is removed from the code and you don't want to break existing
-# yaml configs, you can add the full config key as a string to the set below.
-# ---------------------------------------------------------------------------- #
-_DEPCRECATED_KEYS = set(
-    {
-        'FINAL_MSG',
-        'MODEL.DILATION',
-        'ROOT_GPU_ID',
-        'RPN.ON',
-        'TRAIN.BBOX_NORMALIZE_TARGETS_PRECOMPUTED',
-        'TRAIN.DROPOUT',
-        'USE_GPU_NMS',
-        'TEST.NUM_TEST_IMAGES',
-    }
-)
-
-
-
-# ---------------------------------------------------------------------------- #
-# Renamed options
-# If you rename a config option, record the mapping from the old name to the new
-# name in the dictionary below. Optionally, if the type also changed, you can
-# make the value a tuple that specifies first the renamed key and then
-# instructions for how to edit the config file.
-# ---------------------------------------------------------------------------- #
-_RENAMED_KEYS = {
-    'EXAMPLE.RENAMED.KEY': 'EXAMPLE.KEY',  # Dummy example to follow
-    'MODEL.PS_GRID_SIZE': 'RFCN.PS_GRID_SIZE',
-    'MODEL.ROI_HEAD': 'FAST_RCNN.ROI_BOX_HEAD',
-    'MRCNN.MASK_HEAD_NAME': 'MRCNN.ROI_MASK_HEAD',
-    'TRAIN.DATASET': (
-        'TRAIN.DATASETS',
-        "Also convert to a tuple, e.g., " +
-        "'coco_2014_train' -> ('coco_2014_train',) or " +
-        "'coco_2014_train:coco_2014_valminusminival' -> " +
-        "('coco_2014_train', 'coco_2014_valminusminival')"
-    ),
-    'TRAIN.PROPOSAL_FILE': (
-        'TRAIN.PROPOSAL_FILES',
-        "Also convert to a tuple, e.g., " +
-        "'path/to/file' -> ('path/to/file',) or " +
-        "'path/to/file1:path/to/file2' -> " +
-        "('path/to/file1', 'path/to/file2')"
-    ),
-    'TEST.SCALES': (
-        'TEST.SCALE',
-        "Also convert from a tuple, e.g. (600, ), " +
-        "to a integer, e.g. 600."
-    ),
-    'TEST.DATASET': (
-        'TEST.DATASETS',
-        "Also convert from a string, e.g 'coco_2014_minival', " +
-        "to a tuple, e.g. ('coco_2014_minival', )."
-    ),
-    'TEST.PROPOSAL_FILE': (
-        'TEST.PROPOSAL_FILES',
-        "Also convert from a string, e.g. '/path/to/props.pkl', " +
-        "to a tuple, e.g. ('/path/to/props.pkl', )."
-    ),
-}
-
-"""

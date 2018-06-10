@@ -9,9 +9,11 @@ from .building_blocks import Branching
 from .building_blocks import FC
 from .building_blocks import Join
 
+# TODO: it is interesting the posibility to loop over many models.
+# TODO: Having multiple experiments, over the same alias.
 class CoILICRA(nn.Module):
 
-    def __init__(self):
+    def __init__(self, params):
         # TODO: Make an auto naming function for this.
 
         super(CoILICRA, self).__init__()
@@ -19,38 +21,40 @@ class CoILICRA(nn.Module):
         # TODO: AUTOMATICALLY GET THE OUTSIZES
         # TODO: Make configurable function on the config files by reading other dictionary
 
+
         self.perception = nn.Sequential(*[
-                            Conv(params={'channel_sizes': [3, 32, 32, 64, 64, 128, 128, 256, 256],
-                                         'kernel_sizes': [5] + [3]*7,
-                                         'strides': [2, 1, 2, 1, 2, 1, 1, 1],
-                                         'dropouts': [0.2]*8,
+                            Conv(params={'channels': params['perception']['conv']['channels'],
+                                         'kernels': params['perception']['conv']['kernels'],
+                                         'strides': params['perception']['conv']['strides'],
+                                         'dropouts': params['perception']['conv']['dropouts'],
                                          'end_layer': True}),
-                            FC(params={'kernel_sizes': [8192, 512, 512],
-                                       'dropouts': [0.5, 0.5],
+                            FC(params={'neurons': params['perception']['fc']['channels'],
+                                       'dropouts': params['perception']['fc']['dropouts'],
                                        'end_layer': False})]
                             )
 
 
-        self.measurements = FC(params={'kernel_sizes': [1, 128, 128],
-                                       'dropouts': [0.5, 0.5],
+        self.measurements = FC(params={'neurons': params['measurements']['fc']['neurons'],
+                                       'dropouts': params['measurements']['fc']['dropouts'],
                                        'end_layer': False})
 
 
 
-        self.join = Join(params={'after_process': FC(params={'kernel_sizes': [640, 512],
-                                                             'dropouts': [0.5],
+        self.join = Join(params={'after_process': FC(params={'neurons': params['join']['fc']['neurons'],
+                                                             'dropouts': params['join']['fc']['dropouts'],
                                                              'end_layer': False}),
                                  'mode': 'cat'
                                 }
                          )
 
-        self.speed_branch = FC(params={'kernel_sizes': [512, 256, 256, 1],
-                                       'dropouts': [0.5, 0.5, 0.0],
+        self.speed_branch = FC(params={'neurons': params['speed_branch']['fc']['neurons'],
+                                       'dropouts': params['speed_branch']['fc']['dropouts'],
                                        'end_layer': False})
 
-        self.branches = Branching([FC(params={'kernel_sizes': [512, 256, 256, 3],
-                                               'dropouts': [0.5, 0.5, 0.0],
-                                               'end_layer': True})]*4) #  Here we set branching automatically
+        self.branches = Branching([FC(params={'neurons': params['branches']['fc']['neurons'],
+                                               'dropouts': params['branches']['fc']['dropouts'],
+                                               'end_layer': True})]
+                                                * params['number_of_branches']) #  Here we set branching automatically
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
@@ -63,14 +67,7 @@ class CoILICRA(nn.Module):
     # TODO: iteration control should go inside the logger, somehow
 
     def forward(self, x, a):
-        # get only the speeds from measurement labels
-        #speed = labels[:, 10, :]
 
-        #coil_logger.add_message('Model', {
-        #    "Iteration": 765,
-        #    "Output": [1.0, 12.3, 124.29]
-        #}
-        #                        )
 
         """ ###### APPLY THE PERCEPTION MODULE """
         x = self.perception(x)

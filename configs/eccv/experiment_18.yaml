@@ -22,8 +22,10 @@ NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 40.0
-TRAIN_DATASET_NAME: '02HoursW1-3-6-8'
-AUGMENTATION: None
+TRAIN_DATASET_NAME: '5HoursW1-3-6-8'
+AUGMENTATION: 'high'
+DATA_USED: 'all'
+USE_NOISE_DATA: True
 
 #### Testing Related Parameters ####
 TEST_SCHEDULE: [0, 2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
@@ -37,7 +39,7 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
     conv:
       channels: [32, 32, 64, 64, 128, 128, 256, 256]
-      kernels: [5, 3, 3, 3, 3, 3, 3, 3] #[5] + [3] * 7
+      kernels: [5, 3, 3, 3, 3, 3, 3, 3]
       strides: [2, 1, 2, 1, 2, 1, 1, 1]
       dropouts: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
     fc:

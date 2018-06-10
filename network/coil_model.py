@@ -14,7 +14,7 @@ def CoILModel(architecture_name):
     """
     # TODO: this could be extended to some more arbitrary definition
 
-    if architecture_name == 'coil_icra':
+    if architecture_name == 'coil-icra':
 
         return CoILICRA()
 
