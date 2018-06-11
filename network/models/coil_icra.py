@@ -53,7 +53,7 @@ class CoILICRA(nn.Module):
 
         self.branches = Branching([FC(params={'neurons': params['branches']['fc']['neurons'],
                                                'dropouts': params['branches']['fc']['dropouts'],
-                                               'end_layer': True})]
+                                               'end_layer': True})] # TODO: THE number of branches multiplying does not work.
                                                 * params['number_of_branches']) #  Here we set branching automatically
 
         for m in self.modules():

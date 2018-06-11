@@ -139,8 +139,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
                       latest)
                 iteration_on_checkpoint += 1
 
-            checkpoint_average_loss = accumulated_loss/len(dataset)
-            checkpoint_average_error = accumulated_error/len(dataset)
+            checkpoint_average_loss = accumulated_loss/len(data_loader)
+            checkpoint_average_error = accumulated_error/len(data_loader)
             coil_logger.add_scalar('Loss', checkpoint_average_loss, latest)
             coil_logger.add_scalar('Error', checkpoint_average_error, latest)
 
