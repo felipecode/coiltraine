@@ -22,8 +22,7 @@ from carla.client import make_carla_client
 from carla.driving_benchmark import run_driving_benchmark
 
 from drive import CoILAgent
-from drive import ECCVTrainingSuite
-from drive import ECCVGeneralizationSuite
+
 from testing.unit_tests.test_drive.test_suite import TestSuite
 from logger import coil_logger
 from logger import monitorer
