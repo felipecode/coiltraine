@@ -24,7 +24,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
     # We set the visible cuda devices
 
 
-
+    # TODO: probable race condition, the train has to be started before.
     try:
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
