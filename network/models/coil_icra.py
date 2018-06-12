@@ -33,7 +33,7 @@ class CoILICRA(nn.Module):
                                          'strides': params['perception']['conv']['strides'],
                                          'dropouts': params['perception']['conv']['dropouts'],
                                          'end_layer': True}),
-                            FC(params={'neurons': [8192] + params['perception']['fc']['channels'],
+                            FC(params={'neurons': [8192] + params['perception']['fc']['neurons'],
                                        'dropouts': params['perception']['fc']['dropouts'],
                                        'end_layer': False})]
                             )
