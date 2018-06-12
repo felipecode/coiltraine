@@ -158,11 +158,7 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
                                           exp_batch + '_' + exp_alias + '_' + str(latest)
                                           , False, host, port)
 
-                    # Read the resulting dictionary
-                    #with open(os.path.join('_benchmark_results',
-                    #                       exp_batch+'_'+exp_alias + 'iteration', 'metrics.json')
-                    #          , 'r') as f:
-                    #    summary_dict = json.loads(f.read())
+
 
                     # TODO: When you add the message you need to check if the experiment continues properly
 

@@ -75,8 +75,9 @@ def execute(gpu, exp_batch, exp_alias):
 
         # Creates the sampler, this part is responsible for managing the keys. It divides
         # all keys depending on the measurements and produces a set of keys for each bach.
+        keys = range(0, len(dataset.measurements[0, :]) - g_conf.NUMBER_IMAGES_SEQUENCE)
         sampler = BatchSequenceSampler(
-                splitter.control_steer_split(dataset.measurements, dataset.meta_data),
+                splitter.control_steer_split(dataset.measurements, dataset.meta_data, keys),
                 iteration * g_conf.BATCH_SIZE,
                 g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE
         )
