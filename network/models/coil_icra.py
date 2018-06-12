@@ -60,12 +60,17 @@ class CoILICRA(nn.Module):
                                        'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
                                        'end_layer': False})
 
-        self.branches = Branching([FC(params={'neurons': params['join']['fc']['neurons'][-1] +
+
+        # Create the fc vector separatedely
+        branch_fc_vector = []
+        for i in range(params['number_of_branches']):
+            branch_fc_vector.append(FC(params={'neurons': params['join']['fc']['neurons'][-1] +
                                                          params['branches']['fc']['neurons'] +
                                                          [len(g_conf.TARGETS)],
-                                               'dropouts': params['branches']['fc']['dropouts'],
-                                               'end_layer': True})]
-                                                * params['number_of_branches']) #  Here we set branching automatically
+                                               'dropouts': params['branches']['fc']['dropouts'] + [0.0],
+                                               'end_layer': True}))
+
+        self.branches = Branching(branch_fc_vector) #  Here we set branching automatically
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
