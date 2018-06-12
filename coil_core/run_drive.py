@@ -6,7 +6,7 @@ import logging
 import json
 import datetime
 
-
+import importlib
 import numpy as np
 import os
 import time
@@ -25,6 +25,7 @@ from drive import CoILAgent
 
 from testing.unit_tests.test_drive.test_suite import TestSuite
 from logger import coil_logger
+
 from logger import monitorer
 
 
@@ -75,7 +76,7 @@ def start_carla_simulator(gpu, exp_batch, exp_alias):
 # OBS : I AM FIXING host as localhost now
 # TODO :  Memory use should also be adaptable with a limit, for now that seems to be doing fine in PYtorch
 
-def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host='127.0.0.1'):
+def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0.0.1'):
     # host,port,gpu_number,path,show_screen,resolution,noise_type,config_path,type_of_driver,experiment_name,city_name,game,drivers_name
     #drive_config.city_name = city_name
     # TODO Eliminate drive config.
@@ -88,7 +89,7 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
         os.mkdir('_output_logs')
 
     merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
-    set_type_of_process('drive', city_name)
+    set_type_of_process('drive', exp_set_name)
 
 
     #sys.stdout = open(os.path.join('_output_logs',
@@ -113,10 +114,22 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
         experiment_suite = ECCVTrainingSuite()
     else:
         experiment_suite = ECCVGeneralizationSuite()
+        
+        
     """
-    experiment_suite = TestSuite()
+    try:
+        exp_set_builder = importlib.import_module('drive.' + exp_set_name + '.build_' + exp_set_name)
+    except:
+        carla_process.kill()
+        coil_logger.add_message('Error', {'Message': 'Suite name not existent'})
+        raise ValueError("Suite name not existent")
 
-    coil_logger.add_message('Loading', {'Poses': experiment_suite._poses()})
+
+
+    experiment_set, experiment_configs = exp_set_builder()
+
+    coil_logger.add_message('Loading', {'Town01Poses': experiment_configs['Town01']['poses'],
+                                        'Town02Poses': experiment_configs['Town02']['poses']})
 
     coil_logger.add_message('Loading', {'CARLAClient': host + ':' + str(port)})
 
@@ -141,7 +154,7 @@ def execute(gpu, exp_batch, exp_alias, city_name='Town01', memory_use=0.2, host=
                     coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
                     # TODO: Change alias to actual experiment name.
 
-                    run_driving_benchmark(coil_agent, experiment_suite, city_name,
+                    run_driving_benchmark(coil_agent, experiment_set, experiment_configs,
                                           exp_batch + '_' + exp_alias + '_' + str(latest)
                                           , False, host, port)
 

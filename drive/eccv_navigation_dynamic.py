@@ -8,7 +8,7 @@ from carla.sensor import Camera
 
 
 
-def build_eccv_exp_sets():
+def build_eccv_navigation_dynamic():
     def _poses_town01():
         """
         Each matrix is a new task. We have all the four tasks

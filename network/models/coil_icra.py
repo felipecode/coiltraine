@@ -24,7 +24,7 @@ class CoILICRA(nn.Module):
         number_first_layer_channels = 0
 
         for _, sizes in g_conf.SENSORS.items():
-            number_first_layer_channels += sizes[0]*g_conf.NUMBER_FRAMES_FUSION
+            number_first_layer_channels += sizes[0] * g_conf.NUMBER_FRAMES_FUSION
 
         self.perception = nn.Sequential(*[
                             Conv(params={'channels': [number_first_layer_channels] +

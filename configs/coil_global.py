@@ -113,8 +113,7 @@ _g_conf.LOSS_FUNCTION = 'MSE'
 
 
 """#### Simulation Related Parameters ####"""
-_g_conf.CITY_NAME = 'Town01'
-_g_conf.EXPERIMENTAL_SUITE_NAME = 'TestSuite'
+
 _g_conf.IMAGE_CUT = [115, 510]  # How you should cut the input image that is received from the server
 _g_conf.USE_ORACLE = False
 
@@ -175,7 +174,7 @@ def set_type_of_process(process_type, param=None):
         _g_conf.PROCESS_NAME = process_type + '_' + param
     if process_type == "drive":  # FOR drive param is city name.
         _g_conf.CITY_NAME = param
-        _g_conf.PROCESS_NAME = process_type + '_' + _g_conf.EXPERIMENTAL_SUITE_NAME
+        _g_conf.PROCESS_NAME = process_type + '_' + param
 
     #else:  # FOr the test case we join with the name of the experimental suite.
 
