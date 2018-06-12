@@ -52,12 +52,7 @@ if __name__ == "__main__":
     steering_pred = []
     steering_gt = []
 
-    positions_to_test = range(0, len(
-        [name for name in os.listdir(path) if os.path.isfile(os.path.join(path, name))]))
 
-
-    #if not os.path.exists(path_clean):
-    #    os.mkdir(path_clean)
 
     files = glob.glob(os.path.join(path, 'data_*.h5'))
     for f in files:
@@ -108,3 +103,7 @@ if __name__ == "__main__":
         metadata[28, 0], metadata[28, 1] = 'waypoint1_y', 'float'
         metadata[29, 0], metadata[29, 1] = 'waypoint2_x', 'float'
         metadata[30, 0], metadata[30, 1] = 'waypoint2_y', 'float'
+        metadata[31, 0], metadata[31, 1] = 'waypoint1_angle', 'float'
+        metadata[32, 0], metadata[32, 1] = 'waypoint1_mag', 'float'
+        metadata[33, 0], metadata[33, 1] = 'waypoint2_angle', 'float'
+        metadata[34, 0], metadata[34, 1] = 'waypoint2_mag', 'float'
