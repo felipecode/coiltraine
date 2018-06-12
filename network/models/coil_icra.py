@@ -28,7 +28,7 @@ class CoILICRA(nn.Module):
 
         self.perception = nn.Sequential(*[
                             Conv(params={'channels': [number_first_layer_channels] +
-                                                     params['perception']['conv']['channels'],
+                                                      params['perception']['conv']['channels'],
                                          'kernels': params['perception']['conv']['kernels'],
                                          'strides': params['perception']['conv']['strides'],
                                          'dropouts': params['perception']['conv']['dropouts'],
@@ -42,7 +42,7 @@ class CoILICRA(nn.Module):
         # WILL NOT WORK FOR SMALL AND DEEP LAYERS
         # TODO: eliminate this hardcoded middle layer, make a conv simulation to get the fc out size
         self.measurements = FC(params={'neurons': [len(g_conf.INPUTS)] +
-                                                  params['measurements']['fc']['neurons'],
+                                                   params['measurements']['fc']['neurons'],
                                        'dropouts': params['measurements']['fc']['dropouts'],
                                        'end_layer': False})
 

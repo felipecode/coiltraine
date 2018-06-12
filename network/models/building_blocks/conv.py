@@ -27,7 +27,7 @@ class Conv(nn.Module):
         if 'end_layer' not in params:
             raise ValueError(" Missing the end module parameter ")
 
-        if len(params['dropouts']) != len(params['channel_sizes'])-1:
+        if len(params['dropouts']) != len(params['channels'])-1:
             raise ValueError("Dropouts should be from the len of channel_sizes minus 1")
 
 
