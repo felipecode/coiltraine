@@ -172,7 +172,7 @@ def float_split(output_to_split, keys, percentiles):
 
 
 
-def control_steer_split(float_data, meta_data):
+def control_steer_split(float_data, meta_data, keys):
 
 
     steerings = float_data[np.where(meta_data[:, 0] == b'steer'), :][0][0] # TODO: WHY EVERY WHERE MAKE THIS TO BE USED ??
@@ -185,7 +185,7 @@ def control_steer_split(float_data, meta_data):
     labels = float_data[np.where(meta_data[:, 0] == b'control'), :][0][0]
 
     print ("labels shape ", labels.shape)
-    keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
+    #keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
 
     splitted_labels = label_split(labels, keys, g_conf.LABELS_DIVISION)
 

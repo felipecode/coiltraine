@@ -82,10 +82,15 @@ class CoILDataset(Dataset):
                             pos_inside = chosen_key - es
                             sensor_image = np.array(x[pos_inside, :, :, :])
 
-                            try:
-                                sensor_image = self.transform(sensor_image)
-                            except:
-                                sensor_image = self.transform(0, sensor_image)
+                            if self.transform is not None:
+                                try:
+                                    sensor_image = self.transform(sensor_image)
+                                except:
+                                    sensor_image = self.transform(0, sensor_image)
+                            else:
+
+                                sensor_image = np.swapaxes(sensor_image, 0, 2)
+                                sensor_image = np.swapaxes(sensor_image, 1, 2)
 
                             batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
                             ] = sensor_image
@@ -139,6 +144,10 @@ class CoILDataset(Dataset):
         # that is important to be able to reference variables in a more legible way
         dataset = h5py.File(folder_file_names[0], "r")
         metadata_targets = np.array(dataset['metadata_'+ meas_names[0]])
+
+        # Forcing the metada
+        metadata_targets =np.array([[some_meta_data[0].encode('utf-8'), some_meta_data[1].encode('utf-8')]
+                            for some_meta_data in metadata_targets])
 
         lastidx = 0
         count = 0

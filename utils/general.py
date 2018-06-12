@@ -1,5 +1,6 @@
 import re
-from logger import monitorer
+import os
+from PIL import Image
 
 def tryint(s):
     try:
@@ -23,6 +24,16 @@ def sort_nicely(l):
 def command_number_to_index(command_vector):
 
     return command_vector-2
+
+
+def plot_test_image(image, name):
+
+    os.makedirs(name)
+
+    image_to_plot = Image.fromarray(image)
+    image_to_plot.save(name)
+
+
 
 
 

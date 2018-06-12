@@ -56,7 +56,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
 
 
     # TODO: here there is clearly a posibility to make a cool "conditioning" system.
-    model = CoILModel(g_conf.MODEL_NAME)
+    model = CoILModel(g_conf.MODEL_TYPE)
     model.cuda()
 
 
