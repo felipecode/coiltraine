@@ -5,7 +5,6 @@ import traceback
 import sys
 import numpy as np
 
-
 from torch.utils.data import Dataset
 import torch
 
@@ -13,6 +12,7 @@ from logger import coil_logger
 
 # TODO: Warning, maybe this does not need to be included everywhere.
 from configs import g_conf
+
 
 class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
@@ -58,14 +58,10 @@ class CoILDataset(Dataset):
             sensor_data = np.zeros(
                 (number_of_position, sensor_size[0], sensor_size[1],
                  sensor_size[2] * g_conf.NUMBER_FRAMES_FUSION),
-                 dtype='float32'
+                dtype='float32'
             )
 
-
             batch_sensors.update({sensor_name: sensor_data})
-
-
-
 
         for sensor_name, sensor_size in g_conf.SENSORS.items():
             count = 0
@@ -83,10 +79,7 @@ class CoILDataset(Dataset):
                             sensor_image = np.array(x[pos_inside, :, :, :])
 
                             if self.transform is not None:
-                                try:
-                                    sensor_image = self.transform(sensor_image)
-                                except:
-                                    sensor_image = self.transform(0, sensor_image)
+                                sensor_image = self.transform(self.batch_read_number, sensor_image)
                             else:
 
                                 sensor_image = np.swapaxes(sensor_image, 0, 2)
@@ -95,13 +88,9 @@ class CoILDataset(Dataset):
                             batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
                             ] = sensor_image
 
-
-
                 count += 1
 
-
-
-        #coil_logger.add_message('Running', {'Reading':{'Iteration': self.batch_read_number,
+        # coil_logger.add_message('Running', {'Reading':{'Iteration': self.batch_read_number,
         #                                               'ReadKeys': used_ids}})
         self.batch_read_number += 1
         # TODO: IMPORTANT !!!
@@ -130,24 +119,23 @@ class CoILDataset(Dataset):
         # From the determined path take all the possible file names.
         # TODO: Add more flexibility for the file base names ??
         folder_file_names = [os.path.join(path_for_files, f)
-                      for f in glob.glob1(path_for_files, "data_*.h5")]
-
+                             for f in glob.glob1(path_for_files, "data_*.h5")]
 
         # Concatenate all the sensor names and measurements names
         # TODO: This structure is very ugly.
         meas_data_cat = [list([]) for _ in range(len(meas_names))]
         sensors_data_cat = [list([]) for _ in range(len(sensors_names))]
 
-
-
         # We open one dataset to get the metadata for targets
         # that is important to be able to reference variables in a more legible way
         dataset = h5py.File(folder_file_names[0], "r")
-        metadata_targets = np.array(dataset['metadata_'+ meas_names[0]])
+        metadata_targets = np.array(dataset['metadata_' + meas_names[0]])
 
-        # Forcing the metada
-        metadata_targets =np.array([[some_meta_data[0].encode('utf-8'), some_meta_data[1].encode('utf-8')]
-                            for some_meta_data in metadata_targets])
+        # Forcing the metadata to be bytes
+        if not isinstance(metadata_targets[0][0], bytes):
+            metadata_targets = np.array(
+                [[some_meta_data[0].encode('utf-8'), some_meta_data[1].encode('utf-8')]
+                 for some_meta_data in metadata_targets])
 
         lastidx = 0
         count = 0
@@ -182,7 +170,7 @@ class CoILDataset(Dataset):
                 traceback.print_tb(exc_traceback, limit=1, file=sys.stdout)
                 traceback.print_exception(exc_type, exc_value, exc_traceback,
                                           limit=2, file=sys.stdout)
-                print("failed to open", file_name )
+                print("failed to open", file_name)
 
         # TODO: ADD THE STEERING MULTIPLE CAMERA AUGMENTATION
 

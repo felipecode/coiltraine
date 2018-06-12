@@ -151,7 +151,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
     for experiment in experiments_list:
         g_conf.immutable(False)
 
-        merge_with_yaml(os.path.join('configs', exp_batch, experiment))
+        merge_with_yaml(os.path.join('configs', exp_batch, experiment + '.yaml'))
 
         print (BOLD + g_conf.EXPERIMENT_GENERATED_NAME + END)
 

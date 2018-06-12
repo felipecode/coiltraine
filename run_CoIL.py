@@ -59,8 +59,8 @@ if __name__ == '__main__':
     args = argparser.parse_args()
 
 
-    log_level = logging.DEBUG if args.debug else logging.INFO
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
+    #log_level = logging.DEBUG if args.debug else logging.INFO
+    #logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
 
     for gpu in args.gpus:

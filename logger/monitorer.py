@@ -124,7 +124,6 @@ def get_status(exp_batch, experiment, process_name):
 
         return ['Does Not Exist', '']
 
-
     # The experiment exist ! However, check if the log file exist.
 
     if not os.path.exists(log_file_path):
