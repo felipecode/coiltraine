@@ -40,12 +40,13 @@ class Conv(nn.Module):
         self.layers = []
 
         # TODO: need to log the loaded networks
+
+
         for i in range(0, len(params['channels'])-1):
 
             conv = nn.Conv2d(in_channels=params['channels'][i], out_channels=params['channels'][i+1],
                              kernel_size=params['kernels'][i], stride=params['strides'][i])
-            #init.xavier_uniform_(conv.weight)
-            #init.constant_(conv.bias, 0.1)
+
 
             dropout = nn.Dropout2d(p=params['dropouts'][i])
             relu = nn.ReLU(inplace=True)

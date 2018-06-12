@@ -2,6 +2,7 @@ from logger import coil_logger
 import torch.nn as nn
 import torch
 
+from configs import g_conf
 from utils.general import command_number_to_index
 
 from .building_blocks import Conv
@@ -20,10 +21,14 @@ class CoILICRA(nn.Module):
 
         # TODO: AUTOMATICALLY GET THE OUTSIZES
         # TODO: Make configurable function on the config files by reading other dictionary
+        number_first_layer_channels = 0
 
+        for _, sizes in g_conf.SENSORS.items():
+            number_first_layer_channels += sizes[0]*g_conf.NUMBER_FRAMES_FUSION
 
         self.perception = nn.Sequential(*[
-                            Conv(params={'channels': params['perception']['conv']['channels'],
+                            Conv(params={'channels': [number_first_layer_channels] +
+                                                     params['perception']['conv']['channels'],
                                          'kernels': params['perception']['conv']['kernels'],
                                          'strides': params['perception']['conv']['strides'],
                                          'dropouts': params['perception']['conv']['dropouts'],
@@ -34,26 +39,32 @@ class CoILICRA(nn.Module):
                             )
 
 
-        self.measurements = FC(params={'neurons': params['measurements']['fc']['neurons'],
+        # WILL NOT WORK FOR SMALL AND DEEP LAYERS
+        # TODO: eliminate this hardcoded middle layer, make a conv simulation to get the fc out size
+        self.measurements = FC(params={'neurons': [8192] + params['measurements']['fc']['neurons'],
                                        'dropouts': params['measurements']['fc']['dropouts'],
                                        'end_layer': False})
 
 
 
-        self.join = Join(params={'after_process': FC(params={'neurons': params['join']['fc']['neurons'],
+        self.join = Join(params={'after_process': FC(params={'neurons': params['measurements']['fc']['neurons'][-1] +
+                                                                 params['join']['fc']['neurons'],
                                                              'dropouts': params['join']['fc']['dropouts'],
                                                              'end_layer': False}),
                                  'mode': 'cat'
                                 }
                          )
 
-        self.speed_branch = FC(params={'neurons': params['speed_branch']['fc']['neurons'],
-                                       'dropouts': params['speed_branch']['fc']['dropouts'],
+        self.speed_branch = FC(params={'neurons': params['join']['fc']['neurons'][-1] +
+                                                  params['speed_branch']['fc']['neurons'] + [1],
+                                       'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
                                        'end_layer': False})
 
-        self.branches = Branching([FC(params={'neurons': params['branches']['fc']['neurons'],
+        self.branches = Branching([FC(params={'neurons': params['join']['fc']['neurons'][-1] +
+                                                         params['branches']['fc']['neurons'] +
+                                                         [len(g_conf.TARGETS)],
                                                'dropouts': params['branches']['fc']['dropouts'],
-                                               'end_layer': True})] # TODO: THE number of branches multiplying does not work.
+                                               'end_layer': True})]
                                                 * params['number_of_branches']) #  Here we set branching automatically
 
         for m in self.modules():
