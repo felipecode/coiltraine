@@ -48,13 +48,17 @@ class CoILICRA(nn.Module):
 
 
 
-        self.join = Join(params={'after_process': FC(params={'neurons': [params['measurements']['fc']['neurons'][-1]] +
-                                                                 params['join']['fc']['neurons'],
-                                                             'dropouts': params['join']['fc']['dropouts'],
-                                                             'end_layer': False}),
-                                 'mode': 'cat'
-                                }
-                         )
+        self.join = Join(
+            params={'after_process':
+                         FC(params={'neurons':
+                                        [params['measurements']['fc']['neurons'][-1] +
+                                            params['perception']['fc']['neurons'][-1]] +
+                                        params['join']['fc']['neurons'],
+                                     'dropouts': params['join']['fc']['dropouts'],
+                                     'end_layer': False}),
+                     'mode': 'cat'
+                    }
+         )
 
         self.speed_branch = FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                   params['speed_branch']['fc']['neurons'] + [1],

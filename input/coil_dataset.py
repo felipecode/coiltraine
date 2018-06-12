@@ -3,6 +3,7 @@ import glob
 import h5py
 import traceback
 import sys
+import math
 import numpy as np
 
 from torch.utils.data import Dataset
@@ -90,13 +91,52 @@ class CoILDataset(Dataset):
 
                 count += 1
 
-        # coil_logger.add_message('Running', {'Reading':{'Iteration': self.batch_read_number,
-        #                                               'ReadKeys': used_ids}})
+        if g_conf.AUGMENT_LATERAL_STEERINGS > 0:
+
+            camera_angle = self.measurements[np.where(self.meta_data[:, 0] == b'angle'), used_ids][0][0]
+            speed = self.measurements[np.where(self.meta_data[:, 0] == b'speed_module'), used_ids][0][0]
+            steer = self.measurements[np.where(self.meta_data[:, 0] == b'steer'), used_ids][0][0]
+
+            self.measurements[np.where(self.meta_data[:, 0] == b'steer'), used_ids] =\
+                self.augment_steering(camera_angle, steer, speed)
+
+
+
         self.batch_read_number += 1
         # TODO: IMPORTANT !!!
         # TODO: ADD GROUND TRUTH CONTROL IN SOME META CONFIGURATION FOR THE DATASET
         # TODO: SO if the data read and manipulate is outside some range, it should report error
         return batch_sensors, self.measurements[:, used_ids]
+
+    def augment_steering(self, camera_angle, steer, speed):
+        """
+            Apply the steering physical equation to augment for the lateral cameras.
+        Args:
+            camera_angle_batch:
+            steer_batch:
+            speed_batch:
+
+        Returns:
+
+        """
+
+        time_use = 1.0
+        car_length = 3.0
+
+
+        pos = camera_angle > 0.0
+        neg = camera_angle <= 0.0
+
+
+        rad_camera_angle = math.pi * (math.fabs(camera_angle)) / 180.0
+        val = g_conf.AUGMENT_LATERAL_STEERINGS * (
+        math.atan((rad_camera_angle * car_length) / (time_use * speed + 0.05))) / 3.1415
+        steer -= max(-1.0, pos * min(val, 0.6))
+        steer += min(1.0, neg * min(val, 0.6))
+
+
+        return steer
+
 
     # file_names, image_dataset_names, dataset_names
     def pre_load_hdf5_files(self, path_for_files):

@@ -20,7 +20,7 @@ from torchvision import transforms
 
 
 # The main function maybe we could call it with a default name
-def execute(gpu, exp_batch, exp_alias):
+def execute(gpu, exp_batch, exp_alias, suppress_output=True):
     # We set the visible cuda devices
 
 
@@ -37,8 +37,10 @@ def execute(gpu, exp_batch, exp_alias):
         if not os.path.exists('_output_logs'):
             os.mkdir('_output_logs')
 
-        sys.stdout = open(os.path.join('_output_logs',
-                          g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+        # Put the output to a separate file
+        if suppress_output:
+            sys.stdout = open(os.path.join('_output_logs',
+                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
 
 
 
@@ -73,7 +75,6 @@ def execute(gpu, exp_batch, exp_alias):
 
         # By instanciating the augmenter we get a callable that augment images and transform them
         # into tensors.
-
         augmenter = Augmenter(g_conf.AUGMENTATION)
 
         dataset = CoILDataset(full_dataset, transform=augmenter)
@@ -117,7 +118,6 @@ def execute(gpu, exp_batch, exp_alias):
 
 
             #TODO, ADD ITERATION SCHEDULE
-            input_rgb_data = augmenter(0, input_data['rgb'])
             #coil_logger.add_images(input_rgb_data)
 
             # get the control commands from float_data, size = [120,1]
@@ -127,8 +127,9 @@ def execute(gpu, exp_batch, exp_alias):
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
             model.zero_grad()
+            print (input_data['rgb'].shape)
 
-            branches = model(input_rgb_data, dataset.extract_inputs(float_data).cuda())
+            branches = model(torch.squeeze(input_data['rgb'].cuda()), dataset.extract_inputs(float_data).cuda())
 
             #print ("len ",len(branches))
 

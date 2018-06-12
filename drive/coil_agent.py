@@ -57,7 +57,7 @@ class CoILAgent(Agent):
         Agent.__init__(self)
 
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
-        self.model = CoILModel(g_conf.MODEL_NAME)
+        self.model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
 
         self.model.load_state_dict(checkpoint['state_dict'])
 
@@ -73,12 +73,10 @@ class CoILAgent(Agent):
         #control_agent = self._agent.run_step(measurements, None, target)
 
         speed = torch.cuda.FloatTensor([measurements.player_measurements.forward_speed]).unsqueeze(0)
-        print ("Speed shape ", speed)
         directions_tensor = torch.cuda.LongTensor([directions])
         model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), speed,
                                                   directions_tensor)
 
-        print (model_outputs)
 
         steer, throttle, brake = self._process_model_outputs(model_outputs[0],
                                          measurements.player_measurements.forward_speed)
@@ -105,7 +103,8 @@ class CoILAgent(Agent):
 
         iteration = 0
         for name, size in g_conf.SENSORS.items():
-
+            print ("Sensors")
+            print (sensors)
             sensor = sensors[name].data[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
 
 

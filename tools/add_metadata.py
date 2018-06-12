@@ -70,6 +70,7 @@ if __name__ == "__main__":
         #targets = new_data.create_dataset('targets', (200, data['targets'][0].shape[0]), 'f')
         dt = h5py.special_dtype(vlen=str)  # PY3
 
+        #del f[metadata_targets]
         metadata = data.create_dataset('metadata_targets', (31, 2, ), dtype=dt)
 
         metadata[0,0], metadata[0,1] = 'steer', 'float'

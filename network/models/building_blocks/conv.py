@@ -43,7 +43,6 @@ class Conv(nn.Module):
 
 
         for i in range(0, len(params['channels'])-1):
-
             conv = nn.Conv2d(in_channels=params['channels'][i], out_channels=params['channels'][i+1],
                              kernel_size=params['kernels'][i], stride=params['strides'][i])
 

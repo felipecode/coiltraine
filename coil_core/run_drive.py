@@ -76,7 +76,7 @@ def start_carla_simulator(gpu, exp_batch, exp_alias):
 # OBS : I AM FIXING host as localhost now
 # TODO :  Memory use should also be adaptable with a limit, for now that seems to be doing fine in PYtorch
 
-def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0.0.1'):
+def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0.0.1', suppress_output=True):
     # host,port,gpu_number,path,show_screen,resolution,noise_type,config_path,type_of_driver,experiment_name,city_name,game,drivers_name
     #drive_config.city_name = city_name
     # TODO Eliminate drive config.
@@ -91,9 +91,9 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
     merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
     set_type_of_process('drive', exp_set_name)
 
-
-    #sys.stdout = open(os.path.join('_output_logs',
-    #                  g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+    if suppress_output:
+        sys.stdout = open(os.path.join('_output_logs',
+                          g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
 
 
 

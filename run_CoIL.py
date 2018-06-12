@@ -32,6 +32,11 @@ if __name__ == '__main__':
         type=str
     )
     argparser.add_argument(
+        '-e',
+        '--exp',
+        type=str
+    )
+    argparser.add_argument(
         '-vd',
         '--val_datasets',
         dest='validation_datasets',
@@ -69,6 +74,9 @@ if __name__ == '__main__':
         except:
             raise ValueError(" Gpu is not a valid int number")
 
+    if args.folder is None:
+        raise ValueError(" You should set a folder name where the experiments are placed")
+
 
 
     # Obs this is like a fixed parameter, how much a validation and a train and drives ocupies
@@ -76,15 +84,17 @@ if __name__ == '__main__':
     # TODO: MAKE SURE ALL DATASETS ARE " WAYPOINTED "
 
     if args.single_process is not None:
+        if args.exp is None:
+            raise ValueError(" You should set the exp alias when using single process")
         if args.single_process == 'train':
             # TODO make without position, increases the legibility.
-            execute_train("0", "eccv", "experiment_1")
+            execute_train("0", args.folder, args.exp, False)
 
         if args.single_process == 'validation':
-            execute_validation("0", "eccv", "experiment_1", "SmallTest")
+            execute_validation("0", args.folder, args.exp, args.validation_datasets[0], False)
 
         if args.single_process == 'drive':
-            execute_drive("0", "eccv", "experiment_1", 'Town02')
+            execute_drive("0", args.folder, args.exp, args.driving_environments[0], False)
 
 
     else:

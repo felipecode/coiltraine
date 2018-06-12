@@ -10,7 +10,7 @@ from . import train, validate, run_drive
 
 
 
-def execute_train(gpu, exp_batch, exp_alias):
+def execute_train(gpu, exp_batch, exp_alias, suppress_output=True):
     """
 
     Args:
@@ -23,10 +23,10 @@ def execute_train(gpu, exp_batch, exp_alias):
 
     """
 
-    p = multiprocessing.Process(target=train.execute, args=(gpu, exp_batch, exp_alias,))
+    p = multiprocessing.Process(target=train.execute, args=(gpu, exp_batch, exp_alias, suppress_output))
     p.start()
 
-def execute_validation(gpu, exp_batch, exp_alias, dataset):
+def execute_validation(gpu, exp_batch, exp_alias, dataset, suppress_output=True):
     """
 
     Args:
@@ -44,13 +44,11 @@ def execute_validation(gpu, exp_batch, exp_alias, dataset):
 
 
     # The difference between train and validation is the
-    p = multiprocessing.Process(target=validate.execute, args=(gpu, exp_batch, exp_alias, dataset))
+    p = multiprocessing.Process(target=validate.execute, args=(gpu, exp_batch, exp_alias, dataset, suppress_output))
     p.start()
 
 
-#TODO: set before the dataset path as environment variables
-
-def execute_drive(gpu, exp_batch, exp_alias, city_name):
+def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, suppress_output=True):
     """
 
     Args:
@@ -63,7 +61,8 @@ def execute_drive(gpu, exp_batch, exp_alias, city_name):
 
     """
 
-    p = multiprocessing.Process(target=run_drive.execute, args=(gpu, exp_batch, exp_alias, city_name,))
+    p = multiprocessing.Process(target=run_drive.execute, args=(gpu, exp_batch, exp_alias, exp_set_name,
+                                                                0.2, "127.0.0.1", suppress_output))
     #p.daemon = True
     p.start()
 

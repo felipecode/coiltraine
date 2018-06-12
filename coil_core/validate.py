@@ -11,7 +11,7 @@ import random
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss
-from input import CoILDataset
+from input import CoILDataset, Augmenter
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_checkpoint_ready,\
     maximun_checkpoint_reach, get_next_checkpoint
@@ -19,7 +19,7 @@ from torchvision import transforms
 
 
 # The main function maybe we could call it with a default name
-def execute(gpu, exp_batch, exp_alias, dataset_name):
+def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
     # We set the visible cuda devices
 
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
@@ -31,9 +31,9 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
     if not os.path.exists('_output_logs'):
         os.mkdir('_output_logs')
 
-
-    sys.stdout = open(os.path.join('_output_logs',
-                      g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+    if suppress_output:
+        sys.stdout = open(os.path.join('_output_logs',
+                          g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
 
     if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
         # TODO: print some cool summary or not ?
@@ -43,7 +43,9 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
     #that you can access the HDFILES positions from the root directory as a in a vector.
     full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name)
 
-    dataset = CoILDataset(full_dataset, transform=transforms.Compose([transforms.ToTensor()]))
+    augmenter = Augmenter(None)
+
+    dataset = CoILDataset(full_dataset, transform=augmenter)
 
     # Creates the sampler, this part is responsible for managing the keys. It divides
     # all keys depending on the measurements and produces a set of keys for each bach.
@@ -56,11 +58,9 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
 
 
     # TODO: here there is clearly a posibility to make a cool "conditioning" system.
-    model = CoILModel(g_conf.MODEL_TYPE)
+    model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
     model.cuda()
 
-
-    criterion = Loss()
 
 
     latest = get_latest_evaluated_checkpoint()
@@ -93,8 +93,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
             for data in data_loader:
 
                 input_data, float_data = data
-                control_position = np.where(dataset.meta_data[:, 0] == 'control')[0][0]
-                speed_position = np.where(dataset.meta_data[:, 0] == 'speed_module')[0][0]
+                control_position = np.where(dataset.meta_data[:, 0] == b'control')[0][0]
+                speed_position = np.where(dataset.meta_data[:, 0] == b'speed_module')[0][0]
                 print (torch.squeeze(input_data['rgb']).shape)
 
                 print (control_position)
@@ -164,7 +164,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name):
                       'BestErrorCheckpoint': best_error_iter
                      },
 
-                 'Checkpoint': latest})
+                 'Checkpoint': latest},
+                                    latest)
 
         else:
             time.sleep(1)
