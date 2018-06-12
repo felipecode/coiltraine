@@ -28,7 +28,7 @@ class FC(nn.Module):
         if 'end_layer' not in params:
             raise ValueError(" Missing the end module parameter ")
 
-        if len(params['dropouts']) != len(params['kernel_sizes'])-1:
+        if len(params['dropouts']) != len(params['neurons'])-1:
             raise ValueError("Dropouts should be from the len of kernels minus 1")
 
 
@@ -58,16 +58,7 @@ class FC(nn.Module):
     def forward(self, x):
         # get only the speeds from measurement labels
         # TODO: TRACK NANS OUTPUTS
-        """
 
-        # TODO: Control the frequency of postion log
-        coil_logger.add_message('Model', {
-            {'Perception': { "Iteration": 765,
-             "Output": [1.0, 12.3, 124.29]
-                          }
-             }
-        } )
-        """
         return self.layers(x)
 
 
