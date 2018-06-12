@@ -2,7 +2,7 @@ import imgaug as ia
 from imgaug import augmenters as iaa
 
 
-def medium( iteration):
+def medium(iteration):
 
 
 
@@ -108,7 +108,7 @@ def soft(iteration):
     return augmenter
 
 
-def hard(iteration):
+def high(iteration):
 
 
 

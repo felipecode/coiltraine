@@ -1,6 +1,6 @@
 import numpy as np
 
-class AugmenterCPU(object):
+class Augmenter(object):
     """
     This class serve as a wrapper to apply augmentations from IMGAUG in CPU mode in
     the same way augmentations are applyed when using the transform library from pytorch
@@ -20,15 +20,16 @@ class AugmenterCPU(object):
         img = np.swapaxes(img, 0, 2)
         img = np.swapaxes(img, 1, 2)
 
-        for t in self.scheduler[iteration]:
+        if self.scheduler is not None:
+            for t in eval(self.scheduler, iteration):
 
-            img = t.augment_images(img)
+                img = t.augment_images(img)
 
         return img
 
     def __repr__(self):
         format_string = self.__class__.__name__ + '('
-        for t in self.self.scheduler[0]:
+        for t in self.scheduler:
             format_string += '\n'
             format_string += '    {0}'.format(t)
         format_string += '\n)'

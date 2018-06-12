@@ -32,9 +32,7 @@ import yaml
 
 
 from logger.coil_logger import create_log, add_message
-
-import imgauggpu as iag
-import imgaug.augmenters as ia
+from input.scheduler import soft,medium, high
 
 
 """ RULE ! 
@@ -64,7 +62,9 @@ _g_conf.BATCH_SIZE = 120
 #                             iag.ContrastNormalization((0.5, 1.5))
 #                             ]
 
+
 _g_conf.AUGMENTATION = None
+
 
 #_g_conf.AUGMENTATION_SUITE_CPU = [ ia.Add((0, 0)), ia.Dropout(0, 0),
 #                              ia.GaussianBlur(sigma=(0.0, 3.0)),

@@ -69,8 +69,7 @@ def select_data_sequence(control, selected_data):
 
     count = 0
     del_pos = []
-    # print "SELECTED"
-    # print selected_data
+
     while count * g_conf.SEQUENCE_STRIDE <= (
             len(control) - g_conf.NUMBER_IMAGES_SEQUENCE):
 
@@ -174,14 +173,13 @@ def float_split(output_to_split, keys, percentiles):
 
 def control_steer_split(float_data, meta_data, keys):
 
-
-    steerings = float_data[np.where(meta_data[:, 0] == b'steer'), :][0][0] # TODO: WHY EVERY WHERE MAKE THIS TO BE USED ??
+    # TODO: WHY EVERY WHERE MAKE THIS TO BE USED ??
+    steerings = float_data[np.where(meta_data[:, 0] == b'steer'), :][0][0]
 
     print ("steer shape", steerings.shape)
 
     # TODO: read meta data and turn into a coool dictionary ?
-    #print(np.where(dataset.meta_data[:, 0] == 'control'))
-    #TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
+    # TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
     labels = float_data[np.where(meta_data[:, 0] == b'control'), :][0][0]
 
     print ("labels shape ", labels.shape)
@@ -199,6 +197,6 @@ def control_steer_split(float_data, meta_data, keys):
 
         splitted_steer_labels.append(splitter_steer)
 
-    coil_logger.add_message('Loading', {'KeysDivision': splitted_steer_labels} )
+    coil_logger.add_message('Loading', {'KeysDivision': splitted_steer_labels})
 
     return splitted_steer_labels

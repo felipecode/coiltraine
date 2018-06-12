@@ -13,7 +13,7 @@ import imgauggpu as iag
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss
-from input import CoILDataset, BatchSequenceSampler, splitter
+from input import CoILDataset, BatchSequenceSampler, splitter, Augmenter
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
 from torchvision import transforms
@@ -65,13 +65,18 @@ def execute(gpu, exp_batch, exp_alias):
 
         # TODO: The checkpoint will continue, so it should erase everything up to the iteration
 
-        #Define the dataset. This structure is has the __get_item__ redefined in a way
-        #that you can access the HDFILES positions from the root directory as a in a vector.
+        # Define the dataset. This structure is has the __get_item__ redefined in a way
+        # that you can access the HD_FILES positions from the root directory as a in a vector.
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
 
         #augmenter_cpu = iag.AugmenterCPU(g_conf.AUGMENTATION_SUITE_CPU)
 
-        dataset = CoILDataset(full_dataset, transform=transforms.Compose([transforms.ToTensor()]))
+        # By instanciating the augmenter we get a callable that augment images and transform them
+        # into tensors.
+
+        augmenter = Augmenter(g_conf.AUGMENTATION)
+
+        dataset = CoILDataset(full_dataset, transform=augmenter)
 
         # Creates the sampler, this part is responsible for managing the keys. It divides
         # all keys depending on the measurements and produces a set of keys for each bach.
@@ -88,10 +93,7 @@ def execute(gpu, exp_batch, exp_alias):
         data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
                                                   shuffle=False, num_workers=12,
                                                   pin_memory=True)
-        # By instanciating the augmenter we get a callable that augment images and transform them
-        # into tensors.
 
-        augmenter = iag.Augmenter(g_conf.AUGMENTATION_SUITE)
 
         # TODO: here there is clearly a posibility to make a cool "conditioning" system.
 
