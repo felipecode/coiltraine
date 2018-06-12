@@ -1,4 +1,5 @@
 import numpy as np
+from input.scheduler import soft,medium, high
 
 class Augmenter(object):
     """

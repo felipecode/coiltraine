@@ -32,7 +32,7 @@ import yaml
 
 
 from logger.coil_logger import create_log, add_message
-from input.scheduler import soft,medium, high
+
 
 
 """ RULE ! 
