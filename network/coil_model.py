@@ -6,7 +6,7 @@
 from .models import CoILICRA
 
 
-def CoILModel(architecture_name):
+def CoILModel(architecture_name, architecture_configuration):
     """ Factory function
 
         Note: It is defined with the first letter as uppercase even though is a function to contrast
@@ -16,7 +16,7 @@ def CoILModel(architecture_name):
 
     if architecture_name == 'coil-icra':
 
-        return CoILICRA()
+        return CoILICRA(architecture_configuration)
 
     else:
 
