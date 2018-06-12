@@ -48,7 +48,7 @@ class CoILICRA(nn.Module):
 
 
 
-        self.join = Join(params={'after_process': FC(params={'neurons': params['measurements']['fc']['neurons'][-1] +
+        self.join = Join(params={'after_process': FC(params={'neurons': [params['measurements']['fc']['neurons'][-1]] +
                                                                  params['join']['fc']['neurons'],
                                                              'dropouts': params['join']['fc']['dropouts'],
                                                              'end_layer': False}),
@@ -56,7 +56,7 @@ class CoILICRA(nn.Module):
                                 }
                          )
 
-        self.speed_branch = FC(params={'neurons': params['join']['fc']['neurons'][-1] +
+        self.speed_branch = FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                   params['speed_branch']['fc']['neurons'] + [1],
                                        'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
                                        'end_layer': False})
@@ -65,7 +65,7 @@ class CoILICRA(nn.Module):
         # Create the fc vector separatedely
         branch_fc_vector = []
         for i in range(params['number_of_branches']):
-            branch_fc_vector.append(FC(params={'neurons': params['join']['fc']['neurons'][-1] +
+            branch_fc_vector.append(FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                          params['branches']['fc']['neurons'] +
                                                          [len(g_conf.TARGETS)],
                                                'dropouts': params['branches']['fc']['dropouts'] + [0.0],
