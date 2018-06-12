@@ -118,7 +118,8 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
         
     """
     try:
-        exp_set_builder = importlib.import_module('drive.' + exp_set_name + '.build_' + exp_set_name)
+        exp_set_builder_module = importlib.import_module('drive.' + exp_set_name)
+        exp_set_builder = getattr(exp_set_builder_module, 'build_' + exp_set_name)
     except:
         carla_process.kill()
         coil_logger.add_message('Error', {'Message': 'Suite name not existent'})
