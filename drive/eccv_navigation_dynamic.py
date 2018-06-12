@@ -68,5 +68,5 @@ def build_eccv_navigation_dynamic():
     camera.set_rotation(-15.0, 0, 0)
     sensor_set = [camera]
 
-    return _build_experiments(exp_set_dict, sensor_set)
+    return _build_experiments(exp_set_dict, sensor_set), exp_set_dict
 
