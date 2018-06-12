@@ -7,6 +7,7 @@ import h5py
 import os
 
 import random
+import glob
 
 
 
@@ -58,11 +59,11 @@ if __name__ == "__main__":
     #if not os.path.exists(path_clean):
     #    os.mkdir(path_clean)
 
-    for h_num in positions_to_test:
-
+    files = glob.glob(os.path.join(path, 'data_*.h5'))
+    for f in files:
 
         try:
-            data = h5py.File(path + 'data_' + str(h_num).zfill(5) + '.h5', "r+")
+            data = h5py.File(f, "r+")
         except Exception as e:
             continue
 
@@ -72,7 +73,6 @@ if __name__ == "__main__":
         #new_data_labels = new_data.create_dataset('labels', (200, 88, 200, 1), dtype=np.uint8)
         # new_data_depth= new_data.create_dataset('depth', (200,88,200,3),dtype=np.uint8)
         #targets = new_data.create_dataset('targets', (200, data['targets'][0].shape[0]), 'f')
-
         dt = h5py.special_dtype(vlen=str)  # PY3
 
         metadata = data.create_dataset('metadata_targets', (31, 2, ), dtype=dt)
@@ -108,9 +108,3 @@ if __name__ == "__main__":
         metadata[28, 0], metadata[28, 1] = 'waypoint1_y', 'float'
         metadata[29, 0], metadata[29, 1] = 'waypoint2_x', 'float'
         metadata[30, 0], metadata[30, 1] = 'waypoint2_y', 'float'
-
-
-
-
-
-
