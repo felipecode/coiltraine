@@ -18,8 +18,12 @@ def get_gpu_resources(gpu_resources, executing_processes, allocation_params):
 
     for process_specs in executing_processes:
 
+        print  ("Checking", process_specs['folder'], process_specs['experiment'],
+                                     process_specs['type'])
         status = monitorer.get_status(process_specs['folder'], process_specs['experiment'],
                                      process_specs['type'])[0]
+
+
 
         if  status == "Finished" or status == 'Error':
 
@@ -48,28 +52,6 @@ def allocate_gpu_resources(gpu_resources, amount_to_allocate):
     raise ValueError("Not enough gpu resources to allocate")
 
 
-"""
-def pop_half_gpu(free_gpus):
-    for gpu in free_gpus:
-        if len(gpu) > 1:
-            free_gpus[free_gpus.index(gpu)] = [free_gpus[free_gpus.index(gpu)][0]]
-            return free_gpus, sum(len(row) for row in free_gpus) / 2.0, gpu[0]
-        else:
-            del free_gpus[free_gpus.index(gpu)]
-            return free_gpus, sum(len(row) for row in free_gpus) / 2.0, gpu[0]
-
-
-def pop_one_gpu(free_gpus):
-    for gpu in free_gpus:
-        if len(gpu) > 1:
-            print ('tuple',free_gpus[free_gpus.index(gpu)])
-            del free_gpus[free_gpus.index(gpu)]
-            return free_gpus, sum(len(row) for row in free_gpus) / 2.0, gpu[0]
-        # Otherwise does not pop. maybe raise
-        else:
-            raise ValueError("No full gpu available")
-
-"""
 
 def mount_experiment_heap(folder, experiments_list, is_training, validation_datasets, drive_environments):
 

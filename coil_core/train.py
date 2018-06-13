@@ -131,8 +131,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
             branches = model(torch.squeeze(input_data['rgb'].cuda()), dataset.extract_inputs(float_data).cuda())
 
-            #print ("len ",len(branches))
-
 
             loss = criterion.MSELoss(branches, dataset.extract_targets(float_data).cuda(),
                                      controls.cuda(), dataset.extract_inputs(float_data).cuda())

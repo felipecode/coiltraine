@@ -161,5 +161,7 @@ def folder_execute(params=None):
                                         validation_datasets,
                                         driving_environments)
         # Check allocated process, and look which ones finished.
-        free_gpus = get_gpu_resources(allocated_gpus, executing_processes,allocation_parameters)
+        free_gpus, resources_on_most_free_gpu = get_gpu_resources(allocated_gpus,
+                                                                  executing_processes,
+                                                                  allocation_parameters)
         #Check

@@ -25,7 +25,7 @@ class testExpSched(unittest.TestCase):
 
 
 
-        heap_of_exp = mount_experiment_heap(folder, experiments_list,
+        heap_of_exp = mount_experiment_heap(folder, experiments_list, True,
                               validation_datasets, drive_environments)
 
 
@@ -42,12 +42,14 @@ class testExpSched(unittest.TestCase):
 
         gpus_list = ['0', '1', '2', '3']
         path = 'configs'
-        folder = 'eccv'
+        folder = 'test_exps'
         experiments_list = os.listdir(os.path.join(path, folder))
+
+        experiments_list = [experiment.split('.')[-2] for experiment in experiments_list]
 
         validation_datasets = ['SmallTest', 'OtherSmallTest']
         drive_environments = ['Town01', 'Town02']
-        allocation_parameters = {'gpu_value': 5,
+        allocation_parameters = {'gpu_value': 3.5,
                                  'train_cost': 2,
                                  'validation_cost': 1.5,
                                  'drive_cost': 1.5}
@@ -57,11 +59,16 @@ class testExpSched(unittest.TestCase):
 
         free_gpus, resources_on_most_free_gpu = get_gpu_resources(allocated_gpus, executing_processes,
                                                                allocation_parameters)
-
+        print (" Free GPUS, resources on the most free")
         print (free_gpus, resources_on_most_free_gpu)
 
-        tasks_queue = mount_experiment_heap(folder, experiments_list,
-                              validation_datasets, drive_environments)
+        print ("Experiments list")
+        print (experiments_list)
+
+        tasks_queue = mount_experiment_heap(folder, experiments_list, True,
+                                            validation_datasets, drive_environments)
+
+        print ("Tasks queue", tasks_queue)
 
         executing_processes = []
 
@@ -104,23 +111,20 @@ class testExpSched(unittest.TestCase):
         free_gpus, resources_on_most_free_gpu = get_gpu_resources(free_gpus, executing_processes, allocation_parameters)
         print ("Free GPU Before", free_gpus)
 
-        g_conf.NAME = 'experiment_1'
-        merge_with_yaml('configs/eccv/experiment_1.yaml')
+        first_process = executing_processes[0]
+        fp_name = first_process['experiment']
+
+        merge_with_yaml('configs/test_exps/' + fp_name + '.yaml')
         # JUST A TRICK TO CONTAIN THE CURRENT LIMITATIONS
-        set_type_of_process('train')
 
-        coil_logger.add_message('Iterating',
-                                {'Iteration': 2000* g_conf.BATCH_SIZE,
-                                 'Current Loss': 3,
-                                 'Best Loss': 1, 'Best Loss Iteration': 1,
-                                 'Some Output': 2,
-                                 'GroundTruth': 3,
-                                 'Error': 4,
-                                 'Inputs': 5},
-                                2000 * g_conf.BATCH_SIZE)
+        set_type_of_process(first_process['type'])
+
+        coil_logger.add_message('Finished', {})
 
 
-        free_gpus, resources_on_most_free_gpu = get_gpu_resources(allocated_gpus, executing_processes, allocation_parameters)
-        print ("Free GPU After", free_gpus)
+        free_gpus, resources_on_most_free_gpu = get_gpu_resources(allocated_gpus,
+                                                                  executing_processes,
+                                                                  allocation_parameters)
+        print ("Free GPU After  ", free_gpus, resources_on_most_free_gpu)
 
 # TODO: Test it should continue experiments that are iterating but stopped.

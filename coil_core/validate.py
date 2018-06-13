@@ -171,6 +171,9 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
             time.sleep(1)
             print ("Waiting for the next Validation")
 
+    coil_logger.add_message('Finished', {})
+
+
     # TODO: DO ALL THE AMAZING LOGGING HERE, as a way to very the status in paralell.
     # THIS SHOULD BE AN INTERELY PARALLEL PROCESS
 
