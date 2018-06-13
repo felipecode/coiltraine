@@ -18,8 +18,6 @@ def get_gpu_resources(gpu_resources, executing_processes, allocation_params):
 
     for process_specs in executing_processes:
 
-        print  ("Checking", process_specs['folder'], process_specs['experiment'],
-                                     process_specs['type'])
         status = monitorer.get_status(process_specs['folder'], process_specs['experiment'],
                                      process_specs['type'])[0]
 
