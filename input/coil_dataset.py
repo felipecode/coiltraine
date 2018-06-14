@@ -34,6 +34,7 @@ class CoILDataset(Dataset):
 
     def __len__(self):
         # This is seems to be the entire dataset size
+
         return self.measurements.shape[1]
 
     def __getitem__(self, used_ids):
@@ -131,8 +132,10 @@ class CoILDataset(Dataset):
         rad_camera_angle = math.pi * (math.fabs(camera_angle)) / 180.0
         val = g_conf.AUGMENT_LATERAL_STEERINGS * (
         math.atan((rad_camera_angle * car_length) / (time_use * speed + 0.05))) / 3.1415
-        steer -= max(-1.0, pos * min(val, 0.6))
-        steer += min(1.0, neg * min(val, 0.6))
+        steer -= pos * min(val, 0.6)
+        steer += neg * min(val, 0.6)
+
+        steer = min(0.75, max(-0.75, steer))
 
 
         return steer

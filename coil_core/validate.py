@@ -57,7 +57,9 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         # workers to get all the data.
         # TODO: batch size an number of workers go to some configuration file
         data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
-                                                  shuffle=False, num_workers=12, pin_memory=True)
+                                                  shuffle=False,
+                                                  num_workers=g_conf.NUMBER_OF_LOADING_WORKERS,
+                                                  pin_memory=True)
 
 
         # TODO: here there is clearly a posibility to make a cool "conditioning" system.
@@ -90,7 +92,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                 checkpoint_iteration = checkpoint['iteration']
                 print ("Validation loaded ", checkpoint_iteration)
 
-
+                model.load_state_dict(checkpoint['state_dict'])
 
                 accumulated_loss = 0
                 accumulated_error = 0
@@ -100,11 +102,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     input_data, float_data = data
                     control_position = np.where(dataset.meta_data[:, 0] == b'control')[0][0]
                     speed_position = np.where(dataset.meta_data[:, 0] == b'speed_module')[0][0]
-                    print (torch.squeeze(input_data['rgb']).shape)
 
-                    print (control_position)
-                    print (speed_position)
-                    # Obs : Maybe we could also check for other branches ??
 
                     output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
                                                   float_data[:, speed_position, :].cuda(),
@@ -124,6 +122,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
                     loss = torch.mean((output - dataset.extract_targets(float_data).cuda())**2).data.tolist()
                     mean_error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
+                    #print ("Loss", loss)
+                    #print ("output", output[0])
                     accumulated_error += mean_error
                     accumulated_loss += loss
                     error = torch.abs(output - dataset.extract_targets(float_data).cuda())
@@ -144,10 +144,11 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                           latest)
                     iteration_on_checkpoint += 1
 
-                checkpoint_average_loss = accumulated_loss/len(data_loader)
-                checkpoint_average_error = accumulated_error/len(data_loader)
-                coil_logger.add_scalar('Loss', checkpoint_average_loss, latest)
-                coil_logger.add_scalar('Error', checkpoint_average_error, latest)
+                checkpoint_average_loss = accumulated_loss/(len(data_loader))
+
+                checkpoint_average_error = accumulated_error/(len(data_loader))
+                coil_logger.add_scalar('Loss', checkpoint_average_loss, latest, True)
+                coil_logger.add_scalar('Error', checkpoint_average_error, latest, True)
 
                 if checkpoint_average_loss < best_loss:
                     best_loss = checkpoint_average_loss

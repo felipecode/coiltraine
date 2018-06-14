@@ -91,7 +91,7 @@ class Loss(object):
             if size_average:
                 raise RuntimeError(" size_average can not be applies when reduce is set to 'False' ")
             else:
-                mse_loss =torch.cat([mse_loss,loss_b5],1)
+                mse_loss = torch.cat([mse_loss, loss_b5], 1)
 
         return mse_loss
 

@@ -90,11 +90,14 @@ if __name__ == '__main__':
             # TODO make without position, increases the legibility.
             execute_train("0", args.folder, args.exp, False)
 
-        if args.single_process == 'validation':
+        elif args.single_process == 'validation':
             execute_validation("0", args.folder, args.exp, args.validation_datasets[0], False)
 
-        if args.single_process == 'drive':
+        elif args.single_process == 'drive':
             execute_drive("0", args.folder, args.exp, args.driving_environments[0], False)
+        else:
+
+            raise (" Invalid name for single process, chose from (train, validation, test)")
 
 
     else:

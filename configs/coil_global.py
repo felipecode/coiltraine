@@ -82,7 +82,7 @@ _g_conf.EXPERIMENT_NAME = "default"
 _g_conf.EXPERIMENT_GENERATED_NAME = None
 # TODO: not necessarily the configuration need to know about this
 _g_conf.PROCESS_NAME = "None"
-_g_conf.NUMBER_ITERATIONS = 200
+_g_conf.NUMBER_ITERATIONS = 2000
 _g_conf.SAVE_SCHEDULE = range(0, 2000, 200)
 _g_conf.NUMBER_FRAMES_FUSION = 1
 _g_conf.NUMBER_IMAGES_SEQUENCE = 1

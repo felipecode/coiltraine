@@ -1,6 +1,9 @@
 import re
 import os
 from PIL import Image
+import smtplib
+from email.mime.text import MIMEText
+
 
 def tryint(s):
     try:
@@ -34,6 +37,13 @@ def plot_test_image(image, name):
     image_to_plot.save(name)
 
 
+def send_email(address, message):
+    msg = MIMEText(message)
 
+    msg['Subject'] = 'The experiment is finished '
+    msg['From'] = address
+    msg['To'] = address
 
-
+    s = smtplib.SMTP('localhost')
+    s.sendmail(address, [address], msg.as_string())
+    s.quit()

@@ -150,15 +150,18 @@ def write_on_csv(checkpoint_name, output):
 
 
 
-def add_scalar(tag, value, iteration=None):
+def add_scalar(tag, value, iteration=None, force_writing=False):
 
     """
     For raw output  logging on tensorboard.
+    If you force writing it always writes regardless of the iteration
+    # TODO: how about making the decision to write outside ?
+    # TODO: The problem is that we dont want that in a main
 
 
     """
     if iteration is not None:
-        if iteration % LOG_FREQUENCY == 0:
+        if iteration % LOG_FREQUENCY == 0 or force_writing:
             tl.scalar_summary(tag, value, iteration + 1)
 
     else:

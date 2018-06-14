@@ -51,7 +51,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
 
         checkpoint_file = get_latest_saved_checkpoint()
-        if checkpoint_file != None:
+        if checkpoint_file is not None:
             checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias,
                                      'checkpoints', str(get_latest_saved_checkpoint())))
             iteration = checkpoint['iteration']
@@ -100,11 +100,15 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         model.cuda()
+
+        if checkpoint_file is not None:
+            model.load_state_dict(checkpoint['state_dict'])
+
         print(model)
 
         criterion = Loss()
 
-        optimizer = optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
+        optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
 
         print (dataset.meta_data)
 
@@ -117,7 +121,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             input_data, float_data = data
 
 
-            #TODO, ADD ITERATION SCHEDULE
             #coil_logger.add_images(input_rgb_data)
 
             # get the control commands from float_data, size = [120,1]
@@ -151,6 +154,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
 
             coil_logger.add_scalar('Loss', loss.data, iteration)
+            coil_logger.add_image('Image', input_data['rgb'][position][0], iteration)
 
 
             loss.backward()
