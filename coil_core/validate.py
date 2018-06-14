@@ -21,62 +21,64 @@ from torchvision import transforms
 
 # The main function maybe we could call it with a default name
 def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
-    # We set the visible cuda devices
-
-    os.environ["CUDA_VISIBLE_DEVICES"] = gpu
-
-    # At this point the log file with the correct naming is created.
-    merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
-    set_type_of_process('validation', dataset_name)
-
-    if not os.path.exists('_output_logs'):
-        os.mkdir('_output_logs')
-
-    if suppress_output:
-        sys.stdout = open(os.path.join('_output_logs',
-                          g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
-
-    if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
-        # TODO: print some cool summary or not ?
-        return
-
-    #Define the dataset. This structure is has the __get_item__ redefined in a way
-    #that you can access the HDFILES positions from the root directory as a in a vector.
-    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name)
-
-    augmenter = Augmenter(None)
-
-    dataset = CoILDataset(full_dataset, transform=augmenter)
-
-    # Creates the sampler, this part is responsible for managing the keys. It divides
-    # all keys depending on the measurements and produces a set of keys for each bach.
-
-    # The data loader is the multi threaded module from pytorch that release a number of
-    # workers to get all the data.
-    # TODO: batch size an number of workers go to some configuration file
-    data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
-                                              shuffle=False, num_workers=12, pin_memory=True)
-
-
-    # TODO: here there is clearly a posibility to make a cool "conditioning" system.
-    model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
-    model.cuda()
-
-
-
-    latest = get_latest_evaluated_checkpoint()
-    if latest is None:  # When nothing was tested, get latest returns none, we fix that.
-        latest = 0
-
-
-    print (dataset.meta_data)
-    best_loss = 1000
-    best_error = 1000
-    best_loss_iter = 0
-    best_error_iter = 0
-
 
     try:
+        # We set the visible cuda devices
+
+        os.environ["CUDA_VISIBLE_DEVICES"] = gpu
+
+        # At this point the log file with the correct naming is created.
+        merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
+        set_type_of_process('validation', dataset_name)
+
+        if not os.path.exists('_output_logs'):
+            os.mkdir('_output_logs')
+
+        if suppress_output:
+            sys.stdout = open(os.path.join('_output_logs',
+                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+
+        if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
+            # TODO: print some cool summary or not ?
+            return
+
+        #Define the dataset. This structure is has the __get_item__ redefined in a way
+        #that you can access the HDFILES positions from the root directory as a in a vector.
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name)
+
+        augmenter = Augmenter(None)
+
+        dataset = CoILDataset(full_dataset, transform=augmenter)
+
+        # Creates the sampler, this part is responsible for managing the keys. It divides
+        # all keys depending on the measurements and produces a set of keys for each bach.
+
+        # The data loader is the multi threaded module from pytorch that release a number of
+        # workers to get all the data.
+        # TODO: batch size an number of workers go to some configuration file
+        data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
+                                                  shuffle=False, num_workers=12, pin_memory=True)
+
+
+        # TODO: here there is clearly a posibility to make a cool "conditioning" system.
+        model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
+        model.cuda()
+
+
+
+        latest = get_latest_evaluated_checkpoint()
+        if latest is None:  # When nothing was tested, get latest returns none, we fix that.
+            latest = 0
+
+
+        print (dataset.meta_data)
+        best_loss = 1000
+        best_error = 1000
+        best_loss_iter = 0
+        best_error_iter = 0
+
+
+
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
             if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):

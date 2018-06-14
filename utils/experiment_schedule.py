@@ -25,12 +25,9 @@ def get_gpu_resources(gpu_resources, executing_processes, allocation_params):
             name = 'validation_' + process_specs['dataset']
         else:
             name = process_specs['type']
-        print  ("   Checking", process_specs['folder'], process_specs['experiment'],
-                                     name)
+
         status = monitorer.get_status(process_specs['folder'], process_specs['experiment'],
                                      name)[0]
-
-        print ("    Status", status)
 
         if  status == "Finished" or status == 'Error':
 
