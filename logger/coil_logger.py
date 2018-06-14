@@ -4,7 +4,7 @@ import json
 import logging
 import os
 
-from .json_formatter import filelogger
+from .json_formatter import filelogger, closeFileLogger
 from .tensorboard_logger import Logger
 
 
@@ -53,10 +53,13 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1):
         os.mkdir(os.path.join(root_path, exp_batch_name, exp_name))
 
     dir_name = os.path.join(root_path, exp_batch_name, exp_name)
-    print ("logger dir name ", dir_name)
     full_name = os.path.join(dir_name, process_name)
 
-    flog = filelogger(exp_name + '_' + process_name , [], full_name)
+    if os.path.isfile(full_name):
+        flog = filelogger(exp_name + '_' + process_name, [], full_name, writing_level='a+')
+        print (open(full_name).read())
+    else:
+        flog = filelogger(exp_name + '_' + process_name, [], full_name, writing_level='w')
 
 
 
@@ -68,8 +71,14 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1):
     LOG_FREQUENCY = log_frequency
     tl = Logger(os.path.join(root_path, exp_batch_name, exp_name, 'tensorboard_logs_'+process_name))
 
+def close():
 
-# TODO: iteration is required ! Assert that
+    full_path_name = os.path.join('_logs', EXPERIMENT_BATCH_NAME,
+                                  EXPERIMENT_NAME, PROCESS_NAME)
+
+    closeFileLogger(full_path_name)
+
+
 def add_message(phase, message, iteration=None):
     """
     For the normal case

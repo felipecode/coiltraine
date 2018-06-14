@@ -73,14 +73,16 @@ class testExpSched(unittest.TestCase):
         print ("Tasks queue", tasks_queue)
 
         executing_processes = []
-        for i in range(20):
+        while True:
 
             while resources_on_most_free_gpu > min([allocation_parameters['train_cost'],
                                                  allocation_parameters['validation_cost'],
-                                                 allocation_parameters['drive_cost']]):
+                                                 allocation_parameters['drive_cost']])\
+                    and tasks_queue != []:
                 #Allocate all the gpus
-
-                process_specs = heapq.heappop(tasks_queue)[2]  # To get directly the dict
+                print ("TASKS ", tasks_queue)
+                popped_thing = heapq.heappop(tasks_queue)
+                process_specs = popped_thing[2]  # To get directly the dict
                 print ("process got: ", process_specs)
                 print (free_gpus, resources_on_most_free_gpu)
 
@@ -129,18 +131,23 @@ class testExpSched(unittest.TestCase):
 
             random_message = random.choice(['Finished', 'Error', 'Iterating'])
 
-            print ('set ',random_process['type'], ' from ', random_process['experiment'], ' to ', random_message  )
+            print ('set ', random_process['type'], ' from ', random_process['experiment'], ' to ', random_message  )
 
             if  random_message == 'Iterating':
-                coil_logger.add_message(random_message, {'Iteration': 0},0)
+                coil_logger.add_message(random_message, {'Iteration': 1}, 1)
+                coil_logger.add_message(random_message, {'Iteration': 2}, 2)
             else:
-                coil_logger.add_message(random_message,{})
+                coil_logger.add_message(random_message, {})
 
 
             free_gpus, resources_on_most_free_gpu, executing_processes = get_gpu_resources(
                                                                       allocated_gpus,
                                                                       executing_processes,
                                                                       allocation_parameters)
+
+            coil_logger.close()
+            if len(executing_processes) == 0:
+                break
             print ("Free GPU After  ", free_gpus, resources_on_most_free_gpu)
 
             print ("WE have ", len(executing_processes), " Running.")

@@ -121,8 +121,7 @@ def folder_execute(params=None):
             #Allocate all the gpus
 
             process_specs = heapq.heappop(tasks_queue)[2]  # To get directly the dict
-            print ("process ", process_specs)
-            print (free_gpus, resources_on_most_free_gpu)
+
             if process_specs['type'] == 'train' and resources_on_most_free_gpu >= allocation_parameters['train_cost']:
                 free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
                                                              free_gpus,
@@ -161,7 +160,11 @@ def folder_execute(params=None):
                                         validation_datasets,
                                         driving_environments)
         # Check allocated process, and look which ones finished.
-        free_gpus, resources_on_most_free_gpu = get_gpu_resources(allocated_gpus,
-                                                                  executing_processes,
-                                                                  allocation_parameters)
-        #Check
+        free_gpus, resources_on_most_free_gpu, executing_processes = get_gpu_resources(
+                                                                      allocated_gpus,
+                                                                      executing_processes,
+                                                                      allocation_parameters)
+        if len(executing_processes) == 0:
+            break
+
+    print("ALL EXPERIMENTS EXECUTED")

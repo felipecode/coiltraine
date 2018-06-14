@@ -75,8 +75,7 @@ def mount_experiment_heap(folder, experiments_list, is_training, validation_data
 
         # TODO: One thing is error other thing is stop. However at a first step we can try to restart all error things
         if is_training:
-            if monitorer.get_status(folder, experiment, 'train')[0] == "Not Started" or \
-                    monitorer.get_status(folder, experiment, 'train')[0] == "Error":
+            if monitorer.get_status(folder, experiment, 'train')[0] != "Finished":
 
                 heapq.heappush(tasks_queue, (0,  experiment+'_train' ,
                                              {'type': 'train', 'folder': folder,
@@ -84,8 +83,7 @@ def mount_experiment_heap(folder, experiments_list, is_training, validation_data
 
 
         for val_data in validation_datasets:
-            if monitorer.get_status(folder, experiment, 'validation_' + val_data)[0] == "Not Started" or \
-                    monitorer.get_status(folder, experiment, 'validation_'+ val_data)[0] == "Error":
+            if monitorer.get_status(folder, experiment, 'validation_' + val_data)[0] != 'Finished':
 
 
                 heapq.heappush(tasks_queue, (2, experiment+'_validation_' + val_data,
@@ -93,8 +91,7 @@ def mount_experiment_heap(folder, experiments_list, is_training, validation_data
                                                  'experiment': experiment, 'dataset': val_data}))
 
         for drive_env in drive_environments:
-            if monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] == "Not Started" or \
-                    monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] == "Error":
+            if monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] != "Finished":
 
 
                 heapq.heappush(tasks_queue, (1, experiment+'_drive_' + drive_env,

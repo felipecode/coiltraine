@@ -44,7 +44,7 @@ logrecs
 
 """
 from collections import OrderedDict
-from logging import Formatter, FileHandler, StreamHandler, getLogger, INFO
+from logging import Formatter, FileHandler, StreamHandler, getLogger, INFO, _handlers
 from json import loads, dumps
 
 
@@ -57,7 +57,7 @@ def logger(name, handler, recordfields=[], level=INFO):
     return log
 
 
-def filelogger(logname, recordfields=[], filename='json.log', level=INFO):
+def filelogger(logname, recordfields=[], filename='json.log', level=INFO, writing_level='w'):
     """A convenience function to return a JSON file logger for simple situations.
 
     Args:
@@ -67,8 +67,18 @@ def filelogger(logname, recordfields=[], filename='json.log', level=INFO):
     Returns:
         A JSON file logger.
     """
-    handler = FileHandler(filename, 'w')
+    handler = FileHandler(filename, writing_level)
     return logger(logname, handler, recordfields, level)
+
+def closeFileLogger(name):
+    log = getLogger(name)
+    x = _handlers.copy()
+    for i in x:
+        log.removeHandler(i)
+        i.flush()
+        i.close()
+
+
 
 
 def streamlogger(logname, recordfields=[], outputstream=None, level=INFO):
