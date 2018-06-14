@@ -15,19 +15,32 @@ def get_gpu_resources(gpu_resources, executing_processes, allocation_params):
     Returns:
 
     """
-
+    still_executing_processes = []
     for process_specs in executing_processes:
+        # Make process name:
+        if process_specs['type'] == 'drive':
 
+            name = 'drive_' + process_specs['environment']
+        elif process_specs['type'] == 'validation':
+            name = 'validation_' + process_specs['dataset']
+        else:
+            name = process_specs['type']
+        print  ("   Checking", process_specs['folder'], process_specs['experiment'],
+                                     name)
         status = monitorer.get_status(process_specs['folder'], process_specs['experiment'],
-                                     process_specs['type'])[0]
+                                     name)[0]
 
-
+        print ("    Status", status)
 
         if  status == "Finished" or status == 'Error':
 
             gpu_resources[process_specs['gpu']] += allocation_params[process_specs['type']+'_cost']
 
-    return gpu_resources, max(gpu_resources.values())
+        else:
+            still_executing_processes.append(process_specs)
+
+
+    return gpu_resources, max(gpu_resources.values()), still_executing_processes
 
 
 def allocate_gpu_resources(gpu_resources, amount_to_allocate):

@@ -3,6 +3,7 @@ import numpy as np
 import unittest
 import shutil
 import torch
+import random
 from logger import coil_logger
 from configs import g_conf, merge_with_yaml, set_type_of_process
 
@@ -57,8 +58,9 @@ class testExpSched(unittest.TestCase):
         allocated_gpus = {gpu: allocation_parameters['gpu_value'] for gpu in gpus_list}
         executing_processes = []
 
-        free_gpus, resources_on_most_free_gpu = get_gpu_resources(allocated_gpus, executing_processes,
-                                                               allocation_parameters)
+        free_gpus, resources_on_most_free_gpu, executing_processes = get_gpu_resources(allocated_gpus,
+                                                                           executing_processes,
+                                                                           allocation_parameters)
         print (" Free GPUS, resources on the most free")
         print (free_gpus, resources_on_most_free_gpu)
 
@@ -71,60 +73,78 @@ class testExpSched(unittest.TestCase):
         print ("Tasks queue", tasks_queue)
 
         executing_processes = []
+        for i in range(20):
+
+            while resources_on_most_free_gpu > min([allocation_parameters['train_cost'],
+                                                 allocation_parameters['validation_cost'],
+                                                 allocation_parameters['drive_cost']]):
+                #Allocate all the gpus
+
+                process_specs = heapq.heappop(tasks_queue)[2]  # To get directly the dict
+                print ("process got: ", process_specs)
+                print (free_gpus, resources_on_most_free_gpu)
+
+                if process_specs['type'] == 'train' and resources_on_most_free_gpu >= allocation_parameters['train_cost']:
+                    free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
+                                                                 free_gpus,
+                                                                 allocation_parameters['train_cost'])
+                    #execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
+                    process_specs.update({'gpu': gpu_number})
+                    executing_processes.append(process_specs)
+
+                elif process_specs['type'] == 'validation' and resources_on_most_free_gpu >= allocation_parameters['validation_cost']:
+                    free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
+                                                                 free_gpus,
+                                                                 allocation_parameters['validation_cost'])
+                    #execute_validation(gpu_number, process_specs['folder'], process_specs['experiment'],
+                    #                        process_specs['dataset'])
+                    process_specs.update({'gpu': gpu_number})
+                    executing_processes.append(process_specs)
+
+                elif process_specs['type'] == 'drive' and resources_on_most_free_gpu >= allocation_parameters['drive_cost']:
+
+                    free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
+                                                                 free_gpus,
+                                                                 allocation_parameters['drive_cost'])
+                    #execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
+                    #                   process_specs['environment'])
+                    process_specs.update({'gpu': gpu_number})
+                    executing_processes.append(process_specs)
 
 
-        while resources_on_most_free_gpu > min([allocation_parameters['train_cost'],
-                                             allocation_parameters['validation_cost'],
-                                             allocation_parameters['drive_cost']]):
-            #Allocate all the gpus
 
-            process_specs = heapq.heappop(tasks_queue)[2]  # To get directly the dict
-            print (free_gpus, resources_on_most_free_gpu)
+            random_process = random.choice(executing_processes)
+            print ('random process', random_process)
+            fp_name = random_process['experiment']
+            g_conf.immutable(False)
+            merge_with_yaml('configs/test_exps/' + fp_name + '.yaml')
+            # JUST A TRICK TO CONTAIN THE CURRENT LIMITATIONS
 
-            if process_specs['type'] == 'train' and resources_on_most_free_gpu >= allocation_parameters['train_cost']:
-                free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
-                                                             free_gpus,
-                                                             allocation_parameters['train_cost'])
-                #execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
-                process_specs.update({'gpu': gpu_number})
-                executing_processes.append(process_specs)
+            if random_process['type'] == 'drive':
+                set_type_of_process(random_process['type'], random_process['environment'])
+            elif random_process['type'] == 'validation':
+                set_type_of_process(random_process['type'], random_process['dataset'])
+            else:
+                set_type_of_process(random_process['type'])
 
-            elif process_specs['type'] == 'validation' and resources_on_most_free_gpu >= allocation_parameters['validation_cost']:
-                free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
-                                                             free_gpus,
-                                                             allocation_parameters['validation_cost'])
-                #execute_validation(gpu_number, process_specs['folder'], process_specs['experiment'],
-                #                        process_specs['dataset'])
-                process_specs.update({'gpu': gpu_number})
-                executing_processes.append(process_specs)
+            random_message = random.choice(['Finished', 'Error', 'Iterating'])
 
-            elif process_specs['type'] == 'drive' and resources_on_most_free_gpu >= allocation_parameters['drive_cost']:
+            print ('set ',random_process['type'], ' from ', random_process['experiment'], ' to ', random_message  )
 
-                free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
-                                                             free_gpus,
-                                                             allocation_parameters['drive_cost'])
-                #execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
-                #                   process_specs['environment'])
-                process_specs.update({'gpu': gpu_number})
-                executing_processes.append(process_specs)
-
-        free_gpus, resources_on_most_free_gpu = get_gpu_resources(free_gpus, executing_processes, allocation_parameters)
-        print ("Free GPU Before", free_gpus)
-
-        first_process = executing_processes[0]
-        fp_name = first_process['experiment']
-
-        merge_with_yaml('configs/test_exps/' + fp_name + '.yaml')
-        # JUST A TRICK TO CONTAIN THE CURRENT LIMITATIONS
-
-        set_type_of_process(first_process['type'])
-
-        coil_logger.add_message('Finished', {})
+            if  random_message == 'Iterating':
+                coil_logger.add_message(random_message, {'Iteration': 0},0)
+            else:
+                coil_logger.add_message(random_message,{})
 
 
-        free_gpus, resources_on_most_free_gpu = get_gpu_resources(allocated_gpus,
-                                                                  executing_processes,
-                                                                  allocation_parameters)
-        print ("Free GPU After  ", free_gpus, resources_on_most_free_gpu)
+            free_gpus, resources_on_most_free_gpu, executing_processes = get_gpu_resources(
+                                                                      allocated_gpus,
+                                                                      executing_processes,
+                                                                      allocation_parameters)
+            print ("Free GPU After  ", free_gpus, resources_on_most_free_gpu)
+
+            print ("WE have ", len(executing_processes), " Running.")
 
 # TODO: Test it should continue experiments that are iterating but stopped.
+
+# You mount the experiment heap just once, then you just eliminated th
