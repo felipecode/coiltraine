@@ -75,7 +75,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
     best_loss_iter = 0
     best_error_iter = 0
 
-    
+
     try:
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 

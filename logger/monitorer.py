@@ -76,7 +76,7 @@ def get_latest_checkpoint():
 
     csv_files = os.listdir(csv_file_path)
 
-    if csv_files == []:
+    if len (csv_files):
         return None
 
     sort_nicely(csv_files)

@@ -117,7 +117,8 @@ def folder_execute(params=None):
         # If amount of resources is smaller than a threshold.
         while resources_on_most_free_gpu >= min([allocation_parameters['train_cost'],
                                             allocation_parameters['validation_cost'],
-                                            allocation_parameters['drive_cost']]):
+                                            allocation_parameters['drive_cost']]) \
+                and tasks_queue != []:
             #Allocate all the gpus
 
             process_specs = heapq.heappop(tasks_queue)[2]  # To get directly the dict

@@ -61,8 +61,14 @@ def is_next_checkpoint_ready( checkpoint_schedule):
         next_check = checkpoint_schedule[checkpoint_schedule.index(ltst_check)+1]
 
     # Check if the file is in the checkpoints list.
-    return str(next_check) + '.pth' in os.listdir(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
-                                                               g_conf.EXPERIMENT_NAME, 'checkpoints'))
+    if os.path.exists(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
+                                                               g_conf.EXPERIMENT_NAME, 'checkpoints')):
+
+        return str(next_check) + '.pth' in os.listdir(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
+                                                                   g_conf.EXPERIMENT_NAME, 'checkpoints'))
+    else:
+        # This mean the training part has not created the checkpoints yet.
+        return False
 
 
 def get_next_checkpoint(checkpoint_schedule):
