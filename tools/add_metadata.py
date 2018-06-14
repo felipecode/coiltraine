@@ -71,7 +71,7 @@ if __name__ == "__main__":
         dt = h5py.special_dtype(vlen=str)  # PY3
 
         #del f[metadata_targets]
-        metadata = data.create_dataset('metadata_targets', (31, 2, ), dtype=dt)
+        metadata = data.create_dataset('metadata_targets', (35, 2, ), dtype=dt)
 
         metadata[0,0], metadata[0,1] = 'steer', 'float'
         metadata[1,0], metadata[1,1] = 'throttle', 'float'
