@@ -97,7 +97,7 @@ def folder_execute(params=None):
 
     executing_processes = []
 
-    free_gpus, resources_on_most_free_gpu = get_gpu_resources(allocated_gpus, executing_processes,
+    free_gpus, resources_on_most_free_gpu, executing_processes = get_gpu_resources(allocated_gpus, executing_processes,
                                                            allocation_parameters)
 
     # Is a queue of tasks to be executed. The priority is always train.
