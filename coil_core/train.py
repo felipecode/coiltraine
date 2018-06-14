@@ -154,7 +154,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
 
             coil_logger.add_scalar('Loss', loss.data, iteration)
-            coil_logger.add_image('Image', input_data['rgb'][position][0], iteration)
+            #coil_logger.add_image('Image', input_data['rgb'][position][0], iteration)
 
 
             loss.backward()
