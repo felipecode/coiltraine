@@ -76,9 +76,10 @@ def print_validation_summary(current, latest, verbose):
 
 
     print ('        CHECKPOINT: ', DARK_BLUE + str(current['Checkpoint']) + END)
-    if  verbose:
-        print ('        CURRENT: ')
-        print ('            Iteration: ', BLUE + str(current['Iteration']) + END)
+
+    print ('        CURRENT: ')
+    print ('            Iteration: ', BLUE + str(current['Iteration']) + END)
+    if verbose:
         print ('            Mean Error: ', UNDERLINE + str(current['MeanError']) + END)
         print ('            Loss: ', UNDERLINE + str(current['Loss']) + END)
         print ('            Outputs: ', UNDERLINE + str(current['Output']) + END)
@@ -182,7 +183,6 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                 if 'train' in process:
                     print_train_summary(summary[status])
                 if 'validation' in process:
-                    print (summary)
                     if summary[1] != '':   # If it has no summary we dont plot
                         print_validation_summary(summary[0][status], summary[1][status]['Summary'],
                                                  verbose)
