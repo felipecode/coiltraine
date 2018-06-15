@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
 
     argparser.add_argument(
-        '--single_process',
+        '--single-process',
         default=None,
         type=str
     )
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     )
     argparser.add_argument(
         '-vd',
-        '--val_datasets',
+        '--val-datasets',
         dest='validation_datasets',
         nargs='+',
         default=[]
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     )
     argparser.add_argument(
         '-de',
-        '--drive_envs',
+        '--drive-envs',
         dest='driving_environments',
         nargs='+',
         default=[]
@@ -62,11 +62,15 @@ if __name__ == '__main__':
         dest='debug',
         help='print debug information')
 
+    argparser.add_argument(
+        '-ns', '--no-screen',
+        action='store_true',
+        dest='debug',
+        help='print debug information'
+    )
+
     args = argparser.parse_args()
 
-
-    #log_level = logging.DEBUG if args.debug else logging.INFO
-    #logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
 
     for gpu in args.gpus:
@@ -127,7 +131,8 @@ if __name__ == '__main__':
             'is_training': args.is_training,
             'validation_datasets': list(args.validation_datasets),
             'driving_environments': list(args.driving_environments),
-            'allocation_parameters': allocation_parameters
+            'allocation_parameters': allocation_parameters,
+            'no_screen': args.no_screen,
         }
 
         folder_execute(params)

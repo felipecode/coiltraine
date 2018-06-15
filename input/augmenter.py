@@ -21,9 +21,9 @@ class Augmenter(object):
         #print (img.shape)
         if self.scheduler is not None:
             #print (self.scheduler, iteration)
-            for t in self.scheduler(iteration):
-                #print (t)
-                img = t.augment_image(img)
+            t = self.scheduler(iteration)
+            #print (t)
+            img = t.augment_image(img)
 
         img = np.swapaxes(img, 0, 2)
         img = np.swapaxes(img, 1, 2)

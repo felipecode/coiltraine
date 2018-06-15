@@ -50,7 +50,7 @@ def execute_validation(gpu, exp_batch, exp_alias, dataset, suppress_output=True)
     p.start()
 
 
-def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, suppress_output=True):
+def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, suppress_output=True, no_screen=False):
     """
 
     Args:
@@ -65,8 +65,9 @@ def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, suppress_output=True)
 
     create_exp_path(exp_batch, exp_alias)
     p = multiprocessing.Process(target=run_drive.execute, args=(gpu, exp_batch, exp_alias, exp_set_name,
-                                                                0.2, "127.0.0.1", suppress_output))
-    #p.daemon = True
+                                                                0.2, "127.0.0.1", suppress_output,
+                                                                no_screen))
+
     p.start()
 
 
@@ -93,7 +94,7 @@ def folder_execute(params=None):
 
     # Each gpu has maximun 2 slots
 
-    allocated_gpus = {gpu: allocation_parameters['gpu_value']   for gpu in allocated_gpus}
+    allocated_gpus = {gpu: allocation_parameters['gpu_value'] for gpu in allocated_gpus}
 
     print (allocated_gpus)
 
@@ -150,7 +151,7 @@ def folder_execute(params=None):
                                                              free_gpus,
                                                              allocation_parameters['drive_cost'])
                 execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
-                                   process_specs['environment'])
+                                   process_specs['environment'], no_screen=process_specs['no_screen'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 

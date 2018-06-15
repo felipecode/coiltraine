@@ -46,13 +46,16 @@ def find_free_port():
         s.bind(('', 0))
         return s.getsockname()[1]
 
-def start_carla_simulator(gpu, exp_batch, exp_alias):
+def start_carla_simulator(gpu, no_screen):
 
     port = find_free_port()
     carla_path = os.environ['CARLA_PATH']
 
-    #os.environ['SDL_VIDEODRIVER'] = 'offscreen'
-    #os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
+    if no_screen:
+        os.environ['SDL_VIDEODRIVER'] = 'offscreen'
+
+
+    os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
 
     #subprocess.call()
 
@@ -76,7 +79,8 @@ def start_carla_simulator(gpu, exp_batch, exp_alias):
 # OBS : I AM FIXING host as localhost now
 # TODO :  Memory use should also be adaptable with a limit, for now that seems to be doing fine in PYtorch
 
-def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0.0.1', suppress_output=True):
+def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0.0.1',
+            suppress_output=True, no_screen=False):
 
     try:
 
@@ -97,7 +101,7 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
 
 
 
-        carla_process, port = start_carla_simulator(gpu, exp_batch, exp_alias)
+        carla_process, port = start_carla_simulator(gpu, no_screen)
 
 
 
