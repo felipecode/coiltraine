@@ -65,8 +65,8 @@ if __name__ == '__main__':
     argparser.add_argument(
         '-ns', '--no-screen',
         action='store_true',
-        dest='debug',
-        help='print debug information'
+        dest='no_screen',
+        help='Set to carla to run offscreen'
     )
 
     args = argparser.parse_args()
