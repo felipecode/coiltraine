@@ -11,7 +11,10 @@ class Augmenter(object):
 
 
     def __init__(self, scheduler_strategy):
-        self.scheduler = getattr(input.scheduler, scheduler_strategy)
+        if scheduler_strategy is not None:
+            self.scheduler = getattr(input.scheduler, scheduler_strategy)
+        else:
+            self.scheduler = None
 
     def __call__(self, iteration, img):
         #TODO: Check this format issue
