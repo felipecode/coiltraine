@@ -6,6 +6,14 @@ from logger import monitorer
 from utils.general import sort_nicely
 
 
+def is_open(file_name):
+    if os.path.exists(file_name):
+        try:
+            os.rename(file_name, file_name) #can't rename an open file so an error will be thrown
+            return False
+        except:
+            return True
+    raise NameError
 
 
 
@@ -64,8 +72,15 @@ def is_next_checkpoint_ready( checkpoint_schedule):
     if os.path.exists(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
                                                                g_conf.EXPERIMENT_NAME, 'checkpoints')):
 
-        return str(next_check) + '.pth' in os.listdir(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
-                                                                   g_conf.EXPERIMENT_NAME, 'checkpoints'))
+        # test if the file exist:
+        if str(next_check) + '.pth' in os.listdir(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
+                                                                   g_conf.EXPERIMENT_NAME, 'checkpoints')):
+            # now check if someone is writing to it, if it is the case return false
+            return not is_open(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
+                               g_conf.EXPERIMENT_NAME, 'checkpoints', str(next_check) + '.pth'))
+
+        else:
+            return False
     else:
         # This mean the training part has not created the checkpoints yet.
         return False

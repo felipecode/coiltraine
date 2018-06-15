@@ -48,7 +48,7 @@ def get_latest_output(data):
 
     # Find the one that has an iteration .........
     for i in range(1, len(data)):
-        if 'Iterating' in data[-i]:
+        if 'Iterating' in data[-i] and 'Iteration' in data[-i]['Iterating']:
             return data[-i]
 
 
