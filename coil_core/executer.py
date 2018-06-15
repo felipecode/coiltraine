@@ -4,6 +4,7 @@ import multiprocessing
 import heapq
 
 from utils.experiment_schedule import get_gpu_resources, allocate_gpu_resources, mount_experiment_heap
+from utils.general import create_exp_path
 from logger import  printer
 
 from . import train, validate, run_drive
@@ -22,7 +23,7 @@ def execute_train(gpu, exp_batch, exp_alias, suppress_output=True):
     Returns:
 
     """
-
+    create_exp_path(exp_batch, exp_alias)
     p = multiprocessing.Process(target=train.execute, args=(gpu, exp_batch, exp_alias, suppress_output))
     p.start()
 
@@ -43,6 +44,7 @@ def execute_validation(gpu, exp_batch, exp_alias, dataset, suppress_output=True)
 
 
 
+    create_exp_path(exp_batch, exp_alias)
     # The difference between train and validation is the
     p = multiprocessing.Process(target=validate.execute, args=(gpu, exp_batch, exp_alias, dataset, suppress_output))
     p.start()
@@ -61,6 +63,7 @@ def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, suppress_output=True)
 
     """
 
+    create_exp_path(exp_batch, exp_alias)
     p = multiprocessing.Process(target=run_drive.execute, args=(gpu, exp_batch, exp_alias, exp_set_name,
                                                                 0.2, "127.0.0.1", suppress_output))
     #p.daemon = True
@@ -127,6 +130,7 @@ def folder_execute(params=None):
                 free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
                                                              free_gpus,
                                                              allocation_parameters['train_cost'])
+
                 execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)

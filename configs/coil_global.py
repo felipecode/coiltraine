@@ -145,25 +145,6 @@ def merge_with_yaml(yaml_filename):
     _g_conf.EXPERIMENT_GENERATED_NAME = _generate_name()
 
 
-def create_logs_paths():
-    """
-        Only the train creates the path. The validation should wait for the training anyway,
-        so there is no need to create any path for the logs. That avoids race conditions.
-    Returns:
-
-    """
-    # This is hardcoded the logs always stay on the _logs folder
-    root_path = '_logs'
-
-    if not os.path.exists(root_path):
-        os.mkdir(root_path)
-
-    if not os.path.exists(os.path.join(root_path, _g_conf.EXPERIMENT_BATCH_NAME)):
-        os.mkdir(os.path.join(root_path, _g_conf.EXPERIMENT_BATCH_NAME))
-
-    if not os.path.exists(os.path.join(root_path, _g_conf.EXPERIMENT_BATCH_NAME,
-                                       _g_conf.EXPERIMENT_NAME)):
-        os.mkdir(os.path.join(root_path, _g_conf.EXPERIMENT_BATCH_NAME, _g_conf.EXPERIMENT_NAME))
 
 
 # TODO: Make this nicer, now it receives only one parameter
@@ -187,7 +168,6 @@ def set_type_of_process(process_type, param=None):
 
     if process_type == 'train':
         _g_conf.PROCESS_NAME = process_type
-
     elif process_type == "validation":
         _g_conf.PROCESS_NAME = process_type + '_' + param
     if process_type == "drive":  # FOR drive param is city name.

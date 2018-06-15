@@ -4,7 +4,7 @@ import resource
 
 
 from coil_core import execute_train, execute_validation, execute_drive, folder_execute
-
+from utils.general import create_log_folder, create_exp_path
 
 # You could send the module to be executed and they could have the same interface.
 
@@ -87,10 +87,15 @@ if __name__ == '__main__':
     # Obs this is like a fixed parameter, how much a validation and a train and drives ocupies
 
     # TODO: MAKE SURE ALL DATASETS ARE " WAYPOINTED "
+    create_log_folder(args.folder)
 
     if args.single_process is not None:
+
         if args.exp is None:
             raise ValueError(" You should set the exp alias when using single process")
+
+        create_exp_path(args.folder, args.exp)
+
         if args.single_process == 'train':
             # TODO make without position, increases the legibility.
             execute_train("0", args.folder, args.exp, False)
@@ -124,6 +129,5 @@ if __name__ == '__main__':
             'driving_environments': list(args.driving_environments),
             'allocation_parameters': allocation_parameters
         }
-
 
         folder_execute(params)
