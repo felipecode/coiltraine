@@ -1,5 +1,6 @@
 import argparse
 import logging
+from subprocess import call
 
 
 from coil_core import execute_train, execute_validation, execute_drive, folder_execute
@@ -78,6 +79,8 @@ if __name__ == '__main__':
         raise ValueError(" You should set a folder name where the experiments are placed")
 
 
+    # We increase the number of files available.
+    call(["ulimit", "-Sn", "60000"])
 
     # Obs this is like a fixed parameter, how much a validation and a train and drives ocupies
 

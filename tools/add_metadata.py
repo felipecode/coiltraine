@@ -74,6 +74,7 @@ if __name__ == "__main__":
         try:
             metadata = data.create_dataset('metadata_targets', (35, 2, ), dtype=dt)
         except:
+            print (" The dataset already exists ")
             del data['metadata_targets']
             metadata = data.create_dataset('metadata_targets', (35, 2,), dtype=dt)
 
