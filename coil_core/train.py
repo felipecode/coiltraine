@@ -121,7 +121,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             input_data, float_data = data
 
 
-            #coil_logger.add_images(input_rgb_data)
 
             # get the control commands from float_data, size = [120,1]
 
@@ -154,7 +153,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
 
             coil_logger.add_scalar('Loss', loss.data, iteration)
-            #coil_logger.add_image('Image', input_data['rgb'][position][0], iteration)
+            coil_logger.add_image('Image', torch.squeeze(input_data['rgb']), iteration)
 
 
             loss.backward()

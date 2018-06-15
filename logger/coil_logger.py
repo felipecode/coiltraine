@@ -16,6 +16,7 @@ EXPERIMENT_NAME = ''
 EXPERIMENT_BATCH_NAME = ''
 PROCESS_NAME = ''
 LOG_FREQUENCY = 1
+IMAGE_LOG_FREQUENCY = 1
 tl = ''
 # This next bit is to ensure the script runs unchanged on 2.x and 3.x
 
@@ -25,7 +26,7 @@ tl = ''
 
 #logging.info(SM('message 1', set_value={1, 2, 3}, snowman='\u2603'))
 
-def create_log(exp_batch_name, exp_name, process_name, log_frequency=1):
+def create_log(exp_batch_name, exp_name, process_name, log_frequency=1, image_log_frequency=15):
 
     """
 
@@ -40,6 +41,7 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1):
     global EXPERIMENT_NAME
     global PROCESS_NAME
     global LOG_FREQUENCY
+    global IMAGE_LOG_FREQUENCY
     global tl
 
     # Hardcoded root path
@@ -63,6 +65,7 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1):
     EXPERIMENT_NAME = exp_name
     PROCESS_NAME = process_name
     LOG_FREQUENCY = log_frequency
+    IMAGE_LOG_FREQUENCY = image_log_frequency
     tl = Logger(os.path.join(root_path, exp_batch_name, exp_name, 'tensorboard_logs_'+process_name))
 
 def close():
@@ -154,6 +157,7 @@ def add_scalar(tag, value, iteration=None, force_writing=False):
 
 
     """
+
     if iteration is not None:
         if iteration % LOG_FREQUENCY == 0 or force_writing:
             tl.scalar_summary(tag, value, iteration + 1)
@@ -172,14 +176,21 @@ def add_image(tag, images, iteration=None):
     # and eventually put some of the images to tensorboard.
 
 
+    # TODO: change to sampling 10 images instead
     if iteration is not None:
-        if iteration % LOG_FREQUENCY == 0:
-            images = images.view(-1, 28, 28)[:10].cpu().numpy()
+        if iteration % IMAGE_LOG_FREQUENCY == 0:
+
+            images = images.view(-1, images.shape[1],
+                                     images.shape[2],
+                                     images.shape[3])[:10].cpu().numpy()
             tl.image_summary(tag, images, iteration + 1)
 
 
     else:
-        images = images.view(-1, 28, 28)[:10].cpu().numpy()
+
+        images = images.view(-1, images.shape[1],
+                             images.shape[2],
+                             images.shape[3])[:10].cpu().numpy()
         tl.image_summary(tag, images, iteration + 1)
 
 

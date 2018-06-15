@@ -178,7 +178,9 @@ def set_type_of_process(process_type, param=None):
 
     create_log(_g_conf.EXPERIMENT_BATCH_NAME,
                _g_conf.EXPERIMENT_NAME,
-               _g_conf.PROCESS_NAME)
+               _g_conf.PROCESS_NAME,
+               _g_conf.LOG_SCALAR_WRITING_FREQUENCY,
+               _g_conf.LOG_IMAGE_WRITING_FREQUENCY)
 
     if process_type == "train":
         if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
