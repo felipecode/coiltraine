@@ -5,6 +5,7 @@ from logger import json_formatter
 from configs import g_conf
 from utils.general import sort_nicely
 
+
 from .carla_metrics_parser import get_averaged_metrics
 from visualization.data_reading import read_control_csv
 
@@ -131,7 +132,13 @@ def get_status(exp_batch, experiment, process_name):
         return ['Not Started', '']
 
     # Read the full json file.
-    data = json_formatter.readJSONlog(open(log_file_path, 'r'))
+    try:
+        data = json_formatter.readJSONlog(open(log_file_path, 'r'))
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return ['Error', "Couldn't read the json"]
+
 
     # Now check if the latest data is loading
     if 'Loading' in data[-1]:
