@@ -23,11 +23,11 @@ class Augmenter(object):
             #print (self.scheduler, iteration)
             for t in self.scheduler(iteration):
                 #print (t)
-                img = t.augment_images(img)
+                img = t.augment_image(img)
 
         img = np.swapaxes(img, 0, 2)
         img = np.swapaxes(img, 1, 2)
-        
+
         return img
 
     def __repr__(self):
