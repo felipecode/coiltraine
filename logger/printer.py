@@ -183,7 +183,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                 if 'train' in process:
                     print_train_summary(summary[status])
                 if 'validation' in process:
-                    if summary[1] != '':   # If it has no summary we dont plot
+                    if summary[1] != '':   # If it has no summary we don't plot
                         print_validation_summary(summary[0][status], summary[1][status]['Summary'],
                                                  verbose)
                     else:

@@ -47,10 +47,10 @@ def get_number_episodes_completed(benchmark_log_name):
 def get_latest_output(data):
 
     # Find the one that has an iteration .........
-    if 'Iterating' in data[-1]:
-        return data[-1]
-    else:
-        return data[-2]
+    for i in range(1, len(data)):
+        if 'Iterating' in data[-i]:
+            return data[-i]
+
 
 
 def get_summary(data):

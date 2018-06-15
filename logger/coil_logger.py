@@ -42,15 +42,9 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1):
     global LOG_FREQUENCY
     global tl
 
+    # Hardcoded root path
     root_path = "_logs"
-    if not os.path.exists(root_path):
-        os.mkdir(root_path)
 
-    if not os.path.exists(os.path.join(root_path, exp_batch_name)):
-        os.mkdir(os.path.join(root_path, exp_batch_name))
-
-    if not os.path.exists(os.path.join(root_path, exp_batch_name, exp_name)):
-        os.mkdir(os.path.join(root_path, exp_batch_name, exp_name))
 
     dir_name = os.path.join(root_path, exp_batch_name, exp_name)
     full_name = os.path.join(dir_name, process_name)

@@ -165,7 +165,7 @@ def folder_execute(params=None):
                                                                       allocated_gpus,
                                                                       executing_processes,
                                                                       allocation_parameters)
-        print(tasks_queue)
+
         if len(executing_processes) == 0:
             break
 
