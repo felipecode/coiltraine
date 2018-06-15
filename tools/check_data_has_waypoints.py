@@ -31,8 +31,6 @@ if __name__ == "__main__":
         except Exception as e:
             continue
 
-
-
         print (data['targets'][0][31])
         print (data['targets'][0][32])
         print (data['targets'][0][33])

@@ -1,5 +1,5 @@
 import numpy as np
-from input.scheduler import soft, medium, high
+import input.scheduler
 
 class Augmenter(object):
     """
@@ -10,22 +10,24 @@ class Augmenter(object):
     # Here besides just applying the list, the class should also apply the scheduling
 
 
-    def __init__(self, scheduler):
-        self.scheduler = scheduler
+    def __init__(self, scheduler_strategy):
+        self.scheduler = getattr(input.scheduler, scheduler_strategy)
 
     def __call__(self, iteration, img):
         #TODO: Check this format issue
 
         # THe scheduler receives an iteration number and returns a transformation, vec
 
-        img = np.swapaxes(img, 0, 2)
-        img = np.swapaxes(img, 1, 2)
-
+        #print (img.shape)
         if self.scheduler is not None:
-            for t in eval(self.scheduler, iteration):
-
+            #print (self.scheduler, iteration)
+            for t in self.scheduler(iteration):
+                #print (t)
                 img = t.augment_images(img)
 
+        img = np.swapaxes(img, 0, 2)
+        img = np.swapaxes(img, 1, 2)
+        
         return img
 
     def __repr__(self):
