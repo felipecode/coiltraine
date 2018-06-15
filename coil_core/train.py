@@ -113,6 +113,12 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         print (dataset.meta_data)
 
         print (model)
+        if checkpoint_file is not None:
+            accumulated_time = checkpoint['total_time']
+        else:
+            accumulated_time = 0  # We accumulate iteration time and keep the average speed
+
+
         #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
         capture_time = time.time()
         for data in data_loader:
@@ -147,6 +153,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
             output = model.extract_branch(torch.stack(branches[0:4]), controls)
             error = torch.abs(output - dataset.extract_targets(float_data).cuda())
+
 
 
 

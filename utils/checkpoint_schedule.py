@@ -1,4 +1,5 @@
 import os
+import time
 
 from configs import g_conf
 from logger import monitorer
@@ -8,11 +9,18 @@ from utils.general import sort_nicely
 
 def is_open(file_name):
     if os.path.exists(file_name):
-        fileobj = open(file_name, "wb+")  # can't rename an open file so an error will be thrown
-        if not fileobj.closed:
-            return True
-        else:
+        file1 = os.stat(file_name)  # initial file size
+        file1_size = file1.st_size
+
+        # your script here that collects and writes data (increase file size)
+        time.sleep(0.5)
+        file2 = os.stat(file_name)  # updated file size
+        file2_size = file2.st_size
+        comp = file2_size - file1_size  # compares sizes
+        if comp == 0:
             return False
+        else:
+            return True
 
     raise NameError
 
