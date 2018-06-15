@@ -1,6 +1,6 @@
 import argparse
 import logging
-from subprocess import call
+import resource
 
 
 from coil_core import execute_train, execute_validation, execute_drive, folder_execute
@@ -80,7 +80,9 @@ if __name__ == '__main__':
 
 
     # We increase the number of files available.
-    call(["ulimit", "-Sn", "60000"])
+    resource.setrlimit(
+        resource.RLIMIT_CORE,
+        (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
 
     # Obs this is like a fixed parameter, how much a validation and a train and drives ocupies
 
