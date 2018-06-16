@@ -59,6 +59,9 @@ class CoILAgent(Agent):
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
         self.model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
 
+        # TODO: just  trick, remove this leatter then I learn how to suppress stdout
+        self.first_iter = True
+
         self.model.load_state_dict(checkpoint['state_dict'])
 
         self.model.cuda()
@@ -93,8 +96,10 @@ class CoILAgent(Agent):
         # TODO: adapt the client side agent for the new version. ( PROBLEM )
         #control.throttle = control_agent.throttle
         #control.brake = control_agent.brake
-
-        # TODO: maybe change to a more meaningfull message ??
+        if self.first_iter:
+            coil_logger.add_message('Iterating', {"Checkpoint": self.checkpoint['iteration'],
+                                                  'Agent':str(steer)}, self.checkpoint['iteration'])
+        self.first_iter = False
         return control
 
 

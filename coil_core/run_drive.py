@@ -159,13 +159,14 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
 
                         coil_agent = CoILAgent(checkpoint)
 
+                        coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
+
                         run_driving_benchmark(coil_agent, experiment_set, exp_set_name,
                                               exp_batch + '_' + exp_alias + '_' + str(latest)
                                               + '_drive'
                                               , True, host, port)
 
 
-                        coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
 
                         # TODO: When you add the message you need to check if the experiment continues properly
 

@@ -22,13 +22,13 @@ def read_summary_csv(control_csv_file):
 
 
 
-    f = open(control_csv_file, "r")
+    f = open(control_csv_file, "rU")
     header = f.readline()
     header = header.split(',')
     header[-1] = header[-1][:-2]
     f.close()
 
-    data_matrix = np.loadtxt(open(control_csv_file, "rU"), delimiter=",", skiprows=1)
+    data_matrix = np.loadtxt(control_csv_file, delimiter=",", skiprows=1)
     summary_dict = {}
 
 
@@ -38,9 +38,6 @@ def read_summary_csv(control_csv_file):
     if len(data_matrix.shape) == 1:
         data_matrix = np.expand_dims(data_matrix, axis=0)
 
-
-    print (header)
-    print (data_matrix)
 
     count = 0
     for variable in header:
