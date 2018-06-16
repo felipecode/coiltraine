@@ -53,7 +53,6 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1, image_lo
 
     if os.path.isfile(full_name):
         flog = filelogger(exp_name + '_' + process_name, [], full_name, writing_level='a+')
-        print (open(full_name).read())
     else:
         flog = filelogger(exp_name + '_' + process_name, [], full_name, writing_level='w')
 

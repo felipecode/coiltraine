@@ -18,10 +18,43 @@ speed_labels_2 = np.array(map(int, map(float, open('speed_file_Town02_14.txt')))
 speed_labels_2_noise = np.array(map(int, map(float, open('speed_file_Town02_14_noise.txt'))))
 """
 
+def read_summary_csv(control_csv_file):
+
+
+
+    f = open(control_csv_file, "r")
+    header = f.readline()
+    header = header.split(',')
+    header[-1] = header[-1][:-2]
+    f.close()
+
+    data_matrix = np.loadtxt(open(control_csv_file, "rU"), delimiter=",", skiprows=1)
+    summary_dict = {}
+
+
+    if len(data_matrix) == 0:
+        return None
+
+    if len(data_matrix.shape) == 1:
+        data_matrix = np.expand_dims(data_matrix, axis=0)
+
+
+    print (header)
+    print (data_matrix)
+
+    count = 0
+    for variable in header:
+        summary_dict.update({header[count]: data_matrix[:, count]})
+        count += 1
+
+
+
+    return summary_dict
+
+
+
 
 def read_control_csv(control_csv_file):
-
-
 
 
 
@@ -34,8 +67,11 @@ def read_control_csv(control_csv_file):
     data_matrix = np.loadtxt(open(control_csv_file, "rb"), delimiter=",", skiprows=1)
     control_results_dic = {}
     count = 0
-    # print data_matrix
-    for step in data_matrix[:,0]:
+
+    if len(data_matrix) == 0:
+        return None
+
+    for step in data_matrix[:, 0]:
 
         control_results_dic.update({step: data_matrix[count, 1:]})
         count += 1

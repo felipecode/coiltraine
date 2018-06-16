@@ -60,6 +60,17 @@ def create_exp_path(exp_batch_name, experiment_name):
     if not os.path.exists(os.path.join(root_path, exp_batch_name, experiment_name)):
         os.mkdir(os.path.join(root_path, exp_batch_name, experiment_name))
 
+def get_latest_path(path):
+    """ Considering a certain path for experiments, get the latest one."""
+    import glob
+
+    print ("path tried ", path  )
+    files_list = glob.glob(os.path.join('_benchmarks_results', path+'*'))
+    sort_nicely(files_list)
+
+    return files_list[-1]
+
+
 
 def send_email(address, message):
     msg = MIMEText(message)

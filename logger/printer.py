@@ -4,7 +4,7 @@ import os
 from .carla_metrics_parser import get_averaged_metrics
 from .monitorer import get_status, get_episode_number, get_number_episodes_completed
 from configs import g_conf, merge_with_yaml
-from utils.general import sort_nicely
+from utils.general import sort_nicely, get_latest_path
 
 """
 COLOR CODINGS
@@ -98,14 +98,17 @@ def print_validation_summary(current, latest, verbose):
     print ('            Best Error Checkpoint: ', BLUE + UNDERLINE + str(latest['BestErrorCheckpoint']) + END)
 
 
-@static_vars(previous_checkpoint=0)
+@static_vars(previous_checkpoint=g_conf.TEST_SCHEDULE[0])
 def print_drive_summary(path, summary, checkpoint, verbose):
 
 
 
 
     print ('        CHECKPOINT: ', DARK_BLUE + str(summary['Checkpoint']) + END)
-    if verbose:
+
+    # Check if there is already files to check
+
+    if os.path.exists(os.path.join(path, 'summary.csv')):
         print ('        CURRENT: ')
         print ('            Episode: ', BLUE + str(get_episode_number(path)) + END)
         print ('            Completed: ', GREEN + UNDERLINE + str(get_number_episodes_completed(path)) + END)
@@ -114,17 +117,18 @@ def print_drive_summary(path, summary, checkpoint, verbose):
     if print_drive_summary.previous_checkpoint !=checkpoint:
         print_drive_summary.previous_checkpoint = checkpoint
 
-    if checkpoint == 0: # TODO: CRITICAL, CHANGE THIS TO "FIRST CHECKPOINT INSTEAD "
+    if checkpoint == g_conf.TEST_SCHEDULE[0]:
         return
 
     # TODO: we need to get the previous checkpoint
 
-    get_averaged_metrics(path)
+    averaged_metrics = get_averaged_metrics(path)
+
 
 
     print ('        SUMMARY: ')
-    print ('            Average Completion: ', LIGHT_GREEN + UNDERLINE + str(current['Iteration']) + END)
-    print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE + str(current['MeanError']) + END)
+    print ('            Average Completion: ', LIGHT_GREEN + UNDERLINE + str(averaged_metrics['Iteration']) + END)
+    print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE + str(averaged_metrics['MeanError']) + END)
 
 
 
@@ -142,7 +146,14 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
 
     for drive in drive_environments:
-        process_names.append('drive' + '_' + drive)
+        # OBS: this is a temporal strategy until the town changing bug in carla is fixed
+        if drive == 'Town01':
+            process_names.append('drive' + '_ECCVTrainingSuite_' + drive)
+        elif drive == 'Town02':
+            process_names.append('drive' + '_ECCVGeneralizationSuite_' + drive)
+        else:
+            raise ValueError("Wrong Town Name")
+
 
 
     experiments_list = os.listdir(os.path.join('configs', exp_batch))
@@ -158,7 +169,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
         for process in process_names:
             output = get_status(exp_batch, experiment, process)
-            status  = output[0]
+            status = output[0]
             summary = output[1]
             print ('    ', process)
 
@@ -191,8 +202,8 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                                                  verbose)
                 if 'drive' in process:
                     checkpoint = summary[status]['Checkpoint']  # Get the sta
-                    path = exp_batch + '_' + experiment + '_' + str(checkpoint) + process
-                    print_drive_summary(path, summary[status], checkpoint, verbose)
+                    path = exp_batch + '_' + experiment + '_' + str(checkpoint) + '_' + process
+                    print_drive_summary(get_latest_path(path), summary[status], checkpoint, verbose)
 
 
 

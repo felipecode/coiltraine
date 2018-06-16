@@ -3,8 +3,6 @@ import traceback
 
 import sys
 import logging
-import json
-import datetime
 
 import importlib
 import numpy as np
@@ -21,7 +19,7 @@ from carla.tcp import TCPConnectionError
 from carla.client import make_carla_client
 from carla.driving_benchmark import run_driving_benchmark
 
-from drive import CoILAgent
+from drive import CoILAgent, ECCVGeneralizationSuite, ECCVTrainingSuite
 
 from testing.unit_tests.test_drive.test_suite import TestSuite
 from logger import coil_logger
@@ -46,7 +44,7 @@ def find_free_port():
         s.bind(('', 0))
         return s.getsockname()[1]
 
-def start_carla_simulator(gpu, no_screen):
+def start_carla_simulator(gpu, town_name, no_screen):
 
     port = find_free_port()
     carla_path = os.environ['CARLA_PATH']
@@ -59,7 +57,8 @@ def start_carla_simulator(gpu, no_screen):
 
     #subprocess.call()
 
-    sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '-windowed',
+    sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
+                            '-windowed',
                            '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -93,48 +92,51 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
             os.mkdir('_output_logs')
 
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
-        set_type_of_process('drive', exp_set_name)
+
+
 
         if suppress_output:
             sys.stdout = open(os.path.join('_output_logs',
-                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
 
 
 
-        carla_process, port = start_carla_simulator(gpu, no_screen)
+        carla_process, port = start_carla_simulator(gpu, exp_set_name, no_screen)
 
 
 
-
-        log_level = logging.WARNING
-
-        logging.StreamHandler(stream=None)
-        logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
         # TODO we have some external class that control this weather thing.
 
-        """
-        if city_name == 'Town01':
-            experiment_suite = ECCVTrainingSuite()
-        else:
-            experiment_suite = ECCVGeneralizationSuite()
-            
-            
-        """
         try:
-            exp_set_builder_module = importlib.import_module('drive.' + exp_set_name)
-            exp_set_builder = getattr(exp_set_builder_module, 'build_' + exp_set_name)
+            # TODO: REMOVE this part. This is for a newer version of CARLA.
+            pass
+            #exp_set_builder_module = importlib.import_module('drive.' + exp_set_name)
+            #exp_set_builder = getattr(exp_set_builder_module, 'build_' + exp_set_name)
         except:
             carla_process.kill()
             coil_logger.add_message('Error', {'Message': 'Suite name not existent'})
             raise ValueError("Suite name not existent")
 
 
+        if exp_set_name == 'Town01':
 
-        experiment_set, experiment_configs = exp_set_builder()
+            experiment_set = ECCVTrainingSuite()
+            set_type_of_process('drive', 'ECCVTrainingSuite_' + exp_set_name)
 
-        coil_logger.add_message('Loading', {'Town01Poses': experiment_configs['Town01']['poses'],
-                                            'Town02Poses': experiment_configs['Town02']['poses']})
+        elif exp_set_name == 'Town02':
+
+            experiment_set = ECCVGeneralizationSuite()
+            set_type_of_process('drive', 'ECCVGeneralizationSuite_' + exp_set_name)
+        else:
+
+            raise ValueError(" Exp Set name is not correspondent to a city")
+
+
+
+
+        coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 
         coil_logger.add_message('Loading', {'CARLAClient': host + ':' + str(port)})
 
@@ -156,14 +158,14 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
                                                              , 'checkpoints', str(latest) + '.pth'))
 
                         coil_agent = CoILAgent(checkpoint)
-                        coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
-                        # TODO: Change alias to actual experiment name.
 
-                        run_driving_benchmark(coil_agent, experiment_set, experiment_configs,
+                        run_driving_benchmark(coil_agent, experiment_set, exp_set_name,
                                               exp_batch + '_' + exp_alias + '_' + str(latest)
-                                              , False, host, port)
+                                              + '_drive'
+                                              , True, host, port)
 
 
+                        coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
 
                         # TODO: When you add the message you need to check if the experiment continues properly
 

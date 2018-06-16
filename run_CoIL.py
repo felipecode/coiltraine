@@ -90,6 +90,9 @@ if __name__ == '__main__':
 
     # Obs this is like a fixed parameter, how much a validation and a train and drives ocupies
 
+
+
+
     # TODO: MAKE SURE ALL DATASETS ARE " WAYPOINTED "
     create_log_folder(args.folder)
 

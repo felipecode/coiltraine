@@ -7,7 +7,7 @@ from utils.general import sort_nicely
 
 
 from .carla_metrics_parser import get_averaged_metrics
-from visualization.data_reading import read_control_csv
+from visualization.data_reading import read_summary_csv
 
 # Check the log and also put it to tensorboard
 
@@ -32,13 +32,17 @@ def get_current_iteration(exp):
 #### Get things from CARLA benchmark directly to plot as logs #####
 def get_episode_number(benchmark_log_name):
     """ Get the current episode"""
-    control_dict = read_control_csv(os.path.join('_benchmark_results',benchmark_log_name,'summary.csv'))
+    control_dict = read_summary_csv(os.path.join(benchmark_log_name, 'summary.csv'))
+    if control_dict is None:
+        return None
     return len(control_dict['result']) -1
 
 
 def get_number_episodes_completed(benchmark_log_name):
     """ Get the number of episodes that where completed"""
-    control_dict = read_control_csv(os.path.join('_benchmark_results',benchmark_log_name,'summary.csv'))
+    control_dict = read_summary_csv(os.path.join(benchmark_log_name, 'summary.csv'))
+    if control_dict is None:
+        return None
     return sum(control_dict['result'])
 
 
@@ -48,7 +52,8 @@ def get_latest_output(data):
 
     # Find the one that has an iteration .........
     for i in range(1, len(data)):
-        if 'Iterating' in data[-i] and 'Iteration' in data[-i]['Iterating']:
+        if 'Iterating' in data[-i] and ('Iteration' in data[-i]['Iterating'] or
+                                        'Checkpoint' in data[-i]['Iterating']):
             return data[-i]
 
 
