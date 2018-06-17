@@ -92,6 +92,7 @@ if __name__ == '__main__':
 
 
 
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 
     # TODO: MAKE SURE ALL DATASETS ARE " WAYPOINTED "
     create_log_folder(args.folder)
@@ -111,7 +112,8 @@ if __name__ == '__main__':
             execute_validation("0", args.folder, args.exp, args.validation_datasets[0], False)
 
         elif args.single_process == 'drive':
-            execute_drive("0", args.folder, args.exp, args.driving_environments[0], False)
+            execute_drive("0", args.folder, args.exp, args.driving_environments[0], False,
+                          no_screen=args.no_screen)
         else:
 
             raise (" Invalid name for single process, chose from (train, validation, test)")

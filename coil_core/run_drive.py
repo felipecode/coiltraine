@@ -50,17 +50,16 @@ def start_carla_simulator(gpu, town_name, no_screen):
     carla_path = os.environ['CARLA_PATH']
 
     if no_screen:
+        print (" EXECUTING NO SCREEN! ")
         os.environ['SDL_VIDEODRIVER'] = 'offscreen'
 
 
     os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
 
-    #subprocess.call()
-
     sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
                             '-windowed',
-                           '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
-                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                           '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False
+                           )
 
 
     coil_logger.add_message('Loading', {'CARLA': carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4' 
@@ -95,10 +94,6 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
 
 
 
-        if suppress_output:
-            sys.stdout = open(os.path.join('_output_logs',
-                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
-                              "a", buffering=1)
 
 
 
@@ -132,6 +127,12 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
         else:
 
             raise ValueError(" Exp Set name is not correspondent to a city")
+
+
+        if suppress_output:
+            sys.stdout = open(os.path.join('_output_logs',
+                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
 
 
 

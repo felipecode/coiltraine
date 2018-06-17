@@ -35,7 +35,7 @@ def get_episode_number(benchmark_log_name):
     control_dict = read_summary_csv(os.path.join(benchmark_log_name, 'summary.csv'))
     if control_dict is None:
         return None
-    return len(control_dict['result']) -1
+    return len(control_dict['result'])
 
 
 def get_number_episodes_completed(benchmark_log_name):
