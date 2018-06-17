@@ -140,9 +140,12 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             branches = model(torch.squeeze(input_data['rgb'].cuda()), dataset.extract_inputs(float_data).cuda())
 
 
-            loss = criterion.MSELoss(branches, dataset.extract_targets(float_data).cuda(),
-                                     controls.cuda(), dataset.extract_inputs(float_data).cuda())
+            print ("Weights", g_conf.VARIABLE_WEIGHT.values())
 
+            loss = criterion.MSELoss(branches, dataset.extract_targets(float_data).cuda(),
+                                     controls.cuda(), dataset.extract_inputs(float_data).cuda(),
+                                     branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
+                                     variable_weights=g_conf.VARIABLE_WEIGHT)
             # TODO: All these logging things could go out to clean up the main
             if loss.data < best_loss:
                 best_loss = loss.data.tolist()

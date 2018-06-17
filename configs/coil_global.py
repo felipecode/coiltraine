@@ -106,7 +106,7 @@ _g_conf.TRAINING_SCHEDEULE = [[50000, 0.5], [100000, 0.5 * 0.5], [150000, 0.5 * 
 
 _g_conf.LEARNING_RATE = 0.0002  # First
 _g_conf.BRANCH_LOSS_WEIGHT = [0.95, 0.95, 0.95, 0.95, 0.05]
-_g_conf.VARIABLE_WEIGHT = {'Steer': 0.5, 'Gas': 0.45, 'Brake': 0.05, 'Speed': 1.0}
+_g_conf.VARIABLE_WEIGHT = {'Steer': 0.5, 'Gas': 0.45, 'Brake': 0.05}
 _g_conf.LOSS_FUNCTION = 'MSE'
 
 
