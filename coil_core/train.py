@@ -12,11 +12,11 @@ import imgauggpu as iag
 # What do we define as a parameter what not.
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
-from network import CoILModel, Loss
+from network import CoILModel, Loss, adjust_learning_rate
 from input import CoILDataset, BatchSequenceSampler, splitter, Augmenter
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
-from optmizer import adjust_learning_rate
+
 from torchvision import transforms
 
 
