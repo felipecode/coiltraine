@@ -92,7 +92,6 @@ if __name__ == '__main__':
 
 
 
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 
     # TODO: MAKE SURE ALL DATASETS ARE " WAYPOINTED "
     create_log_folder(args.folder)
