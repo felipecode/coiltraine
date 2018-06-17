@@ -100,22 +100,8 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
 
 
 
-        carla_process, port = start_carla_simulator(gpu, exp_set_name, no_screen)
 
 
-
-
-        # TODO we have some external class that control this weather thing.
-
-        try:
-            # TODO: REMOVE this part. This is for a newer version of CARLA.
-            pass
-            #exp_set_builder_module = importlib.import_module('drive.' + exp_set_name)
-            #exp_set_builder = getattr(exp_set_builder_module, 'build_' + exp_set_name)
-        except:
-            carla_process.kill()
-            coil_logger.add_message('Error', {'Message': 'Suite name not existent'})
-            raise ValueError("Suite name not existent")
 
 
         if exp_set_name == 'Town01':
@@ -137,6 +123,8 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
                               g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
+
+        carla_process, port = start_carla_simulator(gpu, exp_set_name, no_screen)
 
 
 
