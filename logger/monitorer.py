@@ -54,7 +54,7 @@ def get_latest_output(data):
     for i in range(1, len(data)):
         if 'Iterating' in data[-i] and ('Iteration' in data[-i]['Iterating'] or
                                             'Checkpoint' in data[-i]['Iterating']) and \
-                                       'Summary' not in data[-i]:
+                                       'Summary' not in data[-i]['Iterating']:
 
             return data[-i]
 
