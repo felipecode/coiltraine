@@ -16,7 +16,13 @@ from network import CoILModel, Loss
 from input import CoILDataset, BatchSequenceSampler, splitter, Augmenter
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
+from optmizer import adjust_learning_rate
 from torchvision import transforms
+
+
+
+
+
 
 
 # The main function maybe we could call it with a default name
@@ -205,6 +211,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
                                                , 'checkpoints', str(iteration) + '.pth'))
 
             iteration += 1
+
+            if iteration % 1000 == 0:
+                adjust_learning_rate(optimizer, iteration)
 
         coil_logger.add_message('Finished', {})
 
