@@ -212,8 +212,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
             iteration += 1
 
-            if iteration % 1000 == 0:
-                adjust_learning_rate(optimizer, iteration)
+            #if iteration % 1000 == 0:
+            #    adjust_learning_rate(optimizer, iteration)
 
         coil_logger.add_message('Finished', {})
 
