@@ -41,11 +41,15 @@ class Loss(object):
         """
 
         # weight different target items with lambdas
-        if len(variable_weights) != targets.shape[1]:
-            raise ValueError('The input number of weight lambdas is '
-                             + str(len(branch_weights)) +
-                             ', while the number of branches items is '
-                             + str(targets.shape[1]))
+        if variable_weights:
+            if len(variable_weights) != targets.shape[1]:
+                raise ValueError('The input number of weight lambdas is '
+                                 + str(len(branch_weights)) +
+                                 ', while the number of branches items is '
+                                 + str(targets.shape[1]))
+        else:
+
+            variable_weights = {'Gas': 1.0, 'Steer': 1.0, 'Brake': 1.0}
 
 
         if branch_weights:
@@ -55,12 +59,9 @@ class Loss(object):
                                  ', while the number of branches items is '
                                  + str(len(branches)))
 
-            else:
-                lambda_matrix = torch.zeros(targets.shape).cuda()
-                for i in range(len(branch_weights)):
-                    lambda_matrix[:, i] = branch_weights[i]
+
         else:
-            lambda_matrix = torch.ones(targets.shape).cuda()
+            branch_weights = [1.0]*len(branches)
 
         #TODO: improve this code quality
         # command flags: 2 - follow lane; 3 - turn left; 4 - turn right; 5 - go strange
@@ -86,11 +87,11 @@ class Loss(object):
         speed_gt = speed_gt / g_conf.SPEED_FACTOR
 
         # calculate loss for each branch with specific activation
-        loss_b1 = ((branches[0] - targets) * controls_b1) ** 2 * lambda_matrix
-        loss_b2 = ((branches[1] - targets) * controls_b2) ** 2 * lambda_matrix
-        loss_b3 = ((branches[2] - targets) * controls_b3) ** 2 * lambda_matrix
-        loss_b4 = ((branches[3] - targets) * controls_b4) ** 2 * lambda_matrix
-        loss_b5 = (branches[4] - speed_gt) ** 2 * lambda_matrix
+        loss_b1 = ((branches[0] - targets) * controls_b1) ** 2 * branch_weights[0]
+        loss_b2 = ((branches[1] - targets) * controls_b2) ** 2 * branch_weights[1]
+        loss_b3 = ((branches[2] - targets) * controls_b3) ** 2 * branch_weights[2]
+        loss_b4 = ((branches[3] - targets) * controls_b4) ** 2 * branch_weights[3]
+        loss_b5 = (branches[4] - speed_gt) ** 2 * branch_weights[4]
 
 
         # Apply the variable weights
