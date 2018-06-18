@@ -213,7 +213,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                     checkpoint = summary[status]['Checkpoint']  # Get the sta
                     # This contain the results from completed iterations
                     csv_file_path = os.path.join('_logs', exp_batch, experiment,
-                                                 g_conf.PROCESS_NAME + '_csv', 'control_output.csv')
+                                                 process + '_csv', 'control_output.csv')
                     path = exp_batch + '_' + experiment + '_' + str(checkpoint) + '_' + process
                     print_drive_summary(get_latest_path(path), csv_file_path, checkpoint, verbose)
 
