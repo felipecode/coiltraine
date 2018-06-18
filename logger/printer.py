@@ -152,9 +152,9 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
         elif drive == 'Town02':
             process_names.append('drive' + '_ECCVGeneralizationSuite_' + drive)
         elif drive == 'TestT1':
-            process_names.append('drive' + '_TestT1_' + drive)
+            process_names.append('drive' + '_TestT1_Town01')
         elif drive == 'TestT2':
-            process_names.append('drive' + '_TestT2_' + drive)
+            process_names.append('drive' + '_TestT2_Town02')
         else:
             raise ValueError("Wrong Town Name")
 
