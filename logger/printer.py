@@ -5,6 +5,7 @@ from .carla_metrics_parser import get_averaged_metrics
 from .monitorer import get_status, get_episode_number, get_number_episodes_completed
 from configs import g_conf, merge_with_yaml
 from utils.general import sort_nicely, get_latest_path
+from visualization.data_reading import read_control_csv
 
 """
 COLOR CODINGS
@@ -99,7 +100,7 @@ def print_validation_summary(current, latest, verbose):
 
 
 @static_vars(previous_checkpoint=g_conf.TEST_SCHEDULE[0])
-def print_drive_summary(path, summary, checkpoint, verbose):
+def print_drive_summary(path, csv_filename, checkpoint, verbose):
 
 
 
@@ -122,12 +123,14 @@ def print_drive_summary(path, summary, checkpoint, verbose):
 
     # TODO: we need to get the previous checkpoint
 
-    averaged_metrics = get_averaged_metrics(path)
+    averaged_metrics = read_control_csv(csv_filename)
+
+
 
 
 
     print ('        SUMMARY: ')
-    print ('            Average Completion: ', LIGHT_GREEN + UNDERLINE + str(averaged_metrics['Iteration']) + END)
+    print ('            Average Completion: ', LIGHT_GREEN + UNDERLINE + str(averaged_metrics['episodes_completion']) + END)
     print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE + str(averaged_metrics['MeanError']) + END)
 
 
@@ -208,9 +211,11 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                     if 'Agent' not in summary[status]:
                         continue
                     checkpoint = summary[status]['Checkpoint']  # Get the sta
-
+                    # This contain the results from completed iterations
+                    csv_file_path = os.path.join('_logs', exp_batch, experiment,
+                                                 g_conf.PROCESS_NAME + '_csv', 'control_output.csv')
                     path = exp_batch + '_' + experiment + '_' + str(checkpoint) + '_' + process
-                    print_drive_summary(get_latest_path(path), summary[status], checkpoint, verbose)
+                    print_drive_summary(get_latest_path(path), csv_file_path, checkpoint, verbose)
 
 
 
