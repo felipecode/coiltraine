@@ -67,6 +67,8 @@ def read_control_csv(control_csv_file):
 
     if len(data_matrix) == 0:
         return None
+    if len(data_matrix.shape) == 1:
+        data_matrix = np.expand_dims(data_matrix, axis=0)
 
     for step in data_matrix[:, 0]:
 
@@ -74,7 +76,7 @@ def read_control_csv(control_csv_file):
         count += 1
 
 
-    return control_results_dic
+    return control_results_dic, header
 
 
 

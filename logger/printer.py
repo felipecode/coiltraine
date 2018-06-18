@@ -121,17 +121,17 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
     if checkpoint == g_conf.TEST_SCHEDULE[0]:
         return
 
+    previous_checkpoint = g_conf.TEST_SCHEDULE[g_conf.TEST_SCHEDULE.index(checkpoint)-1]
     # TODO: we need to get the previous checkpoint
 
-    averaged_metrics = read_control_csv(csv_filename)
-
-
-
+    averaged_metrics, header = read_control_csv(csv_filename)
 
 
     print ('        SUMMARY: ')
-    print ('            Average Completion: ', LIGHT_GREEN + UNDERLINE + str(averaged_metrics['episodes_completion']) + END)
-    print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE + str(averaged_metrics['collision_pedestrians']) + END)
+    print ('            Average Completion: ', LIGHT_GREEN + UNDERLINE +
+           str(averaged_metrics[float(previous_checkpoint)][header.index('episodes_completion')]-1) + END)
+    print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE +
+           str(averaged_metrics[float(previous_checkpoint)][header.index('collision_pedestrians')]-1) + END)
 
 
 
