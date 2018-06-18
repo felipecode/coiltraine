@@ -125,6 +125,9 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
             sys.stdout = open(os.path.join('_output_logs',
                               g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
+            sys.stderr = open(os.path.join('_output_logs',
+                              'err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
 
         if exp_set_name == 'TestT1':
             carla_process, port = start_carla_simulator(gpu, 'Town01', no_screen)
