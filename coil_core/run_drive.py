@@ -10,6 +10,7 @@ import os
 import time
 import subprocess
 import socket
+import json
 
 
 import torch
@@ -19,7 +20,7 @@ from carla.tcp import TCPConnectionError
 from carla.client import make_carla_client
 from carla.driving_benchmark import run_driving_benchmark
 
-from drive import CoILAgent, ECCVGeneralizationSuite, ECCVTrainingSuite
+from drive import CoILAgent, ECCVGeneralizationSuite, ECCVTrainingSuite, TestT1, TestT2
 
 from testing.unit_tests.test_drive.test_suite import TestSuite
 from logger import coil_logger
@@ -30,7 +31,7 @@ from logger import monitorer
 from configs import g_conf, merge_with_yaml, set_type_of_process
 
 from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkpoint, is_next_checkpoint_ready
-
+from utils.general import compute_average_std, get_latest_path
 
 
 def frame2numpy(frame, frameSize):
@@ -101,21 +102,23 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
 
 
 
-
-
-
         if exp_set_name == 'Town01':
-
             experiment_set = ECCVTrainingSuite()
             set_type_of_process('drive', 'ECCVTrainingSuite_' + exp_set_name)
-
         elif exp_set_name == 'Town02':
-
             experiment_set = ECCVGeneralizationSuite()
             set_type_of_process('drive', 'ECCVGeneralizationSuite_' + exp_set_name)
+        elif exp_set_name == 'TestT1':
+            experiment_set = TestT1()
+            set_type_of_process('drive', 'TestT1_Town01')
+        elif exp_set_name == 'TestT2':
+            experiment_set = TestT2()
+            set_type_of_process('drive', 'TestT2_Town02')
         else:
 
             raise ValueError(" Exp Set name is not correspondent to a city")
+
+
 
 
         if suppress_output:
@@ -123,14 +126,29 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
                               g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
-
-        carla_process, port = start_carla_simulator(gpu, exp_set_name, no_screen)
-
-
+        if exp_set_name == 'TestT1':
+            carla_process, port = start_carla_simulator(gpu, 'Town01', no_screen)
+            town_name = 'Town01'
+        elif exp_set_name == 'TestT2':
+            carla_process, port = start_carla_simulator(gpu, 'Town02', no_screen)
+            town_name = 'Town02'
+        else:
+            carla_process, port = start_carla_simulator(gpu, exp_set_name, no_screen)
+            town_name = exp_set_name
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 
         coil_logger.add_message('Loading', {'CARLAClient': host + ':' + str(port)})
+        csv_outfile = open(os.path.join('_logs', exp_batch, exp_alias,
+                                        g_conf.PROCESS_NAME + '_csv', 'control_output.csv'),
+                           'w')
+
+        csv_outfile.write("%s,%s,%s,%s,%s,%s,%s,%s\n"
+                          % ('step', 'episodes_completion', 'intersection_offroad',
+                             'intersection_otherlane', 'collision_pedestrians',
+                             'collision_vehicles', 'episodes_fully_completed',
+                             'driven_kilometers'))
+        csv_outfile.close()
 
         while True:
             try:
@@ -138,6 +156,8 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
                 # Now actually run the driving_benchmark
 
                 latest = 0
+                # Write the header of the summary file used conclusion
+
                 # While the checkpoint is not there
                 while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
@@ -153,12 +173,39 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
 
                         coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
 
-                        run_driving_benchmark(coil_agent, experiment_set, exp_set_name,
+                        run_driving_benchmark(coil_agent, experiment_set, town_name,
                                               exp_batch + '_' + exp_alias + '_' + str(latest)
                                               + '_drive'
                                               , True, host, port)
 
+                        path = exp_batch + '_' + exp_alias + '_' + str(latest) \
+                               + '_' + g_conf.PROCESS_NAME
 
+                        print("Finished")
+                        benchmark_json_path = os.path.join(get_latest_path(path), 'metrics.json')
+                        with open(benchmark_json_path, 'r') as f:
+                            benchmark_dict = json.loads(f.read())
+
+
+                        averaged_dict = compute_average_std([benchmark_dict],
+                                                            experiment_set.weathers,
+                                                            len(experiment_set.build_experiments()))
+                        print (averaged_dict)
+                        csv_outfile = open(os.path.join('_logs', exp_batch, exp_alias,
+                                                        g_conf.PROCESS_NAME + '_csv',
+                                                        'control_output.csv'),
+                                           'a')
+
+                        csv_outfile.write("%d,%f,%f,%f,%f,%f,%f,%f\n"
+                                     % (latest, averaged_dict['episodes_completion'],
+                                         averaged_dict['intersection_offroad'],
+                                         averaged_dict['intersection_otherlane'],
+                                         averaged_dict['collision_pedestrians'],
+                                         averaged_dict['collision_vehicles'],
+                                         averaged_dict['episodes_fully_completed'],
+                                         averaged_dict['driven_kilometers']))
+
+                        csv_outfile.close()
 
                         # TODO: When you add the message you need to check if the experiment continues properly
 

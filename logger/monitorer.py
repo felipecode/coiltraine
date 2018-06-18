@@ -1,5 +1,6 @@
 import os
 import re
+import numpy as np
 
 from logger import json_formatter
 from configs import g_conf
@@ -73,25 +74,56 @@ def get_summary(data):
         return ''
 
 
-
-def get_latest_checkpoint():
-
-
-    # The path for log
-
+def get_latest_checkpoint_validation():
     csv_file_path = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
                                  g_conf.EXPERIMENT_NAME, g_conf.PROCESS_NAME + '_csv')
 
     csv_files = os.listdir(csv_file_path)
 
-    if len (csv_files) == 0:
+    if len(csv_files) == 0:
         return None
 
     sort_nicely(csv_files)
 
-    #data = json_formatter.readJSONlog(open(log_file_path, 'r'))
+    # data = json_formatter.readJSONlog(open(log_file_path, 'r'))
 
     return int(re.findall('\d+', csv_files[-1])[0])
+
+def get_latest_checkpoint_drive():
+
+
+    csv_file_path = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
+                                 g_conf.EXPERIMENT_NAME, g_conf.PROCESS_NAME + '_csv')
+    f = open(os.path.join(csv_file_path, 'control_output.csv'), "r")
+    header = f.readline()
+    header = header.split(',')
+    header[-1] = header[-1][:-2]
+    f.close()
+
+    data_matrix = np.loadtxt(open(os.path.join(csv_file_path, 'control_output.csv'), "rb"),
+                             delimiter=",", skiprows=1)
+    print ("data_matrix")
+    print (data_matrix)
+    if len(data_matrix) == 0:
+        return None
+
+    if len(data_matrix.shape) == 1:
+        data_matrix = np.expand_dims(data_matrix, axis=0)
+
+
+    return float(data_matrix[-1][header.index('step')])
+
+
+
+def get_latest_checkpoint():
+
+    if 'validation' in g_conf.PROCESS_NAME:
+        return get_latest_checkpoint_validation()
+    elif 'drive' in g_conf.PROCESS_NAME:
+        return get_latest_checkpoint_drive()
+    else:
+        raise ValueError("The process name is not producing checkpoints")
+
 
 
 def get_status(exp_batch, experiment, process_name):
@@ -141,7 +173,7 @@ def get_status(exp_batch, experiment, process_name):
     # Read the full json file.
     try:
         data = json_formatter.readJSONlog(open(log_file_path, 'r'))
-    except Exception as e:
+    except Exception:
         import traceback
         traceback.print_exc()
         return ['Error', "Couldn't read the json"]

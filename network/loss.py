@@ -57,7 +57,7 @@ class Loss(object):
 
             else:
                 lambda_matrix = torch.zeros(targets.shape).cuda()
-                for i in range(targets.shape[1]):
+                for i in range(len(branch_weights)):
                     lambda_matrix[:, i] = branch_weights[i]
         else:
             lambda_matrix = torch.ones(targets.shape).cuda()
