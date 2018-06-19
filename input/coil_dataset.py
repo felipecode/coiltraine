@@ -124,8 +124,7 @@ class CoILDataset(Dataset):
 
         time_use = 1.0
         car_length = 6.0
-
-
+        old_steer = steer
         pos = camera_angle > 0.0
         neg = camera_angle <= 0.0
         # You should use the absolute value of speed
@@ -139,6 +138,7 @@ class CoILDataset(Dataset):
         steer = min(1.0, max(-1.0, steer))
 
 
+        #print('Angle', camera_angle, ' Steer ', old_steer, ' speed ', speed, 'new steer', steer)
         return steer
 
 

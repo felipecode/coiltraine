@@ -1,19 +1,20 @@
+from configs import g_conf
 def adjust_learning_rate(optimizer, num_iters):
     """
     Adjusts the learning rate every epoch based on the selected schedule
     """
     cur_iters = num_iters
-    lr = 0.00002
     minlr = 0.0000001
     scheduler = "normal"
-    decayinterval = 50000
-    decaylevel = 0.5
+    learning_rate = g_conf.LEARNING_RATE
+    decayinterval = g_conf.LEARNING_RATE_DECAY_INTERVAL
+    decaylevel = g_conf.LEARNING_RATE_DECAY_LEVEL
     if scheduler == "normal":
         while cur_iters >= decayinterval:
-            lr = lr * decaylevel
+            learning_rate = learning_rate * decaylevel
             cur_iters = cur_iters - decayinterval
-        lr = max(lr, minlr)
+        learning_rate = max(learning_rate, minlr)
 
     for param_group in optimizer.param_groups:
-        print("New Learning rate is ", lr)
-        param_group['lr'] = lr
+        print("New Learning rate is ", learning_rate)
+        param_group['lr'] = learning_rate

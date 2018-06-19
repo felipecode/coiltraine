@@ -138,15 +138,16 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
             controls = float_data[:, dataset.controls_position(), :]
 
+
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
             model.zero_grad()
             print (input_data['rgb'].shape)
 
-            branches = model(torch.squeeze(input_data['rgb'].cuda()), dataset.extract_inputs(float_data).cuda())
+            branches = model(torch.squeeze(input_data['rgb'].cuda()),
+                             dataset.extract_inputs(float_data).cuda())
 
 
-            print ("Weights", g_conf.VARIABLE_WEIGHT.values())
 
             loss = criterion.MSELoss(branches, dataset.extract_targets(float_data).cuda(),
                                      controls.cuda(), dataset.extract_inputs(float_data).cuda(),
@@ -211,9 +212,10 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
                                                , 'checkpoints', str(iteration) + '.pth'))
 
             iteration += 1
+            print (iteration)
 
-            #if iteration % 1000 == 0:
-            #    adjust_learning_rate(optimizer, iteration)
+            if iteration % 1000 == 0:
+                adjust_learning_rate(optimizer, iteration)
 
         coil_logger.add_message('Finished', {})
 
