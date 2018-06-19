@@ -99,9 +99,8 @@ _g_conf.MODEL_TYPE = 'coil_icra'
 _g_conf.MODEL_CONFIGURATION = {}
 
 
-_g_conf.TRAINING_SCHEDEULE = [[50000, 0.5], [100000, 0.5 * 0.5], [150000, 0.5 * 0.5 * 0.5],
-                              [200000, 0.5 * 0.5 * 0.5 * 0.5],
-                              [250000, 0.5 * 0.5 * 0.5 * 0.5 * 0.5]]  # Number of iterations, multiplying factor
+_g_conf.LEARNING_RATE_DECAY_INTERVAL = 50000
+_g_conf.LEARNING_RATE_DECAY_LEVEL = 0.5
 #TODO check how to use this part
 
 _g_conf.LEARNING_RATE = 0.0002  # First
