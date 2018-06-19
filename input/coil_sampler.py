@@ -31,7 +31,8 @@ class PreSplittedSampler(Sampler):
     def __init__(self, keys, executed_iterations):
 
         self.keys = keys
-        self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE - executed_iterations + 1
+        self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
+                                     executed_iterations + g_conf.BATCH_SIZE
         self.replacement = True
 
     def __iter__(self):

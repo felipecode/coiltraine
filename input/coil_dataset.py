@@ -118,24 +118,25 @@ class CoILDataset(Dataset):
             speed_batch:
 
         Returns:
+            the augmented steering
 
         """
 
         time_use = 1.0
-        car_length = 3.0
+        car_length = 6.0
 
 
         pos = camera_angle > 0.0
         neg = camera_angle <= 0.0
-
-
-        rad_camera_angle = math.pi * (math.fabs(camera_angle)) / 180.0
+        # You should use the absolute value of speed
+        speed = math.fabs(speed)
+        rad_camera_angle = math.radians(math.fabs(camera_angle))
         val = g_conf.AUGMENT_LATERAL_STEERINGS * (
         math.atan((rad_camera_angle * car_length) / (time_use * speed + 0.05))) / 3.1415
-        steer -= pos * min(val, 0.6)
-        steer += neg * min(val, 0.6)
+        steer -= pos * min(val, 0.3)
+        steer += neg * min(val, 0.3)
 
-        steer = min(0.75, max(-0.75, steer))
+        steer = min(1.0, max(-1.0, steer))
 
 
         return steer

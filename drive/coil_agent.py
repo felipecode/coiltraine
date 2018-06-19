@@ -75,18 +75,17 @@ class CoILAgent(Agent):
 
         #control_agent = self._agent.run_step(measurements, None, target)
 
-        speed = torch.cuda.FloatTensor([measurements.player_measurements.forward_speed]).unsqueeze(0)
+        norm_speed = measurements.player_measurements.forward_speed/g_conf.SPEED_FACTOR
+        norm_speed = torch.cuda.FloatTensor([norm_speed]).unsqueeze(0)
+
         directions_tensor = torch.cuda.LongTensor([directions])
-        model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), speed,
+        model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), norm_speed,
                                                   directions_tensor)
 
 
-        steer, throttle, brake = self._process_model_outputs(model_outputs[0],
-                                         measurements.player_measurements.forward_speed)
+        steer, throttle, brake = self._process_model_outputs(model_outputs[0])
 
-        #control = self.compute_action(,
-        #                              ,
-        #                              directions)
+
         control = carla_protocol.Control()
         control.steer = steer
         control.throttle = throttle
@@ -98,7 +97,8 @@ class CoILAgent(Agent):
         #control.brake = control_agent.brake
         if self.first_iter:
             coil_logger.add_message('Iterating', {"Checkpoint": self.checkpoint['iteration'],
-                                                  'Agent':str(steer)}, self.checkpoint['iteration'])
+                                                  'Agent': str(steer)},
+                                    self.checkpoint['iteration'])
         self.first_iter = False
         return control
 
@@ -116,12 +116,9 @@ class CoILAgent(Agent):
             if  sensors[name].type == 'SemanticSegmentation':
                 # For now we have just for RGB images and semantic segmentation.
 
-
                 # TODO: the camera name has to be sincronized with what is in the experiment...
                 sensor = join_classes(sensor)
-
                 sensor = sensor[:, :, np.newaxis]
-
 
                 sensor = scipy.misc.imresize(sensor, (size[1], size[2]), interp='nearest')
                 sensor = sensor * (1 / (number_of_seg_classes - 1))
@@ -157,7 +154,7 @@ class CoILAgent(Agent):
         return image_input
 
 
-    def _process_model_outputs(self, outputs, speed):
+    def _process_model_outputs(self, outputs):
         """
          A bit of heuristics in the control, to eventually make car faster, for instance.
         Returns:
