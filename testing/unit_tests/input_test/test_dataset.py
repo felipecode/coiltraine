@@ -89,7 +89,7 @@ class testCILDataset(unittest.TestCase):
         #data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
         #                                          shuffle=True, num_workers=12, pin_memory=True)
         #capture_time = time.time()
-        data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
+        data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
                                                   shuffle=False, num_workers=12,
                                                   pin_memory=True)
 
@@ -99,16 +99,17 @@ class testCILDataset(unittest.TestCase):
         for data in data_loader:
             print (count)
             image, labels = data
-            pos = random.randint(0, 119)
 
 
-            image_to_save = transforms.ToPILImage()(image['rgb'][0][0])
-            if math.fabs(float(labels[pos][0][0])) > max_steer:
-                max_steer = math.fabs(float(labels[pos][0][0]))
+            for pos in range(0,120,2):
+
+                image_to_save = transforms.ToPILImage()(image['rgb'][0][0])
+                if math.fabs(float(labels[pos][0][0])) > max_steer:
+                    max_steer = math.fabs(float(labels[pos][0][0]))
 
 
-            image_to_save.save(
-                os.path.join(self.test_images_write_path + 'normal_steer',
-                             str(float(labels[pos][0][0])) + '.png'))
+                image_to_save.save(
+                    os.path.join(self.test_images_write_path + 'normal_steer',
+                                 str(float(labels[pos][0][0])) + '.png'))
             count += 1
         print ("MAX STEER ", max_steer)

@@ -134,7 +134,9 @@ class CoILICRA(nn.Module):
 
     def extract_branch(self, output_vec, branch_number):
 
+
         branch_number = command_number_to_index(branch_number)
+        print ("Branch number", branch_number)
         if len(branch_number) > 1:
             branch_number = torch.squeeze(branch_number.type(torch.cuda.LongTensor))
         else:

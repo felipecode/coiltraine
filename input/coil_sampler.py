@@ -21,6 +21,23 @@ def get_rank(input_array):
             return rank
 
 
+class SubsetSampler(Sampler):
+    r"""Samples elements randomly from a given list of indices, without replacement.
+
+    Arguments:
+        indices (list): a list of indices
+    """
+
+    def __init__(self, indices):
+        self.indices = indices
+
+    def __iter__(self):
+        return (self.indices[i] for i in range(len(self.indices)))
+
+    def __len__(self):
+        return len(self.indices)
+
+
 
 class PreSplittedSampler(Sampler):
     """ Sample on a list of keys that was previously splitted

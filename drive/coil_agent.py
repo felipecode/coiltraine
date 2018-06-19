@@ -13,9 +13,8 @@ import random
 
 import scipy
 
+from utils.general import plot_test_image
 
-#from carla.autopilot.autopilot import Autopilot
-#from carla.autopilot.pilotconfiguration import ConfigAutopilot
 
 from carla.agent import Agent
 from PIL import Image
@@ -131,9 +130,11 @@ class CoILAgent(Agent):
 
                 sensor = scipy.misc.imresize(sensor, (size[1], size[2]))
 
+                plot_test_image(sensor, "image.png")
                 sensor = np.swapaxes(sensor, 0, 1)
 
                 sensor = np.transpose(sensor, (2, 0, 1))
+
 
                 sensor = torch.from_numpy(sensor).type(torch.FloatTensor).cuda()
 
@@ -150,6 +151,7 @@ class CoILAgent(Agent):
 
         image_input = image_input.unsqueeze(0)
 
+        print (image_input.shape)
 
         return image_input
 

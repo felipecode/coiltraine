@@ -3,6 +3,15 @@ from logger import monitorer
 import heapq
 
 
+def get_remainig_exps(executing_processes, experiment_list):
+
+    executing_list = []
+    for process in executing_processes:
+        executing_list.append(process['experiment'])
+
+    return list(set(experiment_list)- set(executing_list))
+
+
 def get_gpu_resources(gpu_resources, executing_processes, allocation_params):
 
     """
@@ -61,18 +70,24 @@ def allocate_gpu_resources(gpu_resources, amount_to_allocate):
 
 
 
-def mount_experiment_heap(folder, experiments_list, is_training, validation_datasets, drive_environments):
+def mount_experiment_heap(folder, experiments_list, is_training,
+                          validation_datasets, drive_environments, restart_error=True):
 
 
     tasks_queue = []
     for experiment in experiments_list:
-
-
         # Train is always priority. # TODO: some system to check priority depending on iterations
 
         # TODO: One thing is error other thing is stop. However at a first step we can try to restart all error things
         if is_training:
-            if monitorer.get_status(folder, experiment, 'train')[0] != "Finished":
+            if monitorer.get_status(folder, experiment, 'train')[0] == "Not Started":
+
+                heapq.heappush(tasks_queue, (0, experiment + '_train',
+                                             {'type': 'train', 'folder': folder,
+                                              'experiment': experiment}))
+
+            elif restart_error and monitorer.get_status(folder, experiment, 'train')[0] \
+                            == "Error":
 
                 heapq.heappush(tasks_queue, (0,  experiment+'_train' ,
                                              {'type': 'train', 'folder': folder,
@@ -80,19 +95,27 @@ def mount_experiment_heap(folder, experiments_list, is_training, validation_data
 
 
         for val_data in validation_datasets:
-            if monitorer.get_status(folder, experiment, 'validation_' + val_data)[0] != 'Finished':
+            if monitorer.get_status(folder, experiment, 'validation_' + val_data)[0] == "Not Started":
+                heapq.heappush(tasks_queue, (2, experiment + '_validation_' + val_data,
+                                             {'type': 'validation', 'folder': folder,
+                                              'experiment': experiment, 'dataset': val_data}))
 
-
+            elif restart_error and monitorer.get_status(folder, experiment, 'train')[0] \
+                            == "Error":
                 heapq.heappush(tasks_queue, (2, experiment+'_validation_' + val_data,
                                              {'type': 'validation', 'folder': folder,
                                                  'experiment': experiment, 'dataset': val_data}))
 
         for drive_env in drive_environments:
-            if monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] != "Finished":
+            if monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] == "Not Started":
+                heapq.heappush(tasks_queue, (1, experiment + '_drive_' + drive_env,
+                                             {'type': 'drive', 'folder': folder,
+                                              'experiment': experiment, 'environment': drive_env}))
 
-
-                heapq.heappush(tasks_queue, (1, experiment+'_drive_' + drive_env,
-                                            {'type': 'drive', 'folder': folder,
-                                                 'experiment': experiment, 'environment': drive_env}))
+            elif restart_error and monitorer.get_status(folder, experiment, 'train')[0] \
+                                == "Error":
+                    heapq.heappush(tasks_queue, (1, experiment+'_drive_' + drive_env,
+                                                {'type': 'drive', 'folder': folder,
+                                              'experiment': experiment, 'environment': drive_env}))
 
     return tasks_queue

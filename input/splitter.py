@@ -73,7 +73,6 @@ def select_data_sequence(control, selected_data):
     while count * g_conf.SEQUENCE_STRIDE <= (
             len(control) - g_conf.NUMBER_IMAGES_SEQUENCE):
 
-        #print ('sequence starting on : ', count*g_conf.SEQUENCE_STRIDE)
         # We count the number of positions not corresponding to a label
         eliminated_positions = 0
         for iter_sequence in range((count * g_conf.SEQUENCE_STRIDE),
@@ -190,11 +189,8 @@ def control_steer_split(float_data, meta_data, keys):
     # Another level of splitting
     splitted_steer_labels = []
 
-
     for keys in splitted_labels:
-        splitter_steer = float_split(steerings, keys,
-                                              g_conf.STEERING_DIVISION)
-
+        splitter_steer = float_split(steerings, keys, g_conf.STEERING_DIVISION)
         splitted_steer_labels.append(splitter_steer)
 
     coil_logger.add_message('Loading', {'KeysDivision': splitted_steer_labels})

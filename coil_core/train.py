@@ -3,7 +3,7 @@ import sys
 import random
 import time
 import traceback
-
+import numpy as np
 import torch
 import torch.optim as optim
 import imgauggpu as iag
@@ -88,6 +88,19 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         # Creates the sampler, this part is responsible for managing the keys. It divides
         # all keys depending on the measurements and produces a set of keys for each bach.
         keys = range(0, len(dataset.measurements[0, :]) - g_conf.NUMBER_IMAGES_SEQUENCE)
+
+        if g_conf.DATA_USED == 'central':
+            camera_names = \
+            dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
+            keys = splitter.label_split(camera_names, keys, [[1]])
+        elif g_conf.DATA_USED == 'sides':
+            camera_names = \
+            dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
+            keys = splitter.label_split(camera_names, keys, [[0, 2]])
+        elif g_conf.DATA_USED != 'all':
+            raise ValueError(" Invalid data used keyname")
+
+
         sampler = BatchSequenceSampler(
                 splitter.control_steer_split(dataset.measurements, dataset.meta_data, keys),
                 iteration * g_conf.BATCH_SIZE,

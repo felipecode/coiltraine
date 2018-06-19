@@ -4,9 +4,9 @@ import multiprocessing
 import heapq
 
 from utils.experiment_schedule import get_gpu_resources, allocate_gpu_resources, \
-    mount_experiment_heap
+    mount_experiment_heap, get_remainig_exps
 from utils.general import create_exp_path
-from logger import printer
+from logger import printer, monitorer
 
 from . import train, validate, run_drive
 
@@ -117,13 +117,18 @@ def folder_execute(params=None):
     while True:
         #        if not done or executing  get to the list
         # If amount of resources is smaller than a threshold.
+
         while resources_on_most_free_gpu >= min([allocation_parameters['train_cost'],
                                                  allocation_parameters['validation_cost'],
                                                  allocation_parameters['drive_cost']]) \
                 and tasks_queue != []:
             # Allocate all the gpus
+            popped_thing = heapq.heappop(tasks_queue)
+            process_specs = popped_thing[2]  # To get directly the dict
 
-            process_specs = heapq.heappop(tasks_queue)[2]  # To get directly the dict
+
+            # Get the train status, that will affect in scheduling a validation or drive process
+            train_status = monitorer.get_status(folder, process_specs['experiment'], 'train')[0]
 
             if process_specs['type'] == 'train' and resources_on_most_free_gpu >= \
                     allocation_parameters['train_cost']:
@@ -133,30 +138,41 @@ def folder_execute(params=None):
 
                 execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
                 process_specs.update({'gpu': gpu_number})
+                print ("Added train")
                 executing_processes.append(process_specs)
 
             elif process_specs['type'] == 'validation' and resources_on_most_free_gpu >= \
-                    allocation_parameters['validation_cost']:
+                    allocation_parameters['validation_cost'] \
+                    and (train_status == 'Iterating' or train_status == 'Loading' or
+                         train_status == 'Finished'):
                 free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
-                    free_gpus,
-                    allocation_parameters['validation_cost'])
+                                        free_gpus, allocation_parameters['validation_cost'])
                 execute_validation(gpu_number, process_specs['folder'], process_specs['experiment'],
                                    process_specs['dataset'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 
             elif process_specs['type'] == 'drive' and resources_on_most_free_gpu >= \
-                    allocation_parameters['drive_cost']:
-
+                    allocation_parameters['drive_cost'] \
+                    and (train_status == 'Iterating' or train_status == 'Loading' or
+                         train_status == 'Finished'):
                 free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
-                    free_gpus,
-                    allocation_parameters['drive_cost'])
+                                            free_gpus, allocation_parameters['drive_cost'])
                 execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
                               process_specs['environment'], no_screen=params['no_screen'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 
+
+
+
         time.sleep(10)
+        print (executing_processes)
+
+        tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
+                                            validation_datasets, driving_environments, False)
+
+        print(tasks_queue)
 
         printer.plot_folder_summaries(folder,
                                       params['is_training'],
@@ -168,7 +184,7 @@ def folder_execute(params=None):
             executing_processes,
             allocation_parameters)
 
-        if len(executing_processes) == 0:
+        if len(tasks_queue) == 0 and len(executing_processes) == 0:
             break
 
     print("ALL EXPERIMENTS EXECUTED")

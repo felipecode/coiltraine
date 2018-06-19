@@ -102,8 +102,7 @@ def get_latest_checkpoint_drive():
 
     data_matrix = np.loadtxt(open(os.path.join(csv_file_path, 'control_output.csv'), "rb"),
                              delimiter=",", skiprows=1)
-    print ("data_matrix")
-    print (data_matrix)
+
     if len(data_matrix) == 0:
         return None
 
@@ -178,6 +177,8 @@ def get_status(exp_batch, experiment, process_name):
         traceback.print_exc()
         return ['Error', "Couldn't read the json"]
 
+    if len(data) == 0:
+        return ['Not Started', '']
 
     # Now check if the latest data is loading
     if 'Loading' in data[-1]:
