@@ -59,11 +59,13 @@ def start_carla_simulator(gpu, town_name, no_screen):
 
     carla_out_file = os.path.join('_output_logs',
                       'CARLA_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
+    carla_out_file_err = os.path.join('_output_logs',
+                      'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
 
     sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
                             '-windowed',
                            '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
-                           stdout=open(carla_out_file, 'w'))
+                           stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
 
 
     coil_logger.add_message('Loading', {'CARLA': carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4' 

@@ -138,7 +138,7 @@ def folder_execute(params=None):
 
                 execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
                 process_specs.update({'gpu': gpu_number})
-                print ("Added train")
+
                 executing_processes.append(process_specs)
 
             elif process_specs['type'] == 'validation' and resources_on_most_free_gpu >= \
@@ -167,12 +167,10 @@ def folder_execute(params=None):
 
 
         time.sleep(10)
-        print (executing_processes)
 
         tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
                                             validation_datasets, driving_environments, False)
 
-        print(tasks_queue)
 
         printer.plot_folder_summaries(folder,
                                       params['is_training'],
@@ -186,5 +184,6 @@ def folder_execute(params=None):
 
         if len(tasks_queue) == 0 and len(executing_processes) == 0:
             break
+
 
     print("ALL EXPERIMENTS EXECUTED")

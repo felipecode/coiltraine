@@ -22,10 +22,12 @@ import matplotlib.colors as colors
 
 root_path = 'eccv_results'
 
+"""
 camera_labels_1 = np.array(map(int, map(float, open('camera_label_file_Town01_1.txt'))))
 camera_labels_1_noise = np.array(map(int, map(float, open('camera_label_file_Town01_1_noise.txt'))))
 camera_labels_2 = np.array(map(int, map(float, open('camera_label_file_Town02_14.txt'))))
 camera_labels_2_noise = np.array(map(int, map(float, open('camera_label_file_Town02_14_noise.txt'))))
+"""
 
 
 def read_data(experiment, town, noise, data_params):

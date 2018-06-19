@@ -6,6 +6,8 @@ import resource
 from coil_core import execute_train, execute_validation, execute_drive, folder_execute
 from utils.general import create_log_folder, create_exp_path
 
+from visualization import plot_scatter
+
 # You could send the module to be executed and they could have the same interface.
 
 
@@ -93,8 +95,11 @@ if __name__ == '__main__':
 
 
 
+
+
     # TODO: MAKE SURE ALL DATASETS ARE " WAYPOINTED "
     create_log_folder(args.folder)
+    
 
     if args.single_process is not None:
 
@@ -140,3 +145,5 @@ if __name__ == '__main__':
         }
 
         folder_execute(params)
+
+        plot_scatter()
