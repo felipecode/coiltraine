@@ -63,7 +63,7 @@ class CoILICRA(nn.Module):
         self.speed_branch = FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                   params['speed_branch']['fc']['neurons'] + [1],
                                        'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
-                                       'end_layer': False})
+                                       'end_layer': True})
 
 
         # Create the fc vector separatedely
@@ -136,7 +136,7 @@ class CoILICRA(nn.Module):
 
 
         branch_number = command_number_to_index(branch_number)
-        print ("Branch number", branch_number)
+
         if len(branch_number) > 1:
             branch_number = torch.squeeze(branch_number.type(torch.cuda.LongTensor))
         else:

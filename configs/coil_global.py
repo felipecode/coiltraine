@@ -31,13 +31,10 @@ import os.path as osp
 import yaml
 
 
+from configs.namer import generate_name
 from logger.coil_logger import create_log, add_message
 
 
-
-""" RULE ! 
-    all the names inside cannot have underscore.
-"""
 
 # TODO: NAMing conventions ?
 
@@ -141,9 +138,24 @@ def merge_with_yaml(yaml_filename):
     path_parts = os.path.split(yaml_filename)
     _g_conf.EXPERIMENT_BATCH_NAME = os.path.split(path_parts[-2])[-1]
     _g_conf.EXPERIMENT_NAME = path_parts[-1].split('.')[-2]
-    _g_conf.EXPERIMENT_GENERATED_NAME = _generate_name()
+    _g_conf.EXPERIMENT_GENERATED_NAME = generate_name(_g_conf)
 
 
+def get_names(folder):
+    #
+
+    alias_in_folder = os.listdir(os.path.join('configs',folder))
+
+    experiments_in_folder = []
+
+    for experiment_alias in alias_in_folder:
+        g_conf.immutable(False)
+        print (experiment_alias)
+        merge_with_yaml(os.path.join('configs', folder, experiment_alias))
+
+        experiments_in_folder.append(g_conf.EXPERIMENT_GENERATED_NAME)
+
+    return experiments_in_folder
 
 
 # TODO: Make this nicer, now it receives only one parameter
@@ -220,91 +232,7 @@ def set_type_of_process(process_type, param=None):
 def merge_with_parameters():
     pass
 
-def _generate_name():
-    # TODO: Make a cool name generator, maybe in another class
-    """
 
-        The name generator is currently formed by the following parts
-        Dataset_name.
-        THe type of network used, got directly from the class.
-        The regularization
-        The strategy with respect to time
-        The type of output
-        The preprocessing made in the data
-        The type of loss function
-        The parts  of data that where used.
-
-        Take into account if the variable was not set, it set the default name, from the global conf
-
-
-
-    Returns:
-        a string containing the name
-
-
-    """
-
-    final_name_string = ""
-    # Addind dataset
-    final_name_string += _g_conf.TRAIN_DATASET_NAME
-    # Model type
-    final_name_string += '_' + _g_conf.MODEL_TYPE
-    # Model Size
-    #TODO: for now is just saying the number of convs, add a layer counting
-    final_name_string += '_' + str(len(_g_conf.MODEL_CONFIGURATION['perception']['conv']['kernels'])) +'conv'
-
-    # Model Regularization
-    # We start by checking if there is some kind of augmentation, and the schedule name.
-
-    if _g_conf.AUGMENTATION is not None:
-        final_name_string += '_' + _g_conf.AUGMENTATION
-    else:
-        # We check if there is dropout
-        if sum(_g_conf.MODEL_CONFIGURATION['branches']['fc']['dropouts']) > 0:
-            final_name_string += '_dropout'
-        else:
-            final_name_string += '_none'
-
-    # Temporal
-
-    if _g_conf.NUMBER_FRAMES_FUSION > 1 and _g_conf.NUMBER_IMAGES_SEQUENCE > 1:
-        final_name_string += '_lstm_fusion'
-    elif _g_conf.NUMBER_FRAMES_FUSION > 1:
-        final_name_string += '_fusion'
-    elif _g_conf.NUMBER_IMAGES_SEQUENCE > 1:
-        final_name_string += '_lstm'
-    else:
-        final_name_string += '_single'
-
-    # THe type of output
-
-    if 'W1A' in set(_g_conf.TARGETS):
-
-        final_name_string += '_waypoints'
-    else:
-        final_name_string += '_control'
-
-    # The pre processing ( Balance or not )
-    if _g_conf.BALANCE_DATA:
-        final_name_string += '_balance'
-    else:
-        final_name_string += '_sequential'
-
-    # The type of loss function
-
-    final_name_string += '_'+_g_conf.LOSS_FUNCTION
-
-    # the parts of the data that were used.
-
-    if _g_conf.USE_NOISE_DATA:
-        final_name_string += '_noise'
-    else:
-        final_name_string += '_'
-
-    final_name_string += _g_conf.DATA_USED
-
-
-    return final_name_string
 
 def generate_param_dict():
     # TODO IMPLEMENT ! generate a cool param dictionary USE

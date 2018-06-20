@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import math
 import os
 import time
+import shutil
 
 import traceback
 import matplotlib.patches as mpatches
@@ -18,6 +19,9 @@ import pprint
 import collections
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
+
+
+from configs.coil_global import get_names
 
 
 root_path = 'eccv_results'
@@ -30,16 +34,30 @@ camera_labels_2_noise = np.array(map(int, map(float, open('camera_label_file_Tow
 """
 
 
-def read_data(experiment, town, noise, data_params):
+def read_data(exp_batch, experiment, val_dataset, data_params):
 
-    #the town path
-    full_path = os.path.join(data_params['root_path'],experiment,experiment + '_' + town + noise)
+
+
     # read the data
     data = {}
 
-    data['town'] = town
+    data['town'] = town  # Where can we get the town from ??
     data['experiment'] = experiment
-    values = data_reading._read_town_data(full_path, data_params['control'])
+    values = {}
+
+    full_path_control = os.path.join(data_params['root_path'], exp_batch, experiment,
+                                        'drive_' + val_dataset + '_csv')
+    control_data = data_reading._read_control_data(full_path_control,
+                                                                    data_params['control'])
+
+    # We get the path for the validation csvs
+    full_path_validation = os.path.join(data_params['root_path'], exp_batch, experiment,
+                                        'validation_' + val_dataset + '_csv')
+    # Based on the control data, we read the rest of the data
+
+
+    values = data_reading._read_data(full_path_validation, control_data)
+
     if values is None:
         return None
     else:
@@ -323,35 +341,42 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
     if plot_param['print']:
         fig.savefig(out_file, bbox_inches='tight')
 
-def plot_scatter(list_of_experiments, data_params, processing_params, plot_params, out_folder=None):
+
+def plot_scatter(exp_batch, list_of_experiments, data_params,
+                 processing_params, plot_params, out_folder=None):
 
     # create a folder
     if out_folder is None:
         out_folder = time.strftime("plots_%Y_%m_%d_%H_%M_%S", time.gmtime())
-    out_path = os.path.join(data_params['root_path'], 'plots', out_folder)
+    out_path = os.path.join(data_params['root_path'], exp_batch, 'plots', out_folder)
 
     if not os.path.exists(out_path):
         os.makedirs(out_path)
     else:
-        raise Exception('Folder %s already exists' % out_path)
+        shutil.rmtree(out_path)
+        os.makedirs(out_path)
 
     # save the parameters
-    with open(os.path.join(out_path,'params.txt'),'w') as f:
+    print ("Out path", out_path)
+    with open(os.path.join(out_path, 'params.txt'), 'w') as f:
         f.write('list_of_experiments:\n' + pprint.pformat(list_of_experiments,indent=4))
         f.write('\n\ndata_params:\n' + pprint.pformat(data_params,indent=4))
         f.write('\n\nprocessing_params:\n' + pprint.pformat(processing_params,indent=4))
         f.write('\n\nplot_params:\n' + pprint.pformat(plot_params,indent=4))
 
     all_metrics = {}
+
+    list_of_exps_names = get_names(exp_batch)
+    print ('list,expnames', list_of_exps_names)
     for experiment in list_of_experiments:
 
         #if '25_nor_no' in experiment or '5_small_ndrop_single_wp' in experiment:
         #    continue
 
         for town in data_params['towns']:
-            print('\n === Experiment %s _ %s %s ===\n' % (experiment,town,data_params['noise']))
+            print('\n === Experiment %s _ %s %s ===\n' % (experiment, town, data_params['noise']))
             print('\n ** Reading the data **\n')
-            data = read_data(experiment,town, data_params['noise'], data_params) # this reads the data and infers the masks (or offsets) for different cameras
+            data = read_data(exp_batch, experiment, town, data_params['noise'], data_params) # this reads the data and infers the masks (or offsets) for different cameras
             if data is None: # This folder didnt work out, probably is missing important data
                 print('\n ** Missing Data on Folder **\n')
                 continue
@@ -366,7 +391,7 @@ def plot_scatter(list_of_experiments, data_params, processing_params, plot_param
             metrics = process_data(data, processing_params,data_params['noise']) # Compute metrics from the data. Can be multiple metrics, given by the processing_params list. Should be vectorized as much as possible. The output is a list of the same size as processing_params.
             all_metrics[experiment + '_' + town] = metrics # append to the computed list of metrics to the dictionary of results.
 
-    with open(os.path.join(out_path,'all_metrics.txt'),'w') as f:
+    with open(os.path.join(out_path,'all_metrics.txt'), 'w') as f:
         f.write('all_metrics:\n' + pprint.pformat(all_metrics, indent=4))
 
     # Plot the results
@@ -377,6 +402,6 @@ def plot_scatter(list_of_experiments, data_params, processing_params, plot_param
         if 'analysis' in plot_param:
             make_scatter_plot_analysis(all_metrics, plot_param, out_file=os.path.join(out_path, plot_label+'.pdf'))
         else:
-            make_scatter_plot(all_metrics, plot_param, out_file=os.path.join(out_path, plot_label+'.pdf'))
+            make_scatter_plot(all_metrics, plot_param, out_file=os.path.join(out_path, plot_label + '.pdf'))
 
 # TODO Should we cache the computed metrics? The metrics should have unique names then

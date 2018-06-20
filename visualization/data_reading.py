@@ -4,6 +4,8 @@ import math
 import traceback
 import collections
 
+from configs import g_conf
+from utils.general import static_vars
 
 """
 
@@ -119,23 +121,40 @@ def _read_step_data_wp(step_path):
 
     return step_dictionary
 
+# Add a static variable to avoid re-reading
+@static_vars(previous_dataset=g_conf.TEST_SCHEDULE[0])
+def get_ground_truth(dataset_name):
+    pass
+
+
+
+
+
 
 
 def _read_step_data(step_path):
 
     step_dictionary = {}
 
+    # On this step we read all predictions for this benchmark step.
+    predictions = np.loadtxt(step_path, delimiter=" ", skiprows=0, usecols=([0]))
 
-    steer_pred = np.loadtxt(step_path + '_seq_output_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
-    step_dictionary.update({'steer_pred': steer_pred})
-    steer_gt = np.loadtxt(step_path + '_seq_gt_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
-    step_dictionary.update({'steer_gt': steer_gt})
+    # Get the ground truth directly from the datasets path with the already generated steer and speed
+    ground_truth = get_ground_truth()
 
-    steer_error = np.loadtxt(step_path + '_seq_error_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
-    step_dictionary.update({'steer_error': steer_error})
-
+    step_dictionary.update({'steer_pred': predictions[0,:]})
 
 
+
+    #steer_gt = np.loadtxt(step_path + '_seq_gt_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
+    step_dictionary.update({'steer_gt': ground_truth})
+
+    #steer_error = np.loadtxt(step_path + '_seq_error_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
+    step_dictionary.update({'steer_error': compute_error(predictions, ground_truth)})
+
+
+
+    """
     if 'Town01' in step_path and 'noise' in step_path:
         speed_input = speed_labels_1_noise
     elif 'Town01' in step_path:
@@ -144,14 +163,12 @@ def _read_step_data(step_path):
         speed_input = speed_labels_2_noise
     else:
         speed_input = speed_labels_2
+    """
 
 
+    step_dictionary.update({'speed_input': get_speed_ground_truth()})
 
-    step_dictionary.update({'speed_input': speed_input})
 
-
-    #speed_input =np.loadtxt(step_path + '_seq_B_4_input_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
-    #step_dictionary.update({'speed_input': speed_input})
 
 
     return step_dictionary
@@ -160,35 +177,33 @@ def _read_step_data(step_path):
 
 
 
-def _read_town_data(train_town_path,control_to_use):
-    town_dictionary = {}
+def _read_control_data(full_path, control_to_use):
+
 
     # The word auto refers to the use of the autopilot
 
     # Try to read the controls
     # Some flags to check the control files found
 
-
-
-
     try:
-        control = read_control_csv(os.path.join(train_town_path,'control_summary'+control_to_use+'.csv'))
+        control = read_control_csv(os.path.join(full_path, 'control_summary'+control_to_use+'.csv'))
     except KeyboardInterrupt:
         raise
     except:
-        # HACKYYYYYY
+        # HACKYYYYYY  # TODO: maybe remove that
         try:
-            control = read_control_csv(os.path.join(train_town_path[:-6], 'control_summary' + control_to_use + '.csv'))
+            control = read_control_csv(os.path.join(full_path[:-6], 'control_summary' + control_to_use + '.csv'))
         except:
             traceback.print_exc()
             return None
-    # Now we get the steps
-    benchmarked_steps = control.items()
 
+
+    return control.items()
     # Simple extra counter
 
 
-
+def _read_data(full_path, benchmarked_steps):
+    town_dictionary = {}
 
     for i in range(len(benchmarked_steps)):
 
@@ -196,11 +211,12 @@ def _read_town_data(train_town_path,control_to_use):
         step = int(benchmarked_steps[i][0])
 
 
-        step_path = os.path.join(train_town_path,'raw', str(step))
+        step_path = os.path.join(benchmarked_steps, str(step))
 
         # First we try to add prediction data
         try:
-            if '_wp_' in train_town_path:  # We test if the model is a waypoints based model, then we read a different part
+            # Check for waypoints.
+            if '_wp_' in full_path:  # We test if the model is a waypoints based model, then we read a different part
                 prediction_data = {step: _read_step_data_wp(step_path)}
             else:
                 prediction_data = {step: _read_step_data(step_path)}
@@ -213,7 +229,7 @@ def _read_town_data(train_town_path,control_to_use):
             return None
 
 
-        print ('control'+control_to_use)
+        print ('control')
         print (benchmarked_steps[i][1])
         town_dictionary[step].update({'control': benchmarked_steps[i][1]})
 

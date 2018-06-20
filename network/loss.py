@@ -83,9 +83,6 @@ class Loss(object):
         controls_b4 = torch.tensor(controls_b4, dtype = torch.float32).cuda()
         controls_b4 = torch.cat([controls_b4, controls_b4, controls_b4], 1)
 
-        # Normalize with the maximum speed from the training set (40 km/h)
-        speed_gt = speed_gt / g_conf.SPEED_FACTOR
-
         # calculate loss for each branch with specific activation
         loss_b1 = ((branches[0] - targets) * controls_b1) ** 2 * branch_weights[0]
         loss_b2 = ((branches[1] - targets) * controls_b2) ** 2 * branch_weights[1]

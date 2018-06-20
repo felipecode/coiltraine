@@ -64,7 +64,41 @@ class testCILDataset(unittest.TestCase):
         #TODO: Test frame fusion
         # number of frames fused equal 3, should return 9 frames in the end
     """
+    def test_speed_reading(self):
+        if not os.path.exists(self.test_images_write_path + 'normal_steer'):
+            os.mkdir(self.test_images_write_path + 'normal_steer')
 
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], '1HoursW1-3-6-8')
+        # This depends on the number of fused frames. A image could have
+        # A certain number of fused frames
+
+        augmenter = Augmenter(None)
+        dataset = CoILDataset(full_dataset, transform=augmenter)
+
+        keys = range(0, len(dataset.measurements[0, :]) - g_conf.NUMBER_IMAGES_SEQUENCE)
+        sampler = BatchSequenceSampler(
+            splitter.control_steer_split(dataset.measurements, dataset.meta_data, keys),
+            0 * g_conf.BATCH_SIZE,
+            g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE
+        )
+
+        # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
+        #                                          shuffle=True, num_workers=12, pin_memory=True)
+        # capture_time = time.time()
+        data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
+                                                  shuffle=False, num_workers=12,
+                                                  pin_memory=True)
+
+        count = 0
+        print('len ', len(data_loader))
+        max_steer = 0
+        for data in data_loader:
+            print(count)
+            image, labels = data
+
+            count += 1
+        print("MAX STEER ", max_steer)
+    """
     def test_augmented_steering_batch(self):
         if not os.path.exists(self.test_images_write_path + 'normal_steer'):
             os.mkdir(self.test_images_write_path + 'normal_steer')
@@ -113,3 +147,4 @@ class testCILDataset(unittest.TestCase):
                                  str(float(labels[pos][0][0])) + '.png'))
             count += 1
         print ("MAX STEER ", max_steer)
+    """

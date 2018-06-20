@@ -72,23 +72,25 @@ class CoILDataset(Dataset):
                 for i in range(g_conf.NUMBER_FRAMES_FUSION):
                     chosen_key = chosen_key + i * 3
 
-                    for es, ee, x in self.sensor_data[count]:
 
-                        if chosen_key >= es and chosen_key < ee:
-                            """ We found the part of the data to open """
+                    #if chosen_key >= es and chosen_key < ee:
+                    """ We found the part of the data to open """
 
-                            pos_inside = chosen_key - es
-                            sensor_image = np.array(x[pos_inside, :, :, :])
+                    pos_inside = chosen_key - (chosen_key // 200)*200
 
-                            if self.transform is not None:
-                                sensor_image = self.transform(self.batch_read_number, sensor_image)
-                            else:
+                    x = self.sensor_data[count][chosen_key // 200][2]
 
-                                sensor_image = np.swapaxes(sensor_image, 0, 2)
-                                sensor_image = np.swapaxes(sensor_image, 1, 2)
+                    sensor_image = np.array(x[pos_inside, :, :, :])
 
-                            batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
-                            ] = sensor_image
+                    if self.transform is not None:
+                        sensor_image = self.transform(self.batch_read_number, sensor_image)
+                    else:
+
+                        sensor_image = np.swapaxes(sensor_image, 0, 2)
+                        sensor_image = np.swapaxes(sensor_image, 1, 2)
+
+                    batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
+                    ] = sensor_image
 
                 count += 1
 
@@ -101,7 +103,7 @@ class CoILDataset(Dataset):
             self.measurements[np.where(self.meta_data[:, 0] == b'steer'), used_ids] =\
                 self.augment_steering(camera_angle, steer, speed)
 
-
+        self.measurements[np.where(self.meta_data[:, 0] == b'speed_module'), used_ids] /= g_conf.SPEED_FACTOR
 
         self.batch_read_number += 1
         # TODO: IMPORTANT !!!

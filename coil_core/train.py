@@ -155,7 +155,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
             model.zero_grad()
-            print (input_data['rgb'].shape)
 
             branches = model(torch.squeeze(input_data['rgb'].cuda()),
                              dataset.extract_inputs(float_data).cuda())

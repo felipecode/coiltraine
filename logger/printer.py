@@ -4,7 +4,7 @@ import os
 from .carla_metrics_parser import get_averaged_metrics
 from .monitorer import get_status, get_episode_number, get_number_episodes_completed
 from configs import g_conf, merge_with_yaml
-from utils.general import sort_nicely, get_latest_path
+from utils.general import sort_nicely, get_latest_path, static_vars
 from visualization.data_reading import read_control_csv
 
 """
@@ -41,13 +41,6 @@ def format_name(experiment_name):
 
 
 
-
-def static_vars(**kwargs):
-    def decorate(func):
-        for k in kwargs:
-            setattr(func, k, kwargs[k])
-        return func
-    return decorate
 
 
 

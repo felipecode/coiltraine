@@ -7,6 +7,13 @@ from email.mime.text import MIMEText
 from PIL import Image
 
 
+def static_vars(**kwargs):
+    def decorate(func):
+        for k in kwargs:
+            setattr(func, k, kwargs[k])
+        return func
+    return decorate
+
 
 def tryint(s):
     try:
@@ -84,6 +91,9 @@ def send_email(address, message):
     s = smtplib.SMTP('localhost')
     s.sendmail(address, [address], msg.as_string())
     s.quit()
+
+
+
 
 def compute_average_std(dic_list, weathers, number_of_tasks=1):
 
