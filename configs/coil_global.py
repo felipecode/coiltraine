@@ -182,7 +182,7 @@ def set_type_of_process(process_type, param=None):
     elif process_type == "validation":
         _g_conf.PROCESS_NAME = process_type + '_' + param
     if process_type == "drive":  # FOR drive param is city name.
-        _g_conf.CITY_NAME = param
+        _g_conf.CITY_NAME = param.split('_')[-1]
         _g_conf.PROCESS_NAME = process_type + '_' + param
 
     #else:  # FOr the test case we join with the name of the experimental suite.

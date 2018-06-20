@@ -104,10 +104,10 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
 
 
-        if exp_set_name == 'Town01':
+        if exp_set_name == 'ECCVTrainingSuite':
             experiment_set = ECCVTrainingSuite()
             set_type_of_process('drive', drive_conditions)
-        elif exp_set_name == 'Town02':
+        elif exp_set_name == 'ECCVGeneralizationSuite':
             experiment_set = ECCVGeneralizationSuite()
             set_type_of_process('drive', drive_conditions)
         elif exp_set_name == 'TestT1':
