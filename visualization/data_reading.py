@@ -122,27 +122,61 @@ def _read_step_data_wp(step_path):
     return step_dictionary
 
 # Add a static variable to avoid re-reading
-@static_vars(previous_dataset=g_conf.TEST_SCHEDULE[0])
+@static_vars(previous_ground_truth=None)
 def get_ground_truth(dataset_name):
-    pass
+    if get_ground_truth.previous_ground_truth is None:
+        full_path = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name, 'ground_truth.csv')
+        ground_truth = np.loadtxt(full_path, delimiter=",", skiprows=0, usecols=([0]))
+        get_ground_truth.previous_ground_truth = ground_truth
 
+    return get_ground_truth.previous_ground_truth
 
+@static_vars(previous_error=None)
+def compute_error(predictions, ground_truth):
 
+    if compute_error.previous_error is None:
+        compute_error.previous_error = abs(predictions - ground_truth)
+    return compute_error.previous_error
+
+@static_vars(previous_speed_ground_truth=None)
+def get_speed_ground_truth(dataset_name):
+    if get_speed_ground_truth.previous_speed_ground_truth is None:
+        full_path = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name,
+                                 'speed_ground_truth.csv')
+        speed_ground_truth = np.loadtxt(full_path, delimiter=",", skiprows=0, usecols=([0]))
+        get_speed_ground_truth.previous_speed_ground_truth = speed_ground_truth
+
+    return get_speed_ground_truth.previous_speed_ground_truth
+
+@static_vars(previous_camera_labels=None)
+def get_camera_labels(dataset_name):
+    if get_camera_labels.previous_camera_labels is None:
+        full_path = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name,
+                                 'camera_labels.csv')
+        speed_ground_truth = np.loadtxt(full_path, delimiter=",", skiprows=0, usecols=([0]))
+        get_camera_labels.previous_camera_labels = speed_ground_truth
+
+    return get_camera_labels.previous_camera_labels
 
 
 
 
 def _read_step_data(step_path):
 
+
+    val_dataset_name = step_path.split('/')[-2].split('_')[-2]
+
+    print ("val_dataset_name", val_dataset_name)
+
     step_dictionary = {}
 
     # On this step we read all predictions for this benchmark step.
-    predictions = np.loadtxt(step_path, delimiter=" ", skiprows=0, usecols=([0]))
+    predictions = np.loadtxt(step_path, delimiter=",", skiprows=0, usecols=([0]))
 
     # Get the ground truth directly from the datasets path with the already generated steer and speed
-    ground_truth = get_ground_truth()
+    ground_truth = get_ground_truth(val_dataset_name)
 
-    step_dictionary.update({'steer_pred': predictions[0,:]})
+    step_dictionary.update({'steer_pred': predictions})
 
 
 
@@ -166,7 +200,7 @@ def _read_step_data(step_path):
     """
 
 
-    step_dictionary.update({'speed_input': get_speed_ground_truth()})
+    step_dictionary.update({'speed_input': get_speed_ground_truth(val_dataset_name)})
 
 
 
@@ -186,24 +220,27 @@ def _read_control_data(full_path, control_to_use):
     # Some flags to check the control files found
 
     try:
-        control = read_control_csv(os.path.join(full_path, 'control_summary'+control_to_use+'.csv'))
+        control, _ = read_control_csv(os.path.join(full_path, 'control_output' + control_to_use+'.csv'))
     except KeyboardInterrupt:
         raise
     except:
         # HACKYYYYYY  # TODO: maybe remove that
         try:
-            control = read_control_csv(os.path.join(full_path[:-6], 'control_summary' + control_to_use + '.csv'))
+            control, _ = read_control_csv(os.path.join(full_path[:-6], 'control_output' + control_to_use + '.csv'))
         except:
             traceback.print_exc()
             return None
 
+    print (control)
 
-    return control.items()
+    return list(control.items())
     # Simple extra counter
 
 
 def _read_data(full_path, benchmarked_steps):
     town_dictionary = {}
+
+    print (benchmarked_steps)
 
     for i in range(len(benchmarked_steps)):
 
@@ -211,7 +248,9 @@ def _read_data(full_path, benchmarked_steps):
         step = int(benchmarked_steps[i][0])
 
 
-        step_path = os.path.join(benchmarked_steps, str(step))
+        step_path = os.path.join(full_path, str(step) + '.csv')
+
+        print (step_path)
 
         # First we try to add prediction data
         try:

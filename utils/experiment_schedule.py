@@ -30,6 +30,7 @@ def get_gpu_resources(gpu_resources, executing_processes, allocation_params):
         if process_specs['type'] == 'drive':
 
             name = 'drive_' + process_specs['environment']
+
         elif process_specs['type'] == 'validation':
             name = 'validation_' + process_specs['dataset']
         else:
@@ -38,7 +39,7 @@ def get_gpu_resources(gpu_resources, executing_processes, allocation_params):
         status = monitorer.get_status(process_specs['folder'], process_specs['experiment'],
                                      name)[0]
 
-        if  status == "Finished" or status == 'Error':
+        if status == "Finished" or status == 'Error':
 
             gpu_resources[process_specs['gpu']] += allocation_params[process_specs['type']+'_cost']
 
@@ -100,8 +101,8 @@ def mount_experiment_heap(folder, experiments_list, is_training,
                                              {'type': 'validation', 'folder': folder,
                                               'experiment': experiment, 'dataset': val_data}))
 
-            elif restart_error and monitorer.get_status(folder, experiment, 'train')[0] \
-                            == "Error":
+            elif restart_error and monitorer.get_status(folder, experiment, 'validation_'
+                                                                + val_data)[0] == "Error":
                 heapq.heappush(tasks_queue, (2, experiment+'_validation_' + val_data,
                                              {'type': 'validation', 'folder': folder,
                                                  'experiment': experiment, 'dataset': val_data}))
@@ -112,8 +113,9 @@ def mount_experiment_heap(folder, experiments_list, is_training,
                                              {'type': 'drive', 'folder': folder,
                                               'experiment': experiment, 'environment': drive_env}))
 
-            elif restart_error and monitorer.get_status(folder, experiment, 'train')[0] \
-                                == "Error":
+            elif restart_error and monitorer.get_status(folder, experiment, 'drive_' + drive_env)\
+                                                        [0] == "Error":
+
                     heapq.heappush(tasks_queue, (1, experiment+'_drive_' + drive_env,
                                                 {'type': 'drive', 'folder': folder,
                                               'experiment': experiment, 'environment': drive_env}))

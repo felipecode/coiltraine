@@ -166,10 +166,10 @@ def folder_execute(params=None):
 
 
 
-        time.sleep(10)
 
         tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
                                             validation_datasets, driving_environments, False)
+
 
 
         printer.plot_folder_summaries(folder,
@@ -184,6 +184,9 @@ def folder_execute(params=None):
 
         if len(tasks_queue) == 0 and len(executing_processes) == 0:
             break
-
+        print ("Task queue", tasks_queue)
+        print ("exec proc", executing_processes)
+        print("resources", free_gpus)
+        time.sleep(10)
 
     print("ALL EXPERIMENTS EXECUTED")

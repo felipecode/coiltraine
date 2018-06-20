@@ -30,7 +30,8 @@ from logger import monitorer
 
 from configs import g_conf, merge_with_yaml, set_type_of_process
 
-from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkpoint, is_next_checkpoint_ready
+from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkpoint,\
+    is_next_checkpoint_ready, get_latest_evaluated_checkpoint
 from utils.general import compute_average_std, get_latest_path
 
 
@@ -83,7 +84,7 @@ def start_carla_simulator(gpu, town_name, no_screen):
 # OBS : I AM FIXING host as localhost now
 # TODO :  Memory use should also be adaptable with a limit, for now that seems to be doing fine in PYtorch
 
-def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0.0.1',
+def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='127.0.0.1',
             suppress_output=True, no_screen=False):
 
     try:
@@ -99,23 +100,22 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
 
 
-
-
+        exp_set_name, town_name = drive_conditions.split('_')
 
 
 
         if exp_set_name == 'Town01':
             experiment_set = ECCVTrainingSuite()
-            set_type_of_process('drive', 'ECCVTrainingSuite_' + exp_set_name)
+            set_type_of_process('drive', drive_conditions)
         elif exp_set_name == 'Town02':
             experiment_set = ECCVGeneralizationSuite()
-            set_type_of_process('drive', 'ECCVGeneralizationSuite_' + exp_set_name)
+            set_type_of_process('drive', drive_conditions)
         elif exp_set_name == 'TestT1':
             experiment_set = TestT1()
-            set_type_of_process('drive', 'TestT1_Town01')
+            set_type_of_process('drive', drive_conditions)
         elif exp_set_name == 'TestT2':
             experiment_set = TestT2()
-            set_type_of_process('drive', 'TestT2_Town02')
+            set_type_of_process('drive', drive_conditions)
         else:
 
             raise ValueError(" Exp Set name is not correspondent to a city")
@@ -127,19 +127,13 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
             sys.stdout = open(os.path.join('_output_logs',
                               g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
-            sys.stderr = open(os.path.join('_output_logs',
-                              'err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
-                              "a", buffering=1)
+            #sys.stderr = open(os.path.join('_output_logs',
+            #                  'err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+            #                  "a", buffering=1)
 
-        if exp_set_name == 'TestT1':
-            carla_process, port = start_carla_simulator(gpu, 'Town01', no_screen)
-            town_name = 'Town01'
-        elif exp_set_name == 'TestT2':
-            carla_process, port = start_carla_simulator(gpu, 'Town02', no_screen)
-            town_name = 'Town02'
-        else:
-            carla_process, port = start_carla_simulator(gpu, exp_set_name, no_screen)
-            town_name = exp_set_name
+
+
+        carla_process, port = start_carla_simulator(gpu, town_name, no_screen)
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 
@@ -155,74 +149,76 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
                              'driven_kilometers'))
         csv_outfile.close()
 
-        while True:
+        # Now actually run the driving_benchmark
+
+        latest = get_latest_evaluated_checkpoint()
+        if latest is None:  # When nothing was tested, get latest returns none, we fix that.
+            latest = 0
+
+
+        # Write the header of the summary file used conclusion
+
+        # While the checkpoint is not there
+        while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
+
             try:
 
-                # Now actually run the driving_benchmark
+                # Get the correct checkpoint
+                if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
 
-                latest = 0
-                # Write the header of the summary file used conclusion
+                    latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
+                    checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
+                                                         , 'checkpoints', str(latest) + '.pth'))
 
-                # While the checkpoint is not there
-                while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
+                    coil_agent = CoILAgent(checkpoint)
 
+                    coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
 
-                    # Get the correct checkpoint
-                    if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
+                    run_driving_benchmark(coil_agent, experiment_set, town_name,
+                                          exp_batch + '_' + exp_alias + '_' + str(latest)
+                                          + '_drive'
+                                          , True, host, port)
 
-                        latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
-                        checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
-                                                             , 'checkpoints', str(latest) + '.pth'))
+                    path = exp_batch + '_' + exp_alias + '_' + str(latest) \
+                           + '_' + g_conf.PROCESS_NAME
 
-                        coil_agent = CoILAgent(checkpoint)
-
-                        coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
-
-                        run_driving_benchmark(coil_agent, experiment_set, town_name,
-                                              exp_batch + '_' + exp_alias + '_' + str(latest)
-                                              + '_drive'
-                                              , True, host, port)
-
-                        path = exp_batch + '_' + exp_alias + '_' + str(latest) \
-                               + '_' + g_conf.PROCESS_NAME
-
-                        print("Finished")
-                        benchmark_json_path = os.path.join(get_latest_path(path), 'metrics.json')
-                        with open(benchmark_json_path, 'r') as f:
-                            benchmark_dict = json.loads(f.read())
+                    print("Finished")
+                    benchmark_json_path = os.path.join(get_latest_path(path), 'metrics.json')
+                    with open(benchmark_json_path, 'r') as f:
+                        benchmark_dict = json.loads(f.read())
 
 
-                        averaged_dict = compute_average_std([benchmark_dict],
-                                                            experiment_set.weathers,
-                                                            len(experiment_set.build_experiments()))
-                        print (averaged_dict)
-                        csv_outfile = open(os.path.join('_logs', exp_batch, exp_alias,
-                                                        g_conf.PROCESS_NAME + '_csv',
-                                                        'control_output.csv'),
-                                           'a')
+                    averaged_dict = compute_average_std([benchmark_dict],
+                                                        experiment_set.weathers,
+                                                        len(experiment_set.build_experiments()))
+                    print (averaged_dict)
+                    csv_outfile = open(os.path.join('_logs', exp_batch, exp_alias,
+                                                    g_conf.PROCESS_NAME + '_csv',
+                                                    'control_output.csv'),
+                                       'a')
 
-                        csv_outfile.write("%d,%f,%f,%f,%f,%f,%f,%f\n"
-                                     % (latest, averaged_dict['episodes_completion'],
-                                         averaged_dict['intersection_offroad'],
-                                         averaged_dict['intersection_otherlane'],
-                                         averaged_dict['collision_pedestrians'],
-                                         averaged_dict['collision_vehicles'],
-                                         averaged_dict['episodes_fully_completed'],
-                                         averaged_dict['driven_kilometers']))
+                    csv_outfile.write("%d,%f,%f,%f,%f,%f,%f,%f\n"
+                                 % (latest, averaged_dict['episodes_completion'],
+                                     averaged_dict['intersection_offroad'],
+                                     averaged_dict['intersection_otherlane'],
+                                     averaged_dict['collision_pedestrians'],
+                                     averaged_dict['collision_vehicles'],
+                                     averaged_dict['episodes_fully_completed'],
+                                     averaged_dict['driven_kilometers']))
 
-                        csv_outfile.close()
+                    csv_outfile.close()
 
-                        # TODO: When you add the message you need to check if the experiment continues properly
+                    # TODO: When you add the message you need to check if the experiment continues properly
 
 
 
-                        # TODO: WRITE AN EFICIENT PARAMETRIZED OUTPUT SUMMARY FOR TEST.
+                    # TODO: WRITE AN EFICIENT PARAMETRIZED OUTPUT SUMMARY FOR TEST.
 
 
-                    else:
-                        time.sleep(0.1)
+                else:
+                    time.sleep(0.1)
 
-                    break
+                break
 
 
             except TCPConnectionError as error:
@@ -239,6 +235,11 @@ def execute(gpu, exp_batch, exp_alias, exp_set_name, memory_use=0.2, host='127.0
                 carla_process.kill()
                 coil_logger.add_message('Error', {'Message': 'Something Happened'})
                 break
+
+
+
+        coil_logger.add_message('Finished', {})
+
     except KeyboardInterrupt:
         traceback.print_exc()
         carla_process.kill()

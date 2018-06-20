@@ -93,7 +93,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                 print ("Validation loaded ", checkpoint_iteration)
 
                 model.load_state_dict(checkpoint['state_dict'])
-
+                model.eval()
                 accumulated_loss = 0
                 accumulated_error = 0
                 iteration_on_checkpoint = 0
@@ -154,7 +154,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     best_loss = checkpoint_average_loss
                     best_loss_iter = latest
 
-                if checkpoint_average_error < best_loss:
+                if checkpoint_average_error < best_error:
                     best_error = checkpoint_average_error
                     best_error_iter = latest
 

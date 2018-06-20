@@ -34,21 +34,28 @@ camera_labels_2_noise = np.array(map(int, map(float, open('camera_label_file_Tow
 """
 
 
-def read_data(exp_batch, experiment, val_dataset, data_params):
+def read_data(exp_batch, experiment, town, data_params):
+
+
+    if town == 'Town01':
+        val_dataset = town + 'W1'
+
+    else:
+        val_dataset = town + 'W14'
 
 
 
+    control_dataset = data_params['drive_environments'][town] + '_' + town
     # read the data
     data = {}
 
-    data['town'] = town  # Where can we get the town from ??
+    data['town'] = town
     data['experiment'] = experiment
-    values = {}
 
+    # Set the control dataset.
     full_path_control = os.path.join(data_params['root_path'], exp_batch, experiment,
-                                        'drive_' + val_dataset + '_csv')
-    control_data = data_reading._read_control_data(full_path_control,
-                                                                    data_params['control'])
+                                     'drive_' + control_dataset + '_csv')
+    control_data = data_reading._read_control_data(full_path_control, data_params['control'])
 
     # We get the path for the validation csvs
     full_path_validation = os.path.join(data_params['root_path'], exp_batch, experiment,
@@ -66,20 +73,33 @@ def read_data(exp_batch, experiment, val_dataset, data_params):
     return data
 
 def filter_data(data, filter_param, noise):
+
+
+
     if filter_param:
         list_cameras = {'Town01_1': 'camera_label_file_Town01_1.txt', 'Town02_14': 'camera_label_file_Town02_14.txt'}
         if 'camera' in filter_param:
             # prepare the mask
             camera_name_to_label = {'central': 1, 'left': 0, 'right': 2}
 
+            if data['town'] == 'Town01':
+                val_dataset = data['town'] + 'W1'
+            else:
+                val_dataset = data['town'] + 'W14'
+
+            camera_labels = data_reading.get_camera_labels(val_dataset)
+
+            """
             if data['town'] == 'Town01_1' and noise == '_noise':
-                camera_labels = camera_labels_1_noise
+                camera_labels = 
             elif data['town'] == 'Town01_1':
                 camera_labels = camera_labels_1
             elif data['town'] == 'Town02_14' and noise == '_noise':
                 camera_labels = camera_labels_2_noise
             else:
                 camera_labels = camera_labels_2
+
+            """
 
             mask = np.where(camera_labels == camera_name_to_label[filter_param['camera']])
 
@@ -129,7 +149,7 @@ def compute_metric(metric_name, data, param):
 def process_data(data, processing_params,noise):
     metrics = {}
 
-    for metric_label,metric_param in processing_params.items():
+    for metric_label, metric_param in processing_params.items():
         data_filtered = filter_data(data, metric_param['filter'],noise)
         results = compute_metric(metric_param['metric'], data_filtered, metric_param['params'])
         metrics[metric_label] = results
@@ -368,19 +388,24 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
 
     list_of_exps_names = get_names(exp_batch)
     print ('list,expnames', list_of_exps_names)
+
+    list_of_experiments = [experiment.split('.')[-2] for experiment in list_of_experiments]
+
     for experiment in list_of_experiments:
 
         #if '25_nor_no' in experiment or '5_small_ndrop_single_wp' in experiment:
         #    continue
 
         for town in data_params['towns']:
-            print('\n === Experiment %s _ %s %s ===\n' % (experiment, town, data_params['noise']))
+            print('\n === Experiment %s _ %s %s ===\n' % (list_of_exps_names[list_of_experiments.index(experiment)]
+                                                          , town, data_params['noise']))
             print('\n ** Reading the data **\n')
-            data = read_data(exp_batch, experiment, town, data_params['noise'], data_params) # this reads the data and infers the masks (or offsets) for different cameras
+            data = read_data(exp_batch, experiment, town, data_params) # this reads the data and infers the masks (or offsets) for different cameras
             if data is None: # This folder didnt work out, probably is missing important data
                 print('\n ** Missing Data on Folder **\n')
                 continue
 
+            print (data)
             # Print data
             print(data['town'])
             for step, data_item in data['values'].items():
@@ -388,10 +413,10 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
                 for k,v in data_item.items():
                     print(k, len(v))
             print('\n ** Processing the data **\n')
-            metrics = process_data(data, processing_params,data_params['noise']) # Compute metrics from the data. Can be multiple metrics, given by the processing_params list. Should be vectorized as much as possible. The output is a list of the same size as processing_params.
+            metrics = process_data(data, processing_params, data_params['noise']) # Compute metrics from the data. Can be multiple metrics, given by the processing_params list. Should be vectorized as much as possible. The output is a list of the same size as processing_params.
             all_metrics[experiment + '_' + town] = metrics # append to the computed list of metrics to the dictionary of results.
 
-    with open(os.path.join(out_path,'all_metrics.txt'), 'w') as f:
+    with open(os.path.join(out_path, 'all_metrics.txt'), 'w') as f:
         f.write('all_metrics:\n' + pprint.pformat(all_metrics, indent=4))
 
     # Plot the results

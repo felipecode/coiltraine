@@ -109,9 +109,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
         # The data loader is the multi threaded module from pytorch that release a number of
         # workers to get all the data.
-        # TODO: batch size an number of workers go to some configuration file
         data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
-                                                  shuffle=False, num_workers=12,
+                                                  shuffle=False,
+                                                  num_workers=g_conf.NUMBER_OF_LOADING_WORKERS,
                                                   pin_memory=True)
 
 

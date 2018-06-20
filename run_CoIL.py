@@ -4,7 +4,7 @@ import resource
 
 
 from coil_core import execute_train, execute_validation, execute_drive, folder_execute
-from utils.general import create_log_folder, create_exp_path
+from utils.general import create_log_folder, create_exp_path, erase_logs, fix_driving_environments
 
 from visualization import plot_scatter
 
@@ -96,9 +96,8 @@ if __name__ == '__main__':
 
 
 
-
-    # TODO: MAKE SURE ALL DATASETS ARE " WAYPOINTED "
     create_log_folder(args.folder)
+    erase_logs(args.folder)
     
 
     if args.single_process is not None:
@@ -133,13 +132,15 @@ if __name__ == '__main__':
                                  'train_cost': 2,
                                  'validation_cost': 1.5,
                                  'drive_cost': 1.5}
+        # TODO: temporary function until carla map change feature is fixed.
 
+        driving_environments = fix_driving_environments(list(args.driving_environments))
         params = {
             'folder': args.folder,
             'gpus': list(args.gpus),
             'is_training': args.is_training,
             'validation_datasets': list(args.validation_datasets),
-            'driving_environments': list(args.driving_environments),
+            'driving_environments': driving_environments,
             'allocation_parameters': allocation_parameters,
             'no_screen': args.no_screen,
         }

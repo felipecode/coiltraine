@@ -142,17 +142,8 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
 
     for drive in drive_environments:
-        # OBS: this is a temporal strategy until the town changing bug in carla is fixed
-        if drive == 'Town01':
-            process_names.append('drive' + '_ECCVTrainingSuite_' + drive)
-        elif drive == 'Town02':
-            process_names.append('drive' + '_ECCVGeneralizationSuite_' + drive)
-        elif drive == 'TestT1':
-            process_names.append('drive' + '_TestT1_Town01')
-        elif drive == 'TestT2':
-            process_names.append('drive' + '_TestT2_Town02')
-        else:
-            raise ValueError("Wrong Town Name")
+        process_names.append('drive' + '_' + drive)
+
 
 
 

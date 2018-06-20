@@ -43,12 +43,12 @@ def aggregate_metric(metric_raw, param):
     return metric_result
 
 def compute_id(data, param):
-    if data['town'] == 'Town01_1':
+    if data['town'] == 'Town01':
         return [0]*len(data['values'].items())
-    elif data['town'] == 'Town02_14':
+    elif data['town'] == 'Town02':
         return [1]*len(data['values'].items())
     else:
-        raise Exception('Unknown town', town)
+        raise Exception('Unknown town', data['town'])
 
 def compute_experiment(data, param):
     return [hash(data['experiment']) % 50] * len(data['values'].items())

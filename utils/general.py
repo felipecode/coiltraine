@@ -44,6 +44,28 @@ def plot_test_image(image, name):
     image_to_plot = Image.fromarray(image)
     image_to_plot.save(name)
 
+# TODO: this is a temporary function until carla is able to deal with changing towns
+def fix_driving_environments(drive_environents):
+    new_drive_environments = []
+    for exp_set_name in drive_environents:
+
+        if exp_set_name == 'Town01':
+            new_drive_environments.append('ECCVTrainingSuite_' + exp_set_name)
+
+        elif exp_set_name == 'Town02':
+            new_drive_environments.append('ECCVGeneralizationSuite_' + exp_set_name)
+
+        elif exp_set_name == 'TestT1':
+
+            new_drive_environments.append('TestT1_Town01')
+        elif exp_set_name == 'TestT2':
+
+            new_drive_environments.append('TestT2_Town02')
+        else:
+
+            raise ValueError(" Exp Set name is not correspondent to a city")
+    return new_drive_environments
+
 def create_log_folder(exp_batch_name):
     """
         Only the train creates the path. The validation should wait for the training anyway,
@@ -67,6 +89,21 @@ def create_exp_path(exp_batch_name, experiment_name):
 
     if not os.path.exists(os.path.join(root_path, exp_batch_name, experiment_name)):
         os.mkdir(os.path.join(root_path, exp_batch_name, experiment_name))
+
+def erase_logs(exp_batch_name):
+    import shutil
+    root_path = '_logs'
+
+    experiments = os.listdir(os.path.join(root_path, exp_batch_name))
+
+
+    for exp in experiments:
+        experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
+        for log in experiments:
+            if not os.path.isdir(os.path.join(root_path, exp_batch_name, exp, log)):
+                os.remove(os.path.join(root_path, exp_batch_name, exp, log))
+
+
 
 def get_latest_path(path):
     """ Considering a certain path for experiments, get the latest one."""

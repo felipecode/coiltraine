@@ -64,6 +64,7 @@ class CoILAgent(Agent):
         self.model.load_state_dict(checkpoint['state_dict'])
 
         self.model.cuda()
+        self.model.eval()
 
 
 

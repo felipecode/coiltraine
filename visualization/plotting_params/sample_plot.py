@@ -1,6 +1,8 @@
 import collections
 
-data_params = {'control': '_auto', 'root_path': '_logs', 'towns': ['Town01_1', 'Town02_14'] } # some parameters for which data to read. May or may not be needed (maybe we always read all data, and filter afterwards?)
+data_params = {'control': '', 'root_path': '_logs', 'towns': ['Town01', 'Town02'],
+                 'drive_environments': {'Town01': 'TestT1',
+                                        'Town02': 'TestT2'}}   # some parameters for which data to read. May or may not be needed (maybe we always read all data, and filter afterwards?)
 processing_params = {'control_success_rate':   {'metric': 'control_success_rate', 'filter': {}, 'params': {}},
                      'control_average_completion':   {'metric': 'control_average_completion', 'filter': {}, 'params': {}},
                      'km_per_infraction': {'metric': 'km_per_infraction', 'filter': {}, 'params': {}},
