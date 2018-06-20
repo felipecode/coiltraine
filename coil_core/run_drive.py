@@ -160,6 +160,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
         # Write the header of the summary file used conclusion
 
         # While the checkpoint is not there
+        latest = 0
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
             try:
