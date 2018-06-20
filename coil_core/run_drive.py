@@ -151,9 +151,10 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
         # Now actually run the driving_benchmark
 
-        latest = get_latest_evaluated_checkpoint()
-        if latest is None:  # When nothing was tested, get latest returns none, we fix that.
-            latest = 0
+        #TODO: UNCONMENT
+        #latest = get_latest_evaluated_checkpoint()
+        #if latest is None:  # When nothing was tested, get latest returns none, we fix that.
+        #    latest = 0
 
 
         # Write the header of the summary file used conclusion
