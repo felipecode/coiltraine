@@ -94,6 +94,9 @@ def get_latest_checkpoint_drive():
 
     csv_file_path = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
                                  g_conf.EXPERIMENT_NAME, g_conf.PROCESS_NAME + '_csv')
+    if not os.path.exists(os.path.join(csv_file_path, 'control_output.csv')):
+        return None
+
     f = open(os.path.join(csv_file_path, 'control_output.csv'), "r")
     header = f.readline()
     header = header.split(',')

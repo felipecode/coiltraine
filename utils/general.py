@@ -138,7 +138,6 @@ def erase_logs(exp_batch_name):
 def get_latest_path(path):
     """ Considering a certain path for experiments, get the latest one."""
     import glob
-    print (" PATHS ", os.path.join('_benchmarks_results', path+'*'))
 
     files_list = glob.glob(os.path.join('_benchmarks_results', path+'*'))
     sort_nicely(files_list)

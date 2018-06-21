@@ -125,9 +125,10 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
 
         if suppress_output:
-            sys.stdout = open(os.path.join('_output_logs',
-                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
-                              "a", buffering=1)
+            pass
+            #sys.stdout = open(os.path.join('_output_logs',
+            #                  g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+            #                  "a", buffering=1)
             #sys.stderr = open(os.path.join('_output_logs',
             #                  'err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
             #                  "a", buffering=1)
@@ -160,7 +161,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
         # Write the header of the summary file used conclusion
 
         # While the checkpoint is not there
-        print ( "LATEST IS ", latest)
+
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
             try:

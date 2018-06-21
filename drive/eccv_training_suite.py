@@ -31,12 +31,11 @@ class ECCVTrainingSuite(ExperimentSuite):
 
     def _poses(self):
 
-        return [[[19, 66], [79, 14], [19, 57], [23, 1],
-                 [53, 76], [42, 13], [31, 71], [33, 5],
-                 [54, 30], [10, 61], [66, 3], [27, 12],
-                 [79, 19], [2, 29], [16, 14], [5, 57],
-                 [70, 73], [46, 67], [57, 50], [61, 49], [21, 12],
-                 [51, 81], [77, 68], [56, 65], [43, 54]]]
+        return [[[105, 29], [27, 130], [102, 87], [132, 27], [24, 44],
+                 [96, 26], [34, 67], [28, 1], [140, 134], [105, 9],
+                 [148, 129], [65, 18], [21, 16], [147, 97], [42, 51],
+                 [30, 41], [18, 107], [69, 45], [102, 95], [18, 145],
+                 [111, 64], [79, 45], [84, 69], [73, 31], [37, 81]]]
 
     def build_experiments(self):
         """
@@ -54,8 +53,8 @@ class ECCVTrainingSuite(ExperimentSuite):
         camera.set_rotation(-15.0, 0, 0)
 
         poses_tasks = self._poses()
-        vehicles_tasks = [0, 0, 0, 15]
-        pedestrians_tasks = [0, 0, 0, 50]
+        vehicles_tasks = [15]
+        pedestrians_tasks = [50]
 
         experiments_vector = []
 

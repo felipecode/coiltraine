@@ -60,8 +60,8 @@ class ECCVGeneralizationSuite(ExperimentSuite):
 
 
         poses_tasks = self._poses()
-        vehicles_tasks = [0, 0, 0, 15]
-        pedestrians_tasks = [0, 0, 0, 50]
+        vehicles_tasks = [15]
+        pedestrians_tasks = [50]
 
         experiments_vector = []
 
@@ -71,6 +71,7 @@ class ECCVGeneralizationSuite(ExperimentSuite):
                 poses = poses_tasks[iteration]
                 vehicles = vehicles_tasks[iteration]
                 pedestrians = pedestrians_tasks[iteration]
+
 
                 conditions = CarlaSettings()
                 conditions.set(

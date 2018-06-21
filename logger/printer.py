@@ -1,7 +1,6 @@
 import os
+import time
 
-
-from .carla_metrics_parser import get_averaged_metrics
 from .monitorer import get_status, get_episode_number, get_number_episodes_completed
 from configs import g_conf, merge_with_yaml
 from utils.general import sort_nicely, get_latest_path, static_vars
@@ -92,7 +91,9 @@ def print_validation_summary(current, latest, verbose):
     print ('            Best Error Checkpoint: ', BLUE + UNDERLINE + str(latest['BestErrorCheckpoint']) + END)
 
 
-@static_vars(previous_checkpoint=g_conf.TEST_SCHEDULE[0])
+@static_vars(previous_checkpoint=g_conf.TEST_SCHEDULE[0],
+             previous_checkpoint_number=None,
+             previous_checkpoint_time=0)
 def print_drive_summary(path, csv_filename, checkpoint, verbose):
 
 
@@ -104,17 +105,21 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
 
     if os.path.exists(os.path.join(path, 'summary.csv')):
         print ('        CURRENT: ')
-        print ('            Episode: ', BLUE + str(get_episode_number(path)) + END)
+        print ('            Episode: ', BLUE + str(get_episode_number(path)) + END, ' Time: ',
+               time.time() - print_drive_summary.previous_checkpoint_time )
         print ('            Completed: ', GREEN + UNDERLINE + str(get_number_episodes_completed(path)) + END)
-
 
     if print_drive_summary.previous_checkpoint !=checkpoint:
         print_drive_summary.previous_checkpoint = checkpoint
 
+    if get_episode_number(path) != print_drive_summary.previous_checkpoint_number:
+        print_drive_summary.previous_checkpoint_number = get_episode_number(path)
+        print_drive_summary.previous_checkpoint_time = time.time()
+
     if checkpoint == g_conf.TEST_SCHEDULE[0]:
         return
 
-    previous_checkpoint = g_conf.TEST_SCHEDULE[g_conf.TEST_SCHEDULE.index(checkpoint)-1]
+    print_drive_summary.previous_checkpoint = g_conf.TEST_SCHEDULE[g_conf.TEST_SCHEDULE.index(checkpoint)-1]
     # TODO: we need to get the previous checkpoint
 
     averaged_metrics, header = read_control_csv(csv_filename)
@@ -122,9 +127,11 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
 
     print ('        SUMMARY: ')
     print ('            Average Completion: ', LIGHT_GREEN + UNDERLINE +
-           str(averaged_metrics[float(previous_checkpoint)][header.index('episodes_completion')-1]) + END)
-    print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE +
-           str(averaged_metrics[float(previous_checkpoint)][header.index('collision_pedestrians')-1]) + END)
+           str(averaged_metrics[float(print_drive_summary.previous_checkpoint)]
+               [header.index('episodes_completion')-1]) + END)
+    #print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE +
+    #       str(averaged_metrics[float(print_drive_summary.previous_checkpoint)]
+    #           [header.index('collision_pedestrians')-1]) + END)
 
 
 

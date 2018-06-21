@@ -124,8 +124,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     mean_error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
                     #print ("Loss", loss)
                     #print ("output", output[0])
-                    accumulated_error += mean_error
-                    accumulated_loss += loss
+                    accumulated_error += mean_error.data
+                    accumulated_loss += loss.data
                     error = torch.abs(output - dataset.extract_targets(float_data).cuda())
 
 
