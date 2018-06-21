@@ -106,6 +106,7 @@ def folder_execute(params=None):
     # then test then val.
     # TODO: change the priority to test the ones that have already been trained.
     tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
+                                        [], [],
                                         validation_datasets, driving_environments)
 
     # No process is executing right now.
@@ -125,7 +126,6 @@ def folder_execute(params=None):
             # Allocate all the gpus
             popped_thing = heapq.heappop(tasks_queue)
             process_specs = popped_thing[2]  # To get directly the dict
-
 
             # Get the train status, that will affect in scheduling a validation or drive process
             train_status = monitorer.get_status(folder, process_specs['experiment'], 'train')[0]
@@ -168,8 +168,8 @@ def folder_execute(params=None):
 
 
         tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
+                                            executing_processes, tasks_queue,
                                             validation_datasets, driving_environments, False)
-
 
 
         printer.plot_folder_summaries(folder,
@@ -184,8 +184,8 @@ def folder_execute(params=None):
 
         if len(tasks_queue) == 0 and len(executing_processes) == 0:
             break
-        #print ("Task queue", tasks_queue)
-        #print ("exec proc", executing_processes)
+        print ("Task queue", tasks_queue)
+        print ("exec proc", executing_processes)
         print("resources", free_gpus)
         time.sleep(10)
 
