@@ -63,6 +63,7 @@ class CoILDataset(Dataset):
                 dtype='float32'
             )
 
+
             batch_sensors.update({sensor_name: sensor_data})
 
         for sensor_name, sensor_size in g_conf.SENSORS.items():
@@ -73,7 +74,6 @@ class CoILDataset(Dataset):
                     chosen_key = chosen_key + i * 3
 
 
-                    #if chosen_key >= es and chosen_key < ee:
                     """ We found the part of the data to open """
 
                     pos_inside = chosen_key - (chosen_key // 200)*200
@@ -88,9 +88,9 @@ class CoILDataset(Dataset):
 
                         sensor_image = np.swapaxes(sensor_image, 0, 2)
                         sensor_image = np.swapaxes(sensor_image, 1, 2)
-
+                    # Do not forget the final normalization step
                     batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
-                    ] = sensor_image
+                    ] = sensor_image / 255.0
 
                 count += 1
 
@@ -196,9 +196,7 @@ class CoILDataset(Dataset):
                 for i in range(len(sensors_names)):
                     x = dataset[sensors_names[i]]
                     old_shape = x.shape[0]
-
                     #  Concatenate all the datasets for a given sensor.
-
                     sensors_data_cat[i].append((lastidx, lastidx + x.shape[0], x))
 
                 for i in range(len(meas_names)):

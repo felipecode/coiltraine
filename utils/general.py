@@ -90,8 +90,38 @@ def create_exp_path(exp_batch_name, experiment_name):
     if not os.path.exists(os.path.join(root_path, exp_batch_name, experiment_name)):
         os.mkdir(os.path.join(root_path, exp_batch_name, experiment_name))
 
+def get_validation_datasets(exp_batch_name):
+    root_path = '_logs'
+
+    experiments = os.listdir(os.path.join(root_path, exp_batch_name))
+
+    validation_datasets = set()
+    for exp in experiments:
+        experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
+        for log in experiments:
+            folder_file = os.path.join(root_path, exp_batch_name, exp, log)
+            if not os.path.isdir(folder_file) and 'validation' in folder_file:
+                validation_datasets.add(folder_file.split('_')[-1])
+
+    return list(validation_datasets)
+
+def get_driving_environments(exp_batch_name):
+    root_path = '_logs'
+
+    experiments = os.listdir(os.path.join(root_path, exp_batch_name))
+
+    driving_environments = set()
+    for exp in experiments:
+        experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
+        for log in experiments:
+            folder_file = os.path.join(root_path, exp_batch_name, exp, log)
+            if not os.path.isdir(folder_file) and 'drive' in folder_file:
+                driving_environments.add(folder_file.split('_')[-1])
+
+    return list(driving_environments)
+
 def erase_logs(exp_batch_name):
-    import shutil
+
     root_path = '_logs'
 
     experiments = os.listdir(os.path.join(root_path, exp_batch_name))

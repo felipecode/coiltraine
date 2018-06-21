@@ -100,6 +100,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
 
 
+        print ("drive cond", drive_conditions)
         exp_set_name, town_name = drive_conditions.split('_')
 
 

@@ -115,7 +115,9 @@ if __name__ == '__main__':
             execute_validation("0", args.folder, args.exp, args.validation_datasets[0], False)
 
         elif args.single_process == 'drive':
-            execute_drive("0", args.folder, args.exp, args.driving_environments[0], False,
+
+            driving_environments = fix_driving_environments(list(args.driving_environments))
+            execute_drive("0", args.folder, args.exp, driving_environments[0], False,
                           no_screen=args.no_screen)
         else:
 

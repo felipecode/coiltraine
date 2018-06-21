@@ -163,7 +163,12 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
         print (BOLD + g_conf.EXPERIMENT_GENERATED_NAME + END)
 
         for process in process_names:
-            output = get_status(exp_batch, experiment, process)
+            try:
+                output = get_status(exp_batch, experiment, process)
+            except:
+                import traceback
+                traceback.print_exc()
+
             status = output[0]
             summary = output[1]
             print ('    ', process)

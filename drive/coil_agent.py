@@ -62,6 +62,7 @@ class CoILAgent(Agent):
         self.first_iter = True
 
         self.model.load_state_dict(checkpoint['state_dict'])
+        print ("loaded state", checkpoint)
 
         self.model.cuda()
         self.model.eval()
@@ -85,10 +86,11 @@ class CoILAgent(Agent):
 
         steer, throttle, brake = self._process_model_outputs(model_outputs[0])
 
+        print (steer, throttle, brake)
 
         control = carla_protocol.Control()
         control.steer = steer
-        control.throttle = throttle
+        control.throttle = 0.5
         control.brake = brake
         # if self._auto_pilot:
         #    control.steer = control_agent.steer
@@ -108,8 +110,7 @@ class CoILAgent(Agent):
 
         iteration = 0
         for name, size in g_conf.SENSORS.items():
-            print ("Sensors")
-            print (sensors)
+
             sensor = sensors[name].data[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
 
 
@@ -131,13 +132,14 @@ class CoILAgent(Agent):
 
                 sensor = scipy.misc.imresize(sensor, (size[1], size[2]))
 
-                plot_test_image(sensor, "image.png")
+
                 sensor = np.swapaxes(sensor, 0, 1)
 
                 sensor = np.transpose(sensor, (2, 0, 1))
 
 
-                sensor = torch.from_numpy(sensor).type(torch.FloatTensor).cuda()
+                sensor = torch.from_numpy(sensor/255.0).type(torch.FloatTensor).cuda()
+
 
 
 

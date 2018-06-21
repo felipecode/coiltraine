@@ -2,10 +2,10 @@ import imgaug as ia
 from imgaug import augmenters as iaa
 
 
-def medium(iteration):
+def medium(image_iteration):
 
 
-
+    iteration = image_iteration/(120*1.5)
     frequency_factor = 0.05 + float(iteration)/1000000.0
     color_factor = float(iteration)/1000000.0
     dropout_factor = 0.198667 + (0.03856658 - 0.198667) / (1 + (iteration / 196416.6) ** 1.863486)
@@ -55,10 +55,9 @@ def medium(iteration):
     return augmenter
 
 
-def soft(iteration):
+def soft(image_iteration):
 
-
-
+    iteration = image_iteration/(120*1.5)
     frequency_factor = 0.05 + float(iteration)/1200000.0
     color_factor = float(iteration)/1200000.0
     dropout_factor = 0.198667 + (0.03856658 - 0.198667) / (1 + (iteration / 196416.6) ** 1.863486)
@@ -74,8 +73,8 @@ def soft(iteration):
     contrast_factor_neg = 1 - (0.5 * iteration / 800000.0)
 
 
-    #print 'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,\
-    #    multiply_factor_pos,multiply_factor_neg,contrast_factor_pos,contrast_factor_neg
+    #print ('iteration',iteration,'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,
+    #    multiply_factor_pos,multiply_factor_neg,contrast_factor_pos,contrast_factor_neg)
 
 
     augmenter = iaa.Sequential([
@@ -108,10 +107,9 @@ def soft(iteration):
     return augmenter
 
 
-def high(iteration):
+def high(image_iteration):
 
-
-
+    iteration = image_iteration/(120*1.5)
     frequency_factor = 0.05 + float(iteration)/800000.0
     color_factor = float(iteration)/800000.0
     dropout_factor = 0.198667 + (0.03856658 - 0.198667) / (1 + (iteration / 196416.6) ** 1.863486)
@@ -120,15 +118,15 @@ def high(iteration):
 
     add_factor = 10 + 10*iteration/120000.0
 
-    multiply_factor_pos = 1 + (2.5*iteration/250000.0)
-    multiply_factor_neg = 1 - (0.91 * iteration / 250000.0)
+    multiply_factor_pos = 1 + (2.5*iteration/350000.0)
+    multiply_factor_neg = 1 - (0.91 * iteration / 400000.0)
 
-    contrast_factor_pos = 1 + (0.5*iteration/250000.0)
-    contrast_factor_neg = 1 - (0.5 * iteration / 250000.0)
+    contrast_factor_pos = 1 + (0.5*iteration/350000.0)
+    contrast_factor_neg = 1 - (0.5 * iteration / 400000.0)
 
 
-    #print 'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,\
-    #    multiply_factor_pos,multiply_factor_neg,contrast_factor_pos,contrast_factor_neg
+    #print ('iteration',iteration,'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,
+    #    multiply_factor_pos,multiply_factor_neg,contrast_factor_pos,contrast_factor_neg)
 
 
     augmenter = iaa.Sequential([

@@ -125,6 +125,7 @@ class CoILICRA(nn.Module):
 
         #print (self.forward(x, a))
         # TODO: unit test this function
+        # TODO: take four branches, this is hardcoded
         output_vec = torch.stack(self.forward(x, a)[0:4])
 
 
