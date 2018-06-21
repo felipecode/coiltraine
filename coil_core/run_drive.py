@@ -139,33 +139,31 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 
         coil_logger.add_message('Loading', {'CARLAClient': host + ':' + str(port)})
-        csv_outfile = open(os.path.join('_logs', exp_batch, exp_alias,
-                                        g_conf.PROCESS_NAME + '_csv', 'control_output.csv'),
-                           'w')
-
-        csv_outfile.write("%s,%s,%s,%s,%s,%s,%s,%s\n"
-                          % ('step', 'episodes_completion', 'intersection_offroad',
-                             'intersection_otherlane', 'collision_pedestrians',
-                             'collision_vehicles', 'episodes_fully_completed',
-                             'driven_kilometers'))
-        csv_outfile.close()
 
         # Now actually run the driving_benchmark
 
-        #TODO: UNCONMENT
-        #latest = get_latest_evaluated_checkpoint()
-        #if latest is None:  # When nothing was tested, get latest returns none, we fix that.
-        #    latest = 0
+        latest = get_latest_evaluated_checkpoint()
+        if latest is None:  # When nothing was tested, get latest returns none, we fix that.
+            latest = 0
+            csv_outfile = open(os.path.join('_logs', exp_batch, exp_alias,
+                                            g_conf.PROCESS_NAME + '_csv', 'control_output.csv'),
+                               'w')
+
+            csv_outfile.write("%s,%s,%s,%s,%s,%s,%s,%s\n"
+                              % ('step', 'episodes_completion', 'intersection_offroad',
+                                 'intersection_otherlane', 'collision_pedestrians',
+                                 'collision_vehicles', 'episodes_fully_completed',
+                                 'driven_kilometers'))
+            csv_outfile.close()
 
 
         # Write the header of the summary file used conclusion
 
         # While the checkpoint is not there
-        latest = 0
+        print ( "LATEST IS ", latest)
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
             try:
-
                 # Get the correct checkpoint
                 if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
 
@@ -221,7 +219,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                 else:
                     time.sleep(0.1)
 
-                break
+
 
 
             except TCPConnectionError as error:
@@ -239,7 +237,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                 coil_logger.add_message('Error', {'Message': 'Something Happened'})
                 break
 
-
+        print (" FINISHED HERE ! ")
 
         coil_logger.add_message('Finished', {})
 

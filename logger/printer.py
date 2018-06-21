@@ -122,9 +122,9 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
 
     print ('        SUMMARY: ')
     print ('            Average Completion: ', LIGHT_GREEN + UNDERLINE +
-           str(averaged_metrics[float(previous_checkpoint)][header.index('episodes_completion')]-1) + END)
+           str(averaged_metrics[float(previous_checkpoint)][header.index('episodes_completion')-1]) + END)
     print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE +
-           str(averaged_metrics[float(previous_checkpoint)][header.index('collision_pedestrians')]-1) + END)
+           str(averaged_metrics[float(previous_checkpoint)][header.index('collision_pedestrians')-1]) + END)
 
 
 

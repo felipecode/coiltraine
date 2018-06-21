@@ -101,6 +101,8 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
         if task_to_add is not None and task_to_add not in old_tasks_queue:
             heapq.heappush(tasks_queue, task_to_add)
 
+        task_to_add = None
+
         for val_data in validation_datasets:
             if monitorer.get_status(folder, experiment, 'validation_' + val_data)[0] == "Not Started":
                 task_to_add = (2, experiment + '_validation_' + val_data,
@@ -115,6 +117,8 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
         if task_to_add is not None and task_to_add not in old_tasks_queue:
             heapq.heappush(tasks_queue, task_to_add)
 
+        task_to_add = None
+
         for drive_env in drive_environments:
             if monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] == "Not Started":
                 task_to_add = (1, experiment + '_drive_' + drive_env,
@@ -126,6 +130,7 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
                 task_to_add = (1, experiment + '_drive_' + drive_env,
                                {'type': 'drive', 'folder': folder,
                                 'experiment': experiment, 'environment': drive_env})
+
 
         if task_to_add is not None and task_to_add not in old_tasks_queue:
             heapq.heappush(tasks_queue, task_to_add)

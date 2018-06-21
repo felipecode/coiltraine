@@ -27,6 +27,7 @@ def is_open(file_name):
 
 
 def maximun_checkpoint_reach(iteration, checkpoint_schedule):
+
     if iteration >= max(checkpoint_schedule):
         return True
     else:

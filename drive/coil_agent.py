@@ -86,7 +86,6 @@ class CoILAgent(Agent):
 
         steer, throttle, brake = self._process_model_outputs(model_outputs[0])
 
-        print (steer, throttle, brake)
 
         control = carla_protocol.Control()
         control.steer = steer

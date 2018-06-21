@@ -102,6 +102,9 @@ class CoILDataset(Dataset):
 
             self.measurements[np.where(self.meta_data[:, 0] == b'steer'), used_ids] =\
                 self.augment_steering(camera_angle, steer, speed)
+            #print ( 'camera angle', camera_angle,
+            #        'new_steer' , self.measurements[np.where(self.meta_data[:, 0] == b'steer'), used_ids],
+            #       'old_steer', steer)
 
         self.measurements[np.where(self.meta_data[:, 0] == b'speed_module'), used_ids] /= g_conf.SPEED_FACTOR
 
