@@ -4,6 +4,8 @@ import h5py
 import traceback
 import sys
 import math
+
+import gc
 import numpy as np
 
 from torch.utils.data import Dataset
@@ -100,9 +102,12 @@ class CoILDataset(Dataset):
                         sensor_image = np.swapaxes(sensor_image, 1, 2)
                     # Do not forget the final normalization step
                     batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
-                    ] = sensor_image / 255.0
+                    ] = sensor_image
 
                     del sensor_image
+
+                    gc.collect()
+
 
                 count += 1
 
@@ -124,7 +129,7 @@ class CoILDataset(Dataset):
 
 
 
-
+        print ("Batch number", self.batch_read_number)
 
         self.batch_read_number += 1
         # TODO: IMPORTANT !!!
