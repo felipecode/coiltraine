@@ -90,7 +90,7 @@ class CoILAgent(Agent):
 
         control = carla_protocol.Control()
         control.steer = steer
-        control.throttle = 0.5
+        control.throttle = throttle
         control.brake = brake
         # if self._auto_pilot:
         #    control.steer = control_agent.steer

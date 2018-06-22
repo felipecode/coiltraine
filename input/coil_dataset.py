@@ -89,9 +89,8 @@ class CoILDataset(Dataset):
 
                     pos_inside = chosen_key - (chosen_key // 200)*200
 
-                    x = self.sensor_data[count][chosen_key // 200][2]
-
-                    sensor_image = np.array(x[pos_inside, :, :, :])
+                    sensor_image = np.array(self.sensor_data[count][chosen_key // 200][2]
+                                            [pos_inside])
 
                     if self.transform is not None:
                         sensor_image = self.transform(self.batch_read_number, sensor_image)
@@ -103,7 +102,6 @@ class CoILDataset(Dataset):
                     batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
                     ] = sensor_image / 255.0
 
-                    del x
                     del sensor_image
 
                 count += 1
@@ -124,18 +122,9 @@ class CoILDataset(Dataset):
 
         self.measurements[np.where(self.meta_data[:, 0] == b'speed_module'), used_ids] /= g_conf.SPEED_FACTOR
 
-        """
-        import gc
-        count_obj = 0
-        for obj in gc.get_objects():
-            try:
-                if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
-                    count_obj += 1
-            except:
-                pass
 
-            print (" PYtorch objects ", count_obj)
-        """
+
+
 
         self.batch_read_number += 1
         # TODO: IMPORTANT !!!
