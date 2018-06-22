@@ -89,8 +89,8 @@ class CoILDataset(Dataset):
 
                     pos_inside = chosen_key - (chosen_key // 200)*200
 
-                    sensor_image = np.array(self.sensor_data[count][chosen_key // 200][2]
-                                            [pos_inside])
+                    sensor_image = self.sensor_data[count][chosen_key // 200][2][pos_inside]
+
 
                     if self.transform is not None:
                         sensor_image = self.transform(self.batch_read_number, sensor_image)
