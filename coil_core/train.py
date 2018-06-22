@@ -50,12 +50,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
 
 
-        if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
-            # TODO: print some cool summary or not ?
-            return
-
-
-
         checkpoint_file = get_latest_saved_checkpoint()
         if checkpoint_file is not None:
             checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias,

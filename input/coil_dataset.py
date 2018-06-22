@@ -124,6 +124,18 @@ class CoILDataset(Dataset):
 
         self.measurements[np.where(self.meta_data[:, 0] == b'speed_module'), used_ids] /= g_conf.SPEED_FACTOR
 
+        import gc
+        count_obj = 0
+        for obj in gc.get_objects():
+            try:
+                if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
+                    count_obj += 1
+            except:
+                pass
+
+            print (" PYtorch objects ")
+
+
         self.batch_read_number += 1
         # TODO: IMPORTANT !!!
         # TODO: ADD GROUND TRUTH CONTROL IN SOME META CONFIGURATION FOR THE DATASET
