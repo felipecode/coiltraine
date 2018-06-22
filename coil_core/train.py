@@ -134,8 +134,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
         #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
         capture_time = time.time()
-        data = next(iter(data_loader))
-        for _ in range(iteration, g_conf.NUMBER_ITERATIONS):
+        for data in data_loader:
 
 
             input_data, float_data = data
