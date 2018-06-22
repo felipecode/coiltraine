@@ -148,39 +148,39 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
-            model.zero_grad()
+            #model.zero_grad()
 
-            branches = model(torch.squeeze(input_data['rgb'].cuda()),
-                             dataset.extract_inputs(float_data).cuda())
+            #branches = model(torch.squeeze(input_data['rgb'].cuda()),
+            #                 dataset.extract_inputs(float_data).cuda())
 
 
 
-            loss = criterion.MSELoss(branches, dataset.extract_targets(float_data).cuda(),
-                                     controls.cuda(), dataset.extract_inputs(float_data).cuda(),
-                                     branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
-                                     variable_weights=g_conf.VARIABLE_WEIGHT)
+            #loss = criterion.MSELoss(branches, dataset.extract_targets(float_data).cuda(),
+            #                         controls.cuda(), dataset.extract_inputs(float_data).cuda(),
+            #                         branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
+            #                         variable_weights=g_conf.VARIABLE_WEIGHT)
             # TODO: All these logging things could go out to clean up the main
-            if loss.data < best_loss:
-                best_loss = loss.data.tolist()
-                best_loss_iter = iteration
+            #if loss.data < best_loss:
+            #    best_loss = loss.data.tolist()
+            #    best_loss_iter = iteration
 
             # Log a random position
             position = random.randint(0, len(float_data)-1)
 
-            output = model.extract_branch(torch.stack(branches[0:4]), controls)
-            error = torch.abs(output - dataset.extract_targets(float_data).cuda())
+            #output = model.extract_branch(torch.stack(branches[0:4]), controls)
+            #error = torch.abs(output - dataset.extract_targets(float_data).cuda())
 
 
 
 
             # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
 
-            coil_logger.add_scalar('Loss', loss.data, iteration)
+            coil_logger.add_scalar('Loss', 0, iteration)
             coil_logger.add_image('Image', torch.squeeze(input_data['rgb']), iteration)
 
 
-            loss.backward()
-            optimizer.step()
+            #loss.backward()
+            #optimizer.step()
 
             accumulated_time += time.time() - capture_time
             capture_time = time.time()
@@ -190,12 +190,12 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             # TODO: itearation is repeating , and that is dumb
             coil_logger.add_message('Iterating',
                                     {'Iteration': iteration,
-                                     'Loss': loss.data.tolist(),
+                                     'Loss': 0, # loss.data.tolist(),
                                      'Images/s': (iteration*g_conf.BATCH_SIZE)/accumulated_time,
                                      'BestLoss': best_loss, 'BestLossIteration': best_loss_iter,
-                                     'Output': output[position].data.tolist(),
+                                     'Output': 0, #output[position].data.tolist(),
                                      'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist(),
-                                     'Error': error[position].data.tolist(),
+                                     'Error': 0,#error[position].data.tolist(),
                                      'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()},
                                     iteration)
 
@@ -220,8 +220,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             iteration += 1
             print (iteration)
 
-            if iteration % 1000 == 0:
-                adjust_learning_rate(optimizer, iteration)
+            #if iteration % 1000 == 0:
+            #    adjust_learning_rate(optimizer, iteration)
 
         coil_logger.add_message('Finished', {})
 
