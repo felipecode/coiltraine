@@ -74,23 +74,34 @@ class CoILDataset(Dataset):
                     chosen_key = chosen_key + i * 3
 
 
-                    """ We found the part of the data to open """
 
-                    pos_inside = chosen_key - (chosen_key // 200)*200
+                    for es, ee, x in self.sensor_data[count]:
 
-                    x = self.sensor_data[count][chosen_key // 200][2]
+                        if chosen_key >= es and chosen_key < ee:
 
-                    sensor_image = np.array(x[pos_inside, :, :, :])
 
-                    if self.transform is not None:
-                        sensor_image = self.transform(self.batch_read_number, sensor_image)
-                    else:
+                            pos_inside = chosen_key - es
+                            sensor_image = np.array(x[pos_inside, :, :, :])
 
-                        sensor_image = np.swapaxes(sensor_image, 0, 2)
-                        sensor_image = np.swapaxes(sensor_image, 1, 2)
-                    # Do not forget the final normalization step
-                    batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
-                    ] = sensor_image / 255.0
+
+
+                            """ We found the part of the data to open """
+
+                            #pos_inside = chosen_key - (chosen_key // 200)*200
+
+                            #x = self.sensor_data[count][chosen_key // 200][2]
+
+                            #sensor_image = np.array(x[pos_inside, :, :, :])
+
+                            if self.transform is not None:
+                                sensor_image = self.transform(self.batch_read_number, sensor_image)
+                            else:
+
+                                sensor_image = np.swapaxes(sensor_image, 0, 2)
+                                sensor_image = np.swapaxes(sensor_image, 1, 2)
+                            # Do not forget the final normalization step
+                            batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
+                            ] = sensor_image / 255.0
 
                 count += 1
 
@@ -219,7 +230,6 @@ class CoILDataset(Dataset):
                                           limit=2, file=sys.stdout)
                 print("failed to open", file_name)
 
-        # TODO: ADD THE STEERING MULTIPLE CAMERA AUGMENTATION
 
         # For the number of datasets names that are going to be used for measurements cat all.
         for i in range(len(meas_names)):
