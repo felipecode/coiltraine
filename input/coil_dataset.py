@@ -124,6 +124,7 @@ class CoILDataset(Dataset):
 
         self.measurements[np.where(self.meta_data[:, 0] == b'speed_module'), used_ids] /= g_conf.SPEED_FACTOR
 
+        """
         import gc
         count_obj = 0
         for obj in gc.get_objects():
@@ -133,8 +134,8 @@ class CoILDataset(Dataset):
             except:
                 pass
 
-            print (" PYtorch objects ")
-
+            print (" PYtorch objects ", count_obj)
+        """
 
         self.batch_read_number += 1
         # TODO: IMPORTANT !!!

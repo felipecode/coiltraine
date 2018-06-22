@@ -90,23 +90,14 @@ class CoILAgent(Agent):
 
         control = carla_protocol.Control()
         control.steer = steer
-        control.throttle = throttle
+        control.throttle = 0.5
         control.brake = brake
         # if self._auto_pilot:
         #    control.steer = control_agent.steer
         # TODO: adapt the client side agent for the new version. ( PROBLEM )
         #control.throttle = control_agent.throttle
         #control.brake = control_agent.brake
-        print (" Printing garbade ")
-        garbage_size = 0
-        for obj in gc.get_objects():
-            try:
-                if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
-                    garbage_size += 1
-            except:
-                print ("garbage expecece")
 
-        print ( " GARBANZGES ", garbage_size)
 
         if self.first_iter:
             coil_logger.add_message('Iterating', {"Checkpoint": self.checkpoint['iteration'],
@@ -146,7 +137,7 @@ class CoILAgent(Agent):
 
                 sensor = np.swapaxes(sensor, 0, 1)
 
-                sensor = np.transpose(sensor, (2, 0, 1))
+                sensor = np.transpose(sensor, (2, 1, 0))
 
 
                 sensor = torch.from_numpy(sensor/255.0).type(torch.FloatTensor).cuda()
@@ -163,7 +154,6 @@ class CoILAgent(Agent):
 
 
             iteration += 1
-            print(image_input)
 
         image_input = image_input.unsqueeze(0)
 

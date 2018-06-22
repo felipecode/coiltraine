@@ -138,6 +138,23 @@ def folder_execute(params=None):
 
                 execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
                 process_specs.update({'gpu': gpu_number})
+                print (""
+                       ""
+                       ""
+                       ""
+                       ""
+                       ""
+                       ""
+                       "Added A train"
+                       ""
+                       ""
+                       ""
+                       ""
+                       ""
+                       ""
+                       ""
+                       ""
+                       "")
 
                 executing_processes.append(process_specs)
 
