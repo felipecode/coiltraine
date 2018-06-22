@@ -103,6 +103,9 @@ class CoILDataset(Dataset):
                     batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
                     ] = sensor_image / 255.0
 
+                    del x
+                    del sensor_image
+
                 count += 1
 
         #TODO: if experiments change name there should be an error
