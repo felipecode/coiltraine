@@ -74,7 +74,7 @@ class CoILDataset(Dataset):
                     chosen_key = chosen_key + i * 3
 
 
-
+                    """
                     for es, ee, x in self.sensor_data[count]:
 
                         if chosen_key >= es and chosen_key < ee:
@@ -82,28 +82,30 @@ class CoILDataset(Dataset):
 
                             pos_inside = chosen_key - es
                             sensor_image = np.array(x[pos_inside, :, :, :])
+                    """
 
 
+                    """ We found the part of the data to open """
 
-                            """ We found the part of the data to open """
+                    pos_inside = chosen_key - (chosen_key // 200)*200
 
-                            #pos_inside = chosen_key - (chosen_key // 200)*200
+                    x = self.sensor_data[count][chosen_key // 200][2]
 
-                            #x = self.sensor_data[count][chosen_key // 200][2]
+                    sensor_image = np.array(x[pos_inside, :, :, :])
 
-                            #sensor_image = np.array(x[pos_inside, :, :, :])
+                    if self.transform is not None:
+                        sensor_image = self.transform(self.batch_read_number, sensor_image)
+                    else:
 
-                            if self.transform is not None:
-                                sensor_image = self.transform(self.batch_read_number, sensor_image)
-                            else:
-
-                                sensor_image = np.swapaxes(sensor_image, 0, 2)
-                                sensor_image = np.swapaxes(sensor_image, 1, 2)
-                            # Do not forget the final normalization step
-                            batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
-                            ] = sensor_image / 255.0
+                        sensor_image = np.swapaxes(sensor_image, 0, 2)
+                        sensor_image = np.swapaxes(sensor_image, 1, 2)
+                    # Do not forget the final normalization step
+                    batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
+                    ] = sensor_image / 255.0
 
                 count += 1
+
+        #TODO: if experiments change name there should be an error
 
         if g_conf.AUGMENT_LATERAL_STEERINGS > 0:
 
