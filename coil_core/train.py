@@ -216,12 +216,13 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
                 torch.save(state, os.path.join('_logs', exp_batch, exp_alias
                                                , 'checkpoints', str(iteration) + '.pth'))
 
+            """
             iteration += 1
             print (iteration)
+            #if iteration % 1000 == 0:
+            #    adjust_learning_rate(optimizer, iteration)
 
-            if iteration % 1000 == 0:
-                adjust_learning_rate(optimizer, iteration)
-            """
+
             del data
             del input_data
             del float_data
