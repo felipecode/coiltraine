@@ -125,10 +125,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
 
         if suppress_output:
-            pass
-            #sys.stdout = open(os.path.join('_output_logs',
-            #                  g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
-            #                  "a", buffering=1)
+            sys.stdout = open(os.path.join('_output_logs',
+                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
             #sys.stderr = open(os.path.join('_output_logs',
             #                  'err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
             #                  "a", buffering=1)
