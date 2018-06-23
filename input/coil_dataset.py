@@ -5,6 +5,8 @@ import traceback
 import sys
 import math
 
+
+
 import gc
 import numpy as np
 
@@ -76,7 +78,7 @@ class CoILDataset(Dataset):
                     chosen_key = chosen_key + i * 3
 
 
-                    """
+
                     for es, ee, x in self.sensor_data[count]:
 
                         if chosen_key >= es and chosen_key < ee:
@@ -84,32 +86,31 @@ class CoILDataset(Dataset):
 
                             pos_inside = chosen_key - es
                             sensor_image = np.array(x[pos_inside, :, :, :])
-                    """
 
 
-                    """ We found the part of the data to open """
 
-                    pos_inside = chosen_key - (chosen_key // 200)*200
+                            """ We found the part of the data to open """
+        
+                            #pos_inside = chosen_key - (chosen_key // 200)*200
 
-                    sensor_image = self.sensor_data[count][chosen_key // 200][2][pos_inside]
-
-
-                    if self.transform is not None:
-                        sensor_image = self.transform(self.batch_read_number, sensor_image)
-                    else:
-
-                        sensor_image = np.swapaxes(sensor_image, 0, 2)
-                        sensor_image = np.swapaxes(sensor_image, 1, 2)
-                    # Do not forget the final normalization step
-                    batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
-                    ] = sensor_image
-
-                    del sensor_image
-
-                    gc.collect()
+                            #sensor_image = self.sensor_data[count][chosen_key // 200][2][pos_inside]
 
 
-                count += 1
+                            if self.transform is not None:
+                                sensor_image = self.transform(self.batch_read_number, sensor_image)
+                            else:
+
+                                sensor_image = np.swapaxes(sensor_image, 0, 2)
+                                sensor_image = np.swapaxes(sensor_image, 1, 2)
+                            # Do not forget the final normalization step
+                            batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
+                            ] = sensor_image
+
+                            del sensor_image
+
+
+
+                            count += 1
 
         #TODO: if experiments change name there should be an error
 
@@ -129,7 +130,6 @@ class CoILDataset(Dataset):
 
 
 
-        print ("Batch number", self.batch_read_number)
 
         self.batch_read_number += 1
         # TODO: IMPORTANT !!!
