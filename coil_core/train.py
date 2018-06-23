@@ -20,6 +20,7 @@ from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpo
 from torchvision import transforms
 
 
+torch.multiprocessing.set_start_method("spawn")
 
 
 
