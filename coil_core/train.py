@@ -140,7 +140,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             input_data, float_data = data
 
 
-
+            """
             # get the control commands from float_data, size = [120,1]
 
             controls = float_data[:, dataset.controls_position(), :]
@@ -222,6 +222,10 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
             if iteration % 1000 == 0:
                 adjust_learning_rate(optimizer, iteration)
+            """
+            del data
+            del input_data
+            del float_data
 
         coil_logger.add_message('Finished', {})
 
