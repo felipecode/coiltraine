@@ -33,6 +33,8 @@ def get_current_iteration(exp):
 #### Get things from CARLA benchmark directly to plot as logs #####
 def get_episode_number(benchmark_log_name):
     """ Get the current episode"""
+    print ('Results : ', read_summary_csv(os.path.join(benchmark_log_name, 'summary.csv')))
+    print ("benchmark_log ", benchmark_log_name)
     control_dict = read_summary_csv(os.path.join(benchmark_log_name, 'summary.csv'))
     if control_dict is None:
         return None

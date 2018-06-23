@@ -136,23 +136,6 @@ def folder_execute(params=None):
 
                 execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
                 process_specs.update({'gpu': gpu_number})
-                print (""
-                       ""
-                       ""
-                       ""
-                       ""
-                       ""
-                       ""
-                       "Added A train"
-                       ""
-                       ""
-                       ""
-                       ""
-                       ""
-                       ""
-                       ""
-                       ""
-                       "")
 
                 executing_processes.append(process_specs)
 
@@ -187,8 +170,6 @@ def folder_execute(params=None):
                                             executing_processes, tasks_queue,
                                             validation_datasets, driving_environments, False)
 
-        print("exec proc 1 len", len(executing_processes))
-
         printer.plot_folder_summaries(folder,
                                       params['is_training'],
                                       validation_datasets,
@@ -202,7 +183,8 @@ def folder_execute(params=None):
         if len(tasks_queue) == 0 and len(executing_processes) == 0:
             break
         print ("Task queue", tasks_queue)
-        print ("exec proc 2 len", len(executing_processes))
+        print ("")
+        print ("exec proc", executing_processes)
         print("resources", free_gpus)
         time.sleep(10)
 

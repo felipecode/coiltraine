@@ -24,6 +24,7 @@ from torchvision import transforms
 
 
 
+
 # The main function maybe we could call it with a default name
 def execute(gpu, exp_batch, exp_alias, suppress_output=True):
     # We set the visible cuda devices
@@ -104,7 +105,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         # workers to get all the data.
         data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
                                                   shuffle=False,
-                                                  num_workers=0,
+                                                  num_workers=3,
                                                   pin_memory=True)
 
 
@@ -139,7 +140,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             input_data, float_data = data
 
 
-            """
+
             # get the control commands from float_data, size = [120,1]
 
             controls = float_data[:, dataset.controls_position(), :]
@@ -216,16 +217,13 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
                 torch.save(state, os.path.join('_logs', exp_batch, exp_alias
                                                , 'checkpoints', str(iteration) + '.pth'))
 
-            """
             iteration += 1
             print (iteration)
-            #if iteration % 1000 == 0:
-            #    adjust_learning_rate(optimizer, iteration)
 
+            if iteration % 1000 == 0:
+                adjust_learning_rate(optimizer, iteration)
 
             del data
-            del input_data
-            del float_data
 
         coil_logger.add_message('Finished', {})
 
