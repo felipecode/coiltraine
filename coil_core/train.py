@@ -20,8 +20,6 @@ from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpo
 from torchvision import transforms
 
 
-torch.multiprocessing.set_start_method("spawn")
-
 
 
 
@@ -106,7 +104,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         # workers to get all the data.
         data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
                                                   shuffle=False,
-                                                  num_workers=g_conf.NUMBER_OF_LOADING_WORKERS,
+                                                  num_workers=0,
                                                   pin_memory=True)
 
 
