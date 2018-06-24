@@ -73,7 +73,8 @@ def start_carla_simulator(gpu, town_name, no_screen):
                                stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
     elif mode == 'VGL':
         os.environ['DISPLAY'] =":5"
-        sp = subprocess.Popen(['vglrun -d :7.' + str(gpu) + '; ' + carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
+        sp = subprocess.Popen(['vglrun', '-d :7.' + str(gpu),
+                                    carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
                                     '/Game/Maps/' + town_name, '-windowed', '-benchmark',
                                     '-fps=10', '-world-port='+str(port)],
                                shell=False,
