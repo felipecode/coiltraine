@@ -72,7 +72,7 @@ def get_latest_evaluated_checkpoint():
 
 def is_next_checkpoint_ready( checkpoint_schedule):
 
-    ltst_check = get_latest_evaluated_checkpoint()
+    ltst_check = int(get_latest_evaluated_checkpoint())
     if ltst_check is None:  # This means no checkpoints were evaluated
         next_check = checkpoint_schedule[0]  # Return the first one
     else:
@@ -80,7 +80,7 @@ def is_next_checkpoint_ready( checkpoint_schedule):
 
     # Check if the file is in the checkpoints list.
     if os.path.exists(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
-                                                               g_conf.EXPERIMENT_NAME, 'checkpoints')):
+                                            g_conf.EXPERIMENT_NAME, 'checkpoints')):
 
         # test if the file exist:
         if str(next_check) + '.pth' in os.listdir(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
