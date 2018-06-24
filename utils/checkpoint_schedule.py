@@ -74,7 +74,7 @@ def is_next_checkpoint_ready( checkpoint_schedule):
 
     # IT needs
 
-    ltst_check = int(get_latest_evaluated_checkpoint())
+    ltst_check = get_latest_evaluated_checkpoint()
     if ltst_check is None:  # This means no checkpoints were evaluated
         next_check = checkpoint_schedule[0]  # Return the first one
     else:
