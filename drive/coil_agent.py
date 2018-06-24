@@ -93,6 +93,8 @@ class CoILAgent(Agent):
                                                   'Agent': str(steer)},
                                     self.checkpoint['iteration'])
         self.first_iter = False
+
+        print ('Steer', control.steer)
         return control
 
     def _process_sensors(self, sensors):

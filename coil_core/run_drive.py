@@ -48,25 +48,37 @@ def find_free_port():
 
 def start_carla_simulator(gpu, town_name, no_screen):
 
-    port = find_free_port()
-    carla_path = os.environ['CARLA_PATH']
-
-    if no_screen:
-        print (" EXECUTING NO SCREEN! ")
-        os.environ['SDL_VIDEODRIVER'] = 'offscreen'
-
-
-    os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
-
+    # Set the outfiles for the process
     carla_out_file = os.path.join('_output_logs',
                       'CARLA_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
     carla_out_file_err = os.path.join('_output_logs',
                       'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
 
-    sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
-                            '-windowed',
-                           '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
-                           stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+    # TODO: Add parameters
+    mode = 'VGL'
+    port = find_free_port()
+    carla_path = os.environ['CARLA_PATH']
+
+    if no_screen and mode == 'SDL':
+        print (" EXECUTING NO SCREEN! ")
+        os.environ['SDL_VIDEODRIVER'] = 'offscreen'
+
+
+    if mode == 'SDL':
+        os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
+
+        sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
+                                '-windowed',
+                               '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
+                               stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+    elif mode == 'VGL':
+
+        sp = subprocess.Popen(['DISPLAY=:8 ', 'vglrun -d :7.' + str(gpu),
+                                    carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
+                                    '/Game/Maps/' + town_name, '-windowed', '-benchmark',
+                                    '-fps=10', '-world-port='+str(port)],
+                               shell=False,
+                               stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
 
 
     coil_logger.add_message('Loading', {'CARLA': carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4' 
