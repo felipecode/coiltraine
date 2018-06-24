@@ -86,11 +86,11 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         if g_conf.DATA_USED == 'central':
             camera_names = \
             dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
-            keys = splitter.label_split(camera_names, keys, [[1]])
+            keys = splitter.label_split(camera_names, keys, [[1]])[0]
         elif g_conf.DATA_USED == 'sides':
             camera_names = \
             dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
-            keys = splitter.label_split(camera_names, keys, [[0, 2]])
+            keys = splitter.label_split(camera_names, keys, [[0, 2]])[0]
         elif g_conf.DATA_USED != 'all':
             raise ValueError(" Invalid data used keyname")
 
