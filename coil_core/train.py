@@ -105,7 +105,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         # workers to get all the data.
         data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
                                                   shuffle=False,
-                                                  num_workers=3,
+                                                  num_workers=2,
                                                   pin_memory=True)
 
 

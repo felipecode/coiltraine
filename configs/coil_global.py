@@ -111,7 +111,7 @@ _g_conf.LOSS_FUNCTION = 'MSE'
 """#### Simulation Related Parameters ####"""
 
 _g_conf.IMAGE_CUT = [115, 510]  # How you should cut the input image that is received from the server
-_g_conf.USE_ORACLE = False
+_g_conf.USE_ORACLE = True
 
 
 def _check_integrity():

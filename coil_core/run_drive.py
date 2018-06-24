@@ -93,7 +93,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
         print("Running ", __file__, " On GPU ", gpu, "of experiment name ", exp_alias)
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
-
         if not os.path.exists('_output_logs'):
             os.mkdir('_output_logs')
 
@@ -102,6 +101,11 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
         print ("drive cond", drive_conditions)
         exp_set_name, town_name = drive_conditions.split('_')
+
+        if g_conf.USE_ORACLE:
+            control_filename = 'control_output_auto.csv'
+        else:
+            control_filename = 'control_output.csv'
 
 
 
@@ -145,8 +149,11 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
         latest = get_latest_evaluated_checkpoint()
         if latest is None:  # When nothing was tested, get latest returns none, we fix that.
             latest = 0
+
+
+
             csv_outfile = open(os.path.join('_logs', exp_batch, exp_alias,
-                                            g_conf.PROCESS_NAME + '_csv', 'control_output.csv'),
+                                            g_conf.PROCESS_NAME + '_csv', control_filename),
                                'w')
 
             csv_outfile.write("%s,%s,%s,%s,%s,%s,%s,%s\n"
@@ -171,13 +178,13 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                     checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                                          , 'checkpoints', str(latest) + '.pth'))
 
-                    coil_agent = CoILAgent(checkpoint)
+                    coil_agent = CoILAgent(checkpoint, town_name)
 
                     coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
 
                     run_driving_benchmark(coil_agent, experiment_set, town_name,
                                           exp_batch + '_' + exp_alias + '_' + str(latest)
-                                          + '_drive'
+                                          + '_drive_' + control_filename[:-4]
                                           , True, host, port)
 
                     path = exp_batch + '_' + exp_alias + '_' + str(latest) \
@@ -195,7 +202,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                     print (averaged_dict)
                     csv_outfile = open(os.path.join('_logs', exp_batch, exp_alias,
                                                     g_conf.PROCESS_NAME + '_csv',
-                                                    'control_output.csv'),
+                                                    control_filename),
                                        'a')
 
                     csv_outfile.write("%d,%f,%f,%f,%f,%f,%f,%f\n"
@@ -226,18 +233,18 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                 logging.error(error)
                 time.sleep(1)
                 carla_process.kill()
-                break
+                coil_logger.add_message('Error', {'Message': 'TCP serious Error'})
+                exit(1)
             except KeyboardInterrupt:
                 carla_process.kill()
                 coil_logger.add_message('Error', {'Message': 'Killed By User'})
-                break
+                exit(1)
             except:
                 traceback.print_exc()
                 carla_process.kill()
                 coil_logger.add_message('Error', {'Message': 'Something Happened'})
-                break
+                exit(1)
 
-        print (" FINISHED HERE ! ")
 
         coil_logger.add_message('Finished', {})
 

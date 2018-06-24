@@ -1,27 +1,19 @@
-import sys
-import os
-import time
-import socket
-
-import re
-import math
 import numpy as np
 import copy
 import random
 import gc
 
-#from sklearn import preprocessing
+# from sklearn import preprocessing
 
 import scipy
 
 from utils.general import plot_test_image
 
-
-from carla.agent import Agent
+from carla.agent import Agent, CommandFollower
+from carla.planner import Waypointer
 from PIL import Image
 
-
-#TODO: The network is defined and toguether there is as forward pass operation to be used for testing, depending on the configuration
+# TODO: The network is defined and toguether there is as forward pass operation to be used for testing, depending on the configuration
 
 from network import CoILModel
 from configs import g_conf
@@ -29,7 +21,6 @@ from logger import coil_logger
 from torchvision import transforms
 import imgauggpu as iag
 import torch
-
 
 try:
     from carla import carla_server_pb2 as carla_protocol
@@ -40,6 +31,7 @@ except ImportError:
 number_of_seg_classes = 5
 classes_join = {0: 2, 1: 2, 2: 2, 3: 2, 5: 2, 12: 2, 9: 2, 11: 2, 4: 0, 10: 1, 8: 3, 6: 3, 7: 4}
 
+
 # TODO: implement this as a torch operation. maybe...
 def join_classes(labels_image):
     compressed_labels_image = np.copy(labels_image)
@@ -49,10 +41,9 @@ def join_classes(labels_image):
     return compressed_labels_image
 
 
-
 class CoILAgent(Agent):
 
-    def __init__(self, checkpoint):
+    def __init__(self, checkpoint, town_name):
 
         Agent.__init__(self)
 
@@ -63,41 +54,39 @@ class CoILAgent(Agent):
         self.first_iter = True
 
         self.model.load_state_dict(checkpoint['state_dict'])
-        print ("loaded state", checkpoint)
+        print("loaded state", checkpoint)
 
         self.model.cuda()
+
         self.model.eval()
 
-
-
+        if g_conf.USE_ORACLE:
+            self.control_agent = CommandFollower()
+            self.waypointer = Waypointer(town_name)
 
     def run_step(self, measurements, sensor_data, directions, target):
 
+        # control_agent = self._agent.run_step(measurements, None, target)
 
-
-        #control_agent = self._agent.run_step(measurements, None, target)
-
-        norm_speed = measurements.player_measurements.forward_speed/g_conf.SPEED_FACTOR
+        norm_speed = measurements.player_measurements.forward_speed / g_conf.SPEED_FACTOR
         norm_speed = torch.cuda.FloatTensor([norm_speed]).unsqueeze(0)
 
         directions_tensor = torch.cuda.LongTensor([directions])
         model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), norm_speed,
                                                   directions_tensor)
 
-
         steer, throttle, brake = self._process_model_outputs(model_outputs[0])
-
 
         control = carla_protocol.Control()
         control.steer = steer
         control.throttle = throttle
         control.brake = brake
-        # if self._auto_pilot:
-        #    control.steer = control_agent.steer
-        # TODO: adapt the client side agent for the new version. ( PROBLEM )
-        #control.throttle = control_agent.throttle
-        #control.brake = control_agent.brake
+        if g_conf.USE_ORACLE:
+            _, control.throttle, control.brake = self._get_oracle_prediction(
+                measurements, target)
 
+
+        # TODO: adapt the client side agent for the new version. ( PROBLEM )
 
         if self.first_iter:
             coil_logger.add_message('Iterating', {"Checkpoint": self.checkpoint['iteration'],
@@ -106,17 +95,14 @@ class CoILAgent(Agent):
         self.first_iter = False
         return control
 
-
     def _process_sensors(self, sensors):
-
 
         iteration = 0
         for name, size in g_conf.SENSORS.items():
 
             sensor = sensors[name].data[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
 
-
-            if  sensors[name].type == 'SemanticSegmentation':
+            if sensors[name].type == 'SemanticSegmentation':
                 # For now we have just for RGB images and semantic segmentation.
 
                 # TODO: the camera name has to be sincronized with what is in the experiment...
@@ -134,33 +120,24 @@ class CoILAgent(Agent):
 
                 sensor = scipy.misc.imresize(sensor, (size[1], size[2]))
 
-
                 sensor = np.swapaxes(sensor, 0, 1)
 
                 sensor = np.transpose(sensor, (2, 1, 0))
 
-
-                sensor = torch.from_numpy(sensor/255.0).type(torch.FloatTensor).cuda()
-
-
-
-
-
+                sensor = torch.from_numpy(sensor / 255.0).type(torch.FloatTensor).cuda()
 
             if iteration == 0:
                 image_input = sensor
             else:
                 image_input = torch.cat((image_input, sensor), 0)
 
-
             iteration += 1
 
         image_input = image_input.unsqueeze(0)
 
-        print (image_input.shape)
+        print(image_input.shape)
 
         return image_input
-
 
     def _process_model_outputs(self, outputs):
         """
@@ -174,10 +151,29 @@ class CoILAgent(Agent):
 
         if throttle > brake:
             brake = 0.0
-        #else:
+        # else:
         #    throttle = throttle * 2
-        #if speed > 35.0 and brake == 0.0:
+        # if speed > 35.0 and brake == 0.0:
         #    throttle = 0.0
 
-
         return steer, throttle, brake
+
+    def _get_oracle_prediction(self, measurements, target):
+
+        player_transform = measurements.player_measurements.transform
+
+
+        waypoints_world, _ = self.waypointer.get_next_waypoints(
+            (player_transform.location.x,
+             player_transform.location.y, 0.22),
+            (player_transform.orientation.x, player_transform.orientation.y,
+             player_transform.orientation.z),
+            (target.location.x, target.location.y,
+             target.location.z),
+            (target.orientation.x, target.orientation.y,
+             target.orientation.z)
+        )
+        # For the oracle, the current version of sensor data is not really relevant.
+        control = self.control_agent.run_step(measurements, [], waypoints_world, target)
+
+        return control.steer, control.throttle, control.brake

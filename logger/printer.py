@@ -212,9 +212,16 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                         continue
                     checkpoint = summary[status]['Checkpoint']  # Get the sta
                     # This contain the results from completed iterations
+                    if g_conf.USE_ORACLE:
+                        control_filename = 'control_output_auto.csv'
+                    else:
+                        control_filename = 'control_output.csv'
+
                     csv_file_path = os.path.join('_logs', exp_batch, experiment,
-                                                 process + '_csv', 'control_output.csv')
-                    path = exp_batch + '_' + experiment + '_' + str(checkpoint) + '_' + process
+                                                 process + '_csv', control_filename)
+                    path = exp_batch + '_' + experiment + '_' + str(checkpoint) \
+                           + '_' + process.split('_')[0] + '_' + control_filename[:-4] \
+                           + '_' + process.split('_')[1] + '_' + process.split('_')[2]
                     print_drive_summary(get_latest_path(path), csv_file_path, checkpoint, verbose)
 
 
