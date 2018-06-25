@@ -79,6 +79,8 @@ def start_carla_simulator(gpu, town_name, no_screen):
                                     '-fps=10', '-world-port='+str(port)],
                                shell=False,
                                stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+    else:
+        raise ValueError("Invalid Mode !")
 
 
     coil_logger.add_message('Loading', {'CARLA': carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4' 
@@ -200,8 +202,11 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                                           , True, host, port)
 
                     path = exp_batch + '_' + exp_alias + '_' + str(latest) \
-                           + '_' + g_conf.PROCESS_NAME
+                           + '_' + g_conf.PROCESS_NAME.split('_')[0] + '_' + control_filename[:-4] \
+                           + '_' + g_conf.PROCESS_NAME.split('_')[1] + '_' + g_conf.PROCESS_NAME.split('_')[2]
 
+
+                    print(path)
                     print("Finished")
                     benchmark_json_path = os.path.join(get_latest_path(path), 'metrics.json')
                     with open(benchmark_json_path, 'r') as f:

@@ -195,11 +195,11 @@ def set_type_of_process(process_type, param=None):
 
     if process_type == "train":
         if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
-                                        _g_conf.EXPERIMENT_NAME,
-                                        'checkpoints') ):
-                os.mkdir(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
                                             _g_conf.EXPERIMENT_NAME,
-                                            'checkpoints'))
+                                            'checkpoints') ):
+                os.mkdir(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
+                                      _g_conf.EXPERIMENT_NAME,
+                                      'checkpoints'))
 
 
 

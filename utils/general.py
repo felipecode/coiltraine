@@ -139,7 +139,6 @@ def get_latest_path(path):
     """ Considering a certain path for experiments, get the latest one."""
     import glob
 
-    print ("Get path ", path)
     files_list = glob.glob(os.path.join('_benchmarks_results', path+'*'))
     sort_nicely(files_list)
 
