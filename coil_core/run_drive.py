@@ -55,7 +55,7 @@ def start_carla_simulator(gpu, town_name, no_screen):
                       'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
 
     # TODO: Add parameters
-    mode = 'VGL'
+    mode = 'SDL'
     port = find_free_port()
     carla_path = os.environ['CARLA_PATH']
 
@@ -179,7 +179,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
 
         # Write the header of the summary file used conclusion
-
         # While the checkpoint is not there
 
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
@@ -223,7 +222,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                                        'a')
 
                     csv_outfile.write("%d,%f,%f,%f,%f,%f,%f,%f\n"
-                                 % (latest, averaged_dict['episodes_completion'],
+                                % (latest, averaged_dict['episodes_completion'],
                                      averaged_dict['intersection_offroad'],
                                      averaged_dict['intersection_otherlane'],
                                      averaged_dict['collision_pedestrians'],
