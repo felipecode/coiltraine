@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     create_log_folder(args.folder)
     erase_logs(args.folder)
-    #erase_wrong_plotting_summaries(args.folder, list(args.validation_datasets))
+    erase_wrong_plotting_summaries(args.folder, list(args.validation_datasets))
     
 
     if args.single_process is not None:
