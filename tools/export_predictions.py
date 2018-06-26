@@ -48,6 +48,37 @@ number_of_seg_classes = 5
 classes_join = {0: 2, 1: 2, 2: 2, 3: 2, 5: 2, 12: 2, 9: 2, 11: 2, 4: 0, 10: 1, 8: 3, 6: 3, 7: 4}
 
 
+def augment_steering(camera_angle, steer, speed):
+    """
+        Apply the steering physical equation to augment for the lateral cameras.
+    Args:
+        camera_angle_batch:
+        steer_batch:
+        speed_batch:
+
+    Returns:
+        the augmented steering
+
+    """
+
+    time_use = 1.0
+    car_length = 6.0
+    old_steer = steer
+    pos = camera_angle > 0.0
+    neg = camera_angle <= 0.0
+    # You should use the absolute value of speed
+    speed = math.fabs(speed)
+    rad_camera_angle = math.radians(math.fabs(camera_angle))
+    val = 6 * (
+        math.atan((rad_camera_angle * car_length) / (time_use * speed + 0.05))) / 3.1415
+    steer -= pos * min(val, 0.3)
+    steer += neg * min(val, 0.3)
+
+    steer = min(1.0, max(-1.0, steer))
+
+    # print('Angle', camera_angle, ' Steer ', old_steer, ' speed ', speed, 'new steer', steer)
+    return steer
+
 def join_classes(labels_image, join_dic):
     compressed_labels_image = np.copy(labels_image)
     for key, value in join_dic.iteritems():
@@ -121,7 +152,12 @@ if __name__ == "__main__":
                 continue
 
             for i in range(0, 200):
-                camera_label_file.write(str(data['targets'][i][0]) + ',' +
+                steer = data['targets'][i][0]
+                camera_label = data['targets'][i][25]
+                speed = data['targets'][i][10]
+                steer = augment_steering(camera_label, steer, speed)
+
+                camera_label_file.write(str(steer) + ',' +
                                         str(data['targets'][i][1]) + ',' +
                                         str(data['targets'][i][2]) + '\n')
 

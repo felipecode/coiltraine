@@ -71,7 +71,12 @@ if __name__ == '__main__':
         dest='no_screen',
         help='Set to carla to run offscreen'
     )
-
+    argparser.add_argument(
+        '-ebv', '--erase-bad-validations',
+        action='store_true',
+        dest='erase_bad_validations',
+        help='Set to carla to run offscreen'
+    )
     args = argparser.parse_args()
 
 
@@ -99,7 +104,8 @@ if __name__ == '__main__':
 
     create_log_folder(args.folder)
     erase_logs(args.folder)
-    erase_wrong_plotting_summaries(args.folder, list(args.validation_datasets))
+    if args.erase_bad_validations:
+        erase_wrong_plotting_summaries(args.folder, list(args.validation_datasets))
     
 
     if args.single_process is not None:
