@@ -55,7 +55,7 @@ def start_carla_simulator(gpu, town_name, no_screen):
                       'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
 
     # TODO: Add parameters
-    mode = 'SDL'
+    mode = 'VGL'
     port = find_free_port()
     carla_path = os.environ['CARLA_PATH']
 
