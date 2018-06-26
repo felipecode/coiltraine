@@ -153,7 +153,7 @@ if __name__ == "__main__":
 
             for i in range(0, 200):
                 steer = data['targets'][i][0]
-                camera_label = data['targets'][i][25]
+                camera_label = data['targets'][i][26]
                 speed = data['targets'][i][10]
                 steer = augment_steering(camera_label, steer, speed)
 
