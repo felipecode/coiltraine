@@ -33,16 +33,14 @@ def read_summary_csv(control_csv_file):
     data_matrix = np.loadtxt(control_csv_file, delimiter=",", skiprows=1)
     summary_dict = {}
 
-
     if len(data_matrix) == 0:
         return None
 
     if len(data_matrix.shape) == 1:
         data_matrix = np.expand_dims(data_matrix, axis=0)
 
-
     count = 0
-    for variable in header:
+    for _ in header:
         summary_dict.update({header[count]: data_matrix[:, count]})
         count += 1
 
@@ -55,7 +53,9 @@ def read_summary_csv(control_csv_file):
 
 def read_control_csv(control_csv_file):
 
-
+    # If the file does not exist, return None,None, to point out that data is missing
+    if not os.path.exists(control_csv_file):
+        return None, None
 
     f = open(control_csv_file, "r")
     header = f.readline()
@@ -68,7 +68,7 @@ def read_control_csv(control_csv_file):
     count = 0
 
     if len(data_matrix) == 0:
-        return None
+        return None, None
     if len(data_matrix.shape) == 1:
         data_matrix = np.expand_dims(data_matrix, axis=0)
 
@@ -220,18 +220,15 @@ def _read_control_data(full_path, control_to_use):
     # Some flags to check the control files found
 
     try:
-        control, _ = read_control_csv(os.path.join(full_path, 'control_output' + control_to_use+'.csv'))
-    except KeyboardInterrupt:
-        raise
+        control, _ = read_control_csv(os.path.join(full_path, 'control_output' + control_to_use +
+                                                   '.csv'))
     except:
-        # HACKYYYYYY  # TODO: maybe remove that
-        try:
-            control, _ = read_control_csv(os.path.join(full_path[:-6], 'control_output' + control_to_use + '.csv'))
-        except:
-            traceback.print_exc()
-            return None
+        raise ValueError("exception on control_csv reading full_path = %s,  " % (full_path))
 
-    print (control)
+
+    # resend the none to eliminate this dataset
+    if control is None:
+        return control
 
     return list(control.items())
     # Simple extra counter

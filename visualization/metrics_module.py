@@ -62,11 +62,11 @@ def compute_step(data, param):
 
 def compute_control_accuracy(data_item, param):
     print('Better use the compute_control_success_rate function - it does the same but has a better name')
-    return data_item['control'][-3]
+    return data_item['control'][-2]
 
 # this is a copy of compute_control_accuracy but with a better name
 def compute_control_success_rate(data_item, param):
-    return data_item['control'][-3]
+    return data_item['control'][-2]
 
 def compute_control_average_completion(data_item, param):
     # print('data_item[\'control\']', data_item['control'])
@@ -80,9 +80,9 @@ def compute_km_per_infraction(data_item, param):
     return km_per_infraction
 
 def compute_steering_error(data_item, param):
-    np.savetxt('80maug.csv', data_item['steer_gt'] - data_item['steer_pred'], delimiter='', fmt='%-10.06f')
+    #np.savetxt('80maug.csv', data_item['steer_gt'] - data_item['steer_pred'], delimiter='', fmt='%-10.06f')
 
-    return data_item['steer_error']
+    return abs(data_item['steer_gt'] - data_item['steer_pred'])
 
 def compute_steering_error_filter_gt(data_item, param):
     error_np = np.array(data_item['steer_error'])
@@ -161,6 +161,7 @@ def compute_correlation(data_item, param):
 
         return np.corrcoef(salMap.reshape(-1), fixationMap.reshape(-1))[0][1]
 
+    print (data_item)
     return calc_score(data_item['steer_pred']*np.absolute(data_item['speed_input'])
                       ,data_item['steer_gt']*np.absolute(data_item['speed_input']))
 

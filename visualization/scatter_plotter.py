@@ -56,6 +56,8 @@ def read_data(exp_batch, experiment, town, data_params):
     full_path_control = os.path.join(data_params['root_path'], exp_batch, experiment,
                                      'drive_' + control_dataset + '_csv')
     control_data = data_reading._read_control_data(full_path_control, data_params['control'])
+    if control_data is None:
+        return None
 
     # We get the path for the validation csvs
     full_path_validation = os.path.join(data_params['root_path'], exp_batch, experiment,
@@ -77,7 +79,7 @@ def filter_data(data, filter_param, noise):
 
 
     if filter_param:
-        list_cameras = {'Town01_1': 'camera_label_file_Town01_1.txt', 'Town02_14': 'camera_label_file_Town02_14.txt'}
+        #list_cameras = {'Town01_1': 'camera_label_file_Town01_1.txt', 'Town02_14': 'camera_label_file_Town02_14.txt'}
         if 'camera' in filter_param:
             # prepare the mask
             camera_name_to_label = {'central': 1, 'left': 0, 'right': 2}
@@ -140,7 +142,7 @@ def compute_lims(data_x, data_y):
 
 def compute_metric(metric_name, data, param):
     metric_func = getattr(metrics_module, 'compute_' + metric_name)
-    if metric_name in ['id', 'step','experiment']:
+    if metric_name in ['id', 'step', 'experiment']:
         metric_results = metric_func(data, param)
     else:
         metric_results = metrics_module.compute_and_aggregate(metric_func, data, param)
@@ -221,10 +223,10 @@ def make_scatter_plot_analysis(all_metrics, plot_param, out_file = None):
     y_label = 'Success rate'
     if plot_param['x']['log']:
         x_label += ' (log)'
-        ax.set_xticklabels(['%.1e' % np.power(10,float(t)) for t in ax.get_xticks()])
+        ax.set_xticklabels(['%.1e' % np.power(10, float(t)) for t in ax.get_xticks()])
     if plot_param['y']['log']:
         y_label += ' (log)'
-        ax.set_yticklabels(['%.1e' % np.power(10,float(t)) for t in ax.get_yticks()])
+        ax.set_yticklabels(['%.1e' % np.power(10, float(t)) for t in ax.get_yticks()])
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
 
@@ -387,7 +389,7 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
     all_metrics = {}
 
     list_of_exps_names = get_names(exp_batch)
-    print ('list,expnames', list_of_exps_names)
+    print ('list, expnames', list_of_exps_names)
 
     list_of_experiments = [experiment.split('.')[-2] for experiment in list_of_experiments]
 
