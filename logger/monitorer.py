@@ -95,8 +95,23 @@ def get_latest_checkpoint_validation():
     sort_nicely(csv_files)
 
     # data = json_formatter.readJSONlog(open(log_file_path, 'r'))
+    # print ('csv ', [re.findall('\d+', file)[0] for file in csv_files])
 
-    return int(re.findall('\d+', csv_files[-1])[0])
+    csv_file_numbers = set([float(re.findall('\d+', file)[0]) for file in csv_files])
+
+    not_evaluated_logs = list(set(g_conf.TEST_SCHEDULE).difference(csv_file_numbers))
+
+    not_evaluated_logs = sorted(not_evaluated_logs, reverse=False)
+    print('csv file numbers ', csv_file_numbers)
+    print("not evaluated logs", not_evaluated_logs)
+    if len(not_evaluated_logs) == 0:  # Just in case that is the last one
+        return g_conf.TEST_SCHEDULE[-1]
+
+    if g_conf.TEST_SCHEDULE.index(not_evaluated_logs[0]) == 0:
+        return None
+
+
+    return g_conf.TEST_SCHEDULE[g_conf.TEST_SCHEDULE.index(not_evaluated_logs[0])-1]
 
 def get_latest_checkpoint_drive():
 

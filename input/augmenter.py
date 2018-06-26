@@ -11,7 +11,7 @@ class Augmenter(object):
 
 
     def __init__(self, scheduler_strategy):
-        if scheduler_strategy is not None:
+        if scheduler_strategy is not None and scheduler_strategy is not 'None':
             self.scheduler = getattr(input.scheduler, scheduler_strategy)
         else:
             self.scheduler = None

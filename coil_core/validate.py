@@ -80,7 +80,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         best_error_iter = 0
 
 
-
+        # TODO: refactor on the getting on the checkpoint organization needed
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
             if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
@@ -174,6 +174,10 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                                         latest)
 
             else:
+
+                latest = get_latest_evaluated_checkpoint()
+                if latest is None:  # When nothing was tested, get latest returns none, we fix that.
+                    latest = 0
                 time.sleep(1)
                 print ("Waiting for the next Validation")
 

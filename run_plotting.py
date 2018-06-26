@@ -4,13 +4,12 @@
 
 import argparse
 import os
-
-from visualization.scatter_plotter import plot_scatter
-import numpy as np
-import collections
-import getpass
 import importlib
 import sys
+
+
+from visualization.scatter_plotter import plot_scatter
+from utils.general import erase_wrong_plotting_summaries
 
 
 if __name__ == '__main__':
@@ -121,10 +120,14 @@ if __name__ == '__main__':
         assert (not (final_list_of_experiments and params_module.list_of_experiments)), 'List of experiments should either be given by flags or in the param file, not both'
         final_list_of_experiments = params_module.list_of_experiments
 
-    print ('final_list_experiments', final_list_of_experiments)
-    print ('data params', data_params)
-    print ('process params', params_module.processing_params)
-    print ('plot params', params_module.plot_params)
+    print('final_list_experiments', final_list_of_experiments)
+    print('data params', data_params)
+    print('process params', params_module.processing_params)
+    print('plot params', params_module.plot_params)
+
+    validations = ['Town01W1', 'Town02W14']
+    #erase_wrong_plotting_summaries(args.folder, validations)
+    #exit(1)
 
     plot_scatter(args.folder, final_list_of_experiments, data_params, params_module.processing_params,
                  params_module.plot_params, out_folder=args.folder_name)

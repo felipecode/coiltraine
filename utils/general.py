@@ -128,10 +128,55 @@ def erase_logs(exp_batch_name):
 
 
     for exp in experiments:
-        experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
-        for log in experiments:
+        experiments_logs = os.listdir(os.path.join(root_path, exp_batch_name, exp))
+        for log in experiments_logs:
             if not os.path.isdir(os.path.join(root_path, exp_batch_name, exp, log)):
                 os.remove(os.path.join(root_path, exp_batch_name, exp, log))
+
+def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list):
+    # TODO: eventually add that for driving
+
+    # Erase wrong plotting for validation!
+
+    root_path = '_logs'
+
+
+    experiments = os.listdir(os.path.join(root_path, exp_batch_name))
+
+    # Get the correct files sizes for each validation
+    # open the csv file with the ground_truth
+    validation_sizes = {}
+    for validation_data in validation_data_list:
+        val_size = len(np.loadtxt(os.path.join(os.environ["COIL_DATASET_PATH"],
+                                               validation_data, 'ground_truth.csv'),
+                                  delimiter=","))
+        validation_sizes.update({validation_data: val_size})
+
+
+
+    for exp in experiments:
+        print ("exp", exp)
+        for validation_log in validation_data_list:
+            folder_name = 'validation_' + validation_log + '_csv'
+            print(' VALIDATION ----- ', folder_name)
+            validation_folder_path = os.path.join(root_path, exp_batch_name, exp, folder_name)
+            if not os.path.exists(validation_folder_path):
+                continue
+            csv_files = os.listdir(validation_folder_path)
+            for csv_result in csv_files:
+                print ("    csv_file", csv_result)
+                csv_file_path = os.path.join(root_path, exp_batch_name, exp,
+                                             folder_name, csv_result)
+
+                len_of_csv_file = len(np.loadtxt(csv_file_path, delimiter=","))
+
+                print ('    len data', validation_sizes[validation_log])
+                print ('    len csv ', len_of_csv_file)
+                if validation_sizes[validation_log] != len_of_csv_file:
+
+                    print ("    deleting")
+                    os.remove(csv_file_path)
+
 
 
 

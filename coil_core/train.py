@@ -140,7 +140,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             input_data, float_data = data
 
 
-
             # get the control commands from float_data, size = [120,1]
 
             controls = float_data[:, dataset.controls_position(), :]
@@ -159,6 +158,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
                                      controls.cuda(), dataset.extract_inputs(float_data).cuda(),
                                      branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
                                      variable_weights=g_conf.VARIABLE_WEIGHT)
+
+
             # TODO: All these logging things could go out to clean up the main
             if loss.data < best_loss:
                 best_loss = loss.data.tolist()

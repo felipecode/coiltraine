@@ -4,7 +4,8 @@ import resource
 
 
 from coil_core import execute_train, execute_validation, execute_drive, folder_execute
-from utils.general import create_log_folder, create_exp_path, erase_logs, fix_driving_environments
+from utils.general import create_log_folder, create_exp_path, erase_logs, fix_driving_environments,\
+                          erase_wrong_plotting_summaries
 
 from visualization import plot_scatter
 
@@ -98,6 +99,7 @@ if __name__ == '__main__':
 
     create_log_folder(args.folder)
     erase_logs(args.folder)
+    #erase_wrong_plotting_summaries(args.folder, list(args.validation_datasets))
     
 
     if args.single_process is not None:
