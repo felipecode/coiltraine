@@ -191,8 +191,6 @@ def erase_validations(exp_batch_name, validation_data_list ):
     # open the csv file with the ground_truth
 
 
-
-
     for exp in experiments:
         print ("exp", exp)
         for validation_log in validation_data_list:
@@ -203,10 +201,9 @@ def erase_validations(exp_batch_name, validation_data_list ):
                 continue
             csv_files = os.listdir(validation_folder_path)
             for csv_result in csv_files:
-                print ("    csv_file", csv_result)
+                print("    csv_file", csv_result)
                 csv_file_path = os.path.join(root_path, exp_batch_name, exp,
                                              folder_name, csv_result)
-
                 os.remove(csv_file_path)
 
 

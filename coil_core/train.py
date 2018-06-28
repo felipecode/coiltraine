@@ -21,7 +21,39 @@ from torchvision import transforms
 
 
 
+def select_data(dataset, keys):
+    """
+    Given a dataset with the float data and a set of keys, get the subset of these keys.
+    Args:
+        dataset:
+        keys:
 
+    Returns:
+
+    """
+
+    if g_conf.DATA_USED == 'central':
+        camera_names = \
+            dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
+        keys = splitter.label_split(camera_names, keys, [[1]])[0]
+    elif g_conf.DATA_USED == 'sides':
+        camera_names = \
+            dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
+        keys = splitter.label_split(camera_names, keys, [[0, 2]])[0]
+    elif g_conf.DATA_USED != 'all':
+        raise ValueError(" Invalid data used keyname")
+
+
+    if  not g_conf.USE_NOISE_DATA:
+        steerings = dataset.measurements[np.where(dataset.meta_data[:, 0] == b'steer'), :][0][0]
+        steerings_noise = dataset.measurements[np.where(dataset.meta_data[:, 0]
+                                                 == b'steer_noise'), :][0][0]
+        noise_vec = steerings[:] != steerings_noise[:]
+        non_noise_data = splitter.label_split(noise_vec, keys, [[0]])
+        keys = list(set(non_noise_data[0]).intersection(set(keys)))
+
+
+    return keys
 
 
 
@@ -83,16 +115,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         # all keys depending on the measurements and produces a set of keys for each bach.
         keys = range(0, len(dataset.measurements[0, :]) - g_conf.NUMBER_IMAGES_SEQUENCE)
 
-        if g_conf.DATA_USED == 'central':
-            camera_names = \
-            dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
-            keys = splitter.label_split(camera_names, keys, [[1]])[0]
-        elif g_conf.DATA_USED == 'sides':
-            camera_names = \
-            dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
-            keys = splitter.label_split(camera_names, keys, [[0, 2]])[0]
-        elif g_conf.DATA_USED != 'all':
-            raise ValueError(" Invalid data used keyname")
+        keys = select_data(dataset, keys)
 
 
         sampler = BatchSequenceSampler(
