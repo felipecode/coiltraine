@@ -81,6 +81,7 @@ def filter_data(data, filter_param, noise):
     if filter_param:
         #list_cameras = {'Town01_1': 'camera_label_file_Town01_1.txt', 'Town02_14': 'camera_label_file_Town02_14.txt'}
         if 'camera' in filter_param:
+            print (" GOING TO FILTER CENTER ", filter_param)
             # prepare the mask
             camera_name_to_label = {'central': 1, 'left': 0, 'right': 2}
 
@@ -90,6 +91,7 @@ def filter_data(data, filter_param, noise):
                 val_dataset = data['town'] + 'W14'
 
             camera_labels = data_reading.get_camera_labels(val_dataset)
+            print (camera_labels)
 
             """
             if data['town'] == 'Town01_1' and noise == '_noise':
@@ -106,7 +108,7 @@ def filter_data(data, filter_param, noise):
             mask = np.where(camera_labels == camera_name_to_label[filter_param['camera']])
 
             # actually filter
-            keys_to_filter = ['speed_input', 'steer_gt', 'steer_pred', 'steer_error']
+            keys_to_filter = ['speed_input', 'steer_gt', 'steer_pred']
             data_filtered = {}
             data_filtered['town'] = data['town']
             data_filtered['values'] = collections.OrderedDict()
@@ -114,6 +116,8 @@ def filter_data(data, filter_param, noise):
                 data_filtered['values'][step] = {}
                 for key in keys_to_filter:
                     data_filtered['values'][step][key] = values_item[key][mask]
+
+            print ("len key after filtering ", len(data_filtered['values'][2000.0]['steer_gt']))
     else:
         data_filtered = data
     return data_filtered
@@ -152,7 +156,7 @@ def process_data(data, processing_params,noise):
     metrics = {}
 
     for metric_label, metric_param in processing_params.items():
-        data_filtered = filter_data(data, metric_param['filter'],noise)
+        data_filtered = filter_data(data, metric_param['filter'], noise)
         results = compute_metric(metric_param['metric'], data_filtered, metric_param['params'])
         metrics[metric_label] = results
 
@@ -339,10 +343,10 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
     y_label = plot_param['y']['data']
     if plot_param['x']['log']:
         x_label += ' (log)'
-        ax.set_xticklabels(['%.1e' % np.power(10,float(t)) for t in ax.get_xticks()])
+        ax.set_xticklabels(['%.1e' % np.power(10, float(t)) for t in ax.get_xticks()])
     if plot_param['y']['log']:
         y_label += ' (log)'
-        ax.set_yticklabels(['%.1e' % np.power(10,float(t)) for t in ax.get_yticks()])
+        ax.set_yticklabels(['%.1e' % np.power(10, float(t)) for t in ax.get_yticks()])
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
 

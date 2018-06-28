@@ -85,7 +85,7 @@ def compute_steering_error(data_item, param):
     return abs(data_item['steer_gt'] - data_item['steer_pred'])
 
 def compute_steering_error_filter_gt(data_item, param):
-    error_np = np.array(data_item['steer_error'])
+    error_np = np.array(abs(data_item['steer_gt'] - data_item['steer_pred']))
     gt_np = np.array(data_item['steer_gt'])
     gt_mask = param['gt_condition'](gt_np)
     return error_np[gt_mask]
@@ -122,7 +122,7 @@ def compute_steering_avg_mse(data_item, param):
     return (data_item['steer_gt'] - data_item['steer_pred'])**2
 
 def compute_displacement(data_item, param):
-    return np.multiply(data_item['steer_error'],np.absolute(data_item['speed_input']))
+    return np.multiply(abs(data_item['steer_gt'] - data_item['steer_pred']),np.absolute(data_item['speed_input']))
 
 def compute_displacement_steer(data_item, param):
     steer_gt =data_item['steer_gt'][np.where(abs(data_item['steer_gt']) > (param['thresh_steer']))]
@@ -207,13 +207,13 @@ def compute_average_displacement(data, param):
 def compute_count_errors_weighted(data_item,param):
     weighted_gt = np.multiply(np.abs(data_item['steer_gt']), param['coeff'])
 
-    count = float(sum(data_item['steer_error'] > weighted_gt)) / float(len(weighted_gt))
+    count = float(sum(abs(data_item['steer_gt'] - data_item['steer_pred']) > weighted_gt)) / float(len(weighted_gt))
 
-    if np.isnan(np.sum(data_item['steer_error'])):
+    if np.isnan(np.sum(abs(data_item['steer_gt'] - data_item['steer_pred']))):
         count = 1.0
 
-    #nans = np.isnan(data_item['steer_error'])
-    #data_item['steer_error'] = data_item['steer_error'][np.invert(nans)]
+    #nans = np.isnan(abs(data_item['steer_gt'] - data_item['steer_pred']))
+    #abs(data_item['steer_gt'] - data_item['steer_pred']) = abs(data_item['steer_gt'] - data_item['steer_pred'])[np.invert(nans)]
     # For sure, temporality is important. Even taking into account this naive idea already can be very good
 
     return count
@@ -221,7 +221,7 @@ def compute_count_errors_weighted(data_item,param):
 def compute_relative_error_smoothed(data_item,param):
     assert param['steer_smooth'] > 1e-6, 'Smooth parameter must be at least 1e-8 to avoid numerical problems'
 
-    return data_item['steer_error'] / (np.abs(data_item['steer_gt']) + param['steer_smooth'])
+    return abs(data_item['steer_gt'] - data_item['steer_pred']) / (np.abs(data_item['steer_gt']) + param['steer_smooth'])
 
 
 def compute_count_errors_weighted_speed(data_item,param):
@@ -230,8 +230,8 @@ def compute_count_errors_weighted_speed(data_item,param):
     weighted_gt = np.multiply(data_item['steer_gt'], speed_weighted_coeff)
 
 
-    count = float(sum(data_item['steer_error'] > weighted_gt)) / float(len(weighted_gt))
-    if np.isnan(np.sum(data_item['steer_error'])):
+    count = float(sum(abs(data_item['steer_gt'] - data_item['steer_pred']) > weighted_gt)) / float(len(weighted_gt))
+    if np.isnan(np.sum(abs(data_item['steer_gt'] - data_item['steer_pred']))):
         count = 1.0
 
     return count

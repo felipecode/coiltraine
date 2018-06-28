@@ -119,7 +119,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
         print(model)
 
-        criterion = Loss()
+        criterion = Loss(g_conf.LOSS_FUNCTION)
 
         optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
 
@@ -154,10 +154,10 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
 
 
-            loss = criterion.MSELoss(branches, dataset.extract_targets(float_data).cuda(),
-                                     controls.cuda(), dataset.extract_inputs(float_data).cuda(),
-                                     branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
-                                     variable_weights=g_conf.VARIABLE_WEIGHT)
+            loss = criterion(branches, dataset.extract_targets(float_data).cuda(),
+                             controls.cuda(), dataset.extract_inputs(float_data).cuda(),
+                             branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
+                             variable_weights=g_conf.VARIABLE_WEIGHT)
 
 
             # TODO: All these logging things could go out to clean up the main

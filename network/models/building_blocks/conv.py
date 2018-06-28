@@ -80,7 +80,6 @@ class Conv(nn.Module):
         return x
 
 
-
     def num_flat_features(self, x):
         size = x.size()[1:]  # all dimensions except the batch dimension
         num_features = 1
@@ -88,24 +87,15 @@ class Conv(nn.Module):
             num_features *= s
         return num_features
 
-    def load_network(self, checkpoint):
+
+    def get_conv_output(self, shape):
         """
-        Load a network for a given model definition .
-
-        Args:
-            checkpoint: The checkpoint that the user wants to add .
-
-
-
+           By inputing the shape of the input, simulate what is the ouputsize.
         """
-        coil_logger.add_message('Loading', {
-                    "Model": {"Loaded checkpoint: " + str(checkpoint) }
 
-                })
-
-
-
-        # TODO: implement
-
-
+        bs = 1
+        input = torch.autograd.Variable(torch.rand(bs, *shape))
+        output_feat = self.forward(input)
+        n_size = output_feat.data.view(bs, -1).size(1)
+        return n_size
 

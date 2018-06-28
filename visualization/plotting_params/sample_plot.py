@@ -10,7 +10,6 @@ processing_params = {'control_success_rate':   {'metric': 'control_success_rate'
                      'steer_error_central': {'metric': 'steering_error', 'filter': {'camera': 'central'}, 'params': {}},
                      'displacement': {'metric': 'displacement', 'filter': {}, 'params': {'aggregate': {'type': 'mean'}}},
                      'displacement_central': {'metric': 'displacement', 'filter': {'camera': 'central'}, 'params': {'aggregate': {'type': 'mean'}}},
-                     'displacement_70_central': {'metric': 'displacement', 'filter': {'camera': 'central'}, 'params': {'aggregate': {'type': 'percentile', 'percentile': 70}}},
 
                      'correlation_central': {'metric': 'correlation', 'filter': {'camera': 'central'},
                                              'params': {'thresh_steer': 0.05}},

@@ -15,28 +15,43 @@ from .building_blocks import Join
 class CoILICRA(nn.Module):
 
     def __init__(self, params):
-        # TODO: Make an auto naming function for this.
+        # TODO: Improve the model autonaming function
 
         super(CoILICRA, self).__init__()
 
-        # TODO: AUTOMATICALLY GET THE OUTSIZES
         # TODO: Make configurable function on the config files by reading other dictionary
         number_first_layer_channels = 0
+
 
         for _, sizes in g_conf.SENSORS.items():
             number_first_layer_channels += sizes[0] * g_conf.NUMBER_FRAMES_FUSION
 
-        self.perception = nn.Sequential(*[
-                            Conv(params={'channels': [number_first_layer_channels] +
+        # Get one item from the dict
+        sensor_input_shape = next(iter(g_conf.SENSORS.values()))
+        sensor_input_shape = [number_first_layer_channels, sensor_input_shape[1],
+                              sensor_input_shape[2]]
+
+        #out_size = \
+        #simulate_conv_out_size(number_first_layer_channels, params['perception']['conv'])
+
+
+        perception_convs = Conv(params={'channels': [number_first_layer_channels] +
                                                       params['perception']['conv']['channels'],
-                                         'kernels': params['perception']['conv']['kernels'],
-                                         'strides': params['perception']['conv']['strides'],
-                                         'dropouts': params['perception']['conv']['dropouts'],
-                                         'end_layer': True}),
-                            FC(params={'neurons': [8192] + params['perception']['fc']['neurons'],
-                                       'dropouts': params['perception']['fc']['dropouts'],
-                                       'end_layer': False})]
-                            )
+                                        'kernels': params['perception']['conv']['kernels'],
+                                        'strides': params['perception']['conv']['strides'],
+                                        'dropouts': params['perception']['conv']['dropouts'],
+                                        'end_layer': True})
+
+        perception_fc = FC(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
+                                              + params['perception']['fc']['neurons'],
+                                  'dropouts': params['perception']['fc']['dropouts'],
+                                  'end_layer': False})
+
+
+        self.perception = nn.Sequential(*[perception_convs, perception_fc])
+
+
+
 
 
         # WILL NOT WORK FOR SMALL AND DEEP LAYERS
@@ -85,7 +100,6 @@ class CoILICRA(nn.Module):
 
 
 
-    # TODO: iteration control should go inside the logger, somehow
 
     def forward(self, x, a):
 

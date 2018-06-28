@@ -122,21 +122,16 @@ def _read_step_data_wp(step_path):
     return step_dictionary
 
 # Add a static variable to avoid re-reading
-@static_vars(previous_ground_truth=None)
+@static_vars(previous_ground_truth={})
 def get_ground_truth(dataset_name):
-    if get_ground_truth.previous_ground_truth is None:
+
+    if dataset_name not in get_ground_truth.previous_ground_truth:
         full_path = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name, 'ground_truth.csv')
         ground_truth = np.loadtxt(full_path, delimiter=",", skiprows=0, usecols=([0]))
-        get_ground_truth.previous_ground_truth = ground_truth
+        get_ground_truth.previous_ground_truth.update({dataset_name :ground_truth})
 
-    return get_ground_truth.previous_ground_truth
+    return get_ground_truth.previous_ground_truth[dataset_name]
 
-@static_vars(previous_error=None)
-def compute_error(predictions, ground_truth):
-
-    if compute_error.previous_error is None:
-        compute_error.previous_error = abs(predictions - ground_truth)
-    return compute_error.previous_error
 
 @static_vars(previous_speed_ground_truth=None)
 def get_speed_ground_truth(dataset_name):
@@ -148,15 +143,16 @@ def get_speed_ground_truth(dataset_name):
 
     return get_speed_ground_truth.previous_speed_ground_truth
 
-@static_vars(previous_camera_labels=None)
+@static_vars(previous_camera_labels={})
 def get_camera_labels(dataset_name):
-    if get_camera_labels.previous_camera_labels is None:
+
+    if dataset_name not in get_camera_labels.previous_camera_labels:
         full_path = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name,
                                  'camera_labels.csv')
-        speed_ground_truth = np.loadtxt(full_path, delimiter=",", skiprows=0, usecols=([0]))
-        get_camera_labels.previous_camera_labels = speed_ground_truth
+        camera_labels = np.loadtxt(full_path, delimiter=",", skiprows=0, usecols=([0]))
+        get_camera_labels.previous_camera_labels.update({dataset_name: camera_labels })
 
-    return get_camera_labels.previous_camera_labels
+    return get_camera_labels.previous_camera_labels[dataset_name]
 
 
 
@@ -184,7 +180,7 @@ def _read_step_data(step_path):
     step_dictionary.update({'steer_gt': ground_truth})
 
     #steer_error = np.loadtxt(step_path + '_seq_error_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
-    step_dictionary.update({'steer_error': compute_error(predictions, ground_truth)})
+    #step_dictionary.update({'steer_error': compute_error(predictions, ground_truth)})
 
 
 
@@ -230,6 +226,7 @@ def _read_control_data(full_path, control_to_use):
     if control is None:
         return control
 
+    print ("control read ", control)
     return list(control.items())
     # Simple extra counter
 
@@ -246,7 +243,6 @@ def _read_data(full_path, benchmarked_steps):
 
 
         step_path = os.path.join(full_path, str(step) + '.csv')
-
         print (step_path)
 
         # First we try to add prediction data
@@ -257,6 +253,7 @@ def _read_data(full_path, benchmarked_steps):
             else:
                 prediction_data = {step: _read_step_data(step_path)}
 
+
             town_dictionary.update(prediction_data)
         except KeyboardInterrupt:
             raise
@@ -265,8 +262,6 @@ def _read_data(full_path, benchmarked_steps):
             return None
 
 
-        print ('control')
-        print (benchmarked_steps[i][1])
         town_dictionary[step].update({'control': benchmarked_steps[i][1]})
 
     town_dictionary_ordered = collections.OrderedDict(sorted(town_dictionary.items()))
