@@ -5,7 +5,7 @@ import resource
 
 from coil_core import execute_train, execute_validation, execute_drive, folder_execute
 from utils.general import create_log_folder, create_exp_path, erase_logs, fix_driving_environments,\
-                          erase_wrong_plotting_summaries
+                          erase_wrong_plotting_summaries, erase_validations
 
 from visualization import plot_scatter
 
@@ -77,6 +77,13 @@ if __name__ == '__main__':
         dest='erase_bad_validations',
         help='Set to carla to run offscreen'
     )
+    # TODO: add the posibility to delete a subset
+    argparser.add_argument(
+        '-rv', '--restart-validations',
+        action='store_true',
+        dest='restart_validations',
+        help='Set to carla to run offscreen'
+    )
     args = argparser.parse_args()
 
 
@@ -106,7 +113,8 @@ if __name__ == '__main__':
     erase_logs(args.folder)
     if args.erase_bad_validations:
         erase_wrong_plotting_summaries(args.folder, list(args.validation_datasets))
-    
+    if args.restart_validations:
+        erase_validations(args.folder, list(args.validation_datasets))
 
     if args.single_process is not None:
 

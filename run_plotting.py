@@ -55,6 +55,12 @@ if __name__ == '__main__':
        metavar='S',
        default=None,
        help='IP of the host server (default: localhost)')
+    argparser.add_argument(
+        '-ebv', '--erase-bad-validations',
+        action='store_true',
+        dest='erase_bad_validations',
+        help='Set to carla to run offscreen'
+    )
 
     argparser.add_argument('--ignore-lstm', action='store_true')
 
@@ -125,9 +131,11 @@ if __name__ == '__main__':
     print('process params', params_module.processing_params)
     print('plot params', params_module.plot_params)
 
-    validations = ['Town01W1', 'Town02W14']
-    #erase_wrong_plotting_summaries(args.folder, validations)
-    #exit(1)
+
+    if args.erase_bad_validations:
+        validations = ['Town01W1', 'Town02W14']
+        erase_wrong_plotting_summaries(args.folder, validations)
+
 
     plot_scatter(args.folder, final_list_of_experiments, data_params, params_module.processing_params,
                  params_module.plot_params, out_folder=args.folder_name)

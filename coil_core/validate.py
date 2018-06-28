@@ -64,14 +64,14 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         # TODO: here there is clearly a posibility to make a cool "conditioning" system.
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
-        model.cuda()
+
 
 
 
         latest = get_latest_evaluated_checkpoint()
         if latest is None:  # When nothing was tested, get latest returns none, we fix that.
             latest = 0
-
+        model.cuda()
 
         print (dataset.meta_data)
         best_loss = 1000
@@ -93,6 +93,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                 print ("Validation loaded ", checkpoint_iteration)
 
                 model.load_state_dict(checkpoint['state_dict'])
+
                 model.eval()
                 accumulated_loss = 0
                 accumulated_error = 0
@@ -104,6 +105,9 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     speed_position = np.where(dataset.meta_data[:, 0] == b'speed_module')[0][0]
 
 
+
+                    print ("image ", input_data['rgb'].shape)
+                    print (float_data)
                     output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
                                                   float_data[:, speed_position, :].cuda(),
                                                   float_data[:, control_position, :].cuda())
@@ -111,8 +115,9 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
 
 
-                    for i in range(input_data['rgb'].shape[0]):
 
+
+                    for i in range(input_data['rgb'].shape[0]):
                         coil_logger.write_on_csv(checkpoint_iteration, [output[i][0],
                                                                         output[i][1],
                                                                         output[i][2]])

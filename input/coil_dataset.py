@@ -193,6 +193,8 @@ class CoILDataset(Dataset):
         folder_file_names = [os.path.join(path_for_files, f)
                              for f in glob.glob1(path_for_files, "data_*.h5")]
 
+        folder_file_names = sorted(folder_file_names)
+
         # Concatenate all the sensor names and measurements names
         # TODO: This structure is very ugly.
         meas_data_cat = [list([]) for _ in range(len(meas_names))]

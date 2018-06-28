@@ -133,7 +133,7 @@ def erase_logs(exp_batch_name):
             if not os.path.isdir(os.path.join(root_path, exp_batch_name, exp, log)):
                 os.remove(os.path.join(root_path, exp_batch_name, exp, log))
 
-def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list):
+def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list, ):
     # TODO: eventually add that for driving
 
     # Erase wrong plotting for validation!
@@ -177,6 +177,37 @@ def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list):
                     print ("    deleting")
                     os.remove(csv_file_path)
 
+def erase_validations(exp_batch_name, validation_data_list ):
+    # TODO: eventually add that for driving
+
+    # Erase wrong plotting for validation!
+
+    root_path = '_logs'
+
+
+    experiments = os.listdir(os.path.join(root_path, exp_batch_name))
+
+    # Get the correct files sizes for each validation
+    # open the csv file with the ground_truth
+
+
+
+
+    for exp in experiments:
+        print ("exp", exp)
+        for validation_log in validation_data_list:
+            folder_name = 'validation_' + validation_log + '_csv'
+            print(' VALIDATION ----- ', folder_name)
+            validation_folder_path = os.path.join(root_path, exp_batch_name, exp, folder_name)
+            if not os.path.exists(validation_folder_path):
+                continue
+            csv_files = os.listdir(validation_folder_path)
+            for csv_result in csv_files:
+                print ("    csv_file", csv_result)
+                csv_file_path = os.path.join(root_path, exp_batch_name, exp,
+                                             folder_name, csv_result)
+
+                os.remove(csv_file_path)
 
 
 
