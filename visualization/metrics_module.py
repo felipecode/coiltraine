@@ -161,9 +161,8 @@ def compute_correlation(data_item, param):
 
         return np.corrcoef(salMap.reshape(-1), fixationMap.reshape(-1))[0][1]
 
-    print (data_item)
     return calc_score(data_item['steer_pred']*np.absolute(data_item['speed_input'])
-                      ,data_item['steer_gt']*np.absolute(data_item['speed_input']))
+                      , data_item['steer_gt']*np.absolute(data_item['speed_input']))
 
 
 '''

@@ -13,7 +13,7 @@ import imgauggpu as iag
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss, adjust_learning_rate
-from input import CoILDataset, BatchSequenceSampler, splitter, Augmenter
+from input import CoILDataset, BatchSequenceSampler, splitter, Augmenter, RandomSampler
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
 
@@ -55,6 +55,44 @@ def select_data(dataset, keys):
 
     return keys
 
+# TODO: for now is not posible to maybe balance just labels or just steering. Is either all or nothing
+def select_balancing_strategy(dataset, iteration):
+
+
+    # Creates the sampler, this part is responsible for managing the keys. It divides
+    # all keys depending on the measurements and produces a set of keys for each bach.
+    keys = range(0, len(dataset.measurements[0, :]) - g_conf.NUMBER_IMAGES_SEQUENCE)
+
+
+    keys = select_data(dataset, keys)
+    # In the case we are using the balancing
+    if len(g_conf.STEERING_DIVISION) > 0:
+        print ('Keys', splitter.control_steer_split(dataset.measurements, dataset.meta_data, keys))
+
+        sampler = BatchSequenceSampler(
+            splitter.control_steer_split(dataset.measurements, dataset.meta_data, keys),
+            iteration * g_conf.BATCH_SIZE,
+            g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE
+        )
+
+        # The data loader is the multi threaded module from pytorch that release a number of
+        # workers to get all the data.
+        data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
+                                                  shuffle=False,
+                                                  num_workers=2,
+                                                  pin_memory=True)
+    else:
+        # NO BALANCING
+
+        print (' KEYS', keys)
+        sampler = RandomSampler(keys, iteration * g_conf.BATCH_SIZE)
+        data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
+                                                  sampler=sampler,
+                                                  num_workers=2,
+                                                  pin_memory=True)
+
+
+    return data_loader
 
 
 # The main function maybe we could call it with a default name
@@ -87,23 +125,20 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias,
                                      'checkpoints', str(get_latest_saved_checkpoint())))
             iteration = checkpoint['iteration']
-            accumulated_time = checkpoint['total_time']
             best_loss = checkpoint['best_loss']
             best_loss_iter = checkpoint['best_loss_iter']
 
         else:
             iteration = 0
             best_loss = 10000.0
-            accumulated_time = 0  # We accumulate iteration time and keep the average speed
             best_loss_iter = 0
 
-        # TODO: The checkpoint will continue, so it should erase everything up to the iteration
-
+        # TODO: The checkpoint will continue, so it should erase everything up to the iteration on tensorboard
         # Define the dataset. This structure is has the __get_item__ redefined in a way
         # that you can access the HD_FILES positions from the root directory as a in a vector.
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
 
-        #augmenter_cpu = iag.AugmenterCPU(g_conf.AUGMENTATION_SUITE_CPU)
+        # augmenter_cpu = iag.AugmenterCPU(g_conf.AUGMENTATION_SUITE_CPU)
 
         # By instanciating the augmenter we get a callable that augment images and transform them
         # into tensors.
@@ -111,28 +146,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
         dataset = CoILDataset(full_dataset, transform=augmenter)
 
-        # Creates the sampler, this part is responsible for managing the keys. It divides
-        # all keys depending on the measurements and produces a set of keys for each bach.
-        keys = range(0, len(dataset.measurements[0, :]) - g_conf.NUMBER_IMAGES_SEQUENCE)
+        data_loader = select_balancing_strategy(dataset, iteration)
 
-        keys = select_data(dataset, keys)
-
-
-        sampler = BatchSequenceSampler(
-                splitter.control_steer_split(dataset.measurements, dataset.meta_data, keys),
-                iteration * g_conf.BATCH_SIZE,
-                g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE
-        )
-
-        # The data loader is the multi threaded module from pytorch that release a number of
-        # workers to get all the data.
-        data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
-                                                  shuffle=False,
-                                                  num_workers=2,
-                                                  pin_memory=True)
-
-
-        # TODO: here there is clearly a posibility to make a cool "conditioning" system.
 
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         model.cuda()

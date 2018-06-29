@@ -226,7 +226,6 @@ def _read_control_data(full_path, control_to_use):
     if control is None:
         return control
 
-    print ("control read ", control)
     return list(control.items())
     # Simple extra counter
 

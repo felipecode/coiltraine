@@ -65,10 +65,10 @@ def generate_name(g_conf):
         final_name_string += '_control'
 
     # The pre processing ( Balance or not )
-    if g_conf.BALANCE_DATA:
+    if g_conf.BALANCE_DATA and len(g_conf.STEERING_DIVISION) > 0:
         final_name_string += '_balance'
     else:
-        final_name_string += '_sequential'
+        final_name_string += '_random'
 
     # The type of loss function
 
@@ -77,7 +77,7 @@ def generate_name(g_conf):
     # the parts of the data that were used.
 
     if g_conf.USE_NOISE_DATA:
-        final_name_string += '_noise'
+        final_name_string += '_noise_'
     else:
         final_name_string += '_'
 

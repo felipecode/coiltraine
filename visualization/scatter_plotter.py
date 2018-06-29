@@ -411,7 +411,6 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
                 print('\n ** Missing Data on Folder **\n')
                 continue
 
-            print (data)
             # Print data
             print(data['town'])
             for step, data_item in data['values'].items():

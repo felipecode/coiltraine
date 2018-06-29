@@ -21,6 +21,26 @@ def get_rank(input_array):
             return rank
 
 
+class RandomSampler(Sampler):
+    r"""Samples elements randomly from a given list
+
+    Arguments:
+        indices (list): a list of indices
+    """
+
+    def __init__(self, keys, executed_iterations):
+        self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
+                                     executed_iterations + g_conf.BATCH_SIZE
+        self.keys = keys
+        self.weights = torch.tensor([1.0/float(len(self.keys))]*len(self.keys), dtype=torch.double)
+
+    def __iter__(self):
+        return iter(torch.multinomial(self.weights, self.iterations_to_execute, True))
+
+    def __len__(self):
+        return self.iterations_to_execute
+
+
 class SubsetSampler(Sampler):
     r"""Samples elements randomly from a given list of indices, without replacement.
 
