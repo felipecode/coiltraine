@@ -109,7 +109,7 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
                time.time() - print_drive_summary.previous_checkpoint_time )
         print ('            Completed: ', GREEN + UNDERLINE + str(get_number_episodes_completed(path)) + END)
 
-    if print_drive_summary.previous_checkpoint !=checkpoint:
+    if print_drive_summary.previous_checkpoint != checkpoint:
         print_drive_summary.previous_checkpoint = checkpoint
 
     if get_episode_number(path) != print_drive_summary.previous_checkpoint_number:
@@ -167,7 +167,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
         merge_with_yaml(os.path.join('configs', exp_batch, experiment + '.yaml'))
 
-        print (BOLD + g_conf.EXPERIMENT_GENERATED_NAME + END)
+        print (BOLD +  experiment +' : ' + g_conf.EXPERIMENT_GENERATED_NAME + END)
 
         for process in process_names:
             try:

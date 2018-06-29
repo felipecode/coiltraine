@@ -93,10 +93,7 @@ if __name__ == '__main__':
     else:
         list_of_experiments = []
 
-    if args.add_noise:
-        noise = '_noise'
-    else:
-        noise = ''
+
 
     if args.strings_to_contain is not None:
         final_list_of_experiments = []
@@ -118,7 +115,7 @@ if __name__ == '__main__':
     params_module = importlib.import_module(args.params_file)
 
     data_params = params_module.data_params
-    data_params['noise'] = noise
+
     if args.towns:
         data_params['towns'] = towns
 
@@ -133,7 +130,7 @@ if __name__ == '__main__':
 
 
     if args.erase_bad_validations:
-        validations = ['Town01W1', 'Town02W14']
+        validations = ['Town01W1Noise', 'Town02W14Noise']
         erase_wrong_plotting_summaries(args.folder, validations)
 
 
