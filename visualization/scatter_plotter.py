@@ -34,14 +34,18 @@ camera_labels_2_noise = np.array(map(int, map(float, open('camera_label_file_Tow
 """
 
 
-def read_data(exp_batch, experiment, town, data_params):
+def read_data(exp_batch, experiment, town, data_params, noise):
 
-
-    if town == 'Town01':
+    if town == 'Town01' and noise:
+        val_dataset = town + 'W1' + 'Noise'
+    elif town == 'Town01':
         val_dataset = town + 'W1'
-
-    else:
+    elif town == 'Town02' and noise:
+        val_dataset = town + 'W14' + 'Noise'
+    elif town == 'Town02':
         val_dataset = town + 'W14'
+    else:
+        raise ValueError('InvalidTownName')
 
 
 
@@ -85,10 +89,19 @@ def filter_data(data, filter_param, noise):
             # prepare the mask
             camera_name_to_label = {'central': 1, 'left': 0, 'right': 2}
 
-            if data['town'] == 'Town01':
+            if data['town'] == 'Town01' and noise:
+                val_dataset = data['town'] + 'W1' + 'Noise'
+            elif data['town'] == 'Town01':
                 val_dataset = data['town'] + 'W1'
-            else:
+            elif data['town'] == 'Town02' and noise:
+                val_dataset = data['town'] + 'W14' + 'Noise'
+            elif data['town'] == 'Town02':
                 val_dataset = data['town'] + 'W14'
+            else:
+                raise ValueError('InvalidTownName')
+
+
+
 
             camera_labels = data_reading.get_camera_labels(val_dataset)
             print (camera_labels)
@@ -406,7 +419,7 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
             print('\n === Experiment %s _ %s %s ===\n' % (list_of_exps_names[list_of_experiments.index(experiment)]
                                                           , town, data_params['noise']))
             print('\n ** Reading the data **\n')
-            data = read_data(exp_batch, experiment, town, data_params) # this reads the data and infers the masks (or offsets) for different cameras
+            data = read_data(exp_batch, experiment, town, data_params, data_params['noise']) # this reads the data and infers the masks (or offsets) for different cameras
             if data is None: # This folder didnt work out, probably is missing important data
                 print('\n ** Missing Data on Folder **\n')
                 continue

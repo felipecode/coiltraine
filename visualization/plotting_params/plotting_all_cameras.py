@@ -1,11 +1,12 @@
 import collections
 
 data_params = {'control': '_auto', 'root_path': '_logs', 'towns': ['Town01', 'Town02'],
+               'noise': True,
                'drive_environments': {'Town01': 'ECCVTrainingSuite',
                                       'Town02': 'ECCVGeneralizationSuite'}}   # some parameters for which data to read. May or may not be needed (maybe we always read all data, and filter afterwards?)
 
 
-data_filter = {'camera': 'central'}
+data_filter = {}
 processing_params = {'Success rate':   {'metric': 'control_success_rate', 'filter': {}, 'params': {}},
                     'Average completion':   {'metric': 'control_average_completion', 'filter': {}, 'params': {}},
                     'Km per infraction': {'metric': 'km_per_infraction', 'filter': {}, 'params': {}},
