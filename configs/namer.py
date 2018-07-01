@@ -58,7 +58,7 @@ def generate_name(g_conf):
 
     # THe type of output
 
-    if 'W1A' in set(g_conf.TARGETS):
+    if 'waypoint1_angle' in set(g_conf.TARGETS):
 
         final_name_string += '_waypoints'
     else:
