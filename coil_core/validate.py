@@ -19,6 +19,29 @@ from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_c
 from torchvision import transforms
 
 
+
+def write_waypoints_output(iteration, output):
+
+    for i in range(g_conf.BATCH_SIZE):
+        steer = 0.8 * (output[i][3] + output[i][4])/0.5
+
+        if steer > 0:
+            steer = min(steer, 1)
+        else:
+            steer = max(steer, -1)
+
+        coil_logger.write_on_csv(iteration, [steer,
+                                            output[i][1],
+                                            output[i][2]])
+
+
+def write_regular_output(iteration, output):
+    for i in range(g_conf.BATCH_SIZE):
+        coil_logger.write_on_csv(iteration, [output[i][0],
+                                            output[i][1],
+                                            output[i][2]])
+
+
 # The main function maybe we could call it with a default name
 def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
@@ -108,6 +131,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
                     print ("image ", input_data['rgb'].shape)
                     print (float_data)
+
                     output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
                                                   float_data[:, speed_position, :].cuda(),
                                                   float_data[:, control_position, :].cuda())
@@ -116,11 +140,13 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
 
 
+                    # TODO: this is hardcoded, eliminate the hardcodeness
+                    if 'waypoint1_angle' in g_conf.TARGETS:
+                        write_waypoints_output(checkpoint_iteration, output)
+                    else:
+                        write_regular_output(checkpoint_iteration, output)
 
-                    for i in range(input_data['rgb'].shape[0]):
-                        coil_logger.write_on_csv(checkpoint_iteration, [output[i][0],
-                                                                        output[i][1],
-                                                                        output[i][2]])
+
 
 
                     # TODO: Change this a functional standard using the loss functions.
