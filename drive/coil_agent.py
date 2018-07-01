@@ -72,10 +72,15 @@ class CoILAgent(Agent):
         norm_speed = torch.cuda.FloatTensor([norm_speed]).unsqueeze(0)
 
         directions_tensor = torch.cuda.LongTensor([directions])
+
         model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), norm_speed,
                                                   directions_tensor)
 
-        steer, throttle, brake = self._process_model_outputs(model_outputs[0])
+        # TODO: for now this is hard coded, but on the first week on TRI i will adapt
+        if 'waypoint1_angle' in g_conf.TARGETS:
+            steer, throttle, brake = self._process_model_outputs_wp(model_outputs[0])
+        else:
+            steer, throttle, brake = self._process_model_outputs(model_outputs[0])
 
         control = carla_protocol.Control()
         control.steer = steer
@@ -153,6 +158,34 @@ class CoILAgent(Agent):
 
         if throttle > brake:
             brake = 0.0
+        # else:
+        #    throttle = throttle * 2
+        # if speed > 35.0 and brake == 0.0:
+        #    throttle = 0.0
+
+        return steer, throttle, brake
+
+
+    def _process_model_outputs_wp(self, outputs):
+        """
+         A bit of heuristics in the control, to eventually make car faster, for instance.
+        Returns:
+
+        """
+        wpa1, wpa2, throttle, brake = outputs[3], outputs[4], outputs[1], outputs[2]
+        if brake < 0.2:
+            brake = 0.0
+
+        if throttle > brake:
+            brake = 0.0
+
+        steer = 0.8 * (wpa1 + wpa2)/0.5
+
+        if steer > 0:
+            steer = min(steer, 1)
+        else:
+            steer = max(steer, -1)
+
         # else:
         #    throttle = throttle * 2
         # if speed > 35.0 and brake == 0.0:
