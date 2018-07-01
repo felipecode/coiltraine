@@ -8,7 +8,7 @@ NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
 SENSORS:
   rgb: (3, 88, 200)
 MEASUREMENTS:
-  targets: (31)
+  targets: (34)
 
 BATCH_SIZE: 120
 

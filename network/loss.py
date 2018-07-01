@@ -57,20 +57,20 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
     # when command = 2, branch 1 (follow lane) is activated
     controls_b1 = (controls == 2)
     controls_b1 = torch.tensor(controls_b1, dtype=torch.float32).cuda()
-    controls_b1 = torch.cat([controls_b1, controls_b1, controls_b1],
-                            1)  # activation for steer, gas and brake
+    controls_b1 = torch.cat([controls_b1] * len(g_conf.TARGETS), 1)
+
     # when command = 3, branch 2 (turn left) is activated
     controls_b2 = (controls == 3)
     controls_b2 = torch.tensor(controls_b2, dtype=torch.float32).cuda()
-    controls_b2 = torch.cat([controls_b2, controls_b2, controls_b2], 1)
+    controls_b2 = torch.cat([controls_b2] *  len(g_conf.TARGETS), 1)
     # when command = 4, branch 3 (turn right) is activated
     controls_b3 = (controls == 4)
     controls_b3 = torch.tensor(controls_b3, dtype=torch.float32).cuda()
-    controls_b3 = torch.cat([controls_b3, controls_b3, controls_b3], 1)
+    controls_b3 = torch.cat([controls_b3] * len(g_conf.TARGETS), 1)
     # when command = 5, branch 4 (go strange) is activated
     controls_b4 = (controls == 5)
     controls_b4 = torch.tensor(controls_b4, dtype=torch.float32).cuda()
-    controls_b4 = torch.cat([controls_b4, controls_b4, controls_b4], 1)
+    controls_b4 = torch.cat([controls_b4] * len(g_conf.TARGETS), 1)
 
     # calculate loss for each branch with specific activation
     loss_b1 = ((branches[0] - targets) * controls_b1) ** 2 * branch_weights[0]
