@@ -33,7 +33,7 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
     if variable_weights:
         if len(variable_weights) != targets.shape[1]:
             raise ValueError('The input number of weight lambdas is '
-                             + str(len(branch_weights)) +
+                             + str(len(variable_weights)) +
                              ', while the number of branches items is '
                              + str(targets.shape[1]))
     else:
