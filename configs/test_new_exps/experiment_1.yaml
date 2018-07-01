@@ -1,6 +1,6 @@
 
 #### General Configuration Parameters ####
-SAVE_SCHEDULE: [200, 400, 800, 1600 , 3200]
+SAVE_SCHEDULE: [2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]
 
 NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
 
@@ -11,10 +11,12 @@ MEASUREMENTS:
   targets: (31)
 
 BATCH_SIZE: 120
+
 NUMBER_ITERATIONS: 3200
+
 STEERING_DIVISION: [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
 LABELS_DIVISION: [[0, 2, 5], [3], [4]]
-TARGETS: ['steer', 'throttle', 'brake']
+TARGETS: ['steer', 'throttle', 'brake', 'W1A', 'W2A']
 INPUTS: ['speed_module']
 NUMBER_FRAMES_FUSION: 1
 NUMBER_IMAGES_SEQUENCE: 1
@@ -27,7 +29,7 @@ DATA_USED: 'all'
 USE_NOISE_DATA: True
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [200, 400, 800, 1600 , 3200]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [ 2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
@@ -71,19 +73,22 @@ LEARNING_RATE_DECAY_LEVEL: 0.5
 
 #TODO check how to use this part
 BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05]
-LOSS_FUNCTION: 'L2'
+LOSS_FUNCTION: 'MSE'
 
 VARIABLE_WEIGHT:
-  Steer: 0.5
-  Gas: 0.45
-  Brake: 0.05
+  Steer: 0.2
+  Gas: 0.1
+  Brake: 0.1
+  Speed: 1.0
+  W1A: 0.3
+  W2A: 0.3
 
 
 
 
 #### Simulation Related Parameters ####
 IMAGE_CUT: [115, 510]  # How you should cut the input image that is received from the server
-USE_ORACLE: True
+USE_ORACLE: False
 
 
 

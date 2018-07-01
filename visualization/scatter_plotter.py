@@ -432,7 +432,8 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
                     print(k, len(v))
             print('\n ** Processing the data **\n')
             metrics = process_data(data, processing_params, data_params['noise']) # Compute metrics from the data. Can be multiple metrics, given by the processing_params list. Should be vectorized as much as possible. The output is a list of the same size as processing_params.
-            all_metrics[experiment + '_' + town] = metrics # append to the computed list of metrics to the dictionary of results.
+            all_metrics[experiment + ' : ' + list_of_exps_names[list_of_experiments.index(experiment)]
+                        + '_' + town] = metrics # append to the computed list of metrics to the dictionary of results.
 
     with open(os.path.join(out_path, 'all_metrics.txt'), 'w') as f:
         f.write('all_metrics:\n' + pprint.pformat(all_metrics, indent=4))

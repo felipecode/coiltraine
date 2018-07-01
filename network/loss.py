@@ -80,14 +80,36 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
     loss_b5 = (branches[4] - speed_gt) ** 2 * branch_weights[4]
 
     # Apply the variable weights
-    loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
-              + loss_b1[:, 2] * variable_weights['Brake']
-    loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights['Gas'] \
-              + loss_b2[:, 2] * variable_weights['Brake']
-    loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights['Gas'] \
-              + loss_b3[:, 2] * variable_weights['Brake']
-    loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights['Gas'] \
-              + loss_b4[:, 2] * variable_weights['Brake']
+    # TODO; the variable and its weigths should be sincronized in the same variable.
+    # TODO: very dangerous part. Instead of indexing it should use variable names
+    if 'W1A' in variable_weights:   # TODO: FIX this hardcodedism
+        loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
+                  + loss_b1[:, 2] * variable_weights['Brake'] \
+                  + loss_b1[:, 3] * variable_weights['W1A'] \
+                  + loss_b1[:, 4] * variable_weights['W2A']
+        loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights['Gas'] \
+                  + loss_b2[:, 2] * variable_weights['Brake'] \
+                  + loss_b2[:, 3] * variable_weights['W1A'] \
+                  + loss_b2[:, 4] * variable_weights['W2A']
+
+        loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights['Gas'] \
+                  + loss_b3[:, 2] * variable_weights['Brake'] \
+                  + loss_b3[:, 3] * variable_weights['W1A'] \
+                  + loss_b3[:, 4] * variable_weights['W2A']
+
+        loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights['Gas'] \
+                  + loss_b4[:, 2] * variable_weights['Brake'] \
+                  + loss_b4[:, 3] * variable_weights['W1A'] \
+                  + loss_b4[:, 4] * variable_weights['W2A']
+    else:
+        loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
+                  + loss_b1[:, 2] * variable_weights['Brake']
+        loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights['Gas'] \
+                  + loss_b2[:, 2] * variable_weights['Brake']
+        loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights['Gas'] \
+                  + loss_b3[:, 2] * variable_weights['Brake']
+        loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights['Gas'] \
+                  + loss_b4[:, 2] * variable_weights['Brake']
     # add all branches losses together
     mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4
 
