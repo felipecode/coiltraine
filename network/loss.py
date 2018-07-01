@@ -82,7 +82,7 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
     # Apply the variable weights
     # TODO; the variable and its weigths should be sincronized in the same variable.
     # TODO: very dangerous part. Instead of indexing it should use variable names
-    if 'waypoint1_angle' in variable_weights:   # TODO: FIX this hardcodedism
+    if 'W1A' in variable_weights:   # TODO: FIX this hardcodedism
         loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
                   + loss_b1[:, 2] * variable_weights['Brake'] \
                   + loss_b1[:, 3] * variable_weights['W1A'] \
