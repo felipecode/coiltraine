@@ -21,7 +21,7 @@ NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 40.0
-TRAIN_DATASET_NAME: '25HoursW1-3-6-8'
+TRAIN_DATASET_NAME: '1HoursW1-3-6-8'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
