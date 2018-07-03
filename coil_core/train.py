@@ -67,7 +67,6 @@ def select_balancing_strategy(dataset, iteration):
     keys = select_data(dataset, keys)
     # In the case we are using the balancing
     if len(g_conf.STEERING_DIVISION) > 0:
-        print ('Keys', splitter.control_steer_split(dataset.measurements, dataset.meta_data, keys))
 
         sampler = BatchSequenceSampler(
             splitter.control_steer_split(dataset.measurements, dataset.meta_data, keys),
@@ -84,7 +83,6 @@ def select_balancing_strategy(dataset, iteration):
     else:
         # NO BALANCING
 
-        print (' KEYS', keys)
         sampler = RandomSampler(keys, iteration * g_conf.BATCH_SIZE)
         data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
                                                   sampler=sampler,
@@ -103,6 +101,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
     # TODO: probable race condition, the train has to be started before.
     try:
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
+        g_conf.VARIABLE_WEIGHT = {}
+        print("BEFOE MERGET variable ", g_conf.VARIABLE_WEIGHT, 'conf targets',
+              g_conf.TARGETS)
 
         # At this point the log file with the correct naming is created.
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
@@ -113,10 +114,13 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         if not os.path.exists('_output_logs'):
             os.mkdir('_output_logs')
 
+        print("variable ", g_conf.VARIABLE_WEIGHT, 'conf targets',
+              g_conf.TARGETS)
+
         # Put the output to a separate file
-        if suppress_output:
-            sys.stdout = open(os.path.join('_output_logs',
-                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+        #if suppress_output:
+        #    sys.stdout = open(os.path.join('_output_logs',
+        #                      g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
 
 
 
@@ -274,8 +278,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
     except:
         traceback.print_exc()
-
         coil_logger.add_message('Error', {'Message': 'Something Happened'})
-
 
 

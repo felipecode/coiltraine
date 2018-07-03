@@ -334,14 +334,14 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
     # TODO: there is likely to be an issue on this part, both are hardcoded
     # TODO: This is just working when there is one weather and one task
 
-    print (metrics_summary)
-    print (metrics_summary['average_speed'])
-    average_speed_task =  sum(metrics_summary['average_speed'][str(float(list(weathers)[0]))])
+    print(metrics_summary)
+    print(metrics_summary['average_speed'])
+    average_speed_task = sum(metrics_summary['average_speed'][str(float(list(weathers)[0]))])
 
 
     average_results_matrix.update({'driven_kilometers': np.array([summed_driven_kilometers[0]])})
-    average_results_matrix.update({'average_speed':np.array([average_speed_task])})
-    print (average_results_matrix)
+    average_results_matrix.update({'average_speed': np.array([average_speed_task])})
+    print(average_results_matrix)
 
 
     for metric, vectors in average_results_matrix.items():

@@ -23,7 +23,7 @@ import numpy as np
 def sldist(c1, c2): return math.sqrt((c2[0] - c1[0]) ** 2 + (c2[1] - c1[1]) ** 2)
 
 
-def plot_episode(carla_map,file_name,number_of_episodes,color_palate):
+def plot_episode(carla_map, file_name, number_of_episodes, color_palate):
 
     f = open(file_name, "rb")
     header_details = f.readline()
@@ -32,7 +32,7 @@ def plot_episode(carla_map,file_name,number_of_episodes,color_palate):
     header_details[-1] = header_details[-1][:-2]
     f.close()
 
-    details_matrix = np.loadtxt(open(file_name, "rb"), delimiter = ",", skiprows = 1)
+    details_matrix = np.loadtxt(open(file_name, "rb"), delimiter=",", skiprows=1)
 
 
     #
@@ -61,13 +61,10 @@ def plot_episode(carla_map,file_name,number_of_episodes,color_palate):
         #print point
 
     count_episodes = 1
-
-    print episode_palete
-    print travelled_distance
-
     previous_pos = [details_matrix[0, header_details.index('pos_x')],
                  details_matrix[0, header_details.index('pos_y')]]
-    for i in range(0,episode_palete[-1]):
+
+    for i in range(0, episode_palete[-1]):
 
         point = [details_matrix[i, header_details.index('pos_x')],
                  details_matrix[i, header_details.index('pos_y')]]
@@ -76,12 +73,11 @@ def plot_episode(carla_map,file_name,number_of_episodes,color_palate):
         if sldist(point,previous_pos) > 500.0: # DUMB BUT WHATEVER
             count_episodes +=1
             travel_this_episode =0
-            print episode_palete[count_episodes]
             previous_pos= point
         if count_episodes == number_of_episodes+1:
             break
 
-        travel_this_episode += sldist(point,previous_pos)
+        travel_this_episode += sldist(point, previous_pos)
 
         previous_pos = point
 
@@ -103,7 +99,7 @@ if __name__ == '__main__':
 
 
     city_name = 'Town01'
-    name_to_save = 'Name for saving a map'
+    name_to_save = 'map saved'
 
 
     color_palate =[
@@ -116,7 +112,7 @@ if __name__ == '__main__':
     ]
 
 
-    carla_map = map.CarlaMap(city_name, 16.43, 50.0, name_to_save)
+    carla_map = map.CarlaMap(city_name, 0.1643, 50.0, name_to_save)
 
     plot_episode(carla_map,'/Users/felipecode/chauffeur/500000_25_nor_saug_single_ctrl_bal_regr_allauto_databench_Town01/details_w1.',6,color_palate)
 

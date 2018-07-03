@@ -37,10 +37,10 @@ from logger.coil_logger import create_log, add_message
 
 
 # TODO: NAMing conventions ?
-
 _g_conf = AttributeDict()
 
 
+_g_conf.immutable(False)
 
 """#### GENERAL CONFIGURATION PARAMETERS ####"""
 _g_conf.NUMBER_OF_LOADING_WORKERS = 12
@@ -105,20 +105,16 @@ _g_conf.BRANCH_LOSS_WEIGHT = [0.95, 0.95, 0.95, 0.95, 0.05]
 _g_conf.VARIABLE_WEIGHT = {'Steer': 0.5, 'Gas': 0.45, 'Brake': 0.05}
 _g_conf.LOSS_FUNCTION = 'L2'
 
-
-
-
 """#### Simulation Related Parameters ####"""
 
 _g_conf.IMAGE_CUT = [115, 510]  # How you should cut the input image that is received from the server
 _g_conf.USE_ORACLE = True
 
 
+
 def _check_integrity():
 
-
     pass
-
 
 
 def merge_with_yaml(yaml_filename):

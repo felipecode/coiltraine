@@ -30,6 +30,8 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
     """
 
     # weight different target items with lambdas
+
+    print ( "variable ", variable_weights, ' Targets ', targets.shape[1], 'conf targets',  g_conf.TARGETS)
     if variable_weights:
         if len(variable_weights) != targets.shape[1]:
             raise ValueError('The input number of weight lambdas is '

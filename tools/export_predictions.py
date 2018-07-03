@@ -153,11 +153,12 @@ if __name__ == "__main__":
 
             for i in range(0, 200):
                 steer = data['targets'][i][0]
-                camera_label = data['targets'][i][26]
+                camera_angle = data['targets'][i][26]
+                camera_label = data['targets'][i][25]
                 speed = data['targets'][i][10]
-                steer = augment_steering(camera_label, steer, speed)
-
-                camera_label_file.write(str(steer) + ',' +
-                                        str(data['targets'][i][1]) + ',' +
-                                        str(data['targets'][i][2]) + '\n')
+                steer = augment_steering(camera_angle, steer, speed)
+                camera_label_file.write(str(camera_angle) + '\n')
+                #camera_label_file.write(str(steer) + ',' +
+                #                        str(data['targets'][i][1]) + ',' +
+                #                        str(data['targets'][i][2]) + '\n')
 

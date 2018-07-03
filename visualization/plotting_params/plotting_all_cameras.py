@@ -1,64 +1,63 @@
 import collections
 
-data_params = {'control': '_auto', 'root_path': '_logs', 'towns': ['Town01', 'Town02'],
-               'noise': True,
-               'drive_environments': {'Town01': 'ECCVTrainingSuite',
-                                      'Town02': 'ECCVGeneralizationSuite'}}   # some parameters for which data to read. May or may not be needed (maybe we always read all data, and filter afterwards?)
+data_params = {'control': '_auto', 'root_path': '_logs', 'towns': ['Town01'],
+               'noise': False,
+               'drive_environments': {'Town01': 'ECCVTrainingSuite'}}   # some parameters for which data to read. May or may not be needed (maybe we always read all data, and filter afterwards?)
 
 
-data_filter = {}
+data_filter = {'camera': 'central'}
 processing_params = {'Success rate':   {'metric': 'control_success_rate', 'filter': {}, 'params': {}},
-                    'Average completion':   {'metric': 'control_average_completion', 'filter': {}, 'params': {}},
-                    'Km per infraction': {'metric': 'km_per_infraction', 'filter': {}, 'params': {}},
+                     'Average completion':   {'metric': 'control_average_completion', 'filter': {}, 'params': {}},
+                     'Km per infraction': {'metric': 'km_per_infraction', 'filter': {}, 'params': {}},
                      'Steering absolute error': {'metric': 'steering_error', 'filter': data_filter,
                                                  'params': {}},
-                     'Steering absolute error gt > 0.001': {'metric': 'steering_error_filter_gt',
-                                                            'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.001)}},
-                     'Steering absolute error gt > 0.01': {'metric': 'steering_error_filter_gt',
-                                                           'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.01)}},
-                     'Steering absolute error gt > 0.03': {'metric': 'steering_error_filter_gt',
-                                                           'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.03)}},
-                     'Steering absolute error gt > 0.05': {'metric': 'steering_error_filter_gt',
-                                                           'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.05)}},
-                     'Steering absolute error gt > 0.1': {'metric': 'steering_error_filter_gt',
-                                                          'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.1)}},
-                     'Steering absolute error gt > 0.2': {'metric': 'steering_error_filter_gt',
-                                                          'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.2)}},
+                     # 'Steering absolute error gt > 0.001': {'metric': 'steering_error_filter_gt',
+                     #                                        'filter': data_filter, 'params': {
+                     #         'gt_condition': (lambda x: abs(x) > 0.001)}},
+                     # 'Steering absolute error gt > 0.01': {'metric': 'steering_error_filter_gt',
+                     #                                       'filter': data_filter, 'params': {
+                     #         'gt_condition': (lambda x: abs(x) > 0.01)}},
+                     # 'Steering absolute error gt > 0.03': {'metric': 'steering_error_filter_gt',
+                     #                                       'filter': data_filter, 'params': {
+                     #         'gt_condition': (lambda x: abs(x) > 0.03)}},
+                     # 'Steering absolute error gt > 0.05': {'metric': 'steering_error_filter_gt',
+                     #                                       'filter': data_filter, 'params': {
+                     #         'gt_condition': (lambda x: abs(x) > 0.05)}},
+                     # 'Steering absolute error gt > 0.1': {'metric': 'steering_error_filter_gt',
+                     #                                      'filter': data_filter, 'params': {
+                     #         'gt_condition': (lambda x: abs(x) > 0.1)}},
+                     # 'Steering absolute error gt > 0.2': {'metric': 'steering_error_filter_gt',
+                     #                                      'filter': data_filter, 'params': {
+                     #         'gt_condition': (lambda x: abs(x) > 0.2)}},
                      'Steering MSE': {'metric': 'steering_avg_mse', 'filter': data_filter,
                                       'params': {}},
-                     'Steering accuracy 0.002': {'metric': 'steering_accuracy',
-                                                 'filter': data_filter,
-                                                 'params': {'threshold': 0.002}},
-                     'Steering accuracy 0.005': {'metric': 'steering_accuracy',
-                                                 'filter': data_filter,
-                                                 'params': {'threshold': 0.005}},
-                     'Steering accuracy 0.01': {'metric': 'steering_accuracy',
-                                                'filter': data_filter,
-                                                'params': {'threshold': 0.01}},
-                     'Steering accuracy 0.03': {'metric': 'steering_accuracy',
-                                                'filter': data_filter,
-                                                'params': {'threshold': 0.03}},
-                     'Steering accuracy 0.005 gt > 0.1': {'metric': 'steering_accuracy_filter_gt',
-                                                          'filter': data_filter,
-                                                          'params': {'threshold': 0.005,
-                                                                     'gt_condition': (
-                                                                     lambda x: abs(x) > 0.1)}},
-                     'Steering accuracy 0.01 gt > 0.1': {'metric': 'steering_accuracy_filter_gt',
-                                                         'filter': data_filter,
-                                                         'params': {'threshold': 0.01,
-                                                                    'gt_condition': (
-                                                                    lambda x: abs(x) > 0.1)}},
-                     'Steering accuracy 0.03 gt > 0.1': {'metric': 'steering_accuracy_filter_gt',
-                                                         'filter': data_filter,
-                                                         'params': {'threshold': 0.03,
-                                                                    'gt_condition': (
-                                                                    lambda x: abs(x) > 0.1)}},
+                     # 'Steering accuracy 0.002': {'metric': 'steering_accuracy',
+                     #                             'filter': data_filter,
+                     #                             'params': {'threshold': 0.002}},
+                     # 'Steering accuracy 0.005': {'metric': 'steering_accuracy',
+                     #                             'filter': data_filter,
+                     #                             'params': {'threshold': 0.005}},
+                     # 'Steering accuracy 0.01': {'metric': 'steering_accuracy',
+                     #                            'filter': data_filter,
+                     #                            'params': {'threshold': 0.01}},
+                     # 'Steering accuracy 0.03': {'metric': 'steering_accuracy',
+                     #                            'filter': data_filter,
+                     #                            'params': {'threshold': 0.03}},
+                     # 'Steering accuracy 0.005 gt > 0.1': {'metric': 'steering_accuracy_filter_gt',
+                     #                                      'filter': data_filter,
+                     #                                      'params': {'threshold': 0.005,
+                     #                                                 'gt_condition': (
+                     #                                                 lambda x: abs(x) > 0.1)}},
+                     # 'Steering accuracy 0.01 gt > 0.1': {'metric': 'steering_accuracy_filter_gt',
+                     #                                     'filter': data_filter,
+                     #                                     'params': {'threshold': 0.01,
+                     #                                                'gt_condition': (
+                     #                                                lambda x: abs(x) > 0.1)}},
+                     # 'Steering accuracy 0.03 gt > 0.1': {'metric': 'steering_accuracy_filter_gt',
+                     #                                     'filter': data_filter,
+                     #                                     'params': {'threshold': 0.03,
+                     #                                                'gt_condition': (
+                     #                                                lambda x: abs(x) > 0.1)}},
                      'Displacement': {'metric': 'displacement', 'filter': data_filter,
                                       'params': {'aggregate': {'type': 'mean'}}},
                      'Displacement 70th percentile': {'metric': 'displacement',
@@ -138,53 +137,6 @@ plot_params['ctrl_vs_steer'] = {'print': True,
                                 'color': {'data': 'town_id'}
                                 }
 
-plot_params['ctrl_vs_steer_gt_0001'] = {'print': True,
-                                        'x': {'data': 'Steering absolute error gt > 0.001',
-                                              'log': True},
-                                        'y': {'data': 'Success rate', 'log': False},
-                                        'size': {'data': 'step'},
-                                        'color': {'data': 'town_id'}
-                                        }
-
-plot_params['ctrl_vs_steer_gt_001'] = {'print': True,
-                                       'x': {'data': 'Steering absolute error gt > 0.01',
-                                             'log': True},
-                                       'y': {'data': 'Success rate', 'log': False},
-                                       'size': {'data': 'step'},
-                                       'color': {'data': 'town_id'}
-                                       }
-
-plot_params['ctrl_vs_steer_gt_003'] = {'print': True,
-                                       'x': {'data': 'Steering absolute error gt > 0.03',
-                                             'log': True},
-                                       'y': {'data': 'Success rate', 'log': False},
-                                       'size': {'data': 'step'},
-                                       'color': {'data': 'town_id'}
-                                       }
-
-plot_params['ctrl_vs_steer_gt_005'] = {'print': True,
-                                       'x': {'data': 'Steering absolute error gt > 0.05',
-                                             'log': True},
-                                       'y': {'data': 'Success rate', 'log': False},
-                                       'size': {'data': 'step'},
-                                       'color': {'data': 'town_id'}
-                                       }
-
-plot_params['ctrl_vs_steer_gt_01'] = {'print': True,
-                                      'x': {'data': 'Steering absolute error gt > 0.1',
-                                            'log': True},
-                                      'y': {'data': 'Success rate', 'log': False},
-                                      'size': {'data': 'step'},
-                                      'color': {'data': 'town_id'}
-                                      }
-
-plot_params['ctrl_vs_steer_gt_02'] = {'print': True,
-                                      'x': {'data': 'Steering absolute error gt > 0.2',
-                                            'log': True},
-                                      'y': {'data': 'Success rate', 'log': False},
-                                      'size': {'data': 'step'},
-                                      'color': {'data': 'town_id'}
-                                      }
 
 plot_params['ctrl_vs_steer_mse'] = {'print': True,
                                     'x': {'data': 'Steering MSE', 'log': True},
@@ -193,57 +145,6 @@ plot_params['ctrl_vs_steer_mse'] = {'print': True,
                                     'color': {'data': 'town_id'}
                                     }
 
-plot_params['ctrl_vs_steer_acc_001'] = {'print': True,
-                                        'x': {'data': 'Steering accuracy 0.01', 'log': False},
-                                        'y': {'data': 'Success rate', 'log': False},
-                                        'size': {'data': 'step'},
-                                        'color': {'data': 'town_id'}
-                                        }
-
-plot_params['ctrl_vs_steer_acc_003'] = {'print': True,
-                                        'x': {'data': 'Steering accuracy 0.03', 'log': False},
-                                        'y': {'data': 'Success rate', 'log': False},
-                                        'size': {'data': 'step'},
-                                        'color': {'data': 'town_id'}
-                                        }
-
-plot_params['ctrl_vs_steer_acc_0005'] = {'print': True,
-                                         'x': {'data': 'Steering accuracy 0.005', 'log': False},
-                                         'y': {'data': 'Success rate', 'log': False},
-                                         'size': {'data': 'step'},
-                                         'color': {'data': 'town_id'}
-                                         }
-
-plot_params['ctrl_vs_steer_acc_0002'] = {'print': True,
-                                         'x': {'data': 'Steering accuracy 0.002', 'log': False},
-                                         'y': {'data': 'Success rate', 'log': False},
-                                         'size': {'data': 'step'},
-                                         'color': {'data': 'town_id'}
-                                         }
-
-plot_params['ctrl_vs_steer_acc_0005_gt_01'] = {'print': True,
-                                               'x': {'data': 'Steering accuracy 0.005 gt > 0.1',
-                                                     'log': False},
-                                               'y': {'data': 'Success rate', 'log': False},
-                                               'size': {'data': 'step'},
-                                               'color': {'data': 'town_id'}
-                                               }
-
-plot_params['ctrl_vs_steer_acc_001_gt_01'] = {'print': True,
-                                              'x': {'data': 'Steering accuracy 0.01 gt > 0.1',
-                                                    'log': False},
-                                              'y': {'data': 'Success rate', 'log': False},
-                                              'size': {'data': 'step'},
-                                              'color': {'data': 'town_id'}
-                                              }
-
-plot_params['ctrl_vs_steer_acc_003_gt_01'] = {'print': True,
-                                              'x': {'data': 'Steering accuracy 0.03 gt > 0.1',
-                                                    'log': False},
-                                              'y': {'data': 'Success rate', 'log': False},
-                                              'size': {'data': 'step'},
-                                              'color': {'data': 'town_id'}
-                                              }
 
 plot_params['ctrl_vs_displ'] = {'print': True,
                                 'x': {'data': 'Displacement', 'log': True},

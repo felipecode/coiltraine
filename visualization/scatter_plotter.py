@@ -1,7 +1,7 @@
 
 import numpy as np
 
-
+import json
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
@@ -104,7 +104,6 @@ def filter_data(data, filter_param, noise):
 
 
             camera_labels = data_reading.get_camera_labels(val_dataset)
-            print (camera_labels)
 
             """
             if data['town'] == 'Town01_1' and noise == '_noise':
@@ -435,8 +434,8 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
             all_metrics[experiment + ' : ' + list_of_exps_names[list_of_experiments.index(experiment)]
                         + '_' + town] = metrics # append to the computed list of metrics to the dictionary of results.
 
-    with open(os.path.join(out_path, 'all_metrics.txt'), 'w') as f:
-        f.write('all_metrics:\n' + pprint.pformat(all_metrics, indent=4))
+    with open(os.path.join(out_path, 'all_metrics.json'), 'w') as fo:
+        fo.write(json.dumps(all_metrics))
 
     # Plot the results
     print('\n === Plotting the results ===\n')

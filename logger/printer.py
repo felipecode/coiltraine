@@ -163,6 +163,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
     for experiment in experiments_list:
         if experiment == '':
             raise ValueError("Empty Experiment on List")
+
         g_conf.immutable(False)
 
         merge_with_yaml(os.path.join('configs', exp_batch, experiment + '.yaml'))
