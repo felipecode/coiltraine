@@ -3,6 +3,7 @@ import logging
 import resource
 
 from logger import printer
+from coil_core
 from utils.general import create_log_folder, create_exp_path, erase_logs, fix_driving_environments, \
                             get_validation_datasets, get_driving_environments
 
@@ -27,7 +28,7 @@ if __name__ == '__main__':
     argparser.add_argument(
         '--erase-experiments',
         nargs='+',
-        dest='gpus',
+        dest='erase_experiments',
         type=str
     )
 
@@ -39,8 +40,10 @@ if __name__ == '__main__':
     if args.check_status:
         validation_datasets = get_validation_datasets(args.folder)
         drive_environments = get_driving_environments(args.folder)
+
+        get_names()
         printer.plot_folder_summaries(args.folder, True, validation_datasets, drive_environments,
-                              verbose=False)
+                                      verbose=False)
 
     if args.erase_experiments:
         pass

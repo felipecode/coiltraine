@@ -3,6 +3,7 @@ import time
 
 from .monitorer import get_status, get_episode_number, get_number_episodes_completed
 from configs import g_conf, merge_with_yaml
+from configs.coil_global import get_names
 from utils.general import sort_nicely, get_latest_path, static_vars
 from visualization.data_reading import read_control_csv
 
@@ -158,9 +159,17 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
     experiments_list = [experiment.split('.')[-2] for experiment in experiments_list]
 
+    names_list = get_names(exp_batch)
+    sorted_keys = sorted(range(len(names_list)), key=lambda k: names_list[k])
+
+
     print (experiments_list)
 
-    for experiment in experiments_list:
+    for key in sorted_keys:
+
+        experiment = experiments_list[key]
+        generated_name = names_list[key]
+
         if experiment == '':
             raise ValueError("Empty Experiment on List")
 
@@ -168,7 +177,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
         merge_with_yaml(os.path.join('configs', exp_batch, experiment + '.yaml'))
 
-        print (BOLD +  experiment +' : ' + g_conf.EXPERIMENT_GENERATED_NAME + END)
+        print (BOLD +  experiment +' : ' + generated_name + END)
 
         for process in process_names:
             try:
