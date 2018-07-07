@@ -23,7 +23,19 @@ import numpy as np
 def sldist(c1, c2): return math.sqrt((c2[0] - c1[0]) ** 2 + (c2[1] - c1[1]) ** 2)
 
 
-def plot_episode(carla_map, file_name, number_of_episodes, color_palate):
+def plot_episode(city_name, file_name, number_of_episodes, color_palate):
+
+
+    # This can be hardcoded since the map file name is always the same
+    image_location = (map.__file__)
+
+    self.map_image = Image.open(city_map_file)
+    self.map_image.load()
+    self.map_image = np.asarray(self.map_image, dtype="int32")
+
+    carla_map = map.CarlaMap(city_name, 0.1643, 50.0)
+
+
 
     f = open(file_name, "rb")
     header_details = f.readline()
@@ -90,6 +102,8 @@ def plot_episode(carla_map, file_name, number_of_episodes, color_palate):
 
         color_palate_inst = [0+(value*x) for x in color_palate[count_episodes-1][:-1]]
         color_palate_inst.append(255)
+
+
         carla_map.plot_on_map(point,12,color_palate_inst)
 
     carla_map.save_image('')
@@ -112,12 +126,7 @@ if __name__ == '__main__':
     ]
 
 
-    carla_map = map.CarlaMap(city_name, 0.1643, 50.0, name_to_save)
-
-    plot_episode(carla_map,'/Users/felipecode/chauffeur/500000_25_nor_saug_single_ctrl_bal_regr_allauto_databench_Town01/details_w1.',6,color_palate)
 
 
-"""
-'5_small_ndrop_single_wp_bal_regr_all', '25_nor_ndrop_single_ctrl_seq_regr_all'
- 80_nor_ndrop_single_ctrl_bal_regr_all25_nor_maug_single_ctrl_bal_regr_all
-"""
+    plot_episode(city_name, '/Users/felipecode/chauffeur/500000_25_nor_saug_single_ctrl_bal_regr_allauto_databench_Town01/details_w1.',6,color_palate)
+

@@ -41,7 +41,7 @@ if __name__ == '__main__':
         validation_datasets = get_validation_datasets(args.folder)
         drive_environments = get_driving_environments(args.folder)
 
-        get_names()
+        #get_names()
         printer.plot_folder_summaries(args.folder, True, validation_datasets, drive_environments,
                                       verbose=False)
 

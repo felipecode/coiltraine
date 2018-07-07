@@ -118,9 +118,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
               g_conf.TARGETS)
 
         # Put the output to a separate file
-        #if suppress_output:
-        #    sys.stdout = open(os.path.join('_output_logs',
-        #                      g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+        if suppress_output:
+            sys.stdout = open(os.path.join('_output_logs',
+                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
 
 
 
