@@ -133,5 +133,7 @@ if __name__ == '__main__':
         validations = ['Town01W1Noise', 'Town02W14Noise', 'Town01W1', 'Town02W14']
         erase_wrong_plotting_summaries(args.folder, validations)
 
+    #final_list_of_experiments = ['experiment_29.yaml']
+
     plot_scatter(args.folder, final_list_of_experiments, data_params, params_module.processing_params,
                  params_module.plot_params, out_folder=args.folder_name)

@@ -194,7 +194,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             branches = model(torch.squeeze(input_data['rgb'].cuda()),
                              dataset.extract_inputs(float_data).cuda())
 
-
+            print ("balanced stereing vec")
+            
+            print (float_data[:, 0])
 
             loss = criterion(branches, dataset.extract_targets(float_data).cuda(),
                              controls.cuda(), dataset.extract_inputs(float_data).cuda(),
@@ -217,7 +219,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
 
             # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
-
+            print (" The produced loss")
+            print (loss.data)
             coil_logger.add_scalar('Loss', loss.data, iteration)
             coil_logger.add_image('Image', torch.squeeze(input_data['rgb']), iteration)
 

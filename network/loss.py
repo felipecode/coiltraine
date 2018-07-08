@@ -9,7 +9,7 @@ from configs import g_conf
 # TODO: needs some severe refactor to avoid hardcoding and repetition
 
 def L2(branches, targets, controls, speed_gt, size_average=True,
-            reduce=True, variable_weights=None, branch_weights=None):
+       reduce=True, variable_weights=None, branch_weights=None):
     """
     Args:
           branches - A list contains 5 branches results
@@ -64,7 +64,7 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
     # when command = 3, branch 2 (turn left) is activated
     controls_b2 = (controls == 3)
     controls_b2 = torch.tensor(controls_b2, dtype=torch.float32).cuda()
-    controls_b2 = torch.cat([controls_b2] *  len(g_conf.TARGETS), 1)
+    controls_b2 = torch.cat([controls_b2] * len(g_conf.TARGETS), 1)
     # when command = 4, branch 3 (turn right) is activated
     controls_b3 = (controls == 4)
     controls_b3 = torch.tensor(controls_b3, dtype=torch.float32).cuda()

@@ -102,6 +102,7 @@ class CoILDataset(Dataset):
 
                         sensor_image = np.swapaxes(sensor_image, 0, 2)
                         sensor_image = np.swapaxes(sensor_image, 1, 2)
+
                     # Do not forget the final normalization step
                     batch_sensors[sensor_name][count, (i * 3):((i + 1) * 3), :, :
                     ] = sensor_image/255.0
