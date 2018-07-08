@@ -196,7 +196,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
             print ("balanced stereing vec")
 
-            print (float_data[:, 0])
+            print (sorted(float_data[:, 0])[0])
 
             loss = criterion(branches, dataset.extract_targets(float_data).cuda(),
                              controls.cuda(), dataset.extract_inputs(float_data).cuda(),
