@@ -55,7 +55,7 @@ def start_carla_simulator(gpu, town_name, no_screen):
                       'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
 
     # TODO: Add parameters
-    mode = 'SDL'
+    mode = 'VGL'
     port = find_free_port()
     carla_path = os.environ['CARLA_PATH']
 
@@ -215,6 +215,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                     averaged_dict = compute_average_std([benchmark_dict],
                                                         experiment_set.weathers,
                                                         len(experiment_set.build_experiments()))
+
+                    #plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
+                    #                     )
                     print (averaged_dict)
                     csv_outfile = open(os.path.join('_logs', exp_batch, exp_alias,
                                                     g_conf.PROCESS_NAME + '_csv',
