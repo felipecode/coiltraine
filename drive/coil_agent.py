@@ -68,7 +68,7 @@ class CoILAgent(Agent):
 
         # control_agent = self._agent.run_step(measurements, None, target)
 
-        norm_speed = measurements.player_measurements.forward_speed / g_conf.SPEED_FACTOR
+        norm_speed = (measurements.player_measurements.forward_speed * 3.6) / g_conf.SPEED_FACTOR
         norm_speed = torch.cuda.FloatTensor([norm_speed]).unsqueeze(0)
 
         directions_tensor = torch.cuda.LongTensor([directions])
