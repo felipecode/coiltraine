@@ -31,11 +31,11 @@ class RandomSampler(Sampler):
     def __init__(self, keys, executed_iterations):
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
                                      executed_iterations + g_conf.BATCH_SIZE
-        self.keys = keys
-        self.weights = torch.tensor([1.0/float(len(self.keys))]*len(self.keys), dtype=torch.double)
+
 
     def __iter__(self):
-        return iter(torch.multinomial(self.weights, self.iterations_to_execute, True))
+        return iter(torch.randperm(self.iterations_to_execute).tolist())
+
 
     def __len__(self):
         return self.iterations_to_execute
