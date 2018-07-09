@@ -31,10 +31,10 @@ class RandomSampler(Sampler):
     def __init__(self, keys, executed_iterations):
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
                                      executed_iterations + g_conf.BATCH_SIZE
-
+        self.keys = keys
 
     def __iter__(self):
-        return iter(torch.randperm(self.iterations_to_execute).tolist())
+        return iter([random.randint(0, len(self.keys)) for _ in range(self.iterations_to_execute)])
 
 
     def __len__(self):
