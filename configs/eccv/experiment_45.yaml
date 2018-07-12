@@ -40,7 +40,7 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       channels: [32, 32, 64, 64, 128, 128, 256, 256]
       kernels: [5, 3, 3, 3, 3, 3, 3, 3]
       strides: [2, 1, 2, 1, 2, 1, 1, 1]
-      dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      dropouts: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
     fc:
       neurons: [512, 512]
       dropouts: [0.5, 0.5]

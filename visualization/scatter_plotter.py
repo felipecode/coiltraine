@@ -330,7 +330,7 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
     ###
     ### Plotting
     ###
-    fig, ax = plt.subplots(figsize=(8,8))
+    fig, ax = plt.subplots(figsize=(8, 8))
 
     # Font size
     SMALL_SIZE = 8

@@ -79,9 +79,14 @@ def compute_km_per_infraction(data_item, param):
     km_per_infraction = 1. / np.sum(infraction_vec)
     return km_per_infraction
 
+
+float_formatter = lambda x: "%.2f" % x
+
 def compute_steering_error(data_item, param):
     #np.savetxt('80maug.csv', data_item['steer_gt'] - data_item['steer_pred'], delimiter='', fmt='%-10.06f')
 
+    #np.set_printoptions(threshold=np.nan, formatter={'float_kind': float_formatter})
+    #print (abs(data_item['steer_gt'] - data_item['steer_pred'])[0:100])
     return abs(data_item['steer_gt'] - data_item['steer_pred'])
 
 def compute_steering_error_filter_gt(data_item, param):
