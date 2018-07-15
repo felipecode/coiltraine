@@ -299,11 +299,11 @@ def L3(branches, targets, controls, speed_gt, size_average=True,
     controls_b4 = torch.cat([controls_b4] * len(g_conf.TARGETS), 1)
 
     # calculate loss for each branch with specific activation
-    loss_b1 = ((branches[0] - targets) * controls_b1) ** 3 * branch_weights[0]
-    loss_b2 = ((branches[1] - targets) * controls_b2) ** 3 * branch_weights[1]
-    loss_b3 = ((branches[2] - targets) * controls_b3) ** 3 * branch_weights[2]
-    loss_b4 = ((branches[3] - targets) * controls_b4) ** 3 * branch_weights[3]
-    loss_b5 = (branches[4] - speed_gt) ** 3 * branch_weights[4]
+    loss_b1 = torch.abs(((branches[0] - targets) * controls_b1) ** 3) * branch_weights[0]
+    loss_b2 = torch.abs(((branches[1] - targets) * controls_b2) ** 3) * branch_weights[1]
+    loss_b3 = torch.abs(((branches[2] - targets) * controls_b3) ** 3) * branch_weights[2]
+    loss_b4 = torch.abs(((branches[3] - targets) * controls_b4) ** 3) * branch_weights[3]
+    loss_b5 = torch.abs((branches[4] - speed_gt) ** 3) * branch_weights[4]
 
     # Apply the variable weights
     # TODO; the variable and its weigths should be sincronized in the same variable.
