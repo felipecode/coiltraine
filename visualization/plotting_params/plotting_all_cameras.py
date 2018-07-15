@@ -1,8 +1,9 @@
 import collections
 
-data_params = {'control': '_auto', 'root_path': '_logs', 'towns': ['Town01'],
+data_params = {'control': '_auto', 'root_path': '_logs', 'towns': ['Town01', 'Town02'],
                'noise': False,
-               'drive_environments': {'Town01': 'ECCVTrainingSuite'}}   # some parameters for which data to read. May or may not be needed (maybe we always read all data, and filter afterwards?)
+               'drive_environments': {'Town01': 'ECCVTrainingSuite',
+                                      'Town02': 'ECCVGeneralizationSuite'}}   # some parameters for which data to read. May or may not be needed (maybe we always read all data, and filter afterwards?)
 
 
 data_filter = {'camera': 'central'}

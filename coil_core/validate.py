@@ -178,6 +178,12 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                 checkpoint_average_loss = accumulated_loss/(len(data_loader))
 
                 checkpoint_average_error = accumulated_error/(len(data_loader))
+                with open("average_loss.txt", 'a') as f:
+                    f.write("%f \n" % checkpoint_average_error)
+
+
+
+
                 coil_logger.add_scalar('Loss', checkpoint_average_loss, latest, True)
                 coil_logger.add_scalar('Error', checkpoint_average_error, latest, True)
 

@@ -4,6 +4,7 @@ import h5py
 import traceback
 import sys
 import math
+import copy
 
 
 
@@ -58,6 +59,8 @@ class CoILDataset(Dataset):
         except:
             number_of_position = 1
             used_ids = [used_ids]
+
+        float_data = self.measurements[:, used_ids]
 
         # Initialization of the numpy arrays
         for sensor_name, sensor_size in g_conf.SENSORS.items():
@@ -117,17 +120,19 @@ class CoILDataset(Dataset):
 
         if g_conf.AUGMENT_LATERAL_STEERINGS > 0:
 
-            camera_angle = self.measurements[np.where(self.meta_data[:, 0] == b'angle'), used_ids][0][0]
-            speed = self.measurements[np.where(self.meta_data[:, 0] == b'speed_module'), used_ids][0][0]
-            steer = self.measurements[np.where(self.meta_data[:, 0] == b'steer'), used_ids][0][0]
+            camera_angle = float_data[np.where(self.meta_data[:, 0] == b'angle'), :][0][0]
+            speed = float_data[np.where(self.meta_data[:, 0] == b'speed_module'), :][0][0]
+            steer = float_data[np.where(self.meta_data[:, 0] == b'steer'), :][0][0]
 
-            self.measurements[np.where(self.meta_data[:, 0] == b'steer'), used_ids] =\
-                self.augment_steering(camera_angle, steer, speed)
+            float_data[np.where(self.meta_data[:, 0] == b'steer'), :] =\
+                self.augment_steering(camera_angle, copy.copy(steer), speed)
+
+
             #print ( 'camera angle', camera_angle,
-            #        'new_steer' , self.measurements[np.where(self.meta_data[:, 0] == b'steer'), used_ids],
+            #        'new_steer' ,float_data[np.where(self.meta_data[:, 0] == b'steer'), :],
             #       'old_steer', steer)
 
-        self.measurements[np.where(self.meta_data[:, 0] == b'speed_module'), used_ids] /= g_conf.SPEED_FACTOR
+        float_data[np.where(self.meta_data[:, 0] == b'speed_module'), :] /= g_conf.SPEED_FACTOR
 
 
 
@@ -136,7 +141,7 @@ class CoILDataset(Dataset):
         # TODO: IMPORTANT !!!
         # TODO: ADD GROUND TRUTH CONTROL IN SOME META CONFIGURATION FOR THE DATASET
         # TODO: SO if the data read and manipulate is outside some range, it should report error
-        return batch_sensors, self.measurements[:, used_ids]
+        return batch_sensors, float_data
 
     def augment_steering(self, camera_angle, steer, speed):
         """

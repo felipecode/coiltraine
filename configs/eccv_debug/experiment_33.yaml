@@ -12,7 +12,7 @@ MEASUREMENTS:
 
 BATCH_SIZE: 120
 NUMBER_ITERATIONS: 500000
-STEERING_DIVISION: [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
+STEERING_DIVISION: []
 LABELS_DIVISION: [[0, 2, 5], [3], [4]]
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
@@ -21,13 +21,13 @@ NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 40.0
-TRAIN_DATASET_NAME: '02HoursW1-3-6-8'
+TRAIN_DATASET_NAME: '80HoursW1-3-6-8'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [ 2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####

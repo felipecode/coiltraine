@@ -83,44 +83,6 @@ def read_control_csv(control_csv_file):
 
 
 
-def _read_step_data_wp(step_path):
-    """
-    For this case we automatically get the steering angles from the waypoints.
-    :param step_path:
-    :return:
-    """
-
-
-
-    step_dictionary = {}
-
-
-    steer_pred = 0.8 * np.loadtxt(step_path + '_seq_output_val.csv', delimiter=" ", skiprows=0, usecols=([3]))
-
-    step_dictionary.update({'steer_pred': steer_pred})
-    steer_gt = 0.8 * np.loadtxt(step_path + '_seq_gt_val.csv', delimiter=" ", skiprows=0, usecols=([3]))
-    step_dictionary.update({'steer_gt': steer_gt})
-
-    steer_error =  0.8 * np.loadtxt(step_path + '_seq_error_val.csv', delimiter=" ", skiprows=0, usecols=([3]))
-    step_dictionary.update({'steer_error': steer_error})
-
-    if 'Town01' in step_path and 'noise' in step_path:
-        speed_input = speed_labels_1_noise
-    elif 'Town01' in step_path:
-        speed_input = speed_labels_1
-    elif 'Town02' in step_path and 'noise' in step_path:
-        speed_input = speed_labels_2_noise
-    else:
-        speed_input = speed_labels_2
-
-    step_dictionary.update({'speed_input': speed_input})
-
-    #speed_input =np.loadtxt(step_path + '_seq_B_4_input_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
-    #step_dictionary.update({'speed_input': speed_input})
-
-
-    return step_dictionary
-
 # Add a static variable to avoid re-reading
 @static_vars(previous_ground_truth={})
 def get_ground_truth(dataset_name):
@@ -133,15 +95,18 @@ def get_ground_truth(dataset_name):
     return get_ground_truth.previous_ground_truth[dataset_name]
 
 
-@static_vars(previous_speed_ground_truth=None)
+@static_vars(previous_speed_ground_truth={})
 def get_speed_ground_truth(dataset_name):
-    if get_speed_ground_truth.previous_speed_ground_truth is None:
+
+
+    if dataset_name not in get_speed_ground_truth.previous_speed_ground_truth:
         full_path = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name,
                                  'speed_ground_truth.csv')
         speed_ground_truth = np.loadtxt(full_path, delimiter=",", skiprows=0, usecols=([0]))
-        get_speed_ground_truth.previous_speed_ground_truth = speed_ground_truth
+        get_speed_ground_truth.previous_speed_ground_truth.update({dataset_name: speed_ground_truth})
 
-    return get_speed_ground_truth.previous_speed_ground_truth
+
+    return get_speed_ground_truth.previous_speed_ground_truth[dataset_name]
 
 @static_vars(previous_camera_labels={})
 def get_camera_labels(dataset_name):
