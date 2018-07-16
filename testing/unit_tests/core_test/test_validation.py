@@ -101,9 +101,6 @@ class testValidation(unittest.TestCase):
 
 
 
-                print ("image ", input_data['rgb'].shape)
-                print (float_data)
-
                 output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
                                               float_data[:, speed_position, :].cuda(),
                                               float_data[:, control_position, :].cuda())
@@ -149,8 +146,6 @@ class testValidation(unittest.TestCase):
                 control_position = np.where(dataset.meta_data[:, 0] == b'control')[0][0]
                 speed_position = np.where(dataset.meta_data[:, 0] == b'speed_module')[0][0]
 
-                print ("image ", input_data['rgb'].shape)
-                print (float_data)
 
                 output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
                                               float_data[:, speed_position, :].cuda(),
@@ -174,6 +169,9 @@ class testValidation(unittest.TestCase):
 
             checkpoint_average_loss = accumulated_loss / (len(data_loader))
 
+            print ("Val1 ", checkpoint_avg_loss_vec[count])
+            print ("Val2 ", checkpoint_average_loss)
+            
             self.assertEqual(checkpoint_avg_loss_vec[count], checkpoint_average_loss)
             count += 1
 
