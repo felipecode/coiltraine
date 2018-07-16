@@ -79,7 +79,7 @@ class testValidation(unittest.TestCase):
         checkpoint_avg_loss_vec = []
 
 
-        for latest in [ 2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]:
+        for latest in [ 2000]:
 
 
             checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
@@ -116,7 +116,6 @@ class testValidation(unittest.TestCase):
                 #print ("output", output[0])
                 accumulated_error += mean_error
                 accumulated_loss += loss
-                error = torch.abs(output - dataset.extract_targets(float_data).cuda())
 
 
                 # Log a random position
@@ -127,8 +126,9 @@ class testValidation(unittest.TestCase):
 
             checkpoint_avg_loss_vec.append(checkpoint_average_loss)
 
+
         count = 0
-        for latest in [2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]:
+        for latest in [2000]:
 
             checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                                  , 'checkpoints', str(latest) + '.pth'))
