@@ -79,9 +79,7 @@ class testValidation(unittest.TestCase):
         checkpoint_avg_loss_vec = []
 
 
-        for latest in [ 2000]:
-
-
+        for latest in [2000]:
             checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                     , 'checkpoints', str(latest) + '.pth'))
             checkpoint_iteration = checkpoint['iteration']
@@ -99,13 +97,9 @@ class testValidation(unittest.TestCase):
                 control_position = np.where(dataset.meta_data[:, 0] == b'control')[0][0]
                 speed_position = np.where(dataset.meta_data[:, 0] == b'speed_module')[0][0]
 
-
-
                 output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
                                               float_data[:, speed_position, :].cuda(),
                                               float_data[:, control_position, :].cuda())
-
-
 
 
                 # TODO: Change this a functional standard using the loss functions.
@@ -114,6 +108,7 @@ class testValidation(unittest.TestCase):
                 mean_error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
                 #print ("Loss", loss)
                 print ("output", output[:, 0])
+                print ("ground_truth", float_data[:, 0])
                 accumulated_error += mean_error
                 accumulated_loss += loss
 
@@ -159,6 +154,7 @@ class testValidation(unittest.TestCase):
                     torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
                 # print ("Loss", loss)
                 print ("output", output[:, 0])
+                print ("ground_truth", float_data[:, 0])
                 accumulated_error += mean_error
                 accumulated_loss += loss
                 error = torch.abs(output - dataset.extract_targets(float_data).cuda())
