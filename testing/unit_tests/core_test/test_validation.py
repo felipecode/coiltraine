@@ -158,7 +158,7 @@ class testValidation(unittest.TestCase):
                 mean_error = torch.mean(
                     torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
                 # print ("Loss", loss)
-                 print ("output", output)
+                print ("output", output)
                 accumulated_error += mean_error
                 accumulated_loss += loss
                 error = torch.abs(output - dataset.extract_targets(float_data).cuda())
