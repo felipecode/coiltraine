@@ -58,7 +58,7 @@ class testValidation(unittest.TestCase):
         # TODO: batch size an number of workers go to some configuration file
         data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
                                                   shuffle=False,
-                                                  num_workers=g_conf.NUMBER_OF_LOADING_WORKERS,
+                                                  num_workers=0,
                                                   pin_memory=True)
 
 
