@@ -77,9 +77,6 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
 
     tasks_queue = []
     for experiment in experiments_list:
-        if experiment in executing_processes:
-
-            continue
 
 
         # Train is always priority. # TODO: some system to check priority depending on iterations
@@ -98,12 +95,19 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
                 task_to_add = (0, experiment + '_train',
                                {'type': 'train', 'folder': folder,
                                 'experiment': experiment})
-        if task_to_add is not None and task_to_add not in old_tasks_queue:
-            heapq.heappush(tasks_queue, task_to_add)
 
-        task_to_add = None
+
+            if task_to_add in executing_processes:
+
+                continue
+
+            if task_to_add is not None and task_to_add not in old_tasks_queue:
+                heapq.heappush(tasks_queue, task_to_add)
+
+
 
         for val_data in validation_datasets:
+            task_to_add = None
             if monitorer.get_status(folder, experiment, 'validation_' + val_data)[0] == "Not Started":
                 task_to_add = (2, experiment + '_validation_' + val_data,
                                              {'type': 'validation', 'folder': folder,
@@ -114,12 +118,19 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
                 task_to_add = (2, experiment + '_validation_' + val_data,
                                              {'type': 'validation', 'folder': folder,
                                               'experiment': experiment, 'dataset': val_data})
-        if task_to_add is not None and task_to_add not in old_tasks_queue:
-            heapq.heappush(tasks_queue, task_to_add)
 
-        task_to_add = None
+
+            if task_to_add in executing_processes:
+
+                continue
+
+            if task_to_add is not None and task_to_add not in old_tasks_queue:
+                heapq.heappush(tasks_queue, task_to_add)
+
+
 
         for drive_env in drive_environments:
+            task_to_add = None
             if monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] == "Not Started":
                 task_to_add = (1, experiment + '_drive_' + drive_env,
                                              {'type': 'drive', 'folder': folder,
@@ -132,7 +143,11 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
                                 'experiment': experiment, 'environment': drive_env})
 
 
-        if task_to_add is not None and task_to_add not in old_tasks_queue:
-            heapq.heappush(tasks_queue, task_to_add)
+            if task_to_add in executing_processes:
+
+                continue
+
+            if task_to_add is not None and task_to_add not in old_tasks_queue:
+                heapq.heappush(tasks_queue, task_to_add)
 
     return tasks_queue

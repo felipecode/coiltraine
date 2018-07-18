@@ -6,7 +6,7 @@ import traceback
 import numpy as np
 import torch
 import torch.optim as optim
-import imgauggpu as iag
+
 
 
 # What do we define as a parameter what not.

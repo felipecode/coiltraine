@@ -3,3 +3,7 @@ from .eccv_generalization_suite import ECCVGeneralizationSuite
 from .eccv_training_suite import ECCVTrainingSuite
 from .test_t1 import TestT1
 from .test_t2 import TestT2
+from .pa_training_suite import PATraining
+from .pa_new_weather_town_suite import PANewWeatherTown
+from .pa_new_weather_suite import PANewWeather
+from .pa_new_town_suite import PANewTown

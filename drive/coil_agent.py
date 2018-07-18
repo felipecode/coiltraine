@@ -10,7 +10,7 @@ import scipy
 from utils.general import plot_test_image
 
 from carla.agent import Agent, CommandFollower
-from carla.planner import Waypointer
+from carla.agent.modules import Waypointer
 from PIL import Image
 
 # TODO: The network is defined and toguether there is as forward pass operation to be used for testing, depending on the configuration
@@ -19,7 +19,7 @@ from network import CoILModel
 from configs import g_conf
 from logger import coil_logger
 from torchvision import transforms
-import imgauggpu as iag
+
 import torch
 
 try:
@@ -61,7 +61,7 @@ class CoILAgent(Agent):
         self.model.eval()
 
         if g_conf.USE_ORACLE:
-            self.control_agent = CommandFollower()
+            self.control_agent = CommandFollower(town_name)
             self.waypointer = Waypointer(town_name)
 
     def run_step(self, measurements, sensor_data, directions, target):
@@ -153,7 +153,7 @@ class CoILAgent(Agent):
 
         """
         steer, throttle, brake = outputs[0], outputs[1], outputs[2]
-        if brake < 0.2:
+        if brake < 0.05:
             brake = 0.0
 
         if throttle > brake:
