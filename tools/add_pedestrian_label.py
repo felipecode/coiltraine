@@ -60,14 +60,14 @@ def join_classes(labels_image, join_dic):
 # ***** main loop *****
 
 def add_pedestrian_label(data):
-    num_data_entry = data['targets'][0].shape[0]
+    num_data_entry = 31
 
     # You copy all the targets to an array
     target_dataset = np.zeros((200, num_data_entry + 1))
     for i in range(0, 200):
         target_array = np.zeros(num_data_entry + 1)
 
-        target_array[:-1] = data['targets'][i]
+        target_array[:-1] = data['targets'][i][0:31]
 
         target_dataset[i, :] = target_array
 
