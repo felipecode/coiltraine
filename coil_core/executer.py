@@ -103,6 +103,7 @@ def folder_execute(params=None):
     # Is a queue of tasks to be executed. The priority is always train.
     # then test then val.
     # TODO: change the priority to test the ones that have already been trained.
+    print (" drive environments ", driving_environments)
     tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
                                         [], [],
                                         validation_datasets, driving_environments)

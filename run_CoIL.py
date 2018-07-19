@@ -105,6 +105,13 @@ if __name__ == '__main__':
 
     # Obs this is like a fixed parameter, how much a validation and a train and drives ocupies
 
+    # Check if the driving parameters are passed in a correct way
+
+    if args.driving_environments is not None:
+        for de in list(args.driving_environments):
+            if len(de.split('_'))  < 2:
+                raise ValueError("Invalid format for the driving envinronments should be Suite_Town")
+
 
     create_log_folder(args.folder)
     erase_logs(args.folder)
@@ -129,8 +136,8 @@ if __name__ == '__main__':
 
         elif args.single_process == 'drive':
 
-            driving_environments = fix_driving_environments(list(args.driving_environments))
-            execute_drive("0", args.folder, args.exp, driving_environments[0], False,
+            #driving_environments = fix_driving_environments(list(args.driving_environments))
+            execute_drive("0", args.folder, args.exp, list(args.driving_environments)[0], False,
                           no_screen=args.no_screen)
         else:
 
@@ -149,13 +156,13 @@ if __name__ == '__main__':
                                  'drive_cost': 1.5}
         # TODO: temporary function until carla map change feature is fixed.
 
-        driving_environments = fix_driving_environments(list(args.driving_environments))
+        #driving_environments = fix_driving_environments(list(args.driving_environments))
         params = {
             'folder': args.folder,
             'gpus': list(args.gpus),
             'is_training': args.is_training,
             'validation_datasets': list(args.validation_datasets),
-            'driving_environments': driving_environments,
+            'driving_environments': list(args.driving_environments),
             'allocation_parameters': allocation_parameters,
             'no_screen': args.no_screen,
         }

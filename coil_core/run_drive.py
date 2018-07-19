@@ -17,13 +17,11 @@ import torch
 from contextlib import closing
 
 from carla.tcp import TCPConnectionError
-from carla.client import make_carla_client
 from carla.driving_benchmark import run_driving_benchmark
 
-from drive import CoILAgent, ECCVGeneralizationSuite, ECCVTrainingSuite, TestT1, TestT2
-
-from testing.unit_tests.test_drive.test_suite import TestSuite
+from drive import CoILAgent
 from logger import coil_logger
+
 
 from logger import monitorer
 
@@ -32,7 +30,7 @@ from configs import g_conf, merge_with_yaml, set_type_of_process
 
 from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkpoint,\
     is_next_checkpoint_ready, get_latest_evaluated_checkpoint
-from utils.general import compute_average_std, get_latest_path
+from utils.general import compute_average_std, get_latest_path, snakecase_to_camelcase, camelcase_to_snakecase
 
 
 def frame2numpy(frame, frameSize):
@@ -55,23 +53,20 @@ def start_carla_simulator(gpu, town_name, no_screen):
                       'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
 
     # TODO: Add parameters
-    mode = 'VGL'
+
     port = find_free_port()
     carla_path = os.environ['CARLA_PATH']
 
-    if no_screen and mode == 'SDL':
-        print (" EXECUTING NO SCREEN! ")
-        os.environ['SDL_VIDEODRIVER'] = 'offscreen'
 
 
-    if mode == 'SDL':
+    if not no_screen:
         os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
-
         sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
                                 '-windowed',
                                '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
                                stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
-    elif mode == 'VGL':
+
+    else:
         os.environ['DISPLAY'] =":5"
         sp = subprocess.Popen(['vglrun', '-d', ':7.' + str(gpu),
                                     carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
@@ -79,8 +74,7 @@ def start_carla_simulator(gpu, town_name, no_screen):
                                     '-fps=10', '-world-port='+str(port)],
                                shell=False,
                                stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
-    else:
-        raise ValueError("Invalid Mode !")
+
 
 
     coil_logger.add_message('Loading', {'CARLA': carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4' 
@@ -121,34 +115,24 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
         else:
             control_filename = 'control_output.csv'
 
+        experiment_suite_module = __import__('drive.' + camelcase_to_snakecase(exp_set_name)+'_suite',
+                                             fromlist=[exp_set_name])
+
+        experiment_suite_module = getattr(experiment_suite_module, exp_set_name)
 
 
-        if exp_set_name == 'ECCVTrainingSuite':
-            experiment_set = ECCVTrainingSuite()
-            set_type_of_process('drive', drive_conditions)
-        elif exp_set_name == 'ECCVGeneralizationSuite':
-            experiment_set = ECCVGeneralizationSuite()
-            set_type_of_process('drive', drive_conditions)
-        elif exp_set_name == 'TestT1':
-            experiment_set = TestT1()
-            set_type_of_process('drive', drive_conditions)
-        elif exp_set_name == 'TestT2':
-            experiment_set = TestT2()
-            set_type_of_process('drive', drive_conditions)
-        else:
+        experiment_set = experiment_suite_module()
 
-            raise ValueError(" Exp Set name is not correspondent to a city")
-
-
+        set_type_of_process('drive', drive_conditions)
 
 
         if suppress_output:
             sys.stdout = open(os.path.join('_output_logs',
                               g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
-            #sys.stderr = open(os.path.join('_output_logs',
-            #                  'err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
-            #                  "a", buffering=1)
+            sys.stderr = open(os.path.join('_output_logs',
+                              exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
 
 
 
@@ -223,6 +207,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                                                     g_conf.PROCESS_NAME + '_csv',
                                                     control_filename),
                                        'a')
+
 
                     csv_outfile.write("%d,%f,%f,%f,%f,%f,%f,%f\n"
                                 % (latest, averaged_dict['episodes_completion'],
