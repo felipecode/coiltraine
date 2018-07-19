@@ -75,13 +75,14 @@ def fill_metadata(data):
     metadata[24, 0], metadata[24, 1] = 'control', 'int'
     metadata[25, 0], metadata[25, 1] = 'camera', 'int'
     metadata[26, 0], metadata[26, 1] = 'angle', 'float'
-    metadata[27, 0], metadata[27, 1] = 'pedestrian', 'float'
-
-    """
     metadata[27, 0], metadata[27, 1] = 'waypoint1_x', 'float'
     metadata[28, 0], metadata[28, 1] = 'waypoint1_y', 'float'
     metadata[29, 0], metadata[29, 1] = 'waypoint2_x', 'float'
     metadata[30, 0], metadata[30, 1] = 'waypoint2_y', 'float'
+    metadata[31, 0], metadata[31, 1] = 'pedestrian', 'float'
+
+    """
+
     metadata[31, 0], metadata[31, 1] = 'waypoint1_angle', 'float'
     metadata[32, 0], metadata[32, 1] = 'waypoint1_mag', 'float'
     metadata[33, 0], metadata[33, 1] = 'waypoint2_angle', 'float'

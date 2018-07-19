@@ -59,16 +59,11 @@ def is_hdf5_prepared(filename):
 
     # Check if the number of metadata is correct, the current number is 28
 
+    print (len(data['targets'][0]))
 
-    if len(data['metadata_targets']) < 28:
+    if len(data['metadata_targets']) < 32:
         return False
-    if len(data['targets'][0]) < 28:
-        return False
-
-
-    # Check if the steering is fine
-
-    if sum(data['targets'][:, 0]) == 0.0:
+    if len(data['targets'][0]) < 32:
         return False
 
 
