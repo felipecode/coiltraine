@@ -51,6 +51,8 @@ Drive Mode:
 For driving and testing in CARLA the path to the CARLA
 folder must be specified.
 
+    export CARLA_PATH=<pathtocarla/CARLA/
+    
 
 Running plot:
 
@@ -59,12 +61,6 @@ To run the plotting run
     python3 run_plotting.py --folder eccv_debug -p plotting_all_cameras
     
 Where the "folder" is the folder of the experiments. "-p" is the plotting configuration file
-that is localized at the visulization/plotting_params
+that is localized at the visulization/plotting_params    
 
 
-
-
-
-
-    export CARLA_PATH=<pathtocarla/CARLA/
-    
