@@ -50,6 +50,8 @@ _g_conf.TARGETS = ['steer', 'throttle', 'brake']
 _g_conf.INPUTS = ['speed_module']
 _g_conf.BALANCE_DATA = True
 _g_conf.STEERING_DIVISION = [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
+_g_conf.PEDESTRIAN_PERCENTAGE = 0
+_g_conf.SPEED_DIVISION = []
 #_g_conf.STEERING_DIVISION = [0.01, 0.02, 0.07, 0.4, 0.4, 0.07, 0.02, 0.01]  # Forcing curves alot
 _g_conf.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
 _g_conf.BATCH_SIZE = 120
@@ -145,6 +147,7 @@ def get_names(folder):
     experiments_in_folder = []
 
     for experiment_alias in alias_in_folder:
+
         g_conf.immutable(False)
         print (experiment_alias)
         merge_with_yaml(os.path.join('configs', folder, experiment_alias))
@@ -294,14 +297,7 @@ def _decode_cfg_value(v):
     # The following two excepts allow v to pass through when it represents a
     # string.
     #
-    # Longer explanation:
-    # The type of v is always a string (before calling literal_eval), but
-    # sometimes it *represents* a string and other times a data structure, like
-    # a list. In the case that v represents a string, what we got back from the
-    # yaml parser is 'foo' *without quotes* (so, not '"foo"'). literal_eval is
-    # ok with '"foo"', but will raise a ValueError if given 'foo'. In other
-    # cases, like paths (v = 'foo/bar' and not v = '"foo/bar"'), literal_eval
-    # will raise a SyntaxError.
+
     except ValueError:
         pass
     except SyntaxError:
