@@ -86,10 +86,14 @@ def export_status(exp_batch, validation_datasets, driving_environments):
                 for validation in validation_datasets:
 
                     log = 'validation_' + validation + '_csv'
-                    print (os.listdir(os.path.join(root_path, exp_batch, exp, log)))
-                    if (str(g_conf.TEST_SCHEDULE[-1]) + '.csv') in os.listdir(os.path.join(root_path,
-                                                                                           exp_batch, exp, log)):
-                        f.write(",Done")
+
+                    if log in  os.listdir(os.path.join(root_path, exp_batch, exp)):
+
+                        if (str(g_conf.TEST_SCHEDULE[-1]) + '.csv') in os.listdir(os.path.join(root_path,
+                                                                                               exp_batch, exp, log)):
+                            f.write(",Done")
+                        else:
+                            f.write(", ")
                     else:
                         f.write(", ")
 
