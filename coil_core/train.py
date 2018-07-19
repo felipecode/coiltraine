@@ -80,6 +80,38 @@ def select_balancing_strategy(dataset, iteration):
                                                   shuffle=False,
                                                   num_workers=2,
                                                   pin_memory=True)
+
+    elif g_conf.PEDESTRIAN_PERCENTAGE > 0:
+
+
+        sampler = BatchSequenceSampler(
+            splitter.pedestrian_speed_split(dataset.measurements, dataset.meta_data, keys),
+            iteration * g_conf.BATCH_SIZE,
+            g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE
+        )
+
+        # The data loader is the multi threaded module from pytorch that release a number of
+        # workers to get all the data.
+        data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
+                                                  shuffle=False,
+                                                  num_workers=2,
+                                                  pin_memory=True)
+
+    elif len(g_conf.SPEED_DIVISION) > 0:
+        sampler = BatchSequenceSampler(
+            splitter.control_speed_split(dataset.measurements, dataset.meta_data, keys),
+            iteration * g_conf.BATCH_SIZE,
+            g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE
+        )
+
+        # The data loader is the multi threaded module from pytorch that release a number of
+        # workers to get all the data.
+        data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
+                                                  shuffle=False,
+                                                  num_workers=2,
+                                                  pin_memory=True)
+
+
     else:
         # NO BALANCING
 
@@ -194,9 +226,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             branches = model(torch.squeeze(input_data['rgb'].cuda()),
                              dataset.extract_inputs(float_data).cuda())
 
-            print ("balanced stereing vec")
+            print ("balanced speed vec")
 
-            print (sorted(float_data[:, 0])[0])
+            print (sorted(float_data[:, -1]))
 
             loss = criterion(branches, dataset.extract_targets(float_data).cuda(),
                              controls.cuda(), dataset.extract_inputs(float_data).cuda(),
