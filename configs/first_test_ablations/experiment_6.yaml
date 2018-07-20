@@ -22,7 +22,7 @@ NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 40.0
-TRAIN_DATASET_NAME: '02HoursW1-3-6-8'
+TRAIN_DATASET_NAME: '80HoursW1-3-6-8'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
@@ -44,12 +44,12 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     fc:
       neurons: [512, 512]
-      dropouts: [0.0, 0.0]
+      dropouts: [0.0, 0.5]
 
   measurements:
     fc:
       neurons: [128, 128]
-      dropouts: [0.0, 0.0]
+      dropouts: [0.0, 0.5]
   join:
     fc:
       neurons: [512]

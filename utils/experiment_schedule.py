@@ -69,6 +69,43 @@ def allocate_gpu_resources(gpu_resources, amount_to_allocate):
 
     raise ValueError("Not enough gpu resources to allocate")
 
+def dict_to_namevec(process_dict):
+    """
+    Converts a process dict to a name vec
+
+    """
+    name_vec = ''
+
+    name_vec += process_dict['type']
+    if 'environment' in process_dict:
+        name_vec += process_dict['environment']
+
+    if 'dataset' in process_dict:
+        name_vec += process_dict['dataset']
+
+    name_vec += process_dict['experiment']
+    return name_vec
+
+
+def execvec_to_names(executing_processes):
+    """
+    Creates a name_vec for each the dictonary on the list of executing processss
+    Args:
+        List of executing process
+        
+    returns 
+        List of name vecs 
+    """
+
+
+
+
+    process_name_vec = []
+    for process_dict in executing_processes:
+        process_name_vec.append(dict_to_namevec(process_dict))
+
+    return process_name_vec
+
 
 # TODO: function need severe refactoring  !!! !
 def mount_experiment_heap(folder, experiments_list, is_training, executing_processes, old_tasks_queue,
@@ -76,12 +113,18 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
 
 
     tasks_queue = []
+
+    exec_name_vec = execvec_to_names(executing_processes)
     for experiment in experiments_list:
 
 
         # Train is always priority. # TODO: some system to check priority depending on iterations
         task_to_add = None
         # TODO: One thing is error other thing is stop. However at a first step we can try to restart all error things
+
+        print (' Exec process ', exec_name_vec)
+
+
         if is_training:
             if monitorer.get_status(folder, experiment, 'train')[0] == "Not Started":
 
@@ -97,9 +140,13 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
                                 'experiment': experiment})
 
 
-            if task_to_add in executing_processes:
 
-                continue
+            if task_to_add is not None:
+                print ('Task to add ', task_to_add)
+                task_name_vec = dict_to_namevec(task_to_add[2])
+                if task_name_vec in exec_name_vec:
+
+                    continue
 
             if task_to_add is not None and task_to_add not in old_tasks_queue:
                 heapq.heappush(tasks_queue, task_to_add)
@@ -120,9 +167,12 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
                                               'experiment': experiment, 'dataset': val_data})
 
 
-            if task_to_add in executing_processes:
+            if task_to_add is not None:
+                print ('Task to add ', task_to_add)
+                task_name_vec = dict_to_namevec(task_to_add[2])
+                if task_name_vec in exec_name_vec:
 
-                continue
+                    continue
 
             if task_to_add is not None and task_to_add not in old_tasks_queue:
                 heapq.heappush(tasks_queue, task_to_add)
@@ -143,9 +193,12 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
                                 'experiment': experiment, 'environment': drive_env})
 
 
-            if task_to_add in executing_processes:
+            if task_to_add is not None:
+                print ('Task to add ', task_to_add)
+                task_name_vec = dict_to_namevec(task_to_add[2])
+                if task_name_vec in exec_name_vec:
 
-                continue
+                    continue
 
             if task_to_add is not None and task_to_add not in old_tasks_queue:
                 heapq.heappush(tasks_queue, task_to_add)

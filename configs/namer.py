@@ -40,8 +40,12 @@ def generate_name(g_conf):
         final_name_string += '_' + g_conf.AUGMENTATION
     else:
         # We check if there is dropout
-        if sum(g_conf.MODEL_CONFIGURATION['branches']['fc']['dropouts']) > 0:
-            final_name_string += '_dropout'
+        if sum(g_conf.MODEL_CONFIGURATION['branches']['fc']['dropouts']) > 4:
+            final_name_string += '_highdropout'
+        elif sum(g_conf.MODEL_CONFIGURATION['branches']['fc']['dropouts']) > 2:
+            final_name_string += '_milddropout'
+        elif sum(g_conf.MODEL_CONFIGURATION['branches']['fc']['dropouts']) > 0:
+            final_name_string += '_lowdropout'
         else:
             final_name_string += '_none'
 
@@ -66,13 +70,17 @@ def generate_name(g_conf):
 
     # The pre processing ( Balance or not )
     if g_conf.BALANCE_DATA and len(g_conf.STEERING_DIVISION) > 0:
-        final_name_string += '_balance'
+        final_name_string += '_balancesteer'
+    if g_conf.BALANCE_DATA and g_conf.PEDESTRIAN_PERCENTAGE > 0:
+        final_name_string += '_balancepedestrian'
+    if g_conf.BALANCE_DATA and len(g_conf.SPEED_DIVISION) > 0:
+        final_name_string += '_balancespeed'
     else:
         final_name_string += '_random'
 
     # The type of loss function
 
-    final_name_string += '_'+g_conf.LOSS_FUNCTION
+    final_name_string += '_'+ g_conf.LOSS_FUNCTION
 
     # the parts of the data that were used.
 

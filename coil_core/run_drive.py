@@ -44,7 +44,7 @@ def find_free_port():
         s.bind(('', 0))
         return s.getsockname()[1]
 
-def start_carla_simulator(gpu, town_name, no_screen):
+def start_carla_simulator(gpu, town_name, no_screen, docker):
 
     # Set the outfiles for the process
     carla_out_file = os.path.join('_output_logs',
@@ -58,22 +58,35 @@ def start_carla_simulator(gpu, town_name, no_screen):
     carla_path = os.environ['CARLA_PATH']
 
 
-
-    if not no_screen:
-        os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
-        sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
-                                '-windowed',
+    if docker:
+        sp = subprocess.Popen(['docker', 'run', '--rm', '-p', str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
+                              '--runtime=nvidia', '-e','NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
+                               '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
                                '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
-                               stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+                              stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+
+        print (['docker', 'run', '--rm', '-p '+str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
+                              '--runtime=nvidia', '-e  NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
+                               '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
+                               '-benchmark', '-fps=10', '-world-port='+str(port)])
 
     else:
-        os.environ['DISPLAY'] =":5"
-        sp = subprocess.Popen(['vglrun', '-d', ':7.' + str(gpu),
-                                    carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
-                                    '/Game/Maps/' + town_name, '-windowed', '-benchmark',
-                                    '-fps=10', '-world-port='+str(port)],
-                               shell=False,
-                               stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+
+        if not no_screen:
+            os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
+            sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
+                                    '-windowed',
+                                   '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
+                                   stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+
+        else:
+            os.environ['DISPLAY'] =":5"
+            sp = subprocess.Popen(['vglrun', '-d', ':7.' + str(gpu),
+                                        carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
+                                        '/Game/Maps/' + town_name, '-windowed', '-benchmark',
+                                        '-fps=10', '-world-port='+str(port)],
+                                   shell=False,
+                                   stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
 
 
 
@@ -93,7 +106,7 @@ def start_carla_simulator(gpu, town_name, no_screen):
 # TODO :  Memory use should also be adaptable with a limit, for now that seems to be doing fine in PYtorch
 
 def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='127.0.0.1',
-            suppress_output=True, no_screen=False):
+            suppress_output=True, no_screen=False, docker=False):
 
     try:
 
@@ -136,7 +149,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
 
 
-        carla_process, port = start_carla_simulator(gpu, town_name, no_screen)
+        carla_process, port = start_carla_simulator(gpu, town_name, no_screen, docker)
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 

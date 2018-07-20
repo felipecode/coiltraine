@@ -108,11 +108,12 @@ def get_validation_datasets(exp_batch_name):
 
     validation_datasets = set()
     for exp in experiments:
-        experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
-        for log in experiments:
-            folder_file = os.path.join(root_path, exp_batch_name, exp, log)
-            if not os.path.isdir(folder_file) and 'validation' in folder_file:
-                validation_datasets.add(folder_file.split('_')[-1])
+        if os.path.isdir(os.path.join(root_path, exp_batch_name, exp)):
+            experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
+            for log in experiments:
+                folder_file = os.path.join(root_path, exp_batch_name, exp, log)
+                if  os.path.isdir(folder_file) and 'validation' in folder_file:
+                    validation_datasets.add(folder_file.split('_')[-1])
 
     return list(validation_datasets)
 
@@ -123,11 +124,12 @@ def get_driving_environments(exp_batch_name):
 
     driving_environments = set()
     for exp in experiments:
-        experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
-        for log in experiments:
-            folder_file = os.path.join(root_path, exp_batch_name, exp, log)
-            if not os.path.isdir(folder_file) and 'drive' in folder_file:
-                driving_environments.add(folder_file.split('_')[-1])
+        if os.path.isdir(os.path.join(root_path, exp_batch_name, exp)):
+            experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
+            for log in experiments:
+                folder_file = os.path.join(root_path, exp_batch_name, exp, log)
+                if not os.path.isdir(folder_file) and 'drive' in folder_file:
+                    driving_environments.add(folder_file.split('_')[-2]+'_'+folder_file.split('_')[-1])
 
     return list(driving_environments)
 
@@ -139,10 +141,11 @@ def erase_logs(exp_batch_name):
 
 
     for exp in experiments:
-        experiments_logs = os.listdir(os.path.join(root_path, exp_batch_name, exp))
-        for log in experiments_logs:
-            if not os.path.isdir(os.path.join(root_path, exp_batch_name, exp, log)):
-                os.remove(os.path.join(root_path, exp_batch_name, exp, log))
+        if os.path.isdir(os.path.join(root_path, exp_batch_name, exp)):
+            experiments_logs = os.listdir(os.path.join(root_path, exp_batch_name, exp))
+            for log in experiments_logs:
+                if not os.path.isdir(os.path.join(root_path, exp_batch_name, exp, log)):
+                    os.remove(os.path.join(root_path, exp_batch_name, exp, log))
 
 def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list, ):
     # TODO: eventually add that for driving
@@ -307,8 +310,7 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
                         if t == []:
                             print('    Metric Not Computed')
                         else:
-                            metric_sum_values[count] += (float(sum(t)) / float(len(t))) * 1.0 / float(
-                                len(weathers))
+                            metric_sum_values[count] += (float(sum(t)))
 
                         count += 1
 
@@ -370,7 +372,8 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
     for metric, vectors in average_results_matrix.items():
 
         if metric in metrics_to_average:
-            average_results_matrix[metric] =  np.mean(average_results_matrix[metric])
+            average_results_matrix[metric] =  np.sum(average_results_matrix[metric])/\
+                                              (len(average_results_matrix[metric])*25)
 
         if metric in infraction_metrics:
             average_results_matrix[metric] = average_results_matrix['driven_kilometers']/np.sum(average_results_matrix[metric])

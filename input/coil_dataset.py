@@ -5,7 +5,7 @@ import traceback
 import sys
 import math
 import copy
-
+import time
 
 
 import gc
@@ -18,6 +18,7 @@ from logger import coil_logger
 
 # TODO: Warning, maybe this does not need to be included everywhere.
 from configs import g_conf
+from utils.checking import is_hdf5_prepared
 
 
 class CoILDataset(Dataset):
@@ -201,6 +202,22 @@ class CoILDataset(Dataset):
 
         folder_file_names = sorted(folder_file_names)
 
+
+        # THIS WILL CHECK IF THIS DATASET IS VALID
+        """
+        while True:
+            try:
+                if not is_hdf5_prepared(folder_file_names[0]):
+                    raise ValueError("The showed dataset is not prepared for training")
+                break
+            except OSError:
+                import traceback
+                time.sleep(0.5)
+                traceback.print_exc()
+                continue
+        """
+
+
         # Concatenate all the sensor names and measurements names
         # TODO: This structure is very ugly.
         meas_data_cat = [list([]) for _ in range(len(meas_names))]
@@ -210,6 +227,7 @@ class CoILDataset(Dataset):
         # that is important to be able to reference variables in a more legible way
         dataset = h5py.File(folder_file_names[0], "r")
         metadata_targets = np.array(dataset['metadata_' + meas_names[0]])
+        dataset.close()
 
         # Forcing the metadata to be bytes
         if not isinstance(metadata_targets[0][0], bytes):
@@ -219,7 +237,6 @@ class CoILDataset(Dataset):
 
         lastidx = 0
         count = 0
-        # TODO: More logs to be added ??
         coil_logger.add_message('Loading', {'FilesLoaded': folder_file_names,
                                             'NumberOfImages': len(folder_file_names)})
 
@@ -253,6 +270,7 @@ class CoILDataset(Dataset):
 
         # For the number of datasets names that are going to be used for measurements cat all.
         for i in range(len(meas_names)):
+            #print (meas_data_cat[i])
             meas_data_cat[i] = np.concatenate(meas_data_cat[i], axis=0)
             meas_data_cat[i] = meas_data_cat[i].transpose((1, 0))
 

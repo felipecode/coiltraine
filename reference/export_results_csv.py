@@ -118,8 +118,7 @@ if __name__ == '__main__':
         erase_wrong_plotting_summaries(args.folder, validations)
 
     #final_list_of_experiments = ['experiment_29.yaml']
-
-    variables_to_export = ['episodes_fully_completed', 'collision_pedestrians', 'driven_kilometers']
+    variables_to_export = ['episodes_fully_completed', 'collision_pedestrians', 'driven_kilometer']
 
     # TODO: for now it basically will just export the best
     export_csv(args.folder, variables_to_export)
