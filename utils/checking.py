@@ -1,4 +1,5 @@
 import torch
+import h5py
 import sys
 import numpy as np
 import numbers
@@ -71,4 +72,35 @@ def is_callable(val):
         return hasattr(val, '__call__')
     else:
         return callable(val)
+
+# TODO Resource temporarily unavailable.
+
+def is_hdf5_prepared(filename):
+    """
+        We add this checking to verify if the hdf5 file has all the necessary metadata needed for performing,
+        our trainings.
+        # TODO: I dont know the scope but maybe this can change depending on the system. BUt i want to keep this for
+        CARLA
+
+    """
+
+    data = h5py.File(filename, "r+")
+
+    # Check if the number of metadata is correct, the current number is 28
+
+
+    if len(data['metadata_targets']) < 28:
+        return False
+    if len(data['targets'][0]) < 28:
+        return False
+
+
+    # Check if the steering is fine
+    if sum(data['targets'][0, :]) == 0.0:
+        return False
+
+
+    data.close()
+    return True
+
 

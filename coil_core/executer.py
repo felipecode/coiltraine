@@ -51,7 +51,7 @@ def execute_validation(gpu, exp_batch, exp_alias, dataset, suppress_output=True)
     p.start()
 
 
-def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, suppress_output=True, no_screen=False):
+def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, suppress_output=True, no_screen=False, docker=False):
     """
 
     Args:
@@ -68,7 +68,7 @@ def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, suppress_output=True,
     p = multiprocessing.Process(target=run_drive.execute,
                                 args=(gpu, exp_batch, exp_alias, exp_set_name,
                                       0.2, "127.0.0.1", suppress_output,
-                                      no_screen))
+                                      no_screen, docker))
 
     p.start()
 

@@ -84,6 +84,12 @@ if __name__ == '__main__':
         dest='restart_validations',
         help='Set to carla to run offscreen'
     )
+    argparser.add_argument(
+        '-dk', '--docker',
+        action='store_true',
+        dest='docker',
+        help='Set to run carla using docker'
+    )
     args = argparser.parse_args()
 
 
@@ -138,7 +144,7 @@ if __name__ == '__main__':
 
             #driving_environments = fix_driving_environments(list(args.driving_environments))
             execute_drive("0", args.folder, args.exp, list(args.driving_environments)[0], False,
-                          no_screen=args.no_screen)
+                          no_screen=args.no_screen, docker=args.docker)
         else:
 
             raise (" Invalid name for single process, chose from (train, validation, test)")

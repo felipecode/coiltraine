@@ -118,18 +118,25 @@ def label_split(labels, keys, selected_data):
 
     keys_for_divison = []  # The set of all possible keys for each division
     sorted_steering_division = []
+    if isinstance(selected_data, list):
+        selected_data_vec = selected_data
 
-    for j in range(len(selected_data)):
+    else:  # for this case we are doing label split based on scalar.
+        if not isinstance(selected_data, int):
+            raise ValueError(" Invalid type for scalar label selection")
 
-        keys_to_delete = select_data_sequence(labels, selected_data[j])
-        # print got_keys_for_divison
-        # keys_for_this_part = range(0, len(labels) - g_conf.NUMBER_IMAGES_SEQUENCE,
-        #                           g_conf.SEQUENCE_STRIDE)
+        selected_data_vec = [[1]] + int(100/selected_data -1) * [[0]]
+
+    print (selected_data_vec)
+
+    for j in range(len(selected_data_vec)):
+
+        keys_to_delete = select_data_sequence(labels, selected_data_vec[j])
 
         keys_for_this_part = list(set(keys) - set(keys_to_delete))
         # If it is empty, kindly ask the user to change the label division
         if not keys_for_this_part:
-            raise RuntimeError("No Element found of the key ", selected_data[j],
+            raise RuntimeError("No Element found of the key ", selected_data_vec[j],
                                "please select other keys")
 
         keys_for_divison.append(keys_for_this_part)
@@ -168,7 +175,7 @@ def float_split(output_to_split, keys, percentiles):
 
 
 
-
+#TODO: Refactor this splitting strategy.
 
 def control_steer_split(float_data, meta_data, keys):
 
@@ -191,6 +198,60 @@ def control_steer_split(float_data, meta_data, keys):
 
     for keys in splitted_labels:
         splitter_steer = float_split(steerings, keys, g_conf.STEERING_DIVISION)
+        splitted_steer_labels.append(splitter_steer)
+
+    coil_logger.add_message('Loading', {'KeysDivision': splitted_steer_labels})
+
+    return splitted_steer_labels
+
+def control_speed_split(float_data, meta_data, keys):
+
+    # TODO: WHY EVERY WHERE MAKE THIS TO BE USED ??
+    speeds = float_data[np.where(meta_data[:, 0] == b'speed_module'), :][0][0]
+
+    print ("steer shape", speeds.shape)
+
+    # TODO: read meta data and turn into a coool dictionary ?
+    # TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
+    labels = float_data[np.where(meta_data[:, 0] == b'control'), :][0][0]
+
+    print ("labels shape ", labels.shape)
+    #keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
+
+    splitted_labels = label_split(labels, keys, g_conf.LABELS_DIVISION)
+
+    # Another level of splitting
+    splitted_steer_labels = []
+
+    for keys in splitted_labels:
+        splitter_steer = float_split(speeds, keys, g_conf.SPEED_DIVISION)
+        splitted_steer_labels.append(splitter_steer)
+
+    coil_logger.add_message('Loading', {'KeysDivision': splitted_steer_labels})
+
+    return splitted_steer_labels
+
+
+def pedestrian_speed_split(float_data, meta_data, keys):
+
+    # TODO: WHY EVERY WHERE MAKE THIS TO BE USED ??
+    speeds = float_data[np.where(meta_data[:, 0] == b'speed_module'), :][0][0]
+
+    print ("steer shape", speeds.shape)
+
+    # TODO: read meta data and turn into a coool dictionary ?
+    # TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
+    labels = float_data[-1, :]
+    print ("labels shape ", labels.shape)
+    #keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
+
+    splitted_labels = label_split(labels, keys, g_conf.PEDESTRIAN_PERCENTAGE)
+
+    # Another level of splitting
+    splitted_steer_labels = []
+
+    for keys in splitted_labels:
+        splitter_steer = float_split(speeds, keys, g_conf.SPEED_DIVISION)
         splitted_steer_labels.append(splitter_steer)
 
     coil_logger.add_message('Loading', {'KeysDivision': splitted_steer_labels})
