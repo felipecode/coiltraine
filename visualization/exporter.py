@@ -69,17 +69,17 @@ def export_status(exp_batch, validation_datasets, driving_environments):
 
         f.write('\n')
 
-        names_list = get_names(exp_batch)
-        count = 0
         for exp in experiments:
 
 
-            if os.path.isdir(os.path.join(root_path, exp_batch, exp)):
+            if os.path.isdir(os.path.join(root_path, exp_batch, exp)) and  exp != 'plots':
 
-                f.write("%s,%s" % (exp, names_list[count]))
-                count += 1
                 print (exp)
+
+                g_conf.immutable(False)
                 merge_with_yaml(os.path.join('configs', exp_batch, exp + '.yaml'))
+
+                f.write("%s,%s" % (exp, g_conf.EXPERIMENT_GENERATED_NAME))
 
                 experiments_logs = os.listdir(os.path.join(root_path, exp_batch, exp))
 
@@ -99,7 +99,7 @@ def export_status(exp_batch, validation_datasets, driving_environments):
 
                 for driving in driving_environments:
                     log = 'drive_' + driving + '_csv'
-                    if log in  os.listdir(os.path.join(root_path, exp_batch, exp)):
+                    if log in os.listdir(os.path.join(root_path, exp_batch, exp)):
 
                         if g_conf.USE_ORACLE:
                             output_name = 'control_output_auto.csv'
