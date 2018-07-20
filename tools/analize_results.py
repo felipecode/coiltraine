@@ -66,6 +66,7 @@ if __name__ == '__main__':
     found_experiments    = []
 
 
+    experiments_to_print = ['experiment_59', 'experiment_22']
 
 
     name_keys = []
@@ -87,6 +88,14 @@ if __name__ == '__main__':
 
 
     for key, value in all_metrics_dict.items():
+
+        out = False
+        for experiment in experiments_to_print:
+            if experiment in key:
+                out = True
+                break
+        if out:
+            continue
 
         print (key)
         for i in  range(len(all_metrics_dict[key][absolute_error_name])):
