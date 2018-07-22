@@ -1,32 +1,37 @@
 import numpy as np
+import shutil
 import copy
 import random
 import gc
+import os
 
 # from sklearn import preprocessing
 
 import scipy
-
-from utils.general import plot_test_image
-
-from carla.agent import Agent, CommandFollower
-from carla.planner import Waypointer
-from PIL import Image
-
-# TODO: The network is defined and toguether there is as forward pass operation to be used for testing, depending on the configuration
-
-from network import CoILModel
-from configs import g_conf
-from logger import coil_logger
-from torchvision import transforms
-import imgauggpu as iag
 import torch
+from PIL import Image
 
 try:
     from carla import carla_server_pb2 as carla_protocol
 except ImportError:
     raise RuntimeError(
         'cannot import "carla_server_pb2.py", run the protobuf compiler to generate this file')
+
+
+from utils.general import plot_test_image
+
+from carla.agent import Agent, CommandFollower
+from carla.planner import Waypointer
+
+
+# TODO: The network is defined and toguether there is as forward pass operation to be used for testing, depending on the configuration
+
+from network import CoILModel
+from configs import g_conf
+from logger import coil_logger
+from car_screen_recorder import CarScreenRecorder
+
+
 
 number_of_seg_classes = 5
 classes_join = {0: 2, 1: 2, 2: 2, 3: 2, 5: 2, 12: 2, 9: 2, 11: 2, 4: 0, 10: 1, 8: 3, 6: 3, 7: 4}
@@ -43,9 +48,19 @@ def join_classes(labels_image):
 
 class CoILAgent(Agent):
 
-    def __init__(self, checkpoint, town_name):
+    def __init__(self, checkpoint, town_name, video_recording=False):
 
         Agent.__init__(self)
+        if video_recording:
+            writting_path = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
+                                        g_conf.EXPERIMENT_NAME, town_name, 'recording_episodes')
+            if not os.path.exists(writting_path):
+                os.makedirs(writting_path)
+            else:
+                shutil.rmtree(writting_path)
+                os.makedirs(writting_path)
+
+            self._screen_recorder = CarScreenRecorder(writting_path, load_wheel=True)
 
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
         self.model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
@@ -57,7 +72,7 @@ class CoILAgent(Agent):
         print("loaded state", checkpoint)
 
         self.model.cuda()
-
+        self.video_recording = video_recording
         self.model.eval()
 
         if g_conf.USE_ORACLE:
@@ -89,6 +104,10 @@ class CoILAgent(Agent):
         if g_conf.USE_ORACLE:
             _, control.throttle, control.brake = self._get_oracle_prediction(
                 measurements, target)
+
+        if self.video_recording:
+            self._screen_recorder.record_frame(sensor_data, control, measurements)
+
 
 
         # TODO: adapt the client side agent for the new version. ( PROBLEM )
@@ -179,7 +198,7 @@ class CoILAgent(Agent):
         if throttle > brake:
             brake = 0.0
 
-        steer = 0.8 * (wpa1 + wpa2)/0.5
+        steer = 0.7 * wpa2
 
         if steer > 0:
             steer = min(steer, 1)
