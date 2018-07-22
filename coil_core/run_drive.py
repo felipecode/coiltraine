@@ -121,8 +121,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
         else:
             control_filename = 'control_output.csv'
 
-
-
         if exp_set_name == 'ECCVTrainingSuite':
             experiment_set = ECCVTrainingSuite()
             set_type_of_process('drive', drive_conditions)
@@ -151,7 +149,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
             #                  "a", buffering=1)
 
 
-
+        print (" GOnna open CARLA")
         carla_process, port = start_carla_simulator(gpu, town_name, no_screen)
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
@@ -160,6 +158,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
         # Now actually run the driving_benchmark
 
+        print (" CARLA IS OPEN")
         latest = get_latest_evaluated_checkpoint()
         if latest is None:  # When nothing was tested, get latest returns none, we fix that.
             latest = 0
@@ -186,7 +185,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
             try:
                 # Get the correct checkpoint
                 if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
-
+                    print (" Load next checkpoint")
                     latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
                     checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                                          , 'checkpoints', str(latest) + '.pth'))
