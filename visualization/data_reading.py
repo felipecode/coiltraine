@@ -7,18 +7,7 @@ import collections
 from configs import g_conf
 from utils.general import static_vars
 
-"""
 
-speed_labels_1 = np.array(map(int, map(float, open('speed_file_Town01_1.txt'))))
-
-
-speed_labels_1_noise = np.array(map(int, map(float, open('speed_file_Town01_1_noise.txt'))))
-
-speed_labels_2 = np.array(map(int, map(float, open('speed_file_Town02_14.txt'))))
-
-
-speed_labels_2_noise = np.array(map(int, map(float, open('speed_file_Town02_14_noise.txt'))))
-"""
 
 def read_summary_csv(control_csv_file):
 
@@ -149,18 +138,6 @@ def _read_step_data(step_path):
 
 
 
-    """
-    if 'Town01' in step_path and 'noise' in step_path:
-        speed_input = speed_labels_1_noise
-    elif 'Town01' in step_path:
-        speed_input = speed_labels_1
-    elif 'Town02' in step_path and 'noise' in step_path:
-        speed_input = speed_labels_2_noise
-    else:
-        speed_input = speed_labels_2
-    """
-
-
     step_dictionary.update({'speed_input': get_speed_ground_truth(val_dataset_name)})
 
 
@@ -195,6 +172,8 @@ def _read_control_data(full_path, control_to_use):
     # Simple extra counter
 
 
+
+
 def _read_data(full_path, benchmarked_steps):
     town_dictionary = {}
 
@@ -212,10 +191,8 @@ def _read_data(full_path, benchmarked_steps):
         # First we try to add prediction data
         try:
             # Check for waypoints.
-            if '_wp_' in full_path:  # We test if the model is a waypoints based model, then we read a different part
-                prediction_data = {step: _read_step_data_wp(step_path)}
-            else:
-                prediction_data = {step: _read_step_data(step_path)}
+            print ("step path ", step_path)
+            prediction_data = {step: _read_step_data(step_path)}
 
 
             town_dictionary.update(prediction_data)

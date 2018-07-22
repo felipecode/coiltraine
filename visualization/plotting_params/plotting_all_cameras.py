@@ -44,21 +44,25 @@ processing_params = {'Success rate':   {'metric': 'control_success_rate', 'filte
                      # 'Steering accuracy 0.03': {'metric': 'steering_accuracy',
                      #                            'filter': data_filter,
                      #                            'params': {'threshold': 0.03}},
-                     # 'Steering accuracy 0.005 gt > 0.1': {'metric': 'steering_accuracy_filter_gt',
-                     #                                      'filter': data_filter,
-                     #                                      'params': {'threshold': 0.005,
-                     #                                                 'gt_condition': (
-                     #                                                 lambda x: abs(x) > 0.1)}},
-                     # 'Steering accuracy 0.01 gt > 0.1': {'metric': 'steering_accuracy_filter_gt',
-                     #                                     'filter': data_filter,
-                     #                                     'params': {'threshold': 0.01,
-                     #                                                'gt_condition': (
-                     #                                                lambda x: abs(x) > 0.1)}},
-                     # 'Steering accuracy 0.03 gt > 0.1': {'metric': 'steering_accuracy_filter_gt',
-                     #                                     'filter': data_filter,
-                     #                                     'params': {'threshold': 0.03,
-                     #                                                'gt_condition': (
-                     #                                                lambda x: abs(x) > 0.1)}},
+                     'Steering absolute error gt > 0.001': {'metric': 'steering_error_filter_gt',
+                                                            'filter': data_filter, 'params': {
+                             'gt_condition': (lambda x: abs(x) > 0.001)}},
+                     'Steering absolute error gt > 0.01': {'metric': 'steering_error_filter_gt',
+                                                           'filter': data_filter, 'params': {
+                             'gt_condition': (lambda x: abs(x) > 0.01)}},
+                     'Steering absolute error gt > 0.03': {'metric': 'steering_error_filter_gt',
+                                                           'filter': data_filter, 'params': {
+                             'gt_condition': (lambda x: abs(x) > 0.03)}},
+                     'Steering absolute error gt > 0.05': {'metric': 'steering_error_filter_gt',
+                                                           'filter': data_filter, 'params': {
+                             'gt_condition': (lambda x: abs(x) > 0.05)}},
+                     'Steering absolute error gt > 0.1': {'metric': 'steering_error_filter_gt',
+                                                          'filter': data_filter, 'params': {
+                             'gt_condition': (lambda x: abs(x) > 0.1)}},
+                     'Steering absolute error gt > 0.2': {'metric': 'steering_error_filter_gt',
+                                                          'filter': data_filter, 'params': {
+                             'gt_condition': (lambda x: abs(x) > 0.2)}},
+
                      'Displacement': {'metric': 'displacement', 'filter': data_filter,
                                       'params': {'aggregate': {'type': 'mean'}}},
                      'Displacement 70th percentile': {'metric': 'displacement',
@@ -214,3 +218,37 @@ plot_params['ctrl_vs_cum_disp16'] = {'print': True,
                                      'size': {'data': 'step'},
                                      'color': {'data': 'town_id'}
                                      }
+plot_params['ctrl_vs_steer_gt_0001'] = {'print': True,
+                                   'x': {'data': 'Steering absolute error gt > 0.001', 'log': True},
+                                   'y': {'data': 'Success rate', 'log': False},
+                                   'size': {'data': 'step'},
+                                   'color': {'data': 'town_id'}
+                                   }
+
+plot_params['ctrl_vs_steer_gt_001'] = {'print': True,
+                                   'x': {'data': 'Steering absolute error gt > 0.01', 'log': True},
+                                   'y': {'data': 'Success rate', 'log': False},
+                                   'size': {'data': 'step'},
+                                   'color': {'data': 'town_id'}
+                                   }
+
+plot_params['ctrl_vs_steer_gt_003'] = {'print': True,
+                                   'x': {'data': 'Steering absolute error gt > 0.03', 'log': True},
+                                   'y': {'data': 'Success rate', 'log': False},
+                                   'size': {'data': 'step'},
+                                   'color': {'data': 'town_id'}
+                                   }
+
+plot_params['ctrl_vs_steer_gt_005'] = {'print': True,
+                                   'x': {'data': 'Steering absolute error gt > 0.05', 'log': True},
+                                   'y': {'data': 'Success rate', 'log': False},
+                                   'size': {'data': 'step'},
+                                   'color': {'data': 'town_id'}
+                                   }
+
+plot_params['ctrl_vs_steer_gt_01'] = {'print': True,
+                                   'x': {'data': 'Steering absolute error gt > 0.1', 'log': True},
+                                   'y': {'data': 'Success rate', 'log': False},
+                                   'size': {'data': 'step'},
+                                   'color': {'data': 'town_id'}
+                                   }

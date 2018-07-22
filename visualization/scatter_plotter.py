@@ -59,13 +59,20 @@ def read_data(exp_batch, experiment, town, data_params, noise):
     # Set the control dataset.
     full_path_control = os.path.join(data_params['root_path'], exp_batch, experiment,
                                      'drive_' + control_dataset + '_csv')
+    print ("Full data control ", full_path_control)
+
     control_data = data_reading._read_control_data(full_path_control, data_params['control'])
     if control_data is None:
+        print ("control is none")
         return None
+
+
+    print (" read control")
 
     # We get the path for the validation csvs
     full_path_validation = os.path.join(data_params['root_path'], exp_batch, experiment,
                                         'validation_' + val_dataset + '_csv')
+
     # Based on the control data, we read the rest of the data
 
 
@@ -402,12 +409,15 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
         f.write('\n\nprocessing_params:\n' + pprint.pformat(processing_params,indent=4))
         f.write('\n\nplot_params:\n' + pprint.pformat(plot_params,indent=4))
 
-    all_metrics = {}
+
 
     list_of_exps_names = get_names(exp_batch)
     print ('list, expnames', list_of_exps_names)
 
     list_of_experiments = [experiment.split('.')[-2] for experiment in list_of_experiments]
+
+    all_metrics_town01 = {}
+    all_metrics_town02 = {}
 
     for experiment in list_of_experiments:
 
@@ -431,20 +441,40 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
                     print(k, len(v))
             print('\n ** Processing the data **\n')
             metrics = process_data(data, processing_params, data_params['noise']) # Compute metrics from the data. Can be multiple metrics, given by the processing_params list. Should be vectorized as much as possible. The output is a list of the same size as processing_params.
-            all_metrics[experiment + ' : ' + list_of_exps_names[list_of_experiments.index(experiment)]
-                        + '_' + town] = metrics # append to the computed list of metrics to the dictionary of results.
-
-    with open(os.path.join(out_path, 'all_metrics.json'), 'w') as fo:
-        fo.write(json.dumps(all_metrics))
+            if town == 'Town01':
+                all_metrics_town01[experiment + ' : ' + list_of_exps_names[list_of_experiments.index(experiment)]
+                            + '_' + town] = metrics # append to the computed list of metrics to the dictionary of results.
+            else:
+                all_metrics_town02[experiment + ' : ' + list_of_exps_names[list_of_experiments.index(experiment)]
+                            + '_' + town] = metrics # append to the computed list of metrics to the dictionary of results.
 
     # Plot the results
-    print('\n === Plotting the results ===\n')
-    for plot_label, plot_param in plot_params.items():
-        print(plot_param)
-        print('\n ** Plotting %s **' % plot_label)
-        if 'analysis' in plot_param:
-            make_scatter_plot_analysis(all_metrics, plot_param, out_file=os.path.join(out_path, plot_label+'.pdf'))
-        else:
-            make_scatter_plot(all_metrics, plot_param, out_file=os.path.join(out_path, plot_label + '.pdf'))
+
+    for town in data_params['towns']:
+        with open(os.path.join(out_path, 'all_metrics' + town + '.json'), 'w') as fo:
+            if town == 'Town01':
+                fo.write(json.dumps(all_metrics_town01))
+            else:
+                fo.write(json.dumps(all_metrics_town02))
+
+        print('\n === Plotting the results ===\n')
+        for plot_label, plot_param in plot_params.items():
+            print(plot_param)
+            print('\n ** Plotting %s **' % plot_label)
+            if 'analysis' in plot_param:
+                make_scatter_plot_analysis(all_metrics, plot_param,
+                                           out_file=os.path.join(out_path, plot_label + town + '.pdf'))
+            else:
+                if town == 'Town01':
+                    make_scatter_plot(all_metrics_town01, plot_param,
+                                  out_file=os.path.join(out_path, plot_label + town + '.pdf'))
+                else:
+                    make_scatter_plot(all_metrics_town02, plot_param,
+                                  out_file=os.path.join(out_path, plot_label + town + '.pdf'))
+
+
+
+
+
 
 # TODO Should we cache the computed metrics? The metrics should have unique names then
