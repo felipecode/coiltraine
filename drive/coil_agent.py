@@ -29,7 +29,7 @@ from carla.planner import Waypointer
 from network import CoILModel
 from configs import g_conf
 from logger import coil_logger
-from car_screen_recorder import CarScreenRecorder
+from .car_screen_recorder import CarScreenRecorder
 
 
 
