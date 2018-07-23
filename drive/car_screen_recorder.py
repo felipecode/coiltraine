@@ -141,7 +141,7 @@ class CarScreenRecorder(object):
         sensor_data.setflags(write=1)
         speed = measurements.player_measurements.forward_speed
 
-        sensor_data = np.swapaxes(sensor_data, 1, 0)
+        #sensor_data = np.swapaxes(sensor_data, 1, 0)
         print(sensor_data.shape)
         #sensor_data = np.rot90(sensor_data, 2)
 
