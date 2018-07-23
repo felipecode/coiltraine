@@ -135,6 +135,7 @@ class CarScreenRecorder(object):
     def record_frame(self, sensor_data, control, direction,
                      measurements, screen_position=[0, 0]):
         # direction, speed, screen_position=[0, 0], draw_wheel=False):
+        sensor_data.setflags(write=1)
         speed = measurements.player_measurements.forward_speed
         #start_to_print = time.time()
         steer = control.steer
