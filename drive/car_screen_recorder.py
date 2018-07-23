@@ -139,14 +139,16 @@ class CarScreenRecorder(object):
         # direction, speed, screen_position=[0, 0], draw_wheel=False):
         sensor_data.setflags(write=1)
         speed = measurements.player_measurements.forward_speed
+
+        sensor_data = np.swapaxes(sensor_data, 0, 1)
         #start_to_print = time.time()
         steer = control.steer
         acc = control.throttle
         brake = control.brake
         size_x, size_y, size_z = sensor_data.shape
-        sensor_data = sensor_data[:, :, ::-1]
+
         # Define our fonts
-        print(sensor_data.shape)
+        #print(sensor_data.shape)
         #print()
         draw_vbar_on(sensor_data, acc, int(1.5 * sensor_data.shape[0] / 8), (0, 255, 0))
         draw_vbar_on(sensor_data, brake, int(1.5 * sensor_data.shape[0] / 8) + 97, (255, 0, 0))
