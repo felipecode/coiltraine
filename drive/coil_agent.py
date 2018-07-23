@@ -106,7 +106,8 @@ class CoILAgent(Agent):
                 measurements, target)
 
         if self.video_recording:
-            self._screen_recorder.record_frame(sensor_data, control, measurements)
+            self._screen_recorder.record_frame(sensor_data, control, directions,
+                                               measurements)
 
 
 
