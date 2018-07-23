@@ -46,7 +46,7 @@ class CarScreenRecorder(object):
             self._wheel = cv2.imread('drive/wheel.png')  # ,cv2.IMREAD_UNCHANGED)
             self._wheel = cv2.resize(self._wheel, (int(0.08 * self._wheel.shape[0]), int(0.08 * self._wheel.shape[1])))
 
-        self.start_screen([600, 800], [1, 1], 1)
+        self.start_screen([800, 600], [1, 1], 1)
 
     # If we were to load the steering wheel load it
 
@@ -101,8 +101,8 @@ class CarScreenRecorder(object):
 
         # pygame.surfarray.array_colorkey(self._camera_surfaces[screen_number])
         self._camera_surfaces[screen_position[0] * screen_position[1]].set_colorkey((255, 0, 255))
-        pygame.surfarray.blit_array(self._camera_surfaces[screen_position[0] * screen_position[1]],
-                                    array.swapaxes(0, 1))
+        pygame.surfarray.blit_array(self._camera_surfaces[screen_position[0] * screen_position[1]])#,
+                                    #array.swapaxes(0, 1))
 
         camera_scale = pygame.transform.scale(self._camera_surfaces[screen_position[0] * screen_position[1]],
                                               (int(self._resolution[0] * scale), int(self._resolution[1] * scale)))
@@ -140,11 +140,10 @@ class CarScreenRecorder(object):
         sensor_data.setflags(write=1)
         speed = measurements.player_measurements.forward_speed
 
-        sensor_data = np.swapaxes(sensor_data, 1, 0)
+        #sensor_data = np.swapaxes(sensor_data, 1, 0)
         print(sensor_data.shape)
-        sensor_data = np.rot90(sensor_data, 2)
+        #sensor_data = np.rot90(sensor_data, 2)
 
-        sensor_data = np.swapaxes(sensor_data, 1, 0)
 
         #start_to_print = time.time()
         steer = control.steer
