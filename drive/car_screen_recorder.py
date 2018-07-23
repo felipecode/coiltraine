@@ -46,6 +46,7 @@ class CarScreenRecorder(object):
             self._wheel = cv2.imread('drive/wheel.png')  # ,cv2.IMREAD_UNCHANGED)
             self._wheel = cv2.resize(self._wheel, (int(0.08 * self._wheel.shape[0]), int(0.08 * self._wheel.shape[1])))
 
+        self.start_screen([600, 800], [1, 1], 1)
 
     # If we were to load the steering wheel load it
 
@@ -55,7 +56,6 @@ class CarScreenRecorder(object):
     def start_screen(self, resolution, aspect_ratio, scale=1):
 
         self._resolution = resolution
-
         self._aspect_ratio = aspect_ratio
         self._scale = scale
 
