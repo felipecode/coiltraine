@@ -22,10 +22,12 @@ def draw_vbar_on(img, bar_intensity, x_pos, color=(0, 0, 255)):
     initial_y_pos = img.shape[0] - img.shape[0] / 6
     # print bar_intensity
 
+
     for i in range(bar_size):
         if bar_intensity > 0.0:
             y = initial_y_pos - i
             for j in range(20):
+                print (y, x_pos + j)
                 img[y, x_pos + j] = color
 
 
