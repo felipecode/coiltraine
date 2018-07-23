@@ -92,6 +92,7 @@ class CarScreenRecorder(object):
             scale = self._scale
 
         if array.shape[0] != self._resolution[1] or array.shape[1] != self._resolution[0]:
+            print("ROLOU RESIZE")
             array = scipy.misc.imresize(array, [self._resolution[1], self._resolution[0]])
 
         # print array.shape, self._resolution
@@ -102,7 +103,7 @@ class CarScreenRecorder(object):
         # pygame.surfarray.array_colorkey(self._camera_surfaces[screen_number])
         self._camera_surfaces[screen_position[0] * screen_position[1]].set_colorkey((255, 0, 255))
         pygame.surfarray.blit_array(self._camera_surfaces[screen_position[0] * screen_position[1]],
-                                    array.swapaxes(0, 1))
+                                    array)
 
         camera_scale = pygame.transform.scale(self._camera_surfaces[screen_position[0] * screen_position[1]],
                                               (int(self._resolution[0] * scale), int(self._resolution[1] * scale)))
@@ -142,7 +143,7 @@ class CarScreenRecorder(object):
 
         sensor_data = np.swapaxes(sensor_data, 1, 0)
         print(sensor_data.shape)
-        sensor_data = np.rot90(sensor_data, 2)
+        #sensor_data = np.rot90(sensor_data, 2)
 
 
         #start_to_print = time.time()
