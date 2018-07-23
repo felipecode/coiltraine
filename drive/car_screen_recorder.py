@@ -140,7 +140,7 @@ class CarScreenRecorder(object):
         sensor_data.setflags(write=1)
         speed = measurements.player_measurements.forward_speed
 
-        sensor_data = np.swapaxes(sensor_data, 0, 1)
+        sensor_data = np.swapaxes(sensor_data, 1, 0 )
         #start_to_print = time.time()
         steer = control.steer
         acc = control.throttle
