@@ -43,16 +43,16 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     fc:
       neurons: [512, 512]
-      dropouts: [0.5, 0.5]
+      dropouts: [0.0, 0.5]
 
   measurements:
     fc:
       neurons: [128, 128]
-      dropouts: [0.5, 0.5]
+      dropouts: [0.0, 0.5]
   join:
     fc:
       neurons: [512]
-      dropouts: [0.5]
+      dropouts: [0.0]
   speed_branch:
     fc:
       neurons: [256, 256]
@@ -71,7 +71,7 @@ LEARNING_RATE_DECAY_LEVEL: 0.5
 
 #TODO check how to use this part
 BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05]
-LOSS_FUNCTION: 'L2'
+LOSS_FUNCTION: 'L1'
 
 VARIABLE_WEIGHT:
   Steer: 0.5
