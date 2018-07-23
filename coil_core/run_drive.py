@@ -55,7 +55,6 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
     # TODO: Add parameters
 
     port = find_free_port()
-    carla_path = os.environ['CARLA_PATH']
 
 
     if docker:
@@ -72,6 +71,7 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
 
     else:
 
+        carla_path = os.environ['CARLA_PATH']
         if not no_screen:
             os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
             sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
