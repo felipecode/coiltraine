@@ -130,6 +130,12 @@ def compute_steering_avg_l1_speed(data_item, param):
 def compute_steering_avg_mse(data_item, param):
     return (data_item['steer_gt'] - data_item['steer_pred'])**2
 
+def compute_steering_avg_mse_filter_gt(data_item, param):
+    error_np = np.array(abs(data_item['steer_gt'] - data_item['steer_pred']))
+    gt_np = np.array(data_item['steer_gt'])
+    gt_mask = param['gt_condition'](gt_np)
+    return error_np[gt_mask]**2
+
 def compute_displacement(data_item, param):
     return np.multiply(abs(data_item['steer_gt'] - data_item['steer_pred']),np.absolute(data_item['speed_input']))
 
