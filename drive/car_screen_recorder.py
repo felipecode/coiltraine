@@ -134,6 +134,7 @@ class CarScreenRecorder(object):
 
     def record_frame(self, sensor_data, control, direction,
                      measurements, screen_position=[0, 0]):
+
         # direction, speed, screen_position=[0, 0], draw_wheel=False):
         sensor_data.setflags(write=1)
         speed = measurements.player_measurements.forward_speed
@@ -144,6 +145,8 @@ class CarScreenRecorder(object):
         size_x, size_y, size_z = sensor_data.shape
         sensor_data = sensor_data[:, :, ::-1]
         # Define our fonts
+        print(sensor_data.shape)
+        #print()
         draw_vbar_on(sensor_data, acc, int(1.5 * sensor_data.shape[0] / 8), (0, 255, 0))
         draw_vbar_on(sensor_data, brake, int(1.5 * sensor_data.shape[0] / 8) + 97, (255, 0, 0))
         initial_y_pos = size_x - size_x / 6 + 5
@@ -156,7 +159,8 @@ class CarScreenRecorder(object):
                              screen_position)
 
         self.paint_on_screen(size_x / 10, 'BRAKE', (255, 0, 0),
-                             (int(1.5 * sensor_data.shape[0] / 8) + 60, initial_y_pos), screen_position)
+                             (int(1.5 * sensor_data.shape[0] / 8) + 60, initial_y_pos),
+                             screen_position)
 
         if direction == 4:
             text = "GO RIGHT"
