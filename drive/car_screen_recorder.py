@@ -25,9 +25,8 @@ def draw_vbar_on(img, bar_intensity, x_pos, color=(0, 0, 255)):
 
     for i in range(bar_size):
         if bar_intensity > 0.0:
-            y = initial_y_pos - i
+            y = int(initial_y_pos - i)
             for j in range(20):
-                print (y, x_pos + j)
                 img[y, x_pos + j] = color
 
 
