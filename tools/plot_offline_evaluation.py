@@ -14,9 +14,8 @@ import math
 import time
 import os
 from collections import deque
-import seaborn as sns
 
-sns.set(color_codes=True)
+
 
 
 from screen_manager import ScreenManager
@@ -100,16 +99,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     path = args.path
 
-    steer_pred1 = np.loadtxt(
-        '/home/felipe/CIL/_logs/eccv/experiment_1/validation_Town02W14_csv/500000.csv',
-        delimiter=",", skiprows=0, usecols=([0]))
-    steer_pred2 = np.loadtxt(
-        '/home/felipe/CIL/_logs/eccv/experiment_11/validation_Town02W14_csv/16000.csv',
-        delimiter=",", skiprows=0, usecols=([0]))
-    steer_gt = np.loadtxt(
-        '/home/felipe/Datasets/Town02W14/ground_truth.csv',
-        delimiter=",", skiprows=0, usecols=([0]))
-
     first_time = True
     count = 0
     steering_pred = []
@@ -167,12 +156,7 @@ if __name__ == "__main__":
                 capture_time = time.time()
                 images[int(data['targets'][i + j][camera_id_position])] = np.array(
                     data['rgb'][i + j]).astype(np.uint8)
-                steer_gt_order[int(data['targets'][i + j][camera_id_position])] = steer_gt[
-                    (h_num * 200) + i + j]
-                steer_pred1_order[int(data['targets'][i + j][camera_id_position])] = steer_pred1[
-                    (h_num * 200) + i + j]
-                steer_pred2_order[int(data['targets'][i + j][camera_id_position])] = steer_pred2[
-                    (h_num * 200) + i + j]
+
 
                 # print ' Read RGB time ',time.time() - capture_time
                 # depths[int(data['targets'][i +j][25])] = np.array(data['depth'][i+j]).astype(np.uint8)
@@ -209,7 +193,7 @@ if __name__ == "__main__":
                 actions[int(data['targets'][i + j][camera_id_position])] = action
 
                 action_noise = Control()
-                action_noise.steer = data['targets'][i + j][0]
+                action_noise.steer = data['targets'][i + j][5]
                 action_noise.throttle = data['targets'][i + j][1]
                 action_noise.brake = data['targets'][i + j][2]
 
@@ -240,8 +224,8 @@ if __name__ == "__main__":
 
             #    print actions[j].steer
 
-            screen.plot3camrcnoise(images[1], steer_pred1_order[1], steer_pred2_order[1],
-                                   steer_gt_order[1], [0, 0])
+            screen.plot3camrcnoise(images[1], actions_noise[1].steer, actions[1].steer,
+                                   0, [0, 0])
 
 
 
@@ -252,7 +236,6 @@ if __name__ == "__main__":
 
             #  screen.plot_camera(depths[j] ,[j,2])
 
-            # pygame.display.flip()
-            # time.sleep(0.05)
+
 
     # save_gta_surface(gta_surface)

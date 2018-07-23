@@ -21,13 +21,13 @@ NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 40.0
-TRAIN_DATASET_NAME: '02HoursW1-3-6-8'
+TRAIN_DATASET_NAME: '1HoursW1-3-6-8'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [ 2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
@@ -37,22 +37,22 @@ MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
     conv:
-      channels: [32, 32, 64, 64, 128, 128, 256, 256]
-      kernels: [5, 3, 3, 3, 3, 3, 3, 3]
-      strides: [2, 1, 2, 1, 2, 1, 1, 1]
-      dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      channels: [32, 32, 32, 64, 64, 64, 128, 128, 128, 256, 256, 256]
+      kernels: [5, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+      strides: [2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+      dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     fc:
       neurons: [512, 512]
-      dropouts: [0.5, 0.5]
+      dropouts: [0.0, 0.5]
 
   measurements:
     fc:
       neurons: [128, 128]
-      dropouts: [0.5, 0.5]
+      dropouts: [0.0, 0.5]
   join:
     fc:
       neurons: [512]
-      dropouts: [0.5]
+      dropouts: [0.0]
   speed_branch:
     fc:
       neurons: [256, 256]

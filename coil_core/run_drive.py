@@ -76,7 +76,7 @@ def start_carla_simulator(gpu, town_name, no_screen):
         sp = subprocess.Popen(['vglrun', '-d', ':7.' + str(gpu),
                                     carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
                                     '/Game/Maps/' + town_name, '-windowed', '-benchmark',
-                                    '-fps=10', '-world-port='+str(port)],
+                                    '-fps=10', '-world-port='+str(port), '-dumpmovie'],
                                shell=False,
                                stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
     else:
@@ -99,7 +99,7 @@ def start_carla_simulator(gpu, town_name, no_screen):
 # TODO :  Memory use should also be adaptable with a limit, for now that seems to be doing fine in PYtorch
 
 def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='127.0.0.1',
-            suppress_output=True, no_screen=False):
+            suppress_output=True, no_screen=False, video_recording=True):
 
     try:
 
@@ -120,8 +120,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
             control_filename = 'control_output_auto.csv'
         else:
             control_filename = 'control_output.csv'
-
-
 
         if exp_set_name == 'ECCVTrainingSuite':
             experiment_set = ECCVTrainingSuite()
@@ -151,7 +149,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
             #                  "a", buffering=1)
 
 
-
+        print (" GOnna open CARLA")
         carla_process, port = start_carla_simulator(gpu, town_name, no_screen)
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
@@ -160,6 +158,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
         # Now actually run the driving_benchmark
 
+        print (" CARLA IS OPEN")
         latest = get_latest_evaluated_checkpoint()
         if latest is None:  # When nothing was tested, get latest returns none, we fix that.
             latest = 0
@@ -186,12 +185,12 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
             try:
                 # Get the correct checkpoint
                 if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
-
+                    print (" Load next checkpoint")
                     latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
                     checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                                          , 'checkpoints', str(latest) + '.pth'))
 
-                    coil_agent = CoILAgent(checkpoint, town_name)
+                    coil_agent = CoILAgent(checkpoint, town_name, video_recording=video_recording)
 
                     coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
 
