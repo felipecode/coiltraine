@@ -150,16 +150,16 @@ class CarScreenRecorder(object):
         #print()
         draw_vbar_on(sensor_data, acc, int(1.5 * sensor_data.shape[0] / 8), (0, 255, 0))
         draw_vbar_on(sensor_data, brake, int(1.5 * sensor_data.shape[0] / 8) + 97, (255, 0, 0))
-        initial_y_pos = size_x - size_x / 6 + 5
+        initial_y_pos = int(size_x - size_x / 6 + 5)
         self.set_array(sensor_data, screen_position)
         if self._draw_wheel:
             self.draw_wheel_on(steer, screen_position)
 
-        self.paint_on_screen(size_x / 10, 'GAS', (0, 255, 0),
+        self.paint_on_screen(int(size_x / 10), 'GAS', (0, 255, 0),
                              (int(1.5 * sensor_data.shape[0] / 8) - 20, initial_y_pos),
                              screen_position)
 
-        self.paint_on_screen(size_x / 10, 'BRAKE', (255, 0, 0),
+        self.paint_on_screen(int(size_x / 10), 'BRAKE', (255, 0, 0),
                              (int(1.5 * sensor_data.shape[0] / 8) + 60, initial_y_pos),
                              screen_position)
 
@@ -174,15 +174,14 @@ class CarScreenRecorder(object):
             extraback = int(size_x / 2.8)
 
         if direction != 2:
-            direction_pos = (size_y / 2 - size_x / 2 - extraback, size_x / 2 - size_x / 4)
+            direction_pos = (int(size_y / 2 - size_x / 2 - extraback), int(size_x / 2 - size_x / 4))
 
-            self.paint_on_screen(size_x / 6, text, (0, 255, 0), direction_pos, screen_position)
+            self.paint_on_screen(int(size_x / 6), text, (0, 255, 0), direction_pos, screen_position)
 
-        self.paint_on_screen(size_x / 10, "Speed: %.2f" % speed, (0, 255, 0), (size_y / 2 - 55, 30),
-                             screen_position)
+        self.paint_on_screen(int(size_x / 10), "Speed: %.2f" % speed, (0, 255, 0),
+                             (int(size_y / 2) - 55, 30), screen_position)
 
         pygame.display.flip()
-
         pygame.image.save(self._screen, os.path.join(self._writting_path,
                                                      "img" + str(self._render_iter) + ".png"))
 
