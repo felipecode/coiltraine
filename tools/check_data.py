@@ -68,6 +68,9 @@ if __name__ == "__main__":
 
 
     files = glob.glob(os.path.join(path, 'data_*.h5'))
+
+    files = sorted(files)
+
     for f in files:
         print (f)
 
