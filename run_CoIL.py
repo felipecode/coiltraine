@@ -178,6 +178,7 @@ if __name__ == '__main__':
             'driving_environments': list(args.driving_environments),
             'allocation_parameters': allocation_parameters,
             'no_screen': args.no_screen,
+            'docker': args.docker
         }
 
         folder_execute(params)

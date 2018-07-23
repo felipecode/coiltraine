@@ -158,7 +158,7 @@ def folder_execute(params=None):
                 free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
                                             free_gpus, allocation_parameters['drive_cost'])
                 execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
-                              process_specs['environment'], no_screen=params['no_screen'])
+                              process_specs['environment'], no_screen=params['no_screen'], docker=params['docker'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 
