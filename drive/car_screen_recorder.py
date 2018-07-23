@@ -142,7 +142,7 @@ class CarScreenRecorder(object):
 
         sensor_data = np.swapaxes(sensor_data, 1, 0)
         print(sensor_data.shape)
-        #sensor_data = np.rot90(sensor_data, 2)
+        sensor_data = np.rot90(sensor_data, 2)
 
 
         #start_to_print = time.time()
