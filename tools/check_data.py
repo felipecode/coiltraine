@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     files = glob.glob(os.path.join(path, 'data_*.h5'))
     for f in files:
-
+        print (f)
 
         if not is_hdf5_prepared(f):
             raise ValueError("Not working ")
