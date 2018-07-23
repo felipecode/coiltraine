@@ -241,7 +241,8 @@ def pedestrian_speed_split(float_data, meta_data, keys):
 
     # TODO: read meta data and turn into a coool dictionary ?
     # TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
-    labels = float_data[-1, :]
+    labels = float_data[np.where(meta_data[:, 0] == b'pedestrian'), :][0][0].astype(np.bool) & \
+             (float_data[np.where(meta_data[:, 0] == b'camera'), :][0][0] == 1)
     print ("labels shape ", labels.shape)
     #keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
 

@@ -85,6 +85,13 @@ if __name__ == '__main__':
         help='Set to carla to run offscreen'
     )
     argparser.add_argument(
+        '-gv',
+        '--gpu-value',
+        dest='gpu_value',
+        type=float,
+        default=4.0
+    )
+    argparser.add_argument(
         '-dk', '--docker',
         action='store_true',
         dest='docker',
@@ -156,7 +163,7 @@ if __name__ == '__main__':
 
         # Maybe the latest voltas will be underused
         # OBS: This usage is also based on my tensorflow experiences, maybe pytorch allows more.
-        allocation_parameters = {'gpu_value': 3.5,
+        allocation_parameters = {'gpu_value': args.gpu_value,
                                  'train_cost': 2,
                                  'validation_cost': 1.5,
                                  'drive_cost': 1.5}

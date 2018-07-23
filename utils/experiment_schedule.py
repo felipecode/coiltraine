@@ -122,7 +122,6 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
         task_to_add = None
         # TODO: One thing is error other thing is stop. However at a first step we can try to restart all error things
 
-        print (' Exec process ', exec_name_vec)
 
 
         if is_training:
@@ -142,7 +141,6 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
 
 
             if task_to_add is not None:
-                print ('Task to add ', task_to_add)
                 task_name_vec = dict_to_namevec(task_to_add[2])
                 if task_name_vec in exec_name_vec:
 
@@ -168,7 +166,6 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
 
 
             if task_to_add is not None:
-                print ('Task to add ', task_to_add)
                 task_name_vec = dict_to_namevec(task_to_add[2])
                 if task_name_vec in exec_name_vec:
 
@@ -194,7 +191,6 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
 
 
             if task_to_add is not None:
-                print ('Task to add ', task_to_add)
                 task_name_vec = dict_to_namevec(task_to_add[2])
                 if task_name_vec in exec_name_vec:
 
