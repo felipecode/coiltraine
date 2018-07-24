@@ -168,7 +168,13 @@ def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list, ):
                 csv_file_path = os.path.join(root_path, exp_batch_name, exp,
                                              folder_name, csv_result)
 
-                len_of_csv_file = len(np.loadtxt(csv_file_path, delimiter=","))
+                try:
+                    len_of_csv_file = len(np.loadtxt(csv_file_path, delimiter=","))
+                except:
+                    print ("    wrong file")
+                    print ("    deleting")
+                    os.remove(csv_file_path)
+                    continue
 
                 print ('    len data', validation_sizes[validation_log])
                 print ('    len csv ', len_of_csv_file)
