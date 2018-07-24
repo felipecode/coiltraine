@@ -55,7 +55,7 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
     # TODO: Add parameters
     port = 0
     while port > 35000 and port < 34000:
-        print port
+        print (port)
         port = find_free_port()
 
 
