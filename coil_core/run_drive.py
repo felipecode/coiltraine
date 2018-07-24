@@ -53,13 +53,18 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
                       'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
 
     # TODO: Add parameters
+    port = 0
+    while port > 35000 and port < 34000:
+        print port
+        port = find_free_port()
 
-    port = find_free_port()
 
 
-    if docker:
-        sp = subprocess.Popen(['sudo', 'docker', 'run', '--rm', '-p', str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
-                              '--runtime=nvidia', '-e','NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
+    if docker is not None:
+
+
+        sp = subprocess.Popen(['sudo', 'nvidia-docker', 'exec', docker,
+                               '-e','NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
                                '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
                                '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
                               stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
