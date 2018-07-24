@@ -74,9 +74,13 @@ def compute_control_average_completion(data_item, param):
 
 def compute_km_per_infraction(data_item, param):
     label_to_index = {'intersection_offroad':1, 'intersection_otherlane': 2, 'collision_pedestrians': 3, 'collision_vehicles': 4}
-    infraction_vec = np.array(data_item['control'][1:5])
+
+    km_run = data_item['control'][-1]
+    infraction_vec = np.array(data_item['control'][2:6])
+    infraction_vec = infraction_vec/km_run
+
     infraction_vec[infraction_vec==0] = 0.01
-    km_per_infraction = 1. / np.sum(infraction_vec)
+    km_per_infraction = np.sum(infraction_vec)*km_run
     return km_per_infraction
 
 

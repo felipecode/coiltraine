@@ -37,10 +37,10 @@ MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
     conv:
-      channels: [32, 32, 32, 64, 64, 64, 128, 128, 128, 256, 256, 256]
-      kernels: [5, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
-      strides: [2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-      dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      channels: [32, 32, 64, 64, 128, 128, 256, 256]
+      kernels: [5, 3, 3, 3, 3, 3, 3, 3]
+      strides: [2, 1, 2, 1, 2, 1, 1, 1]
+      dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     fc:
       neurons: [512, 512]
       dropouts: [0.0, 0.5]
