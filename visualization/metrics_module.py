@@ -104,6 +104,15 @@ def compute_steering_accuracy(data_item, param):
     matches = (pred_np == gt_np).astype(np.float)
     return matches
 
+def compute_steering_classification_error(data_item, param):
+    pred_np = np.array(data_item['steer_pred'])
+    gt_np = np.array(data_item['steer_gt'])
+    thresh = param['threshold']
+    pred_np = np.digitize(pred_np, [-thresh, thresh])
+    gt_np = np.digitize(gt_np, [-thresh, thresh])
+    matches = 1. - (pred_np == gt_np).astype(np.float)
+    return matches
+
 def compute_steering_accuracy_filter_gt(data_item, param):
     pred_np = np.array(data_item['steer_pred'])
     gt_np = np.array(data_item['steer_gt'])

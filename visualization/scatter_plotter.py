@@ -114,7 +114,7 @@ def filter_data(data, filter_param, noise):
 
             """
             if data['town'] == 'Town01_1' and noise == '_noise':
-                camera_labels = 
+                camera_labels =
             elif data['town'] == 'Town01_1':
                 camera_labels = camera_labels_1
             elif data['town'] == 'Town02_14' and noise == '_noise':
@@ -320,6 +320,12 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
     for key in data:
         data[key] = data[key][np.invert(nans)]
 
+    if 'plot_best_n_percent' in plot_param and plot_param['plot_best_n_percent']:
+        sorting_indices = np.argsort(data['x'])
+        selected_indices = sorting_indices[:int(plot_param['plot_best_n_percent']/100.*len(sorting_indices))]
+        for key in data:
+            data[key] = data[key][selected_indices]
+
     # take log if needed
     data_x = np.log(data['x'])/np.log(10) if plot_param['x']['log'] else np.copy(data['x'])
     data_y = np.log(data['y'])/np.log(10) if plot_param['y']['log'] else np.copy(data['y'])
@@ -362,10 +368,12 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
     y_label = plot_param['y']['data']
     if plot_param['x']['log']:
         x_label += ' (log)'
-        ax.set_xticklabels(['%.1e' % np.power(10, float(t)) for t in ax.get_xticks()])
+        ax.set_xticklabels(['%.3f' % np.power(10, float(t)) for t in ax.get_xticks()])
     if plot_param['y']['log']:
         y_label += ' (log)'
-        ax.set_yticklabels(['%.1e' % np.power(10, float(t)) for t in ax.get_yticks()])
+        ax.set_yticklabels(['%.2f' % np.power(10, float(t)) for t in ax.get_yticks()])
+    else:    
+        ax.set_yticklabels(['%.2f' % float(t) for t in ax.get_yticks()])
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
 
@@ -380,7 +388,8 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
         title = plot_param['title']
     else:
         title = plot_param['y']['data'] + ' vs ' + plot_param['x']['data']
-    plt.title(title + '\ncorrelation %.2f' % corr)
+    # NOTE removed by Alexey for the paper 
+    # plt.title(title + '\ncorrelation %.2f' % corr)
 
     # Save to out_file
     if plot_param['print']:
