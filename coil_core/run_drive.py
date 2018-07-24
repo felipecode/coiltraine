@@ -11,7 +11,7 @@ import time
 import subprocess
 import socket
 import json
-
+import random
 
 import torch
 from contextlib import closing
@@ -52,12 +52,9 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
     carla_out_file_err = os.path.join('_output_logs',
                       'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
 
-    # TODO: Add parameters
-    port = 0
-    while port > 35000 or port < 34000:
-        print (port)
-        port = find_free_port()
-
+    # TODO THIS IS EXTREMELY WRONG AND UNSAFE, JUST FOR TESTING
+    #port = find_free_port()
+    port = random.randint(34000, 35000)
 
 
     if docker is not None:
