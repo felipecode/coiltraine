@@ -87,6 +87,7 @@ def generate_name(g_conf):
     else:
         final_name_string += '_random'
 
+
     # The type of loss function
 
     final_name_string += '_'+ g_conf.LOSS_FUNCTION
@@ -99,6 +100,9 @@ def generate_name(g_conf):
         final_name_string += '_'
 
     final_name_string += g_conf.DATA_USED
+
+    final_name_string += '_' + str(g_conf.AUGMENT_LATERAL_STEERINGS)
+
 
 
     return final_name_string
