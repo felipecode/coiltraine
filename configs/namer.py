@@ -1,3 +1,12 @@
+def get_dropout_sum(model_configuration):
+    return (sum(model_configuration['branches']['fc']['dropouts']) +
+            sum(model_configuration['speed_branch']['fc']['dropouts']) +
+            sum(model_configuration['measurements']['fc']['dropouts'])+
+            sum(model_configuration['join']['fc']['dropouts'])+
+            sum(model_configuration['perception']['fc']['dropouts']))
+
+
+
 
 
 def generate_name(g_conf):
@@ -40,11 +49,11 @@ def generate_name(g_conf):
         final_name_string += '_' + g_conf.AUGMENTATION
     else:
         # We check if there is dropout
-        if sum(g_conf.MODEL_CONFIGURATION['branches']['fc']['dropouts']) > 4:
+        if get_dropout_sum(g_conf.MODEL_CONFIGURATION) > 4:
             final_name_string += '_highdropout'
-        elif sum(g_conf.MODEL_CONFIGURATION['branches']['fc']['dropouts']) > 2:
+        elif get_dropout_sum(g_conf.MODEL_CONFIGURATION) > 2:
             final_name_string += '_milddropout'
-        elif sum(g_conf.MODEL_CONFIGURATION['branches']['fc']['dropouts']) > 0:
+        elif get_dropout_sum(g_conf.MODEL_CONFIGURATION) > 0:
             final_name_string += '_lowdropout'
         else:
             final_name_string += '_none'
@@ -71,12 +80,13 @@ def generate_name(g_conf):
     # The pre processing ( Balance or not )
     if g_conf.BALANCE_DATA and len(g_conf.STEERING_DIVISION) > 0:
         final_name_string += '_balancesteer'
-    if g_conf.BALANCE_DATA and g_conf.PEDESTRIAN_PERCENTAGE > 0:
+    elif g_conf.BALANCE_DATA and g_conf.PEDESTRIAN_PERCENTAGE > 0:
         final_name_string += '_balancepedestrian'
-    if g_conf.BALANCE_DATA and len(g_conf.SPEED_DIVISION) > 0:
+    elif g_conf.BALANCE_DATA and len(g_conf.SPEED_DIVISION) > 0:
         final_name_string += '_balancespeed'
     else:
         final_name_string += '_random'
+
 
     # The type of loss function
 
@@ -90,6 +100,9 @@ def generate_name(g_conf):
         final_name_string += '_'
 
     final_name_string += g_conf.DATA_USED
+
+    final_name_string += '_' + str(g_conf.AUGMENT_LATERAL_STEERINGS)
+
 
 
     return final_name_string
