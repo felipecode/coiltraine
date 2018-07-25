@@ -23,7 +23,7 @@ from torchvision import transforms
 def write_waypoints_output(iteration, output):
 
     for i in range(g_conf.BATCH_SIZE):
-        steer = 0.8 * (output[i][3] + output[i][4])/0.5
+        steer = 0.7 * output[i][3]
 
         if steer > 0:
             steer = min(steer, 1)

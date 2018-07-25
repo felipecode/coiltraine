@@ -149,7 +149,6 @@ def get_names(folder):
     for experiment_alias in alias_in_folder:
 
         g_conf.immutable(False)
-        print (experiment_alias)
         merge_with_yaml(os.path.join('configs', folder, experiment_alias))
 
         experiments_in_folder.append(g_conf.EXPERIMENT_GENERATED_NAME)
