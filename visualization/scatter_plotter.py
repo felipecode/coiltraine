@@ -390,6 +390,7 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
         title = plot_param['y']['data'] + ' vs ' + plot_param['x']['data']
     # NOTE removed by Alexey for the paper 
     # plt.title(title + '\ncorrelation %.2f' % corr)
+    plt.title('Correlation %.2f' % corr)
 
     # Save to out_file
     if plot_param['print']:
