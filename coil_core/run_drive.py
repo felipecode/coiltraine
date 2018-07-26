@@ -53,22 +53,23 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
                       'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
 
     # TODO THIS IS EXTREMELY WRONG AND UNSAFE, JUST FOR TESTING
-    #port = find_free_port()
-    port = random.randint(34000, 35000)
+    port = find_free_port()
+
 
 
     if docker is not None:
 
 
-        sp = subprocess.Popen(['nvidia-docker', 'exec', '-e','NVIDIA_VISIBLE_DEVICES='+str(gpu), docker,
-                               '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
-                               '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
-                              stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
-
-        print (['docker', 'run', '--rm', '-p '+str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
+        sp = subprocess.Popen(['docker', 'run', '--rm', '-p '+str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
                               '--runtime=nvidia', '-e  NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
                                '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
-                               '-benchmark', '-fps=10', '-world-port=' + str(port)])
+                               '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
+                              stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+
+        #print (['docker', 'run', '--rm', '-p '+str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
+        #                      '--runtime=nvidia', '-e  NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
+        #                       '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
+        #                       '-benchmark', '-fps=10', '-world-port=' + str(port)])
 
     else:
 
