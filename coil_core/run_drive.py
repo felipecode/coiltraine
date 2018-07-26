@@ -99,7 +99,7 @@ def start_carla_simulator(gpu, town_name, no_screen):
 # TODO :  Memory use should also be adaptable with a limit, for now that seems to be doing fine in PYtorch
 
 def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='127.0.0.1',
-            suppress_output=True, no_screen=False, video_recording=True):
+            suppress_output=True, no_screen=False, video_recording=False):
 
     try:
 
