@@ -164,6 +164,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
         carla_process, port, out = start_carla_simulator(gpu, town_name, no_screen, docker)
 
+        print (" stopping the following carla process ", out)
+        subprocess.call(['docker', 'stop', out])
+
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 
