@@ -59,7 +59,7 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
     if docker is not None:
 
 
-        sp = subprocess.Popen(['docker', 'run', '--rm', '-p', str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
+        sp = subprocess.Popen(['docker', 'run', '--rm', '-d' ,'-p', str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
                               '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
                                '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
                                '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
@@ -155,9 +155,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
 
         carla_process, port = start_carla_simulator(gpu, town_name, no_screen, docker)
-        out = subprocess.check_output(['docker'])
 
-        print (" CARLA OUt ", out)
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 
