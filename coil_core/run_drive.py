@@ -44,6 +44,9 @@ def find_free_port():
         s.bind(('', 0))
         return s.getsockname()[1]
 
+
+# TODO: The out part is only used for docker
+
 def start_carla_simulator(gpu, town_name, no_screen, docker):
 
     # Set the outfiles for the process
@@ -64,6 +67,10 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
                                '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
                                '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
                               stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+
+        with open(carla_out_file, 'r') as f:
+
+            out = f.read()
 
 
 
@@ -90,13 +97,14 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
                                         '-fps=10', '-world-port='+str(port)],
                                    shell=False,
                                    stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+        out ="0"
 
 
 
     coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4' 
                            '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
 
-    return sp, port
+    return sp, port, out
 
 
 
@@ -154,7 +162,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
 
 
-        carla_process, port = start_carla_simulator(gpu, town_name, no_screen, docker)
+        carla_process, port, out = start_carla_simulator(gpu, town_name, no_screen, docker)
 
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
