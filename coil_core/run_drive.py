@@ -270,11 +270,13 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                 exit(1)
             except KeyboardInterrupt:
                 carla_process.kill()
+                subprocess.call(['docker', 'stop', out[:-1]])
                 coil_logger.add_message('Error', {'Message': 'Killed By User'})
                 exit(1)
             except:
                 traceback.print_exc()
                 carla_process.kill()
+                subprocess.call(['docker', 'stop', out[:-1]])
                 coil_logger.add_message('Error', {'Message': 'Something Happened'})
                 exit(1)
 
