@@ -166,7 +166,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 
-        coil_logger.add_message('Loading', {'CARLAClient': host + ':' + str(port)})
 
         # Now actually run the driving_benchmark
 
