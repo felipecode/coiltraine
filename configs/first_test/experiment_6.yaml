@@ -1,6 +1,6 @@
 
 #### General Configuration Parameters ####
-SAVE_SCHEDULE: [2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]
+SAVE_SCHEDULE: [1]
 
 NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
 
@@ -11,11 +11,11 @@ MEASUREMENTS:
   targets: (31)
 
 BATCH_SIZE: 120
-NUMBER_ITERATIONS: 500000
+NUMBER_ITERATIONS: 10
 STEERING_DIVISION: []
 SPEED_DIVISION: [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
 LABELS_DIVISION: [[0, 2, 5], [3], [4]]
-PEDESTRIAN_PERCENTAGE: 30
+PEDESTRIAN_PERCENTAGE: 0
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
 NUMBER_FRAMES_FUSION: 1
@@ -23,13 +23,13 @@ NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 40.0
-TRAIN_DATASET_NAME: '25HoursW1-3-6-8'
+TRAIN_DATASET_NAME: '02HoursW1-3-6-8'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [ 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [1]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
@@ -84,7 +84,7 @@ VARIABLE_WEIGHT:
 #### Simulation Related Parameters ####
 IMAGE_CUT: [115, 510]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
-USE_FULL_ORACLE: False
+USE_FULL_ORACLE: True
 
 
 

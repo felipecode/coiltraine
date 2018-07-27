@@ -10,7 +10,7 @@ import scipy
 from utils.general import plot_test_image
 
 from carla.agent import Agent, CommandFollower
-from carla.agent.modules import Waypointer
+
 from PIL import Image
 
 # TODO: The network is defined and toguether there is as forward pass operation to be used for testing, depending on the configuration
@@ -60,9 +60,10 @@ class CoILAgent(Agent):
 
         self.model.eval()
 
-        if g_conf.USE_ORACLE:
+        if g_conf.USE_ORACLE or g_conf.USE_FULL_ORACLE:
             self.control_agent = CommandFollower(town_name)
-            self.waypointer = Waypointer(town_name)
+
+
 
     def run_step(self, measurements, sensor_data, directions, target):
 
@@ -90,6 +91,9 @@ class CoILAgent(Agent):
             _, control.throttle, control.brake = self._get_oracle_prediction(
                 measurements, target)
 
+        if g_conf.USE_FULL_ORACLE:
+            control.steer, control.throttle, control.brake = self._get_oracle_prediction(
+                measurements, target)
 
         # TODO: adapt the client side agent for the new version. ( PROBLEM )
 
@@ -195,20 +199,9 @@ class CoILAgent(Agent):
 
     def _get_oracle_prediction(self, measurements, target):
 
-        player_transform = measurements.player_measurements.transform
 
 
-        waypoints_world, _ = self.waypointer.get_next_waypoints(
-            (player_transform.location.x,
-             player_transform.location.y, 0.22),
-            (player_transform.orientation.x, player_transform.orientation.y,
-             player_transform.orientation.z),
-            (target.location.x, target.location.y,
-             target.location.z),
-            (target.orientation.x, target.orientation.y,
-             target.orientation.z)
-        )
         # For the oracle, the current version of sensor data is not really relevant.
-        control = self.control_agent.run_step(measurements, [], waypoints_world, target)
+        control = self.control_agent.run_step(measurements, [], [], target)
 
         return control.steer, control.throttle, control.brake

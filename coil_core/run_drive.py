@@ -52,7 +52,6 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
     carla_out_file_err = os.path.join('_output_logs',
                       'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
 
-    # TODO THIS IS EXTREMELY WRONG AND UNSAFE, JUST FOR TESTING
     port = find_free_port()
 
 
@@ -65,6 +64,8 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
                                '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
                                '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
                               stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+
+
 
         #print (['docker', 'run', '--rm', '-p '+str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
         #                      '--runtime=nvidia', '-e  NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
@@ -130,10 +131,12 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
         else:
             control_filename = 'control_output.csv'
 
-        experiment_suite_module = __import__('drive.' + camelcase_to_snakecase(exp_set_name)+'_suite',
+        experiment_suite_module = __import__('drive.' + camelcase_to_snakecase(exp_set_name) + '_suite',
                                              fromlist=[exp_set_name])
 
         experiment_suite_module = getattr(experiment_suite_module, exp_set_name)
+
+
 
 
         experiment_set = experiment_suite_module()
@@ -152,6 +155,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
 
         carla_process, port = start_carla_simulator(gpu, town_name, no_screen, docker)
+        out, error = carla_process.communicate()
+
+        print (" CARLA OUt ", out)
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 

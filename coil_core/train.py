@@ -114,7 +114,6 @@ def select_balancing_strategy(dataset, iteration):
 
     else:
         # NO BALANCING
-
         sampler = RandomSampler(keys, iteration * g_conf.BATCH_SIZE)
         data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
                                                   sampler=sampler,
