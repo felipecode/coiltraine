@@ -155,7 +155,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
 
         carla_process, port = start_carla_simulator(gpu, town_name, no_screen, docker)
-        out, error = carla_process.communicate()
+        out = subprocess.check_output(['docker'])
 
         print (" CARLA OUt ", out)
 
