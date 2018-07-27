@@ -161,10 +161,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
 
 
-        carla_process, port, out = start_carla_simulator(gpu, town_name, no_screen, docker)
 
         print (" stopping the following carla process ", out[:-1])
-        subprocess.call(['docker', 'stop', out[:-1]])
+
 
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
@@ -199,6 +198,8 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
             try:
                 # Get the correct checkpoint
                 if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
+
+                    carla_process, port, out = start_carla_simulator(gpu, town_name, no_screen, docker)
 
                     latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
                     checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
@@ -254,7 +255,8 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
 
                     # TODO: WRITE AN EFICIENT PARAMETRIZED OUTPUT SUMMARY FOR TEST.
-
+                    carla_process.kill()
+                    subprocess.call(['docker', 'stop', out[:-1]])
 
                 else:
                     time.sleep(0.1)
@@ -266,6 +268,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                 logging.error(error)
                 time.sleep(1)
                 carla_process.kill()
+                subprocess.call(['docker', 'stop', out[:-1]])
                 coil_logger.add_message('Error', {'Message': 'TCP serious Error'})
                 exit(1)
             except KeyboardInterrupt:
@@ -283,13 +286,11 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
 
     except KeyboardInterrupt:
         traceback.print_exc()
-        carla_process.kill()
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
 
     except:
         traceback.print_exc()
-        carla_process.kill()
         coil_logger.add_message('Error', {'Message': 'Something happened'})
 
-    carla_process.kill()
+
 
