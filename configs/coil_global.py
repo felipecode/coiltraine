@@ -61,7 +61,6 @@ _g_conf.BATCH_SIZE = 120
 #                             iag.ContrastNormalization((0.5, 1.5))
 #                             ]
 
-
 _g_conf.AUGMENTATION = None
 
 
@@ -111,7 +110,7 @@ _g_conf.LOSS_FUNCTION = 'L2'
 
 _g_conf.IMAGE_CUT = [115, 510]  # How you should cut the input image that is received from the server
 _g_conf.USE_ORACLE = True
-
+_g_conf.USE_FULL_ORACLE = False
 
 
 def _check_integrity():

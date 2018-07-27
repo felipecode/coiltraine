@@ -83,7 +83,7 @@ VARIABLE_WEIGHT:
 #### Simulation Related Parameters ####
 IMAGE_CUT: [115, 510]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
-
+USE_FULL_ORACLE: False
 
 
 
