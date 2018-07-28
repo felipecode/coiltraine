@@ -151,7 +151,7 @@ if __name__ == '__main__':
         elif args.single_process == 'drive':
 
             #driving_environments = fix_driving_environments(list(args.driving_environments))
-            execute_drive("0", args.folder, args.exp, list(args.driving_environments)[0], False,
+            execute_drive("0", args.folder, args.exp, list(args.driving_environments)[0], suppress_output=False,
                           no_screen=args.no_screen, docker=args.docker)
         else:
 

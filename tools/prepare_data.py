@@ -58,6 +58,9 @@ def is_hdf5_prepared(filename):
     data = h5py.File(filename, "r+")
 
     # Check if the number of metadata is correct, the current number is 28
+    #print (np.where(data['metadata_targets'][:, 0] == 'steer')[0][0])
+    #print (np.where(data['metadata_targets'][:, 0] == 'throttle')[0][0])
+    #print (np.where(data['metadata_targets'][:, 0] == 'brake')[0][0])
 
     print (len(data['targets'][0]))
 
@@ -67,8 +70,10 @@ def is_hdf5_prepared(filename):
         return False
 
 
+    targets_vec = []
 
 
+    print (data['metadata_targets'][:])
 
     return True
 
