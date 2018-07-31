@@ -16,10 +16,10 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 
 
-class ECCVGeneralizationSuite(ExperimentSuite):
+class ECCVGeneralization(ExperimentSuite):
 
     def __init__(self):
-        super(ECCVGeneralizationSuite, self).__init__('Town02')
+        super(ECCVGeneralization, self).__init__('Town02')
 
     @property
     def train_weathers(self):
