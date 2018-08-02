@@ -65,9 +65,14 @@ class PreSplittedSampler(Sampler):
     """
 
 
-    def __init__(self, keys, executed_iterations):
+    def __init__(self, keys, executed_iterations, weights=None):
 
+        if weights is None:
+            self.weights = torch.tensor([1.0/float(len(self.keys))]*len(self.keys), dtype=torch.double)
+        else:
+            self.weights = weights
         self.keys = keys
+        assert len(self.weights) == len(self.keys), "Number of weights and keys should be the same"
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
                                      executed_iterations + g_conf.BATCH_SIZE
         self.replacement = True
@@ -170,5 +175,3 @@ class BatchSequenceSampler(object):
             return len(self.sampler) // self.sequence_size
         else:
             return (len(self.sampler) + self.sequence_size - 1) // self.sequence_size
-
-

@@ -106,7 +106,7 @@ def select_data_sequence(control, selected_data):
 
 def label_split(labels, keys, selected_data):
     """
-    
+
     Args:
         labels:
         keys:
@@ -260,3 +260,11 @@ def pedestrian_speed_split(float_data, meta_data, keys):
     coil_logger.add_message('Loading', {'KeysDivision': splitted_steer_labels})
 
     return splitted_steer_labels
+
+
+def lambda_split(float_data, meta_data, lambda_list):
+    key_list = []
+    for l in lambda_list
+        keys = l(float_data, meta_data)
+        key_list.append(keys)
+    return key_list
