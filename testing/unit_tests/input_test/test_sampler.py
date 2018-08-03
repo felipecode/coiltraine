@@ -658,20 +658,6 @@ class testSampler(unittest.TestCase):
             #print (list(steerings[i]))
             #big_steer_vec += list(steerings[i])
 
-    def test_lambda_sampler(self):
-        float_data = np.random.randn(10, 3)
-        meta_data = {'speed': 0, 'brake': 1, 'throttle': 2}
-
-        keys = splitter.lambda_splitter(float_data, meta_data, [
-            lambda x,y: np.where(
-                np.logical_and(x[y['speed']]>0., x[y['brake']>0.])),
-            lambda x,y: np.where(
-                x[y['throttle']] > 0)])
-        for k in keys[0]:
-            assert float_data[k, 0] > 0 and float_data[k, 1] > 0.
-        for k in keys[1]:
-            assert float_data[k, 2] > 0
-
 """
     def test_real_data_central_sampler_sequence(self):
 
