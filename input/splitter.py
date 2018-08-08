@@ -308,10 +308,8 @@ def full_split(dataset):
                         k = np.where(k)[0]
                         counter += 1
                         # bar.next()
-                        sys.stdout.write("{} ".format(counter))
-                        sys.stdout.flush()
+                        print(counter, end="\r")
                         keys.append(k)
-                        # print(counter)
     keys.append(list(np.arange(M.shape[1])))
     print('pre-filter length: {}'.format(len(keys)))
     keys = [k for k in keys if len(k)>0]
