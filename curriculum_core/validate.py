@@ -38,7 +38,7 @@ def execute(checkpoint, output_file, gpu):
 
         #Define the dataset. This structure is has the __get_item__ redefined in a way
         #that you can access the HDFILES positions from the root directory as a in a vector.
-        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'Town02W14Noise')
         augmenter = Augmenter(None)
         dataset = CoILDataset(full_dataset, transform=augmenter)
         data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,

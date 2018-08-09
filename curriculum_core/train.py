@@ -31,7 +31,7 @@ def execute(weights, keys, iteration, checkpoint, gpu, n_batches=100):
         # print("variable ", g_conf.VARIABLE_WEIGHT, 'conf targets', g_conf.TARGETS)
 
         # Setup sampler and data loader
-        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], '5HoursW1-3-6-8')
         augmenter = Augmenter(g_conf.AUGMENTATION)
         sampler = PreSplittedSampler(keys, iteration*g_conf.BATCH_SIZE, weights)
         dataset = CoILDataset(full_dataset, transform=augmenter)

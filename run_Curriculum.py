@@ -108,6 +108,13 @@ if __name__ == '__main__':
         default=None,
         help='Set to run carla using docker'
     )
+    argparser.add_argument(
+        '-mp', '--max_process',
+        type = int,
+        dest='max_process',
+        default=1,
+        help='Max number of parallel processes to train or validate'
+    )
     args = argparser.parse_args()
 
     gpus = []
@@ -118,9 +125,9 @@ if __name__ == '__main__':
             raise ValueError(" Gpu is not a valid int number")
 
     # create sampler
-    print(g_conf.TRAIN_DATASET_NAME)
-    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
-    augmenter = Augmenter(g_conf.AUGMENTATION)
+    # print(g_conf.TRAIN_DATASET_NAME)
+    # full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], "80HoursW1-3-6-8")
+    # augmenter = Augmenter(g_conf.AUGMENTATION)
     # dataset = CoILDataset(full_dataset, transform=augmenter)
     # keys = splitter.full_split(dataset)
     # np.save('full_split_keys', keys)
@@ -143,34 +150,43 @@ if __name__ == '__main__':
     es = CMAES(len(keys), popsize=len(gpus), weight_decay=0)
 
     # ask, tell, update loop
-    process_deque = deque(maxlen=5)
+    process_deque = deque(maxlen=args.max_process)
     for cc in tqdm(range(1000)):
         weights = es.ask()
         for w, g, c in zip(weights, gpus, checkpoints):
-            while number_alive_process(process_deque) == 5:
+            while number_alive_process(process_deque) == args.max_process:
                 # wait
                 time.sleep(1)
             print("Launching iteration {} at GPU {}: {}".format(cc, g, c))
             p = execute_train(softmax(w), keys, cc, c, g)
+            time.sleep(.5)
+            while not p.is_alive():
+                print("Launching iteration {} at GPU {}: {}".format(cc, g, c))
+                p = execute_train(softmax(w), keys, cc, c, g)
+                time.sleep(1)
             process_deque.append(p)
 
         this_c = 0
         cfiles = glob('./_curriculum_checkpoints/*.pth')
-        while len(cfiles) != len(checkpoints):
+        while len(cfiles) != len(checkpoints) and number_alive_process(process_deque) != 0:  # waiting for training to fully sync before trying to valid
             cfiles = glob('./_curriculum_checkpoints/*.pth')
-            time.sleep(.1)
+            time.sleep(1)
             print(" "*100, end="\r")
-            print("waiting for checkpoints" + "." * this_c, end="\r")
+            print("{}/{} waiting for checkpoints".format(len(cfiles), len(checkpoints)) + "." * this_c, end="\r")
             this_c = (this_c + 1) % 4
 
         print()
         os.system("rm _validation_results/*")  # delete old results
         for g, c in zip(gpus, checkpoints):
-            while number_alive_process(process_deque) == 5:
+            while number_alive_process(process_deque) == args.max_process:
                 # wait
-                time.sleep(.1)
+                time.sleep(1)
             print("Validating checkpoint {} at GPU {}".format(c, g))
             p = execute_validation(c, '_validation_results/{}.json'.format(c.split('/')[1]), g)
+            while not p.is_alive():
+                print("Validating checkpoint {} at GPU {}".format(c, g))
+                p = execute_validation(c, '_validation_results/{}.json'.format(c.split('/')[1]), g)
+                time.sleep(1)
             process_deque.append(p)
 
         this_c = 0
@@ -179,7 +195,7 @@ if __name__ == '__main__':
             jfiles = glob('./_validation_results/*.json')
             time.sleep(1)
             print(" "*100, end="\r")
-            print("waiting for validation results" + "." * this_c, end="\r")
+            print("{}/{} waiting for validation results".format(len(jfiles), len(checkpoints)) + "." * this_c, end="\r")
             this_c = (this_c + 1) % 4
 
         rewards = []
