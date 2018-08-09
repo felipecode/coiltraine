@@ -24,16 +24,17 @@ from .configs import MODEL_TYPE, MODEL_CONFIGURATION
 
 
 def execute_validation(checkpoint, output_file, gpu):
-    # p = multiprocessing.Process(target=execute,
-    #                             args=(checkpoint, output_file, gpu))
-    # p.start()
-    execute(checkpoint, output_file, gpu)
+    p = multiprocessing.Process(target=execute,
+                                args=(checkpoint, output_file, gpu))
+    p.start()
+    # execute(checkpoint, output_file, gpu)
+    return p
 
 
 def execute(checkpoint, output_file, gpu):
     try:
         # We set the visible cuda devices
-        # os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
 
         #Define the dataset. This structure is has the __get_item__ redefined in a way
         #that you can access the HDFILES positions from the root directory as a in a vector.
@@ -75,6 +76,7 @@ def execute(checkpoint, output_file, gpu):
             json.dump({'avg_loss': checkpoint_average_loss,
                        'avg_error': checkpoint_average_error},
                        ofile, indent=4, sort_keys=True)
+
 
     except KeyboardInterrupt:
         print('Error', 'Message: Killed By User')

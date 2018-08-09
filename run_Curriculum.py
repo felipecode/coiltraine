@@ -1,4 +1,5 @@
 import os
+
 import json
 import time
 import argparse
@@ -6,6 +7,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 from glob import glob
+from collections import deque
 
 from curriculum_core import execute_train, execute_validation, MODEL_TYPE, MODEL_CONFIGURATION
 from utils.general import create_log_folder, create_exp_path, erase_logs, fix_driving_environments,\
@@ -14,10 +16,15 @@ from configs import g_conf
 from input import CoILDataset, Augmenter, splitter
 from network import CoILModel
 
-from es import OpenES
+from es import OpenES, CMAES
 from visualization import plot_scatter
 
 # You could send the module to be executed and they could have the same interface.
+
+
+def number_alive_process(process_deque):
+    isalive = [p.is_alive() for p in process_deque]
+    return sum(isalive)
 
 
 def softmax(x):
@@ -114,8 +121,10 @@ if __name__ == '__main__':
     print(g_conf.TRAIN_DATASET_NAME)
     full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
     augmenter = Augmenter(g_conf.AUGMENTATION)
-    dataset = CoILDataset(full_dataset, transform=augmenter)
-    keys = splitter.full_split(dataset)
+    # dataset = CoILDataset(full_dataset, transform=augmenter)
+    # keys = splitter.full_split(dataset)
+    # np.save('full_split_keys', keys)
+    keys = np.load('full_split_keys.npy')
 
     # define checkpoint list
     n_agents = len(gpus)
@@ -130,33 +139,46 @@ if __name__ == '__main__':
     for c in checkpoints:
         torch.save(state, c)
 
-    es = OpenES(len(keys), popsize=len(gpus), weight_decay=0, rank_fitness=False, forget_best=False)
+    # es = OpenES(len(keys), popsize=len(gpus), weight_decay=0, rank_fitness=False, forget_best=False)
+    es = CMAES(len(keys), popsize=len(gpus), weight_decay=0)
 
     # ask, tell, update loop
-    for cc in tqdm(range(2)):
+    process_deque = deque(maxlen=5)
+    for cc in tqdm(range(1000)):
         weights = es.ask()
         for w, g, c in zip(weights, gpus, checkpoints):
+            while number_alive_process(process_deque) == 5:
+                # wait
+                time.sleep(1)
             print("Launching iteration {} at GPU {}: {}".format(cc, g, c))
-            execute_train(softmax(w), keys, cc, c, g)
+            p = execute_train(softmax(w), keys, cc, c, g)
+            process_deque.append(p)
 
         this_c = 0
         cfiles = glob('./_curriculum_checkpoints/*.pth')
         while len(cfiles) != len(checkpoints):
             cfiles = glob('./_curriculum_checkpoints/*.pth')
-            # time.sleep(1)
+            time.sleep(.1)
+            print(" "*100, end="\r")
             print("waiting for checkpoints" + "." * this_c, end="\r")
             this_c = (this_c + 1) % 4
 
+        print()
+        os.system("rm _validation_results/*")  # delete old results
         for g, c in zip(gpus, checkpoints):
+            while number_alive_process(process_deque) == 5:
+                # wait
+                time.sleep(.1)
             print("Validating checkpoint {} at GPU {}".format(c, g))
-            execute_validation(c, '_validation_results/{}.json'.format(c.split('/')[1]), g)
+            p = execute_validation(c, '_validation_results/{}.json'.format(c.split('/')[1]), g)
+            process_deque.append(p)
 
         this_c = 0
         jfiles = glob('./_validation_results/*.json')
         while len(jfiles) != len(checkpoints):
             jfiles = glob('./_validation_results/*.json')
-            print(len(jfiles), len(checkpoints))
-            # time.sleep(1)
+            time.sleep(1)
+            print(" "*100, end="\r")
             print("waiting for validation results" + "." * this_c, end="\r")
             this_c = (this_c + 1) % 4
 
@@ -165,9 +187,11 @@ if __name__ == '__main__':
             with open(j) as J:
                 JJ = json.load(J)
                 rewards.append(-JJ['avg_error'])
+        rewards = np.asarray(rewards)
+        rewards = (rewards - rewards.mean())/rewards.std()
 
         es.tell(rewards)
-        print("Fit: ", es.result()[1])
+        print("Fit: ", es.result()[1], "rewards min, max", rewards.min(), rewards.max())
 
         # Get best model and sync
         idx = np.argmax(rewards)

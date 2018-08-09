@@ -14,23 +14,20 @@ from utils.checkpoint_schedule import is_ready_to_save
 from .configs import MODEL_TYPE, MODEL_CONFIGURATION
 
 
-def execute_train(weights, keys, iteration, checkpoint, gpu):
-    # p = multiprocessing.Process(target=execute,
-    #                             args=(weights, keys, iteration, checkpoint, gpu))
-    # p.start()
-    execute(weights, keys, iteration, checkpoint, gpu)
+def execute_train(weights, keys, iteration, checkpoint, gpu, n_batches=100):
+    p = multiprocessing.Process(target=execute,
+                                args=(weights, keys, iteration, checkpoint, gpu))
+    p.start()
+    # execute(weights, keys, iteration, checkpoint, gpu, n_batches)
+    return p
 
 
-def execute(weights, keys, iteration, checkpoint, gpu):
+def execute(weights, keys, iteration, checkpoint, gpu, n_batches=100):
     try:
-        # os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
         g_conf.VARIABLE_WEIGHT = {}
         # print("BEFORE MERGE variable ", g_conf.VARIABLE_WEIGHT, 'conf targets',
         #       g_conf.TARGETS)
-
-        if not os.path.exists('_output_logs'):
-            os.mkdir('_output_logs')
-
         # print("variable ", g_conf.VARIABLE_WEIGHT, 'conf targets', g_conf.TARGETS)
 
         # Setup sampler and data loader
@@ -48,6 +45,7 @@ def execute(weights, keys, iteration, checkpoint, gpu):
         ckpt = torch.load(checkpoint)
         model.load_state_dict(ckpt['state_dict'])
         model = model.cuda()
+        os.system("rm {}".format(checkpoint))  # delete old checkpoint after loading
 
         # print(model)
 
@@ -76,25 +74,24 @@ def execute(weights, keys, iteration, checkpoint, gpu):
             optimizer.step()
             accumulated_time += time.time() - capture_time
             capture_time = time.time()
-            if is_ready_to_save(iteration):
-                model = model.cpu()
-                state = {
-                    'iteration': iteration,
-                    'state_dict': model.state_dict(),
-                    'total_time': accumulated_time,
-                }
-                # TODO : maybe already summarize the best model ???
-                torch.save(state, checkpoint)
-                model = model.cuda()
-
             iteration += 1
 
             if iteration % 1000 == 0:
                 adjust_learning_rate(optimizer, iteration)
             del data
 
-            if iteration % 100 == 0:
+            if iteration % n_batches == 0:
                 break
+
+        model = model.cpu()
+        state = {
+            'iteration': iteration,
+            'state_dict': model.state_dict(),
+            'total_time': accumulated_time,
+        }
+        # TODO : maybe already summarize the best model ???
+        torch.save(state, checkpoint)
+        model = model.cuda()
 
     except KeyboardInterrupt:
         print('Error', 'Message: Killed By User')
