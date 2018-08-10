@@ -305,11 +305,14 @@ def full_split(dataset):
                         k3 = np.logical_and(k1, k2)
                         k = np.logical_and(k3, true_v)
                         k = np.where(k)[0]
+                        if len(k) > 0:
+                            this_d = {'keys': k, 'control': c, 'steer': s, 'throttle': t, 'brake': b, 'speed': v}
+                            keys.append(this_d)
                         counter += 1
                         # bar.next()
                         print(counter, end="\r")
                         keys.append(k)
-    keys.append(list(np.arange(M.shape[1])))
+    keys.append({'keys': list(np.arange(M.shape[1])), 'control': np.inf, 'steer': np.inf, 'throttle': np.inf, 'brake': np.inf, 'speed': np.inf})
     print('pre-filter length: {}'.format(len(keys)))
     keys = [k for k in keys if len(k)>0]
     print('post-filter length: {}'.format(len(keys)))

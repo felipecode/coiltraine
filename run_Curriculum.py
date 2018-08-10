@@ -132,6 +132,7 @@ if __name__ == '__main__':
     # keys = splitter.full_split(dataset)
     # np.save('full_split_keys', keys)
     keys = np.load('full_split_keys.npy')
+    keys = [k['keys'] for k in keys]
 
     # define checkpoint list
     n_agents = len(gpus)
