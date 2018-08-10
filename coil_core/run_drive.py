@@ -59,7 +59,7 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
 
 
 
-    if docker is not None:
+    if docker:
 
 
         sp = subprocess.Popen(['docker', 'run', '--rm', '-d' ,'-p', str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
@@ -115,8 +115,11 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
 # OBS : I AM FIXING host as localhost now
 # TODO :  Memory use should also be adaptable with a limit, for now that seems to be doing fine in PYtorch
 
-def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='127.0.0.1',
-            suppress_output=True, no_screen=False, docker=False):
+def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
+
+
+            #, host='127.0.0.1',
+            #suppress_output=True, no_screen=False, docker=False):
 
     try:
 
@@ -151,7 +154,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
         set_type_of_process('drive', drive_conditions)
 
 
-        if suppress_output:
+        if params['suppress_output']:
             sys.stdout = open(os.path.join('_output_logs',
                               g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
@@ -196,20 +199,21 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, memory_use=0.2, host='1
                 # Get the correct checkpoint
                 if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
 
-                    carla_process, port, out = start_carla_simulator(gpu, town_name, no_screen, docker)
+                    carla_process, port, out = start_carla_simulator(gpu, town_name,
+                                                                     params['no_screen'], params['docker'])
 
                     latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
                     checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                                          , 'checkpoints', str(latest) + '.pth'))
 
-                    coil_agent = CoILAgent(checkpoint, town_name)
+                    coil_agent = CoILAgent(checkpoint, town_name, params['record_collisions'])
 
                     coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
 
                     run_driving_benchmark(coil_agent, experiment_set, town_name,
                                           exp_batch + '_' + exp_alias + '_' + str(latest)
                                           + '_drive_' + control_filename[:-4]
-                                          , True, host, port)
+                                          , True, params['host'], port)
 
                     path = exp_batch + '_' + exp_alias + '_' + str(latest) \
                            + '_' + g_conf.PROCESS_NAME.split('_')[0] + '_' + control_filename[:-4] \

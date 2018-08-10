@@ -31,8 +31,11 @@ def export_csv(exp_batch, variables_to_export):
             for log in experiments_logs:
                 if 'drive' in log and '_csv' in log:
                     csv_file_path = os.path.join(root_path, exp_batch, exp, log, 'control_output.csv')
+                    if not os.path.exists(csv_file_path):
+                        continue
                     control_csv = read_summary_csv(csv_file_path)
-
+                    if control_csv is None:
+                        continue
                     print (control_csv)
                     with open(csv_outfile, 'a') as f:
                         f.write("%s,%s" % (exp, log.split('_')[1]))

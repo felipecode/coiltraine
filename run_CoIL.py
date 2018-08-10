@@ -93,9 +93,14 @@ if __name__ == '__main__':
     )
     argparser.add_argument(
         '-dk', '--docker',
-        type = str,
+        action='store_true',
         dest='docker',
-        default=None,
+        help='Set to run carla using docker'
+    )
+    argparser.add_argument(
+        '-rc', '--record-collisions',
+        action='store_true',
+        dest='record_collisions',
         help='Set to run carla using docker'
     )
     args = argparser.parse_args()
@@ -134,6 +139,15 @@ if __name__ == '__main__':
     if args.restart_validations:
         erase_validations(args.folder, list(args.validation_datasets))
 
+
+    # THe definition of parameters for driving
+    drive_params = {
+        "suppress_output": True,
+        "no_screen": args.no_screen,
+        "docker": args.docker,
+        "record_collisions": args.record_collisions
+    }
+
     if args.single_process is not None:
 
         if args.exp is None:
@@ -150,9 +164,12 @@ if __name__ == '__main__':
 
         elif args.single_process == 'drive':
 
+            drive_params['suppress_output'] = False
             #driving_environments = fix_driving_environments(list(args.driving_environments))
-            execute_drive("0", args.folder, args.exp, list(args.driving_environments)[0], suppress_output=False,
-                          no_screen=args.no_screen, docker=args.docker)
+            execute_drive("0", args.folder, args.exp, list(args.driving_environments), drive_params)
+
+            # list(args.driving_environments)[0], suppress_output=False,
+                          #no_screen=args.no_screen, docker=args.docker)
         else:
 
             raise (" Invalid name for single process, chose from (train, validation, test)")
@@ -177,9 +194,9 @@ if __name__ == '__main__':
             'is_training': args.is_training,
             'validation_datasets': list(args.validation_datasets),
             'driving_environments': list(args.driving_environments),
-            'allocation_parameters': allocation_parameters,
-            'no_screen': args.no_screen,
-            'docker': args.docker
+            'driving_parameters': drive_params,
+            'allocation_parameters': allocation_parameters
+
         }
 
         folder_execute(params)

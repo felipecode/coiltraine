@@ -16,10 +16,10 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 
 
-class PANewTown(ExperimentSuite):
+class OracleGenCol(ExperimentSuite):
 
     def __init__(self):
-        super(PANewTown, self).__init__('Town02')
+        super(OracleGenCol, self).__init__('Town02')
 
     @property
     def train_weathers(self):
@@ -29,7 +29,9 @@ class PANewTown(ExperimentSuite):
     def test_weathers(self):
         return []
 
-
+    @property
+    def collision_as_failure(self):
+        return True
 
     def _poses(self):
 

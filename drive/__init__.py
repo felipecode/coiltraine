@@ -7,3 +7,7 @@ from .pa_training_suite import PATraining
 from .pa_new_weather_town_suite import PANewWeatherTown
 from .pa_new_weather_suite import PANewWeather
 from .pa_new_town_suite import PANewTown
+from .pa_training_col_suite import PATrainingCol
+from .pa_new_weather_town_col_suite import PANewWeatherTownCol
+from .pa_new_weather_col_suite import PANewWeatherCol
+from .pa_new_town_col_suite import PANewTownCol

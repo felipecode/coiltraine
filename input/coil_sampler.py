@@ -65,16 +65,9 @@ class PreSplittedSampler(Sampler):
     """
 
 
-    def __init__(self, keys, executed_iterations, weights=None):
-
+    def __init__(self, keys, executed_iterations):
 
         self.keys = keys
-        if weights is None:
-            self.weights = torch.tensor([1.0/float(len(self.keys))]*len(self.keys), dtype=torch.double)
-        else:
-            self.weights = weights
-
-        assert len(self.weights) == len(self.keys), "Number of weights and keys should be the same"
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
                                      executed_iterations + g_conf.BATCH_SIZE
         self.replacement = True
@@ -97,7 +90,9 @@ class PreSplittedSampler(Sampler):
         # First we check how many subdivisions there are
         if rank_keys == 2:
 
-            idx = torch.multinomial(self.weights, self.iterations_to_execute, True)
+            weights = torch.tensor([1.0/float(len(self.keys))]*len(self.keys), dtype=torch.double)
+
+            idx = torch.multinomial(weights, self.iterations_to_execute, True)
             idx = idx.tolist()
             return iter([random.choice(self.keys[i]) for i in idx])
 

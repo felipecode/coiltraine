@@ -261,10 +261,3 @@ def pedestrian_speed_split(float_data, meta_data, keys):
 
     return splitted_steer_labels
 
-
-def lambda_split(float_data, meta_data, lambda_list):
-    key_list = []
-    for l in lambda_list
-        keys = l(float_data, meta_data)
-        key_list.append(keys)
-    return key_list

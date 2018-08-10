@@ -16,10 +16,10 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 # TODO: maybe add aditional tasks ( NO dynamic obstacles for instace !)
 
-class PANewWeatherCol(ExperimentSuite):
+class OracleTrainCol(ExperimentSuite):
 
     def __init__(self):
-        super(PANewWeatherCol, self).__init__('Town01')
+        super(OracleTrainCol, self).__init__('Town01')
 
     @property
     def train_weathers(self):
@@ -35,11 +35,14 @@ class PANewWeatherCol(ExperimentSuite):
 
     def _poses(self):
 
-        return [[[105, 29], [27, 130], [102, 87], [132, 27], [24, 44],
-                 [96, 26], [34, 67], [28, 1], [140, 134], [105, 9],
-                 [148, 129], [65, 18], [21, 16], [147, 97], [42, 51],
-                 [30, 41], [18, 107], [69, 45], [102, 95], [18, 145],
-                 [111, 64], [79, 45], [84, 69], [73, 31], [37, 81]]]
+        return [[ [105, 29], [27, 130], [102, 87], [132, 27], [24, 44],
+              [96, 26], [34, 67], [28, 1], [140, 134], [105, 9],
+              [148, 129], [65, 16], [21, 16], [147, 97], [42, 51],
+              [30, 41], [16, 107], [69, 47], [102, 95], [16, 145],
+              [111, 64], [79, 47], [84, 69], [73, 31], [37, 81],
+              [35, 57], [42, 116], [75, 47], [132, 143], [145, 8],
+              [43, 107], [61, 111], [137, 105], [24, 72], [0, 77],
+              [17, 80], [12, 32], [3, 64], [146, 32], [33, 4]]]
 
     def build_experiments(self):
         """
