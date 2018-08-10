@@ -216,4 +216,4 @@ if __name__ == '__main__':
         for c in checkpoints:
             os.system("cp {} {}".format(best_ckpt, c))
 
-    np.save("best_weights", es.result()[0])
+        np.save("best_curriculum_weights", es.result())
