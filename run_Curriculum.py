@@ -142,12 +142,13 @@ if __name__ == '__main__':
         checkpoints.append(c)
 
     # initialize checkpoints and warm up weights
-    w = -5*np.ones(len(keys)
+    w = -5*np.ones(len(keys))
     w[-1] = 1
     model = CoILModel(MODEL_TYPE, MODEL_CONFIGURATION)
     state = {'iteration': 0, 'state_dict': model.state_dict(), 'total_time': 0}
-    torch.save(state, checkpoint[0])
-    p = execute_train(softmax(w), keys, 0, checkpoint[0], 0, n_batches=5000)
+    torch.save(state, checkpoints[0])
+    p = execute_train(softmax(w), keys, 0, checkpoints[0], 0, n_batches=5000)
+    this_c = 0
     while p.is_alive():
         print(" "*100, end="\r")
         print("waiting for warmup" + "." * this_c, end="\r")
@@ -215,7 +216,7 @@ if __name__ == '__main__':
                 JJ = json.load(J)
                 rewards.append(-JJ['avg_error'])
         rewards = np.asarray(rewards)
-        rewards = (rewards - rewards.mean())/rewards.std()
+        # rewards = (rewards - rewards.mean())/rewards.std()
 
         es.tell(rewards)
         print("Fit: ", es.result()[1], "rewards min, max", rewards.min(), rewards.max())
@@ -226,4 +227,5 @@ if __name__ == '__main__':
         for c in checkpoints:
             os.system("cp {} {}".format(best_ckpt, c))
 
+        print("saving new weights")
         np.save("_evolved_weights/{}_weights".format(cc), es.result())

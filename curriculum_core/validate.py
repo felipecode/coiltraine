@@ -52,8 +52,8 @@ def execute(checkpoint, output_file, gpu):
         model = model.cuda()
 
         model.eval()
-        accumulated_loss = 0
-        accumulated_error = 0
+        accumulated_loss = []
+        accumulated_error = []
         iteration_on_checkpoint = 0
         for data in data_loader:
             input_data, float_data = data
@@ -64,13 +64,13 @@ def execute(checkpoint, output_file, gpu):
                                           float_data[:, control_position, :].cuda())
             loss = torch.mean((output - dataset.extract_targets(float_data).cuda())**2).data.tolist()
             mean_error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
-            accumulated_error += mean_error
-            accumulated_loss += loss
+            accumulated_error.append(mean_error)
+            accumulated_loss.append(loss)
             error = torch.abs(output - dataset.extract_targets(float_data).cuda())
             iteration_on_checkpoint += 1
 
-        checkpoint_average_loss = accumulated_loss/(len(data_loader))
-        checkpoint_average_error = accumulated_error/(len(data_loader))
+        checkpoint_average_loss = np.percentile(accumulated_loss, 85)  # accumulated_loss/(len(data_loader))
+        checkpoint_average_error = np.percentile(accumulated_error, 85)  # accumulated_error/(len(data_loader))
 
         with open(output_file, 'w') as ofile:
             json.dump({'avg_loss': checkpoint_average_loss,
