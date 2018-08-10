@@ -20,7 +20,7 @@ from es import OpenES, CMAES
 from visualization import plot_scatter
 
 # You could send the module to be executed and they could have the same interface.
-GPUS_P100 = "0 0 0 1 1 1 1 2 2 2 2 3 3 3 3 4 4 4 4 5 5 5 5 6 6 6 6 7 7 7 7" * 3
+GPUS_P100 = "0001111222233334444555566667777" * 3
 
 
 def number_alive_process(process_deque):
@@ -163,6 +163,7 @@ if __name__ == '__main__':
     # es = OpenES(len(keys), popsize=len(gpus), weight_decay=0, rank_fitness=False, forget_best=False)
     es = CMAES(len(keys), popsize=len(gpus), weight_decay=0, initial_w=softmax(w))
 
+    best_reward = -1000000
     # ask, tell, update loop
     process_deque = deque(maxlen=args.max_process)
     for cc in tqdm(range(1000)):
@@ -220,14 +221,10 @@ if __name__ == '__main__':
         rewards = np.asarray(rewards)
         # rewards = (rewards - rewards.mean())/rewards.std()
 
+        this_best, best_idx = np.max(rewards), np.argmax(rewards)
         es.tell(rewards)
         print("Fit: ", es.result()[1], "rewards min, max", rewards.min(), rewards.max())
-
-        # Get best model and sync
-        idx = np.argmax(rewards)
-        best_ckpt = checkpoints[idx]
-        for c in checkpoints:
-            os.system("cp {} {}".format(best_ckpt, c))
-
-        print("saving new weights")
-        np.save("_evolved_weights/{}_weights".format(cc), es.result())
+        if this_best > best_reward:
+            print("FOUND NEW BEST CHECKPOINT ON ITER {}!!!".format(cc))
+            os.system("cp {} _curriculum_checkpoints/checkpoint.best".format(checkpoints[best_idx]))
+            np.save("_evolved_weights/{}_weights".format(cc), es.result())
