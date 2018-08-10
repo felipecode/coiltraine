@@ -225,6 +225,7 @@ if __name__ == '__main__':
         es.tell(rewards)
         print("Fit: ", es.result()[1], "rewards min, max", rewards.min(), rewards.max())
         if this_best > best_reward:
+            best_reward = this_best
             print("FOUND NEW BEST CHECKPOINT ON ITER {}!!!".format(cc))
             os.system("cp {} _curriculum_checkpoints/checkpoint.best".format(checkpoints[best_idx]))
             np.save("_evolved_weights/{}_weights".format(cc), es.result())
