@@ -20,6 +20,7 @@ from es import OpenES, CMAES
 from visualization import plot_scatter
 
 # You could send the module to be executed and they could have the same interface.
+GPUS_P100 = "0 0 0 1 1 1 1 2 2 2 2 3 3 3 3 4 4 4 4 5 5 5 5 6 6 6 6 7 7 7 7" * 3
 
 
 def number_alive_process(process_deque):
@@ -38,6 +39,7 @@ if __name__ == '__main__':
         '--gpus',
         nargs='+',
         dest='gpus',
+        default=GPUS_P100,
         type=str
     )
     argparser.add_argument(
@@ -112,7 +114,7 @@ if __name__ == '__main__':
         '-mp', '--max_process',
         type = int,
         dest='max_process',
-        default=1,
+        default=31,
         help='Max number of parallel processes to train or validate'
     )
     args = argparser.parse_args()
