@@ -261,3 +261,56 @@ def pedestrian_speed_split(float_data, meta_data, keys):
 
     return splitted_steer_labels
 
+def lambda_splitter(float_data, meta_data, lambda_list):
+    key_list = []
+    for l in lambda_list:
+        keys = l(float_data, meta_data)
+        key_list.append(keys)
+    return key_list
+
+
+def full_split(dataset):
+    control = [[0, 2, 5], [3], [4]]
+    steering = np.cumsum([0, 0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05])
+    throttle = [0, 0.1, 0.45, 1]
+    brake = [0, 0.1, 0.3, 0.5, 1]
+    speed = [0, 5, 15, 40]
+    keys = list()
+
+    M = dataset.measurements
+    D = {}  # meta_dict
+    for i, (k, _) in enumerate(dataset.meta_data):
+        if len(k) > 0:
+            D[k] = i
+    counter = 0
+    for c in range(3):  # control
+        for s in range(len(steering)-1):  # steer
+            for t in range(len(throttle)-1): # throttle
+                for b in range(len(brake)-1): # brake
+                    for v in range(len(speed)-1): # speed
+                        true_c = [True, ] * M.shape[1]
+                        for vals in control[c]:
+                            true_c = np.logical_and(true_c, M[D[b'control']]==vals)
+                        # true_c = [m in control[c] for m in M[D[b'control']]]
+                        S = M[D[b'steer']]
+                        true_s = np.logical_and(S>=steering[s], S<steering[s+1])
+                        T = M[D[b'throttle']]
+                        true_t = np.logical_and(T>=throttle[t], T<throttle[t+1])
+                        B = M[D[b'brake']]
+                        true_b = np.logical_and(B>=brake[b], B<brake[b+1])
+                        V = M[D[b'speed_module']]
+                        true_v = np.logical_and(V>=speed[v], V<speed[v+1])
+                        k1 = np.logical_and(true_c, true_s)
+                        k2 = np.logical_and(true_t, true_b)
+                        k3 = np.logical_and(k1, k2)
+                        k = np.logical_and(k3, true_v)
+                        k = np.where(k)[0]
+                        counter += 1
+                        # bar.next()
+                        print(counter, end="\r")
+                        keys.append(k)
+    keys.append(list(np.arange(M.shape[1])))
+    print('pre-filter length: {}'.format(len(keys)))
+    keys = [k for k in keys if len(k)>0]
+    print('post-filter length: {}'.format(len(keys)))
+    return keys

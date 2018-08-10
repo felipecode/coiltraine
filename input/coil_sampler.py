@@ -4,6 +4,8 @@ import random
 import torch
 
 from torch.utils.data.sampler import Sampler
+from torch import optim
+from torch.autograd import Variable
 
 from configs import g_conf
 
@@ -68,6 +70,7 @@ class PreSplittedSampler(Sampler):
     def __init__(self, keys, executed_iterations):
 
         self.keys = keys
+
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
                                      executed_iterations + g_conf.BATCH_SIZE
         self.replacement = True
@@ -112,6 +115,59 @@ class PreSplittedSampler(Sampler):
         else:
             raise ValueError("Keys have invalid rank")
 
+
+    def __len__(self):
+        return self.iterations_to_execute
+
+
+class LogitSplittedSampler(Sampler):
+    """ Sample on a list of keys that was previously splitted
+        weights for sampling are logits and have to be softmaxed
+
+    """
+
+
+    def __init__(self, keys, executed_iterations, weights=None):
+
+
+        self.keys = keys
+        if weights is None:
+            self.weights = torch.tensor([1.0/float(len(self.keys))]*len(self.keys), dtype=torch.double)
+        else:
+            self.weights = torch.from_numpy(weights)
+        self.weights = Variable(self.weights, requires_grad=True)
+
+        assert len(self.weights) == len(self.keys), "Number of weights and keys should be the same"
+        self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
+                                     executed_iterations + g_conf.BATCH_SIZE
+        self.replacement = True
+        self.optim = optim.Adam([self.weights,], lr=0.01)
+
+    def __iter__(self):
+        """
+
+            OBS: One possible thing to be done is the possibility to have a matrix of ids
+            of rank N
+            OBS2: Probably we dont need weights right now
+
+
+        Returns:
+            Iterator to get ids for the dataset
+
+        """
+        weights = F.softmax(self.weights)
+        idx = torch.multinomial(weights, self.iterations_to_execute, True)
+        idx = idx.tolist()
+        return iter([random.choice(self.keys[i]) for i in idx])
+
+    def update_weights(self, advantage, perturb=False):
+        self.optim.zero_grad()
+        obj = torch.sum(-self.weights * advantage)
+        obj.backward()
+        self.optim.step()
+        if perturb:
+            N = len(self.weights)
+            self.weights = self.weights + torch.normal(torch.zeros(N), perturb * torch.ones(N)).double()
 
     def __len__(self):
         return self.iterations_to_execute
