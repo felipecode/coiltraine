@@ -141,14 +141,24 @@ if __name__ == '__main__':
         c = os.path.join("_curriculum_checkpoints", "checkpoint_{}.pth".format(n))
         checkpoints.append(c)
 
-    # initialize checkpoints
+    # initialize checkpoints and warm up weights
+    w = -5*np.ones(len(keys)
+    w[-1] = 1
     model = CoILModel(MODEL_TYPE, MODEL_CONFIGURATION)
     state = {'iteration': 0, 'state_dict': model.state_dict(), 'total_time': 0}
-    for c in checkpoints:
-        torch.save(state, c)
+    torch.save(state, checkpoint[0])
+    p = execute_train(softmax(w), keys, 0, checkpoint[0], 0, n_batches=5000)
+    while p.is_alive():
+        print(" "*100, end="\r")
+        print("waiting for warmup" + "." * this_c, end="\r")
+        this_c = (this_c + 1) % 4
+        time.sleep(.5)
+    # sync checkpoints
+    for c in checkpoints[1:]:
+        os.system("cp {} {}".format(checkpoints[0], c))
 
     # es = OpenES(len(keys), popsize=len(gpus), weight_decay=0, rank_fitness=False, forget_best=False)
-    es = CMAES(len(keys), popsize=len(gpus), weight_decay=0)
+    es = CMAES(len(keys), popsize=len(gpus), weight_decay=0, initial_w=softmax(w))
 
     # ask, tell, update loop
     process_deque = deque(maxlen=args.max_process)
@@ -216,4 +226,4 @@ if __name__ == '__main__':
         for c in checkpoints:
             os.system("cp {} {}".format(best_ckpt, c))
 
-        np.save("best_curriculum_weights", es.result())
+        np.save("_evolved_weights/{}_weights".format(cc), es.result())
