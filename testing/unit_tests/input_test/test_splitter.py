@@ -2,7 +2,7 @@ import os
 import numpy as np
 import unittest
 
-from input import coil_sampler, splitter, CoILDataset
+from input import coil_sampler, splitter, CoILDataset, Augmenter
 from configs import g_conf
 
 class testSpliter(unittest.TestCase):
@@ -22,6 +22,7 @@ class testSpliter(unittest.TestCase):
 
 
     def test_split(self):
+        return
         measurements = self.generate_float_data()
         labels = self.generate_label_data()
 
@@ -55,6 +56,7 @@ class testSpliter(unittest.TestCase):
 
             # We assert if the new key is always bigger than the previous one
     def test_split_sequence(self):
+        return
         measurements = self.generate_float_data()
         labels = self.generate_label_data()
 
@@ -91,7 +93,7 @@ class testSpliter(unittest.TestCase):
 
 
     def test_split_real_data(self):
-
+        return
         root_test_dir = '/home/felipe/Datasets/CVPR02Noise/SeqTrain'
 
         print ('SPLITING REAL DATA !')
@@ -138,9 +140,105 @@ class testSpliter(unittest.TestCase):
             # We assert if the new key is always bigger than the previous one
 
 
+    def test_split_real_data_speed(self):
+        return
+        root_test_dir = '/home/felipecodevilla/Datasets/02HoursW1-3-6-8'
+
+        print ('SPLITING REAL DATA !')
+        augmenter = Augmenter(g_conf.AUGMENTATION)
+        dataset = CoILDataset(root_test_dir, augmenter)
+        speed = dataset.measurements[10, :]
+
+        print (dataset.meta_data)
+        print (dataset.meta_data[:, 0])
+        print ( " Where is control ",np.where(dataset.meta_data[:, 0] == b'control'))
+        labels = dataset.measurements[np.where(dataset.meta_data[:, 0]  == b'control'), :]
+
+
+        keys = range(0, len(speed))
+
+        print (labels)
+
+        splitted_labels = splitter.label_split(labels[0][0], keys, g_conf.LABELS_DIVISION)
+
+        # Another level of splitting
+        splitted_steer_labels = []
+        for keys in splitted_labels:
+            splitter_steer = splitter.float_split(speed, keys,
+                                                 g_conf.SPEED_DIVISION)
+
+            print(splitter_steer)
+
+
+            for i in range(0, len(splitter_steer)):
+                sum_now = 0
+                for key in splitter_steer[i]:
+                    sum_now += speed[key]
+
+
+                avg_now = sum_now/len(splitter_steer[i])
+                print (avg_now)
+                if i > 0:
+                    self.assertLess(avg_previous, avg_now)
+
+                avg_previous = avg_now
+
+
+            splitted_steer_labels.append(splitter_steer)
+
+
+            # We assert if the new key is always bigger than the previous one
+
+
+    def test_split_label_percentage(self):
+
+        root_test_dir = '/home/felipecodevilla/Datasets/02HoursW1-3-6-8'
+
+        print ('SPLITING REAL DATA !')
+        augmenter = Augmenter(g_conf.AUGMENTATION)
+        dataset = CoILDataset(root_test_dir, augmenter)
+        speed = dataset.measurements[10, :]
+
+        print (dataset.meta_data)
+        print (dataset.meta_data[:, 0])
+        print ( " Where is control ",np.where(dataset.meta_data[:, 0] == b'control'))
+        print (dataset.measurements[np.where(dataset.meta_data[:, 0] == b'pedestrian'), :][0][0].astype(np.bool))
+        print (dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0] == 1)
+        labels = dataset.measurements[np.where(dataset.meta_data[:, 0] == b'pedestrian'), :][0][0].astype(np.bool) & \
+                 (dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0] == 1)
+
+
+
+        keys = range(0, len(speed))
+
+        print (sum(labels))
+        print (sum(dataset.measurements[np.where(dataset.meta_data[:, 0] == b'pedestrian'), :][0][0].astype(np.bool)))
+
+        splitted_labels = splitter.label_split(labels, keys, 10)
+
+
+        #print (splitted_labels)
+
+        # Another level of splitting
+        splitted_steer_labels = []
+
+
+        for key in splitted_labels[0]:
+
+            self.assertEqual(labels[key], 1.0)
+
+        for key in splitted_labels[1]:
+
+            self.assertEqual(labels[key], 0.0)
+
+
+        # The first part should have all the label
+
+
 
     def test_split_real_data_sequence(self):
 
+        return
         root_test_dir = 'testing/unit_tests/data'
 
 
@@ -186,3 +284,22 @@ class testSpliter(unittest.TestCase):
 
 
             # We assert if the new key is always bigger than the previous one
+
+
+    def test_lambda_splitter(self):
+        float_data = np.random.randn(10, 3)
+        meta_data = {'speed': 0, 'brake': 1, 'throttle': 2}
+
+        keys = splitter.lambda_splitter(float_data, meta_data, [
+            lambda x,y: np.where(
+                np.logical_and(x[:, y['speed']]>0., x[:, y['brake']>0.]))[0],
+            lambda x,y: np.where(
+                x[:, y['throttle']] > 0)[0]
+            ])
+        if len(keys[0]) > 0:
+            for k in keys[0]:
+                assert float_data[k, 0] > 0 and float_data[k, 1] > 0.
+        if len(keys[1]) > 0:
+            for k in keys[1]:
+                assert float_data[k, 2] > 0
+

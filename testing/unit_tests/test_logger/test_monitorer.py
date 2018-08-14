@@ -30,7 +30,7 @@ class testMonitorer(unittest.TestCase):
         # Check if status could be check for unexistent experiments
 
         g_conf.immutable(False)
-        status = monitorer.get_status('monitor_test', 'experiment_25.yaml',
+        status = monitorer.get_status('monitor_test', 'experiment_3.yaml',
                                       g_conf.PROCESS_NAME)
         self.assertEqual(status[0], "Does Not Exist")
 

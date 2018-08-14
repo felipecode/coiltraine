@@ -148,6 +148,7 @@ def get_latest_checkpoint_drive():
 
 def get_latest_checkpoint():
 
+    print (" PROCCESS NAME    ", g_conf.PROCESS_NAME)
     if 'validation' in g_conf.PROCESS_NAME:
         return get_latest_checkpoint_validation()
     elif 'drive' in g_conf.PROCESS_NAME:

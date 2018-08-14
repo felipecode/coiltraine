@@ -36,7 +36,7 @@ def write_waypoints_output(iteration, output):
 
 
 def write_regular_output(iteration, output):
-    for i in range(g_conf.BATCH_SIZE):
+    for i in range(len(output)):
         coil_logger.write_on_csv(iteration, [output[i][0],
                                             output[i][1],
                                             output[i][2]])

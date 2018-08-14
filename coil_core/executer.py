@@ -51,24 +51,31 @@ def execute_validation(gpu, exp_batch, exp_alias, dataset, suppress_output=True)
     p.start()
 
 
-def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, suppress_output=True, no_screen=False):
+def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, params):
     """
 
     Args:
         gpu: The gpu being used for this execution.
-        module_name: The module name, if it is train, drive or evaluate
+        exp_batch: the folder this driving experiment is being executed
         exp_alias: The experiment alias, file name, to be executed.
-        path: The path were the datasets are
+        params: all the rest of parameter, if there is recording and etc.
+
 
     Returns:
 
     """
 
+    #suppress_output = True, no_screen = False, docker = False
+
+
+    # OBS the host is allocated always as the localhost.
+
+    params.update({'host': "127.0.0.1"})
+
     create_exp_path(exp_batch, exp_alias)
     p = multiprocessing.Process(target=run_drive.execute,
                                 args=(gpu, exp_batch, exp_alias, exp_set_name,
-                                      0.2, "127.0.0.1", suppress_output,
-                                      no_screen))
+                                      params))
 
     p.start()
 
@@ -103,6 +110,7 @@ def folder_execute(params=None):
     # Is a queue of tasks to be executed. The priority is always train.
     # then test then val.
     # TODO: change the priority to test the ones that have already been trained.
+    print (" drive environments ", driving_environments)
     tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
                                         [], [],
                                         validation_datasets, driving_environments)
@@ -157,7 +165,7 @@ def folder_execute(params=None):
                 free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
                                             free_gpus, allocation_parameters['drive_cost'])
                 execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
-                              process_specs['environment'], no_screen=params['no_screen'])
+                              process_specs['environment'], params['driving_parameters'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 

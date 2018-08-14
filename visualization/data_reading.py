@@ -9,6 +9,8 @@ from utils.general import static_vars
 
 
 
+
+
 def read_summary_csv(control_csv_file):
 
 
@@ -79,6 +81,7 @@ def get_ground_truth(dataset_name):
     if dataset_name not in get_ground_truth.previous_ground_truth:
         full_path = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name, 'ground_truth.csv')
         ground_truth = np.loadtxt(full_path, delimiter=",", skiprows=0, usecols=([0]))
+        ground_truth = augment_ground_truth(ground_truth)
         get_ground_truth.previous_ground_truth.update({dataset_name :ground_truth})
 
     return get_ground_truth.previous_ground_truth[dataset_name]

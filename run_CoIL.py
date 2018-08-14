@@ -84,6 +84,25 @@ if __name__ == '__main__':
         dest='restart_validations',
         help='Set to carla to run offscreen'
     )
+    argparser.add_argument(
+        '-gv',
+        '--gpu-value',
+        dest='gpu_value',
+        type=float,
+        default=4.0
+    )
+    argparser.add_argument(
+        '-dk', '--docker',
+        action='store_true',
+        dest='docker',
+        help='Set to run carla using docker'
+    )
+    argparser.add_argument(
+        '-rc', '--record-collisions',
+        action='store_true',
+        dest='record_collisions',
+        help='Set to run carla using docker'
+    )
     args = argparser.parse_args()
 
 
@@ -105,6 +124,13 @@ if __name__ == '__main__':
 
     # Obs this is like a fixed parameter, how much a validation and a train and drives ocupies
 
+    # Check if the driving parameters are passed in a correct way
+
+    if args.driving_environments is not None:
+        for de in list(args.driving_environments):
+            if len(de.split('_'))  < 2:
+                raise ValueError("Invalid format for the driving envinronments should be Suite_Town")
+
 
     create_log_folder(args.folder)
     erase_logs(args.folder)
@@ -112,6 +138,15 @@ if __name__ == '__main__':
         erase_wrong_plotting_summaries(args.folder, list(args.validation_datasets))
     if args.restart_validations:
         erase_validations(args.folder, list(args.validation_datasets))
+
+
+    # THe definition of parameters for driving
+    drive_params = {
+        "suppress_output": True,
+        "no_screen": args.no_screen,
+        "docker": args.docker,
+        "record_collisions": args.record_collisions
+    }
 
     if args.single_process is not None:
 
@@ -129,9 +164,12 @@ if __name__ == '__main__':
 
         elif args.single_process == 'drive':
 
-            driving_environments = fix_driving_environments(list(args.driving_environments))
-            execute_drive("0", args.folder, args.exp, driving_environments[0], False,
-                          no_screen=args.no_screen)
+            drive_params['suppress_output'] = False
+            #driving_environments = fix_driving_environments(list(args.driving_environments))
+            execute_drive("0", args.folder, args.exp, list(args.driving_environments), drive_params)
+
+            # list(args.driving_environments)[0], suppress_output=False,
+                          #no_screen=args.no_screen, docker=args.docker)
         else:
 
             raise (" Invalid name for single process, chose from (train, validation, test)")
@@ -143,21 +181,22 @@ if __name__ == '__main__':
 
         # Maybe the latest voltas will be underused
         # OBS: This usage is also based on my tensorflow experiences, maybe pytorch allows more.
-        allocation_parameters = {'gpu_value': 3.5,
+        allocation_parameters = {'gpu_value': args.gpu_value,
                                  'train_cost': 2,
                                  'validation_cost': 1.5,
                                  'drive_cost': 1.5}
         # TODO: temporary function until carla map change feature is fixed.
 
-        driving_environments = fix_driving_environments(list(args.driving_environments))
+        #driving_environments = fix_driving_environments(list(args.driving_environments))
         params = {
             'folder': args.folder,
             'gpus': list(args.gpus),
             'is_training': args.is_training,
             'validation_datasets': list(args.validation_datasets),
-            'driving_environments': driving_environments,
-            'allocation_parameters': allocation_parameters,
-            'no_screen': args.no_screen,
+            'driving_environments': list(args.driving_environments),
+            'driving_parameters': drive_params,
+            'allocation_parameters': allocation_parameters
+
         }
 
         folder_execute(params)

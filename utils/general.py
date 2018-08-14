@@ -38,6 +38,18 @@ def command_number_to_index(command_vector):
 
     return command_vector-2
 
+def camelcase_to_snakecase(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
+def snakecase_to_camelcase(column):
+    first, *rest = column.split('_')
+    first = list(first)
+    first[0] = first[0].upper()
+    first = ''.join(first)
+    return first + ''.join(word.capitalize() for word in rest)
+
 
 def plot_test_image(image, name):
 
@@ -61,9 +73,8 @@ def fix_driving_environments(drive_environents):
         elif exp_set_name == 'TestT2':
 
             new_drive_environments.append('TestT2_Town02')
-        else:
 
-            raise ValueError(" Exp Set name is not correspondent to a city")
+
     return new_drive_environments
 
 def create_log_folder(exp_batch_name):
@@ -97,11 +108,12 @@ def get_validation_datasets(exp_batch_name):
 
     validation_datasets = set()
     for exp in experiments:
-        experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
-        for log in experiments:
-            folder_file = os.path.join(root_path, exp_batch_name, exp, log)
-            if not os.path.isdir(folder_file) and 'validation' in folder_file:
-                validation_datasets.add(folder_file.split('_')[-1])
+        if os.path.isdir(os.path.join(root_path, exp_batch_name, exp)):
+            experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
+            for log in experiments:
+                folder_file = os.path.join(root_path, exp_batch_name, exp, log)
+                if  os.path.isdir(folder_file) and 'validation' in folder_file:
+                    validation_datasets.add(folder_file.split('_')[-1])
 
     return list(validation_datasets)
 
@@ -112,11 +124,12 @@ def get_driving_environments(exp_batch_name):
 
     driving_environments = set()
     for exp in experiments:
-        experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
-        for log in experiments:
-            folder_file = os.path.join(root_path, exp_batch_name, exp, log)
-            if not os.path.isdir(folder_file) and 'drive' in folder_file:
-                driving_environments.add(folder_file.split('_')[-1])
+        if os.path.isdir(os.path.join(root_path, exp_batch_name, exp)):
+            experiments = os.listdir(os.path.join(root_path, exp_batch_name, exp))
+            for log in experiments:
+                folder_file = os.path.join(root_path, exp_batch_name, exp, log)
+                if not os.path.isdir(folder_file) and 'drive' in folder_file:
+                    driving_environments.add(folder_file.split('_')[-2]+'_'+folder_file.split('_')[-1])
 
     return list(driving_environments)
 
@@ -128,10 +141,11 @@ def erase_logs(exp_batch_name):
 
 
     for exp in experiments:
-        experiments_logs = os.listdir(os.path.join(root_path, exp_batch_name, exp))
-        for log in experiments_logs:
-            if not os.path.isdir(os.path.join(root_path, exp_batch_name, exp, log)):
-                os.remove(os.path.join(root_path, exp_batch_name, exp, log))
+        if os.path.isdir(os.path.join(root_path, exp_batch_name, exp)):
+            experiments_logs = os.listdir(os.path.join(root_path, exp_batch_name, exp))
+            for log in experiments_logs:
+                if not os.path.isdir(os.path.join(root_path, exp_batch_name, exp, log)):
+                    os.remove(os.path.join(root_path, exp_batch_name, exp, log))
 
 def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list, ):
     # TODO: eventually add that for driving
@@ -217,8 +231,9 @@ def erase_validations(exp_batch_name, validation_data_list ):
 def get_latest_path(path):
     """ Considering a certain path for experiments, get the latest one."""
     import glob
-
+    print (path)
     files_list = glob.glob(os.path.join('_benchmarks_results', path+'*'))
+    print (files_list)
     sort_nicely(files_list)
 
     return files_list[-1]
@@ -241,6 +256,19 @@ def send_email(address, message):
 
 
 def compute_average_std(dic_list, weathers, number_of_tasks=1):
+
+    """
+    There are two types of outputs, these come packed in a dictionary
+
+    Success metrics, these are averaged between weathers, is basically the percentage of completion for a
+    single task.
+
+    Infractions, these are summed and divided by the total number of driven kilometers
+
+
+    For this you have the concept of averaging all the weathers from the experiment suite.
+
+    """
 
     metrics_to_average = [
         'episodes_fully_completed',
@@ -288,8 +316,7 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
                         if t == []:
                             print('    Metric Not Computed')
                         else:
-                            metric_sum_values[count] += (float(sum(t)) / float(len(t))) * 1.0 / float(
-                                len(weathers))
+                            metric_sum_values[count] += (float(sum(t)))
 
                         count += 1
 
@@ -298,6 +325,7 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
 
 
 
+        # For the metrics we sum over all the weathers here, this is to better subdivide the driving envs
         for metric in infraction_metrics:
             values_driven = metrics_summary['driven_kilometers']
             values = metrics_summary[metric]
@@ -326,36 +354,45 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
                         count += 1
 
 
+            # On this part average results matrix basically assume the number of infractions.
             for i in range(len(metric_sum_values)):
                 if metric_sum_values[i] == 0:
-                    average_results_matrix[metric][i][count_dic_pos] = summed_driven_kilometers[i]
+                    average_results_matrix[metric][i][count_dic_pos] = 1
                 else:
-                    average_results_matrix[metric][i][count_dic_pos] = summed_driven_kilometers[i] \
-                                                                       / metric_sum_values[i]
-
-
-
+                    average_results_matrix[metric][i][count_dic_pos] = metric_sum_values
         count_dic_pos += 1
 
-    # TODO: there is likely to be an issue on this part, both are hardcoded
-    # TODO: This is just working when there is one weather and one task
+
+
 
     print(metrics_summary)
     print(metrics_summary['average_speed'])
     average_speed_task = sum(metrics_summary['average_speed'][str(float(list(weathers)[0]))])
 
 
-    average_results_matrix.update({'driven_kilometers': np.array([summed_driven_kilometers[0]])})
+    average_results_matrix.update({'driven_kilometers': np.array(sum(summed_driven_kilometers))})
     average_results_matrix.update({'average_speed': np.array([average_speed_task])})
     print(average_results_matrix)
 
 
     for metric, vectors in average_results_matrix.items():
 
+        if metric in metrics_to_average:
+            average_results_matrix[metric] =  np.sum(average_results_matrix[metric])/\
+                                              (len(average_results_matrix[metric])*25)
+
+        if metric in infraction_metrics:
+            average_results_matrix[metric] = average_results_matrix['driven_kilometers']/np.sum(average_results_matrix[metric])
 
 
+        """
         for i in range(len(vectors)):
+
+            
             average_results_matrix[metric][i] = np.mean(average_results_matrix[metric][i])
+
+        """
+
 
 
 
