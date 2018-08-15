@@ -43,7 +43,7 @@ class NewDataset(Dataset):
             v = torch.from_numpy(np.asarray([v, ]))
             measurements[k] = v.float()
 
-        measurements['camera_rgb'] = img.float()
+        measurements['rgb'] = img.float()
         return measurements
 
     def pre_load_image_folders(self, path):
