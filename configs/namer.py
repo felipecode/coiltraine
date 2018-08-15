@@ -106,10 +106,7 @@ def generate_name(g_conf):
     final_name_string += '_' + str(g_conf.AUGMENT_LATERAL_STEERINGS)
 
 
-<<<<<<< HEAD
-=======
     if g_conf.USE_FULL_ORACLE:
         return 'ORACLE'
->>>>>>> fa0663cc67b5703293b5375d37b68e96cf85fe47
 
     return final_name_string

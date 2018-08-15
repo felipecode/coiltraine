@@ -207,7 +207,7 @@ class testAugmenter(unittest.TestCase):
             result = dropout_random_color(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_dropout_color',
-                                            str(count)+'.png'))
+                               str(count)+'.png'))
             count += 1
 
 

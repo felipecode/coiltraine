@@ -624,10 +624,6 @@ class testSampler(unittest.TestCase):
                     if split_3 not in one_camera_data[0]:
                         raise ValueError("not one camera")
 
-        #weights = [1.0/len(g_conf.STEERING_DIVISION)]*len(g_conf.STEERING_DIVISION)
-
-        #sampler = BatchSequenceSampler(splitted_steer_labels, 0, 120, g_conf.NUMBER_IMAGES_SEQUENCE,
-        #                              g_conf.SEQUENCE_STRIDE, False)
 
         sampler = SubsetSampler(one_camera_data[0])
 
@@ -658,86 +654,3 @@ class testSampler(unittest.TestCase):
             #print (list(steerings[i]))
             #big_steer_vec += list(steerings[i])
 
-"""
-    def test_real_data_central_sampler_sequence(self):
-
-        try:
-            os.mkdir('_images')
-        except:
-            pass
-        augmenter = Augmenter(g_conf.AUGMENTATION)
-
-        dataset = CoILDataset('/home/felipe/Datasets/1HoursW1-3-6-8',
-                              augmenter)
-
-        g_conf.NUMBER_IMAGES_SEQUENCE = 1
-        g_conf.SEQUENCE_STRIDE = 1
-        #g_conf.LABELS_DIVISION = [[0,2,5], [0,2,5], [0,2,5]]
-        g_conf.NUMBER_ITERATIONS = 1200
-        g_conf.BATCH_SIZE = 120
-
-        steerings = dataset.measurements[0, :]
-
-        # TODO: read meta data and turn into a coool dictionary ?
-
-        labels = dataset.measurements[24, :]
-
-        print (np.unique(labels))
-
-
-        print ('position of camera', np.where(dataset.meta_data[:, 0] == b'camera'))
-
-
-        camera_names = dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
-        print (" Camera names ")
-        print (camera_names)
-
-        keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
-
-        one_camera_data = splitter.label_split(camera_names, keys, [[0]])
-
-
-
-        splitted_steer_labels = splitter.control_steer_split(dataset.measurements,
-                                                             dataset.meta_data, one_camera_data[0])
-
-
-        print (splitted_steer_labels)
-
-        #weights = [1.0/len(g_conf.STEERING_DIVISION)]*len(g_conf.STEERING_DIVISION)
-
-        #sampler = BatchSequenceSampler(splitted_steer_labels, 0, 120, g_conf.NUMBER_IMAGES_SEQUENCE,
-        #                              g_conf.SEQUENCE_STRIDE, False)
-
-        sampler = SubsetSampler(one_camera_data[0])
-
-        big_steer_vec = []
-        count =0
-
-        data_loader = torch.utils.data.DataLoader(dataset, sampler=sampler, batch_size=120,
-                                                   num_workers=12, pin_memory=True)
-
-        for data in data_loader:
-
-
-
-
-
-            image, measurements = data
-
-            print (image['rgb'].shape)
-            for i in range(120):
-                name = '_images/' + str(count) + '.png'
-                image_to_save = transforms.ToPILImage()(image['rgb'][i][0].cpu())
-                image_to_save.save(name)
-
-                count += 1
-
-
-
-
-
-
-            #print (list(steerings[i]))
-            #big_steer_vec += list(steerings[i])
-"""

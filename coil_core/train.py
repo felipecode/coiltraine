@@ -59,9 +59,12 @@ def select_data(dataset, keys):
 def select_balancing_strategy(dataset, iteration):
 
 
+    # TODO eliminate this function
+
+
     # Creates the sampler, this part is responsible for managing the keys. It divides
     # all keys depending on the measurements and produces a set of keys for each bach.
-    keys = range(0, len(dataset.measurements[0, :]) - g_conf.NUMBER_IMAGES_SEQUENCE)
+    keys = range(0, len(dataset.measurements) - g_conf.NUMBER_IMAGES_SEQUENCE)
 
 
     keys = select_data(dataset, keys)
@@ -196,7 +199,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
         optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
 
-        print (dataset.meta_data)
 
         print (model)
         if checkpoint_file is not None:
@@ -209,28 +211,21 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         capture_time = time.time()
         for data in data_loader:
 
-
-            input_data, float_data = data
-
-
             # get the control commands from float_data, size = [120,1]
 
-            controls = float_data[:, dataset.controls_position(), :]
+            controls = data['directions']
 
 
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
             model.zero_grad()
 
-            branches = model(torch.squeeze(input_data['rgb'].cuda()),
-                             dataset.extract_inputs(float_data).cuda())
+            branches = model(torch.squeeze(data['rgb'].cuda()),
+                             dataset.extract_inputs(data).cuda())
 
-            print ("balanced speed vec")
 
-            print (sorted(float_data[:, -1]))
-
-            loss = criterion(branches, dataset.extract_targets(float_data).cuda(),
-                             controls.cuda(), dataset.extract_inputs(float_data).cuda(),
+            loss = criterion(branches, dataset.extract_targets(data).cuda(),
+                             controls.cuda(), dataset.extract_inputs(data).cuda(),
                              branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
                              variable_weights=g_conf.VARIABLE_WEIGHT)
 
@@ -241,10 +236,10 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
                 best_loss_iter = iteration
 
             # Log a random position
-            position = random.randint(0, len(float_data)-1)
+            position = random.randint(0, len(data)-1)
 
             output = model.extract_branch(torch.stack(branches[0:4]), controls)
-            error = torch.abs(output - dataset.extract_targets(float_data).cuda())
+            error = torch.abs(output - dataset.extract_targets(data).cuda())
 
 
 
@@ -253,7 +248,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             print (" The produced loss")
             print (loss.data)
             coil_logger.add_scalar('Loss', loss.data, iteration)
-            coil_logger.add_image('Image', torch.squeeze(input_data['rgb']), iteration)
+            coil_logger.add_image('Image', torch.squeeze(data['rgb']), iteration)
 
 
             loss.backward()
@@ -271,9 +266,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
                                      'Images/s': (iteration*g_conf.BATCH_SIZE)/accumulated_time,
                                      'BestLoss': best_loss, 'BestLossIteration': best_loss_iter,
                                      'Output': output[position].data.tolist(),
-                                     'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist(),
+                                     'GroundTruth': dataset.extract_targets(data)[position].data.tolist(),
                                      'Error': error[position].data.tolist(),
-                                     'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()},
+                                     'Inputs': dataset.extract_inputs(data)[position].data.tolist()},
                                     iteration)
 
             # TODO: For now we are computing the error for just the correct branch, it could be multi-branch,
