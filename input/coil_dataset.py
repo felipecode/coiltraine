@@ -9,10 +9,10 @@ import json
 import numpy as np
 
 import torch
+import cv2
 
 from torch.utils.data import Dataset
 
-from scipy.misc import imread
 from logger import coil_logger
 
 # TODO: Warning, maybe this does not need to be included everywhere.
@@ -35,7 +35,8 @@ class CoILDataset(Dataset):
 
     def __getitem__(self, index):
         img_path = self.sensor_data_names[index]
-        img = imread(img_path)
+        img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+        print (img)
         if self.transform is not None:
             img = self.transform(self.batch_read_number, img)
         else:
@@ -96,6 +97,9 @@ class CoILDataset(Dataset):
                      'brake': measurement_data['brake'],
                      'speed_module': measurement_data['playerMeasurements']['forwardSpeed'],
                      'directions': measurement_data['directions'],
+                     "pedestrian": measurement_data['stop_pedestrian'],
+                     "traffic_lights": measurement_data['stop_traffic_lights'],
+                     "vehicle": measurement_data['stop_vehicle'],
                      'angle': 0}
                 )
 
@@ -113,6 +117,9 @@ class CoILDataset(Dataset):
                      'brake': measurement_left['brake'],
                      'speed_module': measurement_left['playerMeasurements']['forwardSpeed'],
                      'directions': measurement_left['directions'],
+                     "pedestrian": measurement_left['stop_pedestrian'],
+                     "traffic_lights": measurement_left['stop_traffic_lights'],
+                     "vehicle": measurement_left['stop_vehicle'],
                      'angle': -30.0}
                 )
                 rgb = 'LeftRGB_' + data_point_number + '.jpg'
@@ -127,12 +134,18 @@ class CoILDataset(Dataset):
                      'brake': measurement_right['brake'],
                      'speed_module': measurement_right['playerMeasurements']['forwardSpeed'],
                      'directions': measurement_right['directions'],
+                     "pedestrian": measurement_right['stop_pedestrian'],
+                     "traffic_lights": measurement_right['stop_traffic_lights'],
+                     "vehicle": measurement_right['stop_vehicle'],
                      'angle': 30.0}
                 )
                 rgb = 'RightRGB_' + data_point_number + '.jpg'
                 sensor_data_names.append(os.path.join(episode, rgb))
 
         return sensor_data_names, float_dicts
+
+
+
 
     def augment_steering(self, camera_angle, steer, speed):
         """

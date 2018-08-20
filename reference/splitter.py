@@ -175,83 +175,103 @@ def float_split(output_to_split, keys, percentiles):
 
 
 
+#TODO: Refactor this splitting strategy.
+
+def control_steer_split(float_data, meta_data, keys):
+
+    # TODO: WHY EVERY WHERE MAKE THIS TO BE USED ??
+    steerings = float_data[np.where(meta_data[:, 0] == b'steer'), :][0][0]
+
+    print ("steer shape", steerings.shape)
+
+    # TODO: read meta data and turn into a coool dictionary ?
+    # TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
+    labels = float_data[np.where(meta_data[:, 0] == b'control'), :][0][0]
+
+    print ("labels shape ", labels.shape)
+    #keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
+
+    splitted_labels = label_split(labels, keys, g_conf.LABELS_DIVISION)
+
+    # Another level of splitting
+    splitted_steer_labels = []
+
+    for keys in splitted_labels:
+        splitter_steer = float_split(steerings, keys, g_conf.STEERING_DIVISION)
+        splitted_steer_labels.append(splitter_steer)
+
+    coil_logger.add_message('Loading', {'KeysDivision': splitted_steer_labels})
+
+    return splitted_steer_labels
+
+def control_speed_split(float_data, meta_data, keys):
+
+    # TODO: WHY EVERY WHERE MAKE THIS TO BE USED ??
+    speeds = float_data[np.where(meta_data[:, 0] == b'speed_module'), :][0][0]
+
+    print ("steer shape", speeds.shape)
+
+    # TODO: read meta data and turn into a coool dictionary ?
+    # TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
+    labels = float_data[np.where(meta_data[:, 0] == b'control'), :][0][0]
+
+    print ("labels shape ", labels.shape)
+    #keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
+
+    splitted_labels = label_split(labels, keys, g_conf.LABELS_DIVISION)
+
+    # Another level of splitting
+    splitted_steer_labels = []
+
+    for keys in splitted_labels:
+        splitter_steer = float_split(speeds, keys, g_conf.SPEED_DIVISION)
+        splitted_steer_labels.append(splitter_steer)
+
+    coil_logger.add_message('Loading', {'KeysDivision': splitted_steer_labels})
+
+    return splitted_steer_labels
 
 
-def split_sequence(data, var, positions):
+def pedestrian_speed_split(float_data, meta_data, keys):
 
-    # positions will start as something like 3,9,17
-    print (data)
-    print (var)
-    print (positions)
-    keys = [np.where(data[var] <= positions[var][0])[0]]
+    # TODO: WHY EVERY WHERE MAKE THIS TO BE USED ??
+    speeds = float_data[np.where(meta_data[:, 0] == b'speed_module'), :][0][0]
 
+    print ("steer shape", speeds.shape)
 
+    # TODO: read meta data and turn into a coool dictionary ?
+    # TODO ELIMINATE ALL NAMES CALLED LABEL OR MEASUREMENTS , MORE GENERIC FLOAT DATA AND SENSOR DATA IS BETTER
+    labels = float_data[np.where(meta_data[:, 0] == b'pedestrian'), :][0][0].astype(np.bool) & \
+             (float_data[np.where(meta_data[:, 0] == b'camera'), :][0][0] == 1)
+    print ("labels shape ", labels.shape)
+    #keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
 
-    for i in range(len(positions[var])-1):
-        print ( positions[var][i], positions[var][i+1])
-        keys.append(np.where(
-            np.logical_and(data[var] > positions[var][i], data[var] <= positions[var][i + 1]))[0])
+    splitted_labels = label_split(labels, keys, g_conf.PEDESTRIAN_PERCENTAGE)
 
-
-
-    keys.append(np.where(data[var] > positions[var][-1])[0])
-
-    return keys
+    # Another level of splitting
+    splitted_steer_labels = []
 
 
-def convert_measurements(measurements):
 
-    conv_measurements = dict.fromkeys(measurements[0].keys())
-    conv_measurements = {key: [] for key in conv_measurements}
+    for keys in splitted_labels:
+        splitter_steer = float_split(speeds, keys, g_conf.SPEED_DIVISION)
+        splitted_steer_labels.append(splitter_steer)
 
-    for data_point in measurements:
+    coil_logger.add_message('Loading', {'KeysDivision': splitted_steer_labels})
 
-        for key, value in data_point.items():
-            conv_measurements[key].append(value)
-
-
-    for key in conv_measurements.keys():
-        conv_measurements[key] = np.array(conv_measurements[key])
+    return splitted_steer_labels
 
 
-    return conv_measurements
 
 
-def split_brake(data, positions):
-    data = convert_measurements(data)
-    return split_sequence(data, 'brake', positions)
 
+def lambda_splitter(float_data, lambda_list):
 
-def split_speed_module(data, positions):
-    data = convert_measurements(data)
-    return split_sequence(data, 'speed_module', positions)
-
-def split_speed_module_throttle(data, positions_dict):
-    data = convert_measurements(data)
-    keys = [np.where(np.logical_and(data['speed_module'] < positions_dict['speed_module'][0],
-                                                           data['throttle'] > positions_dict['throttle'][0]))[0],
-                         np.where(np.logical_or(np.logical_and(data['speed_module'] < positions_dict['speed_module'][0],
-                                                           data['throttle'] <= positions_dict['throttle'][0]),
-                                                data['speed_module'] >= positions_dict['speed_module'][0]))[0]
-             ]
-
-    return keys
-
-
-def split_pedestrian_vehicle_traffic_lights(data, positions_dict):
-    data = convert_measurements(data)
-    keys = [np.where(np.logical_and(data['pedestrian'] < 1.0,
-                                    data['pedestrian'] > 0.))[0],
-            np.where(data['pedestrian'] == 0.)[0],
-            np.where(data['vehicle'] < 1. )[0],
-            np.where(data['traffic_lights'] < 1.0)[0],
-            np.where(np.logical_and(np.logical_and(data['pedestrian'] == 1.,
-                                                   data['vehicle'] == 1.),
-                                     data['traffic_lights'] == 1.))[0]
-
-            ]
-    return keys
-
+    key_list = []
+    for l in lambda_list:
+        keys = l(float_data)
+        key_list.append(keys)
+    return key_list
 
 
 def full_split(dataset):
