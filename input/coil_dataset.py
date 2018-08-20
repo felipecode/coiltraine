@@ -34,9 +34,13 @@ class CoILDataset(Dataset):
         return len(self.measurements)
 
     def __getitem__(self, index):
+
         img_path = self.sensor_data_names[index]
+        print (img_path)
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+
         print (img)
+
         if self.transform is not None:
             img = self.transform(self.batch_read_number, img)
         else:
@@ -74,6 +78,9 @@ class CoILDataset(Dataset):
         """
 
         episodes_list = glob.glob(os.path.join(path, 'episode_*'))
+        print (path)
+        print (" Episodes list ")
+        print (episodes_list)
 
         sensor_data_names = []
         float_dicts = []
@@ -103,7 +110,7 @@ class CoILDataset(Dataset):
                      'angle': 0}
                 )
 
-                rgb = 'CentralRGB_' + data_point_number + '.jpg'
+                rgb = 'CentralRGB_' + data_point_number + '.png'
                 sensor_data_names.append(os.path.join(episode, rgb))
 
                 # We do measurements for the left side camera
@@ -122,7 +129,7 @@ class CoILDataset(Dataset):
                      "vehicle": measurement_left['stop_vehicle'],
                      'angle': -30.0}
                 )
-                rgb = 'LeftRGB_' + data_point_number + '.jpg'
+                rgb = 'LeftRGB_' + data_point_number + '.png'
                 sensor_data_names.append(os.path.join(episode, rgb))
 
                 # We do measurements augmentation for the right side cameras
@@ -139,7 +146,7 @@ class CoILDataset(Dataset):
                      "vehicle": measurement_right['stop_vehicle'],
                      'angle': 30.0}
                 )
-                rgb = 'RightRGB_' + data_point_number + '.jpg'
+                rgb = 'RightRGB_' + data_point_number + '.png'
                 sensor_data_names.append(os.path.join(episode, rgb))
 
         return sensor_data_names, float_dicts
