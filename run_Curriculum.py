@@ -20,7 +20,8 @@ from es import OpenES, CMAES
 from visualization import plot_scatter
 
 # You could send the module to be executed and they could have the same interface.
-GPUS_P100 = "0001111222233334444555566667777" * 3
+# GPUS_P100 = "0001111222233334444555566667777"
+GPUS_P100 = "01234567" * 10
 
 
 def number_alive_process(process_deque):
@@ -114,7 +115,7 @@ if __name__ == '__main__':
         '-mp', '--max_process',
         type = int,
         dest='max_process',
-        default=31,
+        default=16,
         help='Max number of parallel processes to train or validate'
     )
     args = argparser.parse_args()
@@ -206,7 +207,7 @@ if __name__ == '__main__':
 
         this_c = 0
         jfiles = glob('./_validation_results/*.json')
-        while len(jfiles) != len(checkpoints):
+        while len(jfiles) != len(checkpoints) and number_alive_process(process_deque) != 0:
             jfiles = glob('./_validation_results/*.json')
             time.sleep(1)
             print(" "*100, end="\r")
