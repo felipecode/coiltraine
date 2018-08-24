@@ -35,11 +35,9 @@ class CoILDataset(Dataset):
 
     def __getitem__(self, index):
 
-        img_path = self.sensor_data_names[index]
-        print (img_path)
-        img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
-        print (img)
+        img_path = self.sensor_data_names[index]
+        img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
         if self.transform is not None:
             img = self.transform(self.batch_read_number, img)
@@ -58,6 +56,7 @@ class CoILDataset(Dataset):
 
         # TODO: here just one image
         measurements['rgb'] = img
+
         return measurements
 
     def pre_load_image_folders(self, path):
@@ -91,7 +90,7 @@ class CoILDataset(Dataset):
             measurements_list = glob.glob(os.path.join(episode, 'measurement*'))
             sort_nicely(measurements_list)
 
-            for measurement in measurements_list:
+            for measurement in measurements_list[:-2]:
                 data_point_number = measurement.split('_')[-1].split('.')[0]
 
                 # TODO the dataset camera name can be a parameter
