@@ -97,11 +97,16 @@ class CoILDataset(Dataset):
                 with open(measurement) as f:
                     measurement_data = json.load(f)
                 # We extract the interesting subset from the measurement dict
+                if 'forwardSpeed' in  measurement_data['playerMeasurements']:
+                    speed = measurement_data['playerMeasurements']['forwardSpeed']
+                else:
+                    speed = 0
+
                 float_dicts.append(
                     {'steer': measurement_data['steer'],
                      'throttle': measurement_data['throttle'],
                      'brake': measurement_data['brake'],
-                     'speed_module': measurement_data['playerMeasurements']['forwardSpeed'],
+                     'speed_module': speed,
                      'directions': measurement_data['directions'],
                      "pedestrian": measurement_data['stop_pedestrian'],
                      "traffic_lights": measurement_data['stop_traffic_lights'],
@@ -115,13 +120,16 @@ class CoILDataset(Dataset):
                 # We do measurements for the left side camera
                 # #TOdo the angle does not need to be hardcoded
                 measurement_left = self.augment_measurement(measurement_data, -30.0)
-
+                if 'forwardSpeed' in  measurement_left['playerMeasurements']:
+                    speed = measurement_left['playerMeasurements']['forwardSpeed']
+                else:
+                    speed = 0
                 # We extract the interesting subset from the measurement dict
                 float_dicts.append(
                     {'steer': measurement_left['steer'],
                      'throttle': measurement_left['throttle'],
                      'brake': measurement_left['brake'],
-                     'speed_module': measurement_left['playerMeasurements']['forwardSpeed'],
+                     'speed_module': speed,
                      'directions': measurement_left['directions'],
                      "pedestrian": measurement_left['stop_pedestrian'],
                      "traffic_lights": measurement_left['stop_traffic_lights'],
@@ -130,7 +138,10 @@ class CoILDataset(Dataset):
                 )
                 rgb = 'LeftRGB_' + data_point_number + '.png'
                 sensor_data_names.append(os.path.join(episode, rgb))
-
+                if 'forwardSpeed' in  measurement_right['playerMeasurements']:
+                    speed = measurement_right['playerMeasurements']['forwardSpeed']
+                else:
+                    speed = 0
                 # We do measurements augmentation for the right side cameras
 
                 measurement_right = self.augment_measurement(measurement_data, 30.0)
@@ -138,7 +149,7 @@ class CoILDataset(Dataset):
                     {'steer': measurement_right['steer'],
                      'throttle': measurement_right['throttle'],
                      'brake': measurement_right['brake'],
-                     'speed_module': measurement_right['playerMeasurements']['forwardSpeed'],
+                     'speed_module': speed,
                      'directions': measurement_right['directions'],
                      "pedestrian": measurement_right['stop_pedestrian'],
                      "traffic_lights": measurement_right['stop_traffic_lights'],
