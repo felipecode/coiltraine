@@ -119,7 +119,7 @@ class CoILDataset(Dataset):
 
                 # We do measurements for the left side camera
                 # #TOdo the angle does not need to be hardcoded
-                measurement_left = self.augment_measurement(measurement_data, -30.0)
+                measurement_left = self.augment_measurement(measurement_data, -30.0, speed)
                 if 'forwardSpeed' in  measurement_left['playerMeasurements']:
                     speed = measurement_left['playerMeasurements']['forwardSpeed']
                 else:
@@ -141,12 +141,12 @@ class CoILDataset(Dataset):
 
                 # We do measurements augmentation for the right side cameras
 
-                measurement_right = self.augment_measurement(measurement_data, 30.0)
+                measurement_right = self.augment_measurement(measurement_data, 30.0, speed)
                 if 'forwardSpeed' in measurement_right['playerMeasurements']:
                     speed = measurement_right['playerMeasurements']['forwardSpeed']
                 else:
                     speed = 0
-                    
+
                 float_dicts.append(
                     {'steer': measurement_right['steer'],
                      'throttle': measurement_right['throttle'],
@@ -197,14 +197,14 @@ class CoILDataset(Dataset):
         # print('Angle', camera_angle, ' Steer ', old_steer, ' speed ', speed, 'new steer', steer)
         return steer
 
-    def augment_measurement(self, measurements, angle):
+    def augment_measurement(self, measurements, angle, speed):
         """
             Augment the steering of a measurement dict
 
         """
 
         new_steer = self.augment_steering(angle, measurements['steer'],
-                                          measurements['playerMeasurements']['forwardSpeed'])
+                                          speed)
 
         measurements['steer'] = new_steer
 
