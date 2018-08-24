@@ -138,13 +138,15 @@ class CoILDataset(Dataset):
                 )
                 rgb = 'LeftRGB_' + data_point_number + '.png'
                 sensor_data_names.append(os.path.join(episode, rgb))
-                if 'forwardSpeed' in  measurement_right['playerMeasurements']:
-                    speed = measurement_right['playerMeasurements']['forwardSpeed']
-                else:
-                    speed = 0
+
                 # We do measurements augmentation for the right side cameras
 
                 measurement_right = self.augment_measurement(measurement_data, 30.0)
+                if 'forwardSpeed' in measurement_right['playerMeasurements']:
+                    speed = measurement_right['playerMeasurements']['forwardSpeed']
+                else:
+                    speed = 0
+                    
                 float_dicts.append(
                     {'steer': measurement_right['steer'],
                      'throttle': measurement_right['throttle'],
