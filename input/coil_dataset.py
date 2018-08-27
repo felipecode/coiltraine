@@ -77,6 +77,7 @@ class CoILDataset(Dataset):
         """
 
         episodes_list = glob.glob(os.path.join(path, 'episode_*'))
+        sort_nicely(episodes_list)
         print (path)
         print (" Episodes list ")
         print (episodes_list)
@@ -84,13 +85,32 @@ class CoILDataset(Dataset):
         sensor_data_names = []
         float_dicts = []
 
+        number_of_hours_pre_loaded = 0
+
         for episode in episodes_list:
+            if not os.path.exists(os.path.join(episode, "checked")):
+                # Episode was not checked. So we dont load it.
+                continue
+
+            if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
+                # The number of wanted hours achieved
+                break
+
+
             print('Episode ', episode)
 
             measurements_list = glob.glob(os.path.join(episode, 'measurement*'))
             sort_nicely(measurements_list)
 
+            last_data_point_number = measurements_list[-1].split('_')[-1].split('.')[0]
+            number_of_hours_pre_loaded += (float(last_data_point_number) / 10.0)/3600.0
+            print (" Added ", ((float(last_data_point_number) / 10.0)/3600.0))
+
+
             for measurement in measurements_list[:-2]:
+
+
+
                 data_point_number = measurement.split('_')[-1].split('.')[0]
 
                 # TODO the dataset camera name can be a parameter
@@ -106,7 +126,7 @@ class CoILDataset(Dataset):
                     {'steer': measurement_data['steer'],
                      'throttle': measurement_data['throttle'],
                      'brake': measurement_data['brake'],
-                     'speed_module': speed,
+                     'speed_module': speed/g_conf.SPEED_FACTOR,
                      'directions': measurement_data['directions'],
                      "pedestrian": measurement_data['stop_pedestrian'],
                      "traffic_lights": measurement_data['stop_traffic_lights'],
@@ -119,8 +139,9 @@ class CoILDataset(Dataset):
 
                 # We do measurements for the left side camera
                 # #TOdo the angle does not need to be hardcoded
-                measurement_left = self.augment_measurement(measurement_data, -30.0, speed)
-                if 'forwardSpeed' in  measurement_left['playerMeasurements']:
+                # We convert the speed to KM/h for the augmentaiton
+                measurement_left = self.augment_measurement(measurement_data, -30.0, 3.6*speed)
+                if 'forwardSpeed' in measurement_left['playerMeasurements']:
                     speed = measurement_left['playerMeasurements']['forwardSpeed']
                 else:
                     speed = 0
@@ -129,7 +150,7 @@ class CoILDataset(Dataset):
                     {'steer': measurement_left['steer'],
                      'throttle': measurement_left['throttle'],
                      'brake': measurement_left['brake'],
-                     'speed_module': speed,
+                     'speed_module': speed/g_conf.SPEED_FACTOR,
                      'directions': measurement_left['directions'],
                      "pedestrian": measurement_left['stop_pedestrian'],
                      "traffic_lights": measurement_left['stop_traffic_lights'],
@@ -141,7 +162,7 @@ class CoILDataset(Dataset):
 
                 # We do measurements augmentation for the right side cameras
 
-                measurement_right = self.augment_measurement(measurement_data, 30.0, speed)
+                measurement_right = self.augment_measurement(measurement_data, 30.0, 3.6*speed)
                 if 'forwardSpeed' in measurement_right['playerMeasurements']:
                     speed = measurement_right['playerMeasurements']['forwardSpeed']
                 else:
@@ -151,7 +172,7 @@ class CoILDataset(Dataset):
                     {'steer': measurement_right['steer'],
                      'throttle': measurement_right['throttle'],
                      'brake': measurement_right['brake'],
-                     'speed_module': speed,
+                     'speed_module': speed/g_conf.SPEED_FACTOR,
                      'directions': measurement_right['directions'],
                      "pedestrian": measurement_right['stop_pedestrian'],
                      "traffic_lights": measurement_right['stop_traffic_lights'],
@@ -161,6 +182,9 @@ class CoILDataset(Dataset):
                 rgb = 'RightRGB_' + data_point_number + '.png'
                 sensor_data_names.append(os.path.join(episode, rgb))
 
+
+        print ( " LOADED ", number_of_hours_pre_loaded, " This hours")
+        print ()
         return sensor_data_names, float_dicts
 
 
