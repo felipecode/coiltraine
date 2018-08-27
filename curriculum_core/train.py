@@ -31,7 +31,8 @@ def execute(weights, keys, iteration, checkpoint, gpu, n_batches=100):
         # print("variable ", g_conf.VARIABLE_WEIGHT, 'conf targets', g_conf.TARGETS)
 
         # Setup sampler and data loader
-        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], '5HoursW1-3-6-8')
+        # full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], '5HoursW1-3-6-8')
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100_2/CARLA100_2')
         augmenter = Augmenter(g_conf.AUGMENTATION)
         sampler = PreSplittedSampler(keys, iteration*g_conf.BATCH_SIZE, weights)
         dataset = CoILDataset(full_dataset, transform=augmenter)
@@ -59,15 +60,15 @@ def execute(weights, keys, iteration, checkpoint, gpu, n_batches=100):
         #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
         capture_time = time.time()
         for data in data_loader:
-            input_data, float_data = data
+            # input_data, float_data = data
             # get the control commands from float_data, size = [120,1]
-            controls = float_data[:, dataset.controls_position(), :]
+            controls = data['directions']  # float_data[:, dataset.controls_position(), :]
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
             model.zero_grad()
-            branches = model(torch.squeeze(input_data['rgb'].cuda()),
-                             dataset.extract_inputs(float_data).cuda())
-            loss = criterion(branches, dataset.extract_targets(float_data).cuda(),
-                             controls.cuda(), dataset.extract_inputs(float_data).cuda(),
+            branches = model(torch.squeeze(data['rgb'].cuda()),
+                             dataset.extract_inputs(data).cuda())
+            loss = criterion(branches, dataset.extract_targets(data).cuda(),
+                             controls.cuda(), dataset.extract_inputs(data).cuda(),
                              branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
                              variable_weights=g_conf.VARIABLE_WEIGHT)
             loss.backward()

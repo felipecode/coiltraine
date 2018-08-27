@@ -25,8 +25,11 @@ from utils.general import sort_nicely
 class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
-    def __init__(self, root_dir, transform=None):
-        self.sensor_data_names, self.measurements = self.pre_load_image_folders(root_dir)
+    def __init__(self, root_dir, transform=None, use_preload=False):
+        if use_preload:
+            self.measurements, self.sensor_data_names = np.load('dataset_preload.npy')
+        else:
+            self.sensor_data_names, self.measurements = self.pre_load_image_folders(root_dir)
         self.transform = transform
         self.batch_read_number = 0
 
@@ -92,9 +95,9 @@ class CoILDataset(Dataset):
                 # Episode was not checked. So we dont load it.
                 continue
 
-            if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
-                # The number of wanted hours achieved
-                break
+            # if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
+            #     # The number of wanted hours achieved
+            #     break
 
 
             print('Episode ', episode)

@@ -38,7 +38,8 @@ def execute(checkpoint, output_file, gpu):
 
         #Define the dataset. This structure is has the __get_item__ redefined in a way
         #that you can access the HDFILES positions from the root directory as a in a vector.
-        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'Town02W14Noise')
+        # full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'Town02W14Noise')
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100_2/CARLA100_2')
         augmenter = Augmenter(None)
         dataset = CoILDataset(full_dataset, transform=augmenter)
         data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
@@ -56,17 +57,17 @@ def execute(checkpoint, output_file, gpu):
         accumulated_error = []
         iteration_on_checkpoint = 0
         for data in data_loader:
-            input_data, float_data = data
-            control_position = np.where(dataset.meta_data[:, 0] == b'control')[0][0]
-            speed_position = np.where(dataset.meta_data[:, 0] == b'speed_module')[0][0]
-            output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
-                                          float_data[:, speed_position, :].cuda(),
-                                          float_data[:, control_position, :].cuda())
-            loss = torch.mean((output - dataset.extract_targets(float_data).cuda())**2).data.tolist()
-            mean_error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
+            # input_data, float_data = data
+            # control_position = data['directions']  # np.where(dataset.meta_data[:, 0] == b'control')[0][0]
+            # speed_position = np.where(dataset.meta_data[:, 0] == b'speed_module')[0][0]
+            output = model.forward_branch(torch.squeeze(data['rgb']).cuda(),
+                                          data['speed_module'].cuda(),
+                                          data['directions'].cuda())
+            loss = torch.mean((output - dataset.extract_targets(data).cuda())**2).data.tolist()
+            mean_error = torch.mean(torch.abs(output - dataset.extract_targets(data).cuda())).data.tolist()
             accumulated_error.append(mean_error)
             accumulated_loss.append(loss)
-            error = torch.abs(output - dataset.extract_targets(float_data).cuda())
+            error = torch.abs(output - dataset.extract_targets(data).cuda())
             iteration_on_checkpoint += 1
 
         checkpoint_average_loss = np.percentile(accumulated_loss, 85)  # accumulated_loss/(len(data_loader))
