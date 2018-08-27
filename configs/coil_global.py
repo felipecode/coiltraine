@@ -55,6 +55,7 @@ _g_conf.SPEED_DIVISION = []
 #_g_conf.STEERING_DIVISION = [0.01, 0.02, 0.07, 0.4, 0.4, 0.07, 0.02, 0.01]  # Forcing curves alot
 _g_conf.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
 _g_conf.BATCH_SIZE = 120
+_g_conf.SPLIT = None
 
 #_g_conf.AUGMENTATION_SUITE = [iag.ToGPU()]#, iag.Add((0, 0)), iag.Dropout(0, 0), iag.Multiply((1, 1.04)),
 #                             #iag.GaussianBlur(sigma=(0.0, 3.0)),
@@ -88,6 +89,7 @@ _g_conf.SEQUENCE_STRIDE = 1
 _g_conf.TEST_SCHEDULE = range(0, 2000, 200)
 _g_conf.SPEED_FACTOR = 40.0
 _g_conf.AUGMENT_LATERAL_STEERINGS = 6
+_g_conf.NUMBER_OF_HOURS = 1
 
 
 """#### Network Related Parameters ####"""

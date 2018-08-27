@@ -106,6 +106,9 @@ def generate_name(g_conf):
     final_name_string += '_' + str(g_conf.AUGMENT_LATERAL_STEERINGS)
 
 
+    final_name_string += '_' + str(g_conf.NUMBER_OF_HOURS) + 'hours'
+
+
     if g_conf.USE_FULL_ORACLE:
         return 'ORACLE'
 
