@@ -65,7 +65,7 @@ def parse_split_configuration(configuration):
 
     """
     if configuration is None:
-        return "None"
+        return "None", None
     print ('conf', configuration)
     conf_dict = collections.OrderedDict(configuration)
 
