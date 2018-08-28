@@ -41,9 +41,7 @@ class ClutNewWeather(ExperimentSuite):
                     [30, 41], [16, 107], [69, 45], [102, 95], [16, 145],
                     [111, 64], [79, 47], [84, 69], [73, 31], [37, 81]]
 
-        return [_poses_navigation(),
-                _poses_navigation(),
-                _poses_navigation()
+        return [_poses_navigation()
                 ]
 
     def build_experiments(self):

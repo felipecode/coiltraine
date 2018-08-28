@@ -16,10 +16,10 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 
 
-class ClutNewTownWeather(ExperimentSuite):
+class ClutNewWeatherTown(ExperimentSuite):
 
     def __init__(self):
-        super(ClutNewTownWeather, self).__init__('Town02')
+        super(ClutNewWeatherTown, self).__init__('Town02')
 
     @property
     def train_weathers(self):
