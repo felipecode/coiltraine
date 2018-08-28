@@ -166,7 +166,7 @@ if __name__ == '__main__':
 
             drive_params['suppress_output'] = False
             #driving_environments = fix_driving_environments(list(args.driving_environments))
-            execute_drive("0", args.folder, args.exp, list(args.driving_environments), drive_params)
+            execute_drive("0", args.folder, args.exp, list(args.driving_environments)[0], drive_params)
 
             # list(args.driving_environments)[0], suppress_output=False,
                           #no_screen=args.no_screen, docker=args.docker)

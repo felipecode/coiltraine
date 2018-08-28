@@ -123,18 +123,14 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                 iteration_on_checkpoint = 0
                 for data in data_loader:
 
-                    input_data, float_data = data
-                    control_position = np.where(dataset.meta_data[:, 0] == b'control')[0][0]
-                    speed_position = np.where(dataset.meta_data[:, 0] == b'speed_module')[0][0]
+
+                    controls = data['directions']
 
 
 
-                    print ("image ", input_data['rgb'].shape)
-                    print (float_data)
-
-                    output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
-                                                  float_data[:, speed_position, :].cuda(),
-                                                  float_data[:, control_position, :].cuda())
+                    output = model.forward_branch(torch.squeeze(data['rgb']).cuda(),
+                                                  dataset.extract_inputs(),
+                                                  controls)
 
 
 

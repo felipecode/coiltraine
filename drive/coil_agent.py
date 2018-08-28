@@ -58,16 +58,7 @@ class CoILAgent(Agent):
 
 
         Agent.__init__(self)
-        if video_recording:
-            writting_path = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
-                                        g_conf.EXPERIMENT_NAME, town_name, 'recording_episodes')
-            if not os.path.exists(writting_path):
-                os.makedirs(writting_path)
-            else:
-                shutil.rmtree(writting_path)
-                os.makedirs(writting_path)
 
-            self._screen_recorder = CarScreenRecorder(writting_path, load_wheel=True)
 
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
         self.model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
@@ -81,7 +72,6 @@ class CoILAgent(Agent):
         print("loaded state", checkpoint)
 
         self.model.cuda()
-        self.video_recording = video_recording
         self.model.eval()
 
         if g_conf.USE_ORACLE or g_conf.USE_FULL_ORACLE:
@@ -183,12 +173,6 @@ class CoILAgent(Agent):
 
         # If it collided, prepare to save things. after after_collision_clipe_size seconds
 
-        # print ( ' TEST FOR COLLISION ', _test_for_collision(player_measurements, self._previous_vehicle_collision,
-        #                       self._previous_pedestrian_collision, self._previous_other_collision,
-        #                       self._collision_vehicles_thresh,
-        #                       self._collision_pedestrians_thresh, self._collision_other_thresh))
-
-
 
         if _test_for_collision(player_measurements, self._previous_vehicle_collision,
                                self._previous_pedestrian_collision, self._previous_other_collision,
@@ -225,7 +209,7 @@ class CoILAgent(Agent):
 
         # control_agent = self._agent.run_step(measurements, None, target)
 
-        norm_speed = (measurements.player_measurements.forward_speed * 3.6) / g_conf.SPEED_FACTOR
+        norm_speed = (measurements.player_measurements.forward_speed) / g_conf.SPEED_FACTOR
         norm_speed = torch.cuda.FloatTensor([norm_speed]).unsqueeze(0)
 
         directions_tensor = torch.cuda.LongTensor([directions])
@@ -266,7 +250,8 @@ class CoILAgent(Agent):
         self.first_iter = False
 
 
-        print ('Steer', control.steer)
+        print ("speed ", measurements.player_measurements.forward_speed)
+        print ('Steer', control.steer, 'Gas', control.throttle, 'Brake', control.brake)
         return control
 
 

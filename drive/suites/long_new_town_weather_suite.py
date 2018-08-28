@@ -16,18 +16,18 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 
 
-class LongNewTown(ExperimentSuite):
+class LongNewTownWeather(ExperimentSuite):
 
     def __init__(self):
-        super(LongNewTown, self).__init__('Town02')
+        super(LongNewTownWeather, self).__init__('Town02')
 
     @property
     def train_weathers(self):
-        return [1, 3, 6, 8]
+        return []
 
     @property
     def test_weathers(self):
-        return []
+        return [4, 14]
 
     @property
     def collision_as_failure(self):

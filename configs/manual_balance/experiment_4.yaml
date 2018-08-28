@@ -14,20 +14,19 @@ BATCH_SIZE: 120
 NUMBER_ITERATIONS: 500000
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
-SPLIT:
-  brake: [0.8, 2.5, 4.73]
+SPLIT: [['speed_module', [0.8]], ['throttle', [0]], ['weights', [0.25, 0.75]]]
 NUMBER_FRAMES_FUSION: 1
 NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
-SPEED_FACTOR: 40.0
-TRAIN_DATASET_NAME: 'CARLA100Test2'
+SPEED_FACTOR: 10.0
+TRAIN_DATASET_NAME: 'CARLA100_2'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [ 2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [ 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
@@ -80,8 +79,9 @@ VARIABLE_WEIGHT:
 
 
 #### Simulation Related Parameters ####
-IMAGE_CUT: [115, 510]  # How you should cut the input image that is received from the server
-USE_ORACLE: True
+IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
+USE_ORACLE: False
+USE_FULL_ORACLE: False
 
 
 
