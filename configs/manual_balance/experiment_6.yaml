@@ -14,7 +14,7 @@ BATCH_SIZE: 120
 NUMBER_ITERATIONS: 500000
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
-SPLIT: [['pedestrian', []], ['vehicle', []], ['traffic_lights', []], ['weights', [0.2, 0.2, 0.2, 0.2, 0.2]]]
+SPLIT: [['left', []], ['central', []], ['right', []], ['weights', [0, 1, 0]]] # This is a bit criptical, but works
 NUMBER_FRAMES_FUSION: 1
 NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
