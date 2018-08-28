@@ -237,7 +237,6 @@ def split_speed_module_throttle(data, positions_dict):
 
     return keys
 
-
 def split_pedestrian_vehicle_traffic_lights(data, positions_dict):
     data = convert_measurements(data)
     keys = [np.where(np.logical_and(data['pedestrian'] < 1.0,
@@ -249,6 +248,17 @@ def split_pedestrian_vehicle_traffic_lights(data, positions_dict):
                                                    data['vehicle'] == 1.),
                                      data['traffic_lights'] == 1.))[0]
 
+            ]
+    return keys
+
+
+def split_left_central_right(data, positions_dict):
+    data = convert_measurements(data)
+
+
+    keys = [np.where(data['angle'] == -30.)[0],
+            np.where(data['angle'] == 0. )[0],
+            np.where(data['angle'] == 30.) [0]
             ]
     return keys
 
