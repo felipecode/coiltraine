@@ -64,6 +64,8 @@ def parse_split_configuration(configuration):
     Turns the configuration line of sliptting into a name and a set of params.
 
     """
+    if configuration is None:
+        return "None"
     print ('conf', configuration)
     conf_dict = collections.OrderedDict(configuration)
 
