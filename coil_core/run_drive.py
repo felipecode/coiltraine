@@ -4,7 +4,6 @@ import traceback
 import sys
 import logging
 
-import importlib
 import numpy as np
 import os
 import time
@@ -30,7 +29,8 @@ from configs import g_conf, merge_with_yaml, set_type_of_process
 
 from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkpoint,\
     is_next_checkpoint_ready, get_latest_evaluated_checkpoint
-from utils.general import compute_average_std, get_latest_path, snakecase_to_camelcase, camelcase_to_snakecase
+from utils.general import compute_average_std, get_latest_path, write_header_control_summary,\
+    snakecase_to_camelcase, write_data_point_control_summary, camelcase_to_snakecase
 
 
 def frame2numpy(frame, frameSize):
@@ -62,7 +62,7 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
 
 
         sp = subprocess.Popen(['docker', 'run', '--rm', '-d' ,'-p', str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
-                              '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
+                              '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlagear',
                                '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
                                '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
                               stdout=subprocess.PIPE)
@@ -96,7 +96,7 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
                                         '-fps=10', '-world-port='+str(port)],
                                    shell=False,
                                    stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
-        out ="0"
+        out = "0"
 
 
 
@@ -144,7 +144,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             control_filename = 'control_output.csv'
 
 
-        experiment_suite_module = __import__('drive.' + camelcase_to_snakecase(exp_set_name) + '_suite',
+        experiment_suite_module = __import__('drive.suites.' + camelcase_to_snakecase(exp_set_name) + '_suite',
                                              fromlist=[exp_set_name])
 
         experiment_suite_module = getattr(experiment_suite_module, exp_set_name)
@@ -177,19 +177,15 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
         latest = get_latest_evaluated_checkpoint()
         if latest is None:  # When nothing was tested, get latest returns none, we fix that.
             latest = 0
+            # The used tasks are hardcoded, this need to be improved
+            file_base = os.path.join('_logs', exp_batch, exp_alias,
+                         g_conf.PROCESS_NAME + '_csv', control_filename)
+            write_header_control_summary(file_base, 'empty')
 
+            write_header_control_summary(file_base, 'normal')
 
+            write_header_control_summary(file_base, 'cluttered')
 
-            csv_outfile = open(os.path.join('_logs', exp_batch, exp_alias,
-                                            g_conf.PROCESS_NAME + '_csv', control_filename),
-                               'w')
-
-            csv_outfile.write("%s,%s,%s,%s,%s,%s,%s,%s\n"
-                              % ('step', 'episodes_completion', 'intersection_offroad',
-                                 'intersection_otherlane', 'collision_pedestrians',
-                                 'collision_vehicles', 'episodes_fully_completed',
-                                 'driven_kilometers'))
-            csv_outfile.close()
 
 
         # Write the header of the summary file used conclusion
@@ -236,25 +232,17 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                                                         experiment_set.weathers,
                                                         len(experiment_set.build_experiments()))
 
+                    file_base = os.path.join('_logs', exp_batch, exp_alias,
+                                             g_conf.PROCESS_NAME + '_csv', control_filename)
+
+                    write_data_point_control_summary(file_base, 'empty', averaged_dict, latest, 0)
+                    write_data_point_control_summary(file_base, 'normal', averaged_dict, latest, 1)
+                    write_data_point_control_summary(file_base, 'cluttered', averaged_dict, latest, 2)
+
                     #plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
                     #                     )
                     print (averaged_dict)
-                    csv_outfile = open(os.path.join('_logs', exp_batch, exp_alias,
-                                                    g_conf.PROCESS_NAME + '_csv',
-                                                    control_filename),
-                                       'a')
 
-
-                    csv_outfile.write("%d,%f,%f,%f,%f,%f,%f,%f\n"
-                                % (latest, averaged_dict['episodes_completion'],
-                                     averaged_dict['intersection_offroad'],
-                                     averaged_dict['intersection_otherlane'],
-                                     averaged_dict['collision_pedestrians'],
-                                     averaged_dict['collision_vehicles'],
-                                     averaged_dict['episodes_fully_completed'],
-                                     averaged_dict['driven_kilometers']))
-
-                    csv_outfile.close()
 
                     # TODO: When you add the message you need to check if the experiment continues properly
 

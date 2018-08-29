@@ -16,18 +16,18 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 
 
-class LongNewTown(ExperimentSuite):
+class ClutNewWeatherTown(ExperimentSuite):
 
     def __init__(self):
-        super(LongNewTown, self).__init__('Town02')
+        super(ClutNewWeatherTown, self).__init__('Town02')
 
     @property
     def train_weathers(self):
-        return [1, 3, 6, 8]
+        return []
 
     @property
     def test_weathers(self):
-        return []
+        return [4, 14]
 
     @property
     def collision_as_failure(self):
@@ -37,17 +37,14 @@ class LongNewTown(ExperimentSuite):
     def _poses(self):
 
         def _poses_navigation():
-            return [[19, 66], [79, 14], [19, 57], [23, 1],
-                    [53, 76], [42, 13], [31, 71], [33, 5],
-                    [54, 30], [10, 61], [66, 3], [27, 12],
-                    [79, 19], [2, 29], [16, 14], [5, 57],
-                    [70, 73], [46, 67], [57, 50], [61, 49], [21, 12],
-                    [51, 81], [77, 68], [56, 65], [43, 54]]
+            return [[19, 66], [79, 14], [19, 57], [39, 53], [60, 26],
+             [53, 76], [42, 13], [31, 71], [59, 35], [47, 16],
+             [10, 61], [66, 3], [20, 79], [14, 56], [26, 69],
+             [79, 19], [2, 29], [16, 14], [5, 57], [77, 68],
+             [70, 73], [46, 67], [57, 50], [61, 49], [21, 12]]
 
 
-        return [_poses_navigation(),
-                _poses_navigation(),
-                _poses_navigation()]
+        return [_poses_navigation()]
 
 
 
@@ -70,8 +67,8 @@ class LongNewTown(ExperimentSuite):
 
 
         poses_tasks = self._poses()
-        vehicles_tasks = [0, 15, 70]
-        pedestrians_tasks = [0, 50, 150]
+        vehicles_tasks = [70]
+        pedestrians_tasks = [150]
 
 
 

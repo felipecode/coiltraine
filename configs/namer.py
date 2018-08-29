@@ -1,3 +1,5 @@
+import collections
+
 def get_dropout_sum(model_configuration):
     return (sum(model_configuration['branches']['fc']['dropouts']) +
             sum(model_configuration['speed_branch']['fc']['dropouts']) +
@@ -6,8 +8,27 @@ def get_dropout_sum(model_configuration):
             sum(model_configuration['perception']['fc']['dropouts']))
 
 
+# TODO: THIS FUNCTION IS REPEATED FROM MAIN
+def parse_split_configuration(configuration):
+
+    """
+    Turns the configuration line of sliptting into a name and a set of params.
+
+    """
+    if configuration is None:
+        return "None", None
+    print ('conf', configuration)
+    conf_dict = collections.OrderedDict(configuration)
+
+    name = 'split'
+    for key in conf_dict.keys():
+        if key != 'weights':
+            name += '_'
+            name += key
 
 
+
+    return name, conf_dict
 
 def generate_name(g_conf):
     # TODO: Make a cool name generator, maybe in another class
@@ -104,6 +125,8 @@ def generate_name(g_conf):
     final_name_string += g_conf.DATA_USED
 
     final_name_string += '_' + str(g_conf.AUGMENT_LATERAL_STEERINGS)
+    name_splitter, _ = parse_split_configuration(g_conf.SPLIT)
+    final_name_string += '_' + name_splitter
 
 
     final_name_string += '_' + str(g_conf.NUMBER_OF_HOURS) + 'hours'

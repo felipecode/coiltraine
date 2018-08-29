@@ -6,22 +6,23 @@ import traceback
 import numpy as np
 import torch
 import torch.optim as optim
-
+import collections
 
 
 # What do we define as a parameter what not.
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss, adjust_learning_rate
-from input import CoILDataset, BatchSequenceSampler, splitter, Augmenter, RandomSampler
+from input import CoILDataset, PreSplittedSampler, splitter, Augmenter, RandomSampler
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
 
 from torchvision import transforms
 
 
-
+# TODO: check a smarter way to do this
 def select_data(dataset, keys):
+    pass
     """
     Given a dataset with the float data and a set of keys, get the subset of these keys.
     Args:
@@ -30,11 +31,12 @@ def select_data(dataset, keys):
 
     Returns:
 
-    """
 
     if g_conf.DATA_USED == 'central':
-        camera_names = \
-            dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
+
+        camera_names =  dataset.measurements['angle']
+
+
         keys = splitter.label_split(camera_names, keys, [[1]])[0]
     elif g_conf.DATA_USED == 'sides':
         camera_names = \
@@ -55,6 +57,31 @@ def select_data(dataset, keys):
 
     return keys
 
+    """
+
+def parse_split_configuration(configuration):
+    """
+    Turns the configuration line of sliptting into a name and a set of params.
+
+    """
+    if configuration is None:
+        return "None", None
+    print ('conf', configuration)
+    conf_dict = collections.OrderedDict(configuration)
+
+    name = 'split'
+    for key in conf_dict.keys():
+        if key != 'weights':
+            name += '_'
+            name += key
+
+
+
+    return name, conf_dict
+
+
+
+
 # TODO: for now is not posible to maybe balance just labels or just steering. Is either all or nothing
 def select_balancing_strategy(dataset, iteration):
 
@@ -67,61 +94,33 @@ def select_balancing_strategy(dataset, iteration):
     keys = range(0, len(dataset.measurements) - g_conf.NUMBER_IMAGES_SEQUENCE)
 
 
-    keys = select_data(dataset, keys)
+    #keys = select_data(dataset, keys)
     # In the case we are using the balancing
-    if len(g_conf.STEERING_DIVISION) > 0:
+    if g_conf.SPLIT is not None:
+        name, params = parse_split_configuration(g_conf.SPLIT)
+        splitter_function = getattr(splitter, name)
 
-        sampler = BatchSequenceSampler(
-            splitter.control_steer_split(dataset.measurements, dataset.meta_data, keys),
-            iteration * g_conf.BATCH_SIZE,
-            g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE
-        )
+        print (" Function to split", name)
+        print (" params ", params)
+        print (" Weights ", params['weights'])
+        keys = splitter_function(dataset.measurements, params)
 
-        # The data loader is the multi threaded module from pytorch that release a number of
-        # workers to get all the data.
-        data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
-                                                  shuffle=False,
-                                                  num_workers=2,
-                                                  pin_memory=True)
-
-    elif g_conf.PEDESTRIAN_PERCENTAGE > 0:
-
-
-        sampler = BatchSequenceSampler(
-            splitter.pedestrian_speed_split(dataset.measurements, dataset.meta_data, keys),
-            iteration * g_conf.BATCH_SIZE,
-            g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE
-        )
-
-        # The data loader is the multi threaded module from pytorch that release a number of
-        # workers to get all the data.
-        data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
-                                                  shuffle=False,
-                                                  num_workers=2,
-                                                  pin_memory=True)
-
-    elif len(g_conf.SPEED_DIVISION) > 0:
-        sampler = BatchSequenceSampler(
-            splitter.control_speed_split(dataset.measurements, dataset.meta_data, keys),
-            iteration * g_conf.BATCH_SIZE,
-            g_conf.BATCH_SIZE, g_conf.NUMBER_IMAGES_SEQUENCE, g_conf.SEQUENCE_STRIDE
-        )
-
-        # The data loader is the multi threaded module from pytorch that release a number of
-        # workers to get all the data.
-        data_loader = torch.utils.data.DataLoader(dataset, batch_sampler=sampler,
-                                                  shuffle=False,
-                                                  num_workers=2,
-                                                  pin_memory=True)
-
-
+        sampler = PreSplittedSampler(keys, iteration * g_conf.BATCH_SIZE, params['weights'])
     else:
-        # NO BALANCING
+
+        print (" Random Splitter ")
         sampler = RandomSampler(keys, iteration * g_conf.BATCH_SIZE)
-        data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
-                                                  sampler=sampler,
-                                                  num_workers=2,
-                                                  pin_memory=True)
+
+
+
+
+    # The data loader is the multi threaded module from pytorch that release a number of
+    # workers to get all the data.
+    data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
+                                              sampler=sampler,
+                                              num_workers=2,
+                                              pin_memory=True)
+
 
 
     return data_loader
@@ -183,6 +182,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         augmenter = Augmenter(g_conf.AUGMENTATION)
 
         dataset = CoILDataset(full_dataset, transform=augmenter)
+
 
         data_loader = select_balancing_strategy(dataset, iteration)
 

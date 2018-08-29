@@ -276,6 +276,12 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
 
     ]
 
+    metrics_to_sum = [
+        'end_pedestrian_collision',
+        'end_vehicle_collision',
+        'end_other_collision'
+    ]
+
     infraction_metrics = [
         'collision_pedestrians',
         'collision_vehicles',
@@ -293,7 +299,8 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
     # The average results between the dictionaries.
     average_results_matrix = {}
 
-    for metric_name in (metrics_to_average+infraction_metrics):
+
+    for metric_name in (metrics_to_average+infraction_metrics+metrics_to_sum):
         average_results_matrix.update({metric_name: np.zeros((number_of_tasks, len(dic_list)))})
 
     count_dic_pos = 0
@@ -359,18 +366,47 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
                 if metric_sum_values[i] == 0:
                     average_results_matrix[metric][i][count_dic_pos] = 1
                 else:
-                    average_results_matrix[metric][i][count_dic_pos] = metric_sum_values
+                    average_results_matrix[metric][i][count_dic_pos] = metric_sum_values[i]
+
+
+        for metric in metrics_to_sum:
+            values = metrics_summary[metric]
+            metric_sum_values = np.zeros(number_of_episodes)
+
+
+            # print (zip(values.items(), values_driven.items()))
+            for items_metric  in values.items():
+                weather = items_metric[0]
+                tasks = items_metric[1]
+
+                if float(weather) in set(weathers):
+
+                    count = 0
+                    for t in tasks:
+                        # if isinstance(t, np.ndarray) or isinstance(t, list):
+                        if t == []:
+                            print('Metric Not Computed')
+                        else:
+
+                            metric_sum_values[count] += float(sum(t))
+
+                        count += 1
+
+
+            # On this part average results matrix basically assume the number of infractions.
+            for i in range(len(metric_sum_values)):
+                    average_results_matrix[metric][i][count_dic_pos] = metric_sum_values[i]
         count_dic_pos += 1
 
 
 
-
-    print(metrics_summary)
     print(metrics_summary['average_speed'])
     average_speed_task = sum(metrics_summary['average_speed'][str(float(list(weathers)[0]))])
 
 
     average_results_matrix.update({'driven_kilometers': np.array(sum(summed_driven_kilometers))})
+
+
     average_results_matrix.update({'average_speed': np.array([average_speed_task])})
     print(average_results_matrix)
 
@@ -384,6 +420,8 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
         if metric in infraction_metrics:
             average_results_matrix[metric] = average_results_matrix['driven_kilometers']/np.sum(average_results_matrix[metric])
 
+        if metric in metrics_to_sum:
+            average_results_matrix[metric] = np.sum(average_results_matrix[metric])
 
         """
         for i in range(len(vectors)):
@@ -396,6 +434,198 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
 
 
 
+
+
+    return average_results_matrix
+def write_header_control_summary(path, task):
+
+    filename = os.path.join(path + '_' + task + '.csv')
+
+    print (filename)
+
+    csv_outfile = open(filename, 'w')
+
+    csv_outfile.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
+                      % ('step', 'episodes_completion', 'intersection_offroad',
+                          'collision_pedestrians', 'collision_vehicles', 'episodes_fully_completed',
+                         'driven_kilometers', 'end_pedestrian_collision',
+                         'end_vehicle_collision',  'end_other_collision', 'intersection_otherlane' ))
+    csv_outfile.close()
+
+
+
+def write_data_point_control_summary(path, task, averaged_dict, step, pos):
+
+    filename = os.path.join(path + '_' + task + '.csv')
+
+    print (filename)
+
+    if not os.path.exists(filename):
+        raise ValueError("The filename does not yet exists")
+
+    csv_outfile = open(filename, 'a')
+
+    csv_outfile.write("%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n"
+                      % (step,
+                         averaged_dict['episodes_completion'][pos][0],
+                         averaged_dict['intersection_offroad'][pos][0],
+                         averaged_dict['collision_pedestrians'][pos][0],
+                         averaged_dict['collision_vehicles'][pos][0],
+                         averaged_dict['episodes_fully_completed'][pos][0],
+                         averaged_dict['driven_kilometers'][pos],
+                         averaged_dict['end_pedestrian_collision'][pos][0],
+                         averaged_dict['end_vehicle_collision'][pos][0],
+                         averaged_dict['end_other_collision'][pos][0],
+                         averaged_dict['intersection_otherlane'][pos][0]))
+
+    csv_outfile.close()
+
+
+
+#TODO REFACTOR THIS TWO EPISODES INTO MANY FUNCTIONS
+
+def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1):
+    """
+    There are two types of outputs, these come packed in a dictionary
+
+    Success metrics, these are averaged between weathers, is basically the percentage of completion for a
+    single task.
+
+    Infractions, these are summed and divided by the total number of driven kilometers
+
+
+    For this you have the concept of averaging all the weathers from the experiment suite.
+
+    """
+
+    metrics_to_average = [
+        'episodes_fully_completed',
+        'episodes_completion'
+
+    ]
+
+    metrics_to_sum = [
+        'end_pedestrian_collision',
+        'end_vehicle_collision',
+        'end_other_collision'
+    ]
+
+    infraction_metrics = [
+        'collision_pedestrians',
+        'collision_vehicles',
+        'collision_other',
+        'intersection_offroad',
+        'intersection_otherlane'
+
+    ]
+    weather_name_dict = {1: 'Clear Noon', 3: 'After Rain Noon',
+                         6: 'Heavy Rain Noon', 8: 'Clear Sunset',
+                         4: 'Cloudy After Rain', 14: 'Soft Rain Sunset'}
+
+    number_of_episodes = len(list(dic_list[0]['episodes_fully_completed'].items())[0][1])
+
+    # The average results between the dictionaries.
+    average_results_matrix = {}
+
+    for metric_name in (metrics_to_average + infraction_metrics + metrics_to_sum):
+        average_results_matrix.update({metric_name: np.zeros((number_of_tasks, len(dic_list)))})
+
+    count_dic_pos = 0
+    for metrics_summary in dic_list:
+
+        for metric in metrics_to_average:
+
+            values = metrics_summary[metric]
+            # print values
+
+            metric_sum_values = np.zeros(number_of_episodes)
+            for weather, tasks in values.items():
+                if float(weather) in set(weathers):
+                    count = 0
+                    for t in tasks:
+                        # if isinstance(t, np.ndarray) or isinstance(t, list):
+
+                        if t == []:
+                            print('    Metric Not Computed')
+                        else:
+                            metric_sum_values[count] += (float(sum(t)))
+
+                        count += 1
+
+            for i in range(len(metric_sum_values)):
+                average_results_matrix[metric][i][count_dic_pos] = metric_sum_values[i]/(25*len(weathers))
+
+        # For the metrics we sum over all the weathers here, this is to better subdivide the driving envs
+        for metric in infraction_metrics:
+            values_driven = metrics_summary['driven_kilometers']
+            values = metrics_summary[metric]
+            metric_sum_values = np.zeros(number_of_episodes)
+            summed_driven_kilometers = np.zeros(number_of_episodes)
+
+            # print (zip(values.items(), values_driven.items()))
+            for items_metric, items_driven in zip(values.items(), values_driven.items()):
+                weather = items_metric[0]
+                tasks = items_metric[1]
+                tasks_driven = items_driven[1]
+
+                if float(weather) in set(weathers):
+
+                    count = 0
+                    for t, t_driven in zip(tasks, tasks_driven):
+                        # if isinstance(t, np.ndarray) or isinstance(t, list):
+                        if t == []:
+                            print('Metric Not Computed')
+                        else:
+
+                            metric_sum_values[count] += float(sum(t))
+                            summed_driven_kilometers[count] += t_driven
+
+                        count += 1
+
+            # On this part average results matrix basically assume the number of infractions.
+            for i in range(len(metric_sum_values)):
+                if metric_sum_values[i] == 0:
+                    average_results_matrix[metric][i][count_dic_pos] = 1
+                else:
+                    average_results_matrix[metric][i][count_dic_pos] = metric_sum_values[i]
+
+        for metric in metrics_to_sum:
+            values = metrics_summary[metric]
+            metric_sum_values = np.zeros(number_of_episodes)
+
+            # print (zip(values.items(), values_driven.items()))
+            for items_metric in values.items():
+                weather = items_metric[0]
+                tasks = items_metric[1]
+
+                if float(weather) in set(weathers):
+
+                    count = 0
+                    for t in tasks:
+                        # if isinstance(t, np.ndarray) or isinstance(t, list):
+                        if t == []:
+                            print('Metric Not Computed')
+                        else:
+
+                            metric_sum_values[count] += float(sum(t))
+
+                        count += 1
+
+            # On this part average results matrix basically assume the number of infractions.
+            print (" metric sum ", metric_sum_values)
+            for i in range(len(metric_sum_values)):
+                average_results_matrix[metric][i][count_dic_pos] = metric_sum_values[i]/(25*len(weathers))
+
+        count_dic_pos += 1
+
+
+
+    average_speed_task = sum(metrics_summary['average_speed'][str(float(list(weathers)[0]))])
+
+    average_results_matrix.update({'driven_kilometers': np.array(summed_driven_kilometers)})
+
+    average_results_matrix.update({'average_speed': np.array([average_speed_task])})
+    print(average_results_matrix)
 
 
     return average_results_matrix

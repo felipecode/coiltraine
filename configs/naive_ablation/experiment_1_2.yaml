@@ -18,7 +18,7 @@ NUMBER_FRAMES_FUSION: 1
 NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
-SPEED_FACTOR: 10.0
+SPEED_FACTOR: 12.0
 TRAIN_DATASET_NAME: 'CARLA100_2'
 AUGMENTATION: None
 DATA_USED: 'all'
@@ -74,9 +74,9 @@ BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05]
 LOSS_FUNCTION: 'L1'
 
 VARIABLE_WEIGHT:
-  Steer: 0.3
-  Gas: 0.3
-  Brake: 0.3
+  Steer: 0.2
+  Gas: 0.35
+  Brake: 0.45
 
 
 #### Simulation Related Parameters ####
