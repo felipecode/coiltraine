@@ -21,7 +21,7 @@ from visualization import plot_scatter
 
 # You could send the module to be executed and they could have the same interface.
 # GPUS_P100 = "0001111222233334444555566667777"
-GPUS_P100 = "01234567" * 10
+GPUS_P100 = "01234567" * 6
 
 
 def number_alive_process(process_deque):
@@ -170,7 +170,7 @@ if __name__ == '__main__':
     for cc in tqdm(range(1000)):
         weights = es.ask()
         for w, g, c in zip(weights, gpus, checkpoints):
-            while number_alive_process(process_deque) == args.max_process:
+            while number_alive_process(process_deque) >= args.max_process:
                 # wait
                 time.sleep(1)
             print("Launching iteration {} at GPU {}: {}".format(cc, g, c))
@@ -194,7 +194,7 @@ if __name__ == '__main__':
         print()
         os.system("rm _validation_results/*")  # delete old results
         for g, c in zip(gpus, checkpoints):
-            while number_alive_process(process_deque) == args.max_process:
+            while number_alive_process(process_deque) >= args.max_process:
                 # wait
                 time.sleep(1)
             print("Validating checkpoint {} at GPU {}".format(c, g))

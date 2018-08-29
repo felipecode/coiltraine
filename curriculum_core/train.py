@@ -22,7 +22,7 @@ def execute_train(weights, keys, iteration, checkpoint, gpu, n_batches=100):
     return p
 
 
-def execute(weights, keys, iteration, checkpoint, gpu, n_batches=100):
+def execute(weights, keys, iteration, checkpoint, gpu, n_batches=5000):
     try:
         os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
         g_conf.VARIABLE_WEIGHT = {}
