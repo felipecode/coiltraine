@@ -52,7 +52,7 @@ class ClutNewTown(ExperimentSuite):
     def build_experiments(self):
         """
         Creates the whole set of experiment objects,
-        The experiments created depend on the selected Town.
+        The experiments created depend on the selected Town
 
 
         """
@@ -70,6 +70,7 @@ class ClutNewTown(ExperimentSuite):
         poses_tasks = self._poses()
         vehicles_tasks = [70]
         pedestrians_tasks = [150]
+        task_names = ['cluttered']
 
 
 
@@ -101,6 +102,7 @@ class ClutNewTown(ExperimentSuite):
                     Conditions=conditions,
                     Poses=poses,
                     Task=iteration,
+                    TaskName=task_names[iteration],
                     Repetitions=1
                 )
                 experiments_vector.append(experiment)

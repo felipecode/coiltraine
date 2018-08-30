@@ -65,6 +65,8 @@ class LongTraining(ExperimentSuite):
         vehicles_tasks = [0, 20, 100]
         pedestrians_tasks = [0, 50, 250]
 
+        task_names = ['empty', 'normal', 'cluttered']
+
         experiments_vector = []
 
         for weather in self.weathers:
@@ -80,6 +82,7 @@ class LongTraining(ExperimentSuite):
                     NumberOfVehicles=vehicles,
                     NumberOfPedestrians=pedestrians,
                     WeatherId=weather
+
                 )
                 conditions.set(DisableTwoWheeledVehicles=True)
                 # Add all the cameras that were set for this experiments
@@ -91,9 +94,10 @@ class LongTraining(ExperimentSuite):
                     Conditions=conditions,
                     Poses=poses,
                     Task=iteration,
+                    TaskName=task_names[iteration],
                     Repetitions=1
                 )
                 experiments_vector.append(experiment)
 
-
         return experiments_vector
+

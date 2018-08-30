@@ -73,7 +73,7 @@ class LongNewTown(ExperimentSuite):
         vehicles_tasks = [0, 15, 70]
         pedestrians_tasks = [0, 50, 150]
 
-
+        task_names = ['empty', 'normal', 'cluttered']
 
         experiments_vector = []
 
@@ -83,7 +83,6 @@ class LongNewTown(ExperimentSuite):
                 poses = poses_tasks[iteration]
                 vehicles = vehicles_tasks[iteration]
                 pedestrians = pedestrians_tasks[iteration]
-
 
                 conditions = CarlaSettings()
                 conditions.set(
@@ -103,6 +102,7 @@ class LongNewTown(ExperimentSuite):
                     Conditions=conditions,
                     Poses=poses,
                     Task=iteration,
+                    TaskName=task_names[iteration],
                     Repetitions=1
                 )
                 experiments_vector.append(experiment)

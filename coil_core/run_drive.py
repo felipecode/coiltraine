@@ -29,7 +29,7 @@ from configs import g_conf, merge_with_yaml, set_type_of_process
 
 from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkpoint,\
     is_next_checkpoint_ready, get_latest_evaluated_checkpoint
-from utils.general import compute_average_std, get_latest_path, write_header_control_summary,\
+from utils.general import compute_average_std_separatetasks, get_latest_path, write_header_control_summary,\
     snakecase_to_camelcase, write_data_point_control_summary, camelcase_to_snakecase
 
 
@@ -139,9 +139,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
         exp_set_name, town_name = drive_conditions.split('_')
 
         if g_conf.USE_ORACLE:
-            control_filename = 'control_output_auto.csv'
+            control_filename = 'control_output_auto'
         else:
-            control_filename = 'control_output.csv'
+            control_filename = 'control_output'
 
 
         experiment_suite_module = __import__('drive.suites.' + camelcase_to_snakecase(exp_set_name) + '_suite',
@@ -171,37 +171,39 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 
 
+        experiment_list = experiment_set.build_experiments()
         # Now actually run the driving_benchmark
 
         print (" CARLA IS OPEN")
-        latest = get_latest_evaluated_checkpoint()
+        latest = get_latest_evaluated_checkpoint(control_filename + '_' + experiment_list[0].task_name)
         if latest is None:  # When nothing was tested, get latest returns none, we fix that.
             latest = 0
             # The used tasks are hardcoded, this need to be improved
             file_base = os.path.join('_logs', exp_batch, exp_alias,
                          g_conf.PROCESS_NAME + '_csv', control_filename)
-            write_header_control_summary(file_base, 'empty')
+            #write_header_control_summary(file_base, 'empty')
 
-            write_header_control_summary(file_base, 'normal')
-
-            write_header_control_summary(file_base, 'cluttered')
+            #write_header_control_summary(file_base, 'normal')
+            print (g_conf.PROCESS_NAME)
+            print (file_base)
+            write_header_control_summary(file_base, experiment_list[0].task_name)
 
 
 
         # Write the header of the summary file used conclusion
         # While the checkpoint is not there
-
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
             try:
                 # Get the correct checkpoint
-                if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
+                # We check it for some task name, all of then are ready at the same time
+                if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE, control_filename + '_' + experiment_list[0].task_name):
 
 
                     carla_process, port, out = start_carla_simulator(gpu, town_name,
                                                                      params['no_screen'], params['docker'])
 
-                    latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
+                    latest = get_next_checkpoint(g_conf.TEST_SCHEDULE, control_filename + '_' + experiment_list[0].task_name)
                     checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                                          , 'checkpoints', str(latest) + '.pth'))
 
@@ -213,11 +215,11 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
                     run_driving_benchmark(coil_agent, experiment_set, town_name,
                                           exp_batch + '_' + exp_alias + '_' + str(latest)
-                                          + '_drive_' + control_filename[:-4]
+                                          + '_drive_' + control_filename
                                           , True, params['host'], port)
 
                     path = exp_batch + '_' + exp_alias + '_' + str(latest) \
-                           + '_' + g_conf.PROCESS_NAME.split('_')[0] + '_' + control_filename[:-4] \
+                           + '_' + g_conf.PROCESS_NAME.split('_')[0] + '_' + control_filename \
                            + '_' + g_conf.PROCESS_NAME.split('_')[1] + '_' + g_conf.PROCESS_NAME.split('_')[2]
 
 
@@ -228,27 +230,25 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                         benchmark_dict = json.loads(f.read())
 
 
-                    averaged_dict = compute_average_std([benchmark_dict],
+                    averaged_dict = compute_average_std_separatetasks([benchmark_dict],
                                                         experiment_set.weathers,
                                                         len(experiment_set.build_experiments()))
 
                     file_base = os.path.join('_logs', exp_batch, exp_alias,
                                              g_conf.PROCESS_NAME + '_csv', control_filename)
+                    # TODO: Number of tasks is hardcoded
+                    # TODO: Number of tasks is hardcoded
 
-                    write_data_point_control_summary(file_base, 'empty', averaged_dict, latest, 0)
-                    write_data_point_control_summary(file_base, 'normal', averaged_dict, latest, 1)
-                    write_data_point_control_summary(file_base, 'cluttered', averaged_dict, latest, 2)
+                    for i in range(len(experiment_list)):
+                        #write_data_point_control_summary(file_base, 'empty', averaged_dict, latest, 0)
+                        #write_data_point_control_summary(file_base, 'normal', averaged_dict, latest, 1)
+                        write_data_point_control_summary(file_base, experiment_list[i].task_name, averaged_dict, latest, i)
 
                     #plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
                     #                     )
                     print (averaged_dict)
 
 
-                    # TODO: When you add the message you need to check if the experiment continues properly
-
-
-
-                    # TODO: WRITE AN EFICIENT PARAMETRIZED OUTPUT SUMMARY FOR TEST.
                     carla_process.kill()
                     subprocess.call(['docker', 'stop', out[:-1]])
 

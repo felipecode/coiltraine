@@ -113,15 +113,16 @@ def get_latest_checkpoint_validation():
 
     return g_conf.TEST_SCHEDULE[g_conf.TEST_SCHEDULE.index(not_evaluated_logs[0])-1]
 
-def get_latest_checkpoint_drive():
+def get_latest_checkpoint_drive(control_filename):
 
-    if g_conf.USE_ORACLE:
-        control_filename = 'control_output_auto.csv'
-    else:
-        control_filename = 'control_output.csv'
+    # add csv to the file name
+
+    control_filename = control_filename + '.csv'
 
     csv_file_path = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
                                  g_conf.EXPERIMENT_NAME, g_conf.PROCESS_NAME + '_csv')
+
+    print (" TESTED PATHJ ", csv_file_path)
     if not os.path.exists(os.path.join(csv_file_path, control_filename)):
         return None
 
@@ -146,13 +147,13 @@ def get_latest_checkpoint_drive():
 
 
 
-def get_latest_checkpoint():
+def get_latest_checkpoint(filename):
 
     print (" PROCCESS NAME    ", g_conf.PROCESS_NAME)
     if 'validation' in g_conf.PROCESS_NAME:
         return get_latest_checkpoint_validation()
     elif 'drive' in g_conf.PROCESS_NAME:
-        return get_latest_checkpoint_drive()
+        return get_latest_checkpoint_drive(filename)
     else:
         raise ValueError("The process name is not producing checkpoints")
 

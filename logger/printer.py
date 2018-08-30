@@ -120,6 +120,7 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
     if checkpoint == g_conf.TEST_SCHEDULE[0]:
         return
 
+    """
     print_drive_summary.previous_checkpoint = g_conf.TEST_SCHEDULE[g_conf.TEST_SCHEDULE.index(checkpoint)-1]
     # TODO: we need to get the previous checkpoint
 
@@ -133,6 +134,8 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
     #print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE +
     #       str(averaged_metrics[float(print_drive_summary.previous_checkpoint)]
     #           [header.index('collision_pedestrians')-1]) + END)
+    
+    """
 
 
 
@@ -223,16 +226,24 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                     checkpoint = summary[status]['Checkpoint']  # Get the sta
                     # This contain the results from completed iterations
                     if g_conf.USE_ORACLE:
-                        control_filename = 'control_output_auto.csv'
+                        control_filename = 'control_output_auto'
                     else:
-                        control_filename = 'control_output.csv'
+                        control_filename = 'control_output'
 
+                    # TODO: Check -- Not using this for now
+                    """
+                                        
                     csv_file_path = os.path.join('_logs', exp_batch, experiment,
                                                  process + '_csv', control_filename)
+                    """
+
                     path = exp_batch + '_' + experiment + '_' + str(checkpoint) \
-                           + '_' + process.split('_')[0] + '_' + control_filename[:-4] \
+                           + '_' + process.split('_')[0] + '_' + control_filename \
                            + '_' + process.split('_')[1] + '_' + process.split('_')[2]
-                    print_drive_summary(get_latest_path(path), csv_file_path, checkpoint, verbose)
+
+
+
+                    print_drive_summary(get_latest_path(path), None, checkpoint, verbose)
 
 
 

@@ -62,6 +62,7 @@ class ClutNewWeather(ExperimentSuite):
         poses_tasks = self._poses()
         vehicles_tasks = [100]
         pedestrians_tasks = [250]
+        task_names = ['cluttered']
 
         experiments_vector = []
 
@@ -78,6 +79,7 @@ class ClutNewWeather(ExperimentSuite):
                     NumberOfVehicles=vehicles,
                     NumberOfPedestrians=pedestrians,
                     WeatherId=weather
+
                 )
                 conditions.set(DisableTwoWheeledVehicles=True)
                 # Add all the cameras that were set for this experiments
@@ -89,9 +91,9 @@ class ClutNewWeather(ExperimentSuite):
                     Conditions=conditions,
                     Poses=poses,
                     Task=iteration,
+                    TaskName=task_names[iteration],
                     Repetitions=1
                 )
                 experiments_vector.append(experiment)
-
 
         return experiments_vector
