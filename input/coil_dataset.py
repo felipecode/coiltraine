@@ -148,7 +148,7 @@ class CoILDataset(Dataset):
                 # We do measurements for the left side camera
                 # #TOdo the angle does not need to be hardcoded
                 # We convert the speed to KM/h for the augmentaiton
-                measurement_left = self.augment_measurement(measurement_data, -30.0, 3.6*speed)
+                measurement_left = self.augment_measurement(copy.copy(measurement_data), -30.0, 3.6*speed)
 
                 # We extract the interesting subset from the measurement dict
                 float_dicts.append(
@@ -167,7 +167,7 @@ class CoILDataset(Dataset):
 
                 # We do measurements augmentation for the right side cameras
 
-                measurement_right = self.augment_measurement(measurement_data, 30.0, 3.6*speed)
+                measurement_right = self.augment_measurement(copy.copy(measurement_data), 30.0, 3.6*speed)
 
 
                 float_dicts.append(
@@ -214,7 +214,7 @@ class CoILDataset(Dataset):
 
         time_use = 1.0
         car_length = 6.0
-        old_steer = steer
+
         pos = camera_angle > 0.0
         neg = camera_angle <= 0.0
         # You should use the absolute value of speed
