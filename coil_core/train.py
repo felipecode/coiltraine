@@ -158,6 +158,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
 
         checkpoint_file = get_latest_saved_checkpoint()
+        print ( " LOADING  ", checkpoint_file)
         if checkpoint_file is not None:
             checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias,
                                      'checkpoints', str(get_latest_saved_checkpoint())))
