@@ -172,10 +172,12 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
 
         experiment_list = experiment_set.build_experiments()
+        # Get all the uniquely named tasks
+        task_list = list(set([experiment.task_name for experiment in experiment_list ]))
         # Now actually run the driving_benchmark
 
         print (" CARLA IS OPEN")
-        latest = get_latest_evaluated_checkpoint(control_filename + '_' + experiment_list[0].task_name)
+        latest = get_latest_evaluated_checkpoint(control_filename + '_' + task_list[0])
         if latest is None:  # When nothing was tested, get latest returns none, we fix that.
             latest = 0
             # The used tasks are hardcoded, this need to be improved
@@ -186,7 +188,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             #write_header_control_summary(file_base, 'normal')
             print (g_conf.PROCESS_NAME)
             print (file_base)
-            write_header_control_summary(file_base, experiment_list[0].task_name)
+            write_header_control_summary(file_base, task_list[0])
 
 
 
@@ -197,13 +199,13 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             try:
                 # Get the correct checkpoint
                 # We check it for some task name, all of then are ready at the same time
-                if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE, control_filename + '_' + experiment_list[0].task_name):
+                if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE, control_filename + '_' + task_list[0]):
 
 
                     carla_process, port, out = start_carla_simulator(gpu, town_name,
                                                                      params['no_screen'], params['docker'])
 
-                    latest = get_next_checkpoint(g_conf.TEST_SCHEDULE, control_filename + '_' + experiment_list[0].task_name)
+                    latest = get_next_checkpoint(g_conf.TEST_SCHEDULE, control_filename + '_' + task_list[0])
                     checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                                          , 'checkpoints', str(latest) + '.pth'))
 
@@ -229,7 +231,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                     with open(benchmark_json_path, 'r') as f:
                         benchmark_dict = json.loads(f.read())
 
-
+                    print (" number of episodes ", len(experiment_set.build_experiments()))
                     averaged_dict = compute_average_std_separatetasks([benchmark_dict],
                                                         experiment_set.weathers,
                                                         len(experiment_set.build_experiments()))
@@ -239,10 +241,10 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                     # TODO: Number of tasks is hardcoded
                     # TODO: Number of tasks is hardcoded
 
-                    for i in range(len(experiment_list)):
+                    for i in range(len(task_list)):
                         #write_data_point_control_summary(file_base, 'empty', averaged_dict, latest, 0)
                         #write_data_point_control_summary(file_base, 'normal', averaged_dict, latest, 1)
-                        write_data_point_control_summary(file_base, experiment_list[i].task_name, averaged_dict, latest, i)
+                        write_data_point_control_summary(file_base, task_list[i], averaged_dict, latest, i)
 
                     #plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
                     #                     )
