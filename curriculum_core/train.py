@@ -14,7 +14,7 @@ from utils.checkpoint_schedule import is_ready_to_save
 from .configs import MODEL_TYPE, MODEL_CONFIGURATION
 
 
-def execute_train(weights, keys, iteration, checkpoint, gpu, n_batches=100):
+def execute_train(weights, keys, iteration, checkpoint, gpu, n_batches=5000):
     p = multiprocessing.Process(target=execute,
                                 args=(weights, keys, iteration, checkpoint, gpu))
     p.start()
@@ -32,10 +32,10 @@ def execute(weights, keys, iteration, checkpoint, gpu, n_batches=5000):
 
         # Setup sampler and data loader
         # full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], '5HoursW1-3-6-8')
-        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100_2/CARLA100_2')
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100_2')
         augmenter = Augmenter(g_conf.AUGMENTATION)
         sampler = PreSplittedSampler(keys, iteration*g_conf.BATCH_SIZE, weights)
-        dataset = CoILDataset(full_dataset, transform=augmenter, use_preload=True)
+        dataset = CoILDataset(full_dataset, transform=augmenter, use_preload='train_preload.npy')
         data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
                                                   shuffle=False,
                                                   sampler=sampler,
