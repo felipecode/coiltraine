@@ -30,7 +30,7 @@ from configs import g_conf, merge_with_yaml, set_type_of_process
 from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkpoint,\
     is_next_checkpoint_ready, get_latest_evaluated_checkpoint
 from utils.general import compute_average_std_separatetasks, get_latest_path, write_header_control_summary,\
-    snakecase_to_camelcase, write_data_point_control_summary, camelcase_to_snakecase
+    snakecase_to_camelcase, write_data_point_control_summary, camelcase_to_snakecase, unique
 
 
 def frame2numpy(frame, frameSize):
@@ -173,11 +173,13 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
         experiment_list = experiment_set.build_experiments()
         # Get all the uniquely named tasks
-        task_list = list(set([experiment.task_name for experiment in experiment_list ]))
+        task_list = unique([experiment.task_name for experiment in experiment_list ])
         # Now actually run the driving_benchmark
 
         print (" CARLA IS OPEN")
         latest = get_latest_evaluated_checkpoint(control_filename + '_' + task_list[0])
+
+
         if latest is None:  # When nothing was tested, get latest returns none, we fix that.
             latest = 0
             # The used tasks are hardcoded, this need to be improved
@@ -188,7 +190,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             #write_header_control_summary(file_base, 'normal')
             print (g_conf.PROCESS_NAME)
             print (file_base)
-            write_header_control_summary(file_base, task_list[0])
+
+            for i in range(len(task_list)):
+                write_header_control_summary(file_base, task_list[i])
 
 
 
@@ -240,6 +244,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                                              g_conf.PROCESS_NAME + '_csv', control_filename)
                     # TODO: Number of tasks is hardcoded
                     # TODO: Number of tasks is hardcoded
+
+                    print ("TASK LIST ")
+                    print (task_list)
 
                     for i in range(len(task_list)):
                         #write_data_point_control_summary(file_base, 'empty', averaged_dict, latest, 0)
