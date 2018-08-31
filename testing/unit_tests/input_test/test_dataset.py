@@ -6,7 +6,6 @@ import random
 import math
 
 
-from PIL import Image
 from input import CoILDataset, Augmenter, BatchSequenceSampler, splitter
 
 from configs import g_conf
