@@ -5,7 +5,7 @@ import unittest
 import random
 import math
 
-
+import torch
 from input import CoILDataset, Augmenter, BatchSequenceSampler, splitter
 
 from configs import g_conf
