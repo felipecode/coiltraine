@@ -113,7 +113,7 @@ def generate_name(g_conf):
 
     # The type of loss function
 
-    final_name_string += '_'+ g_conf.LOSS_FUNCTION
+    final_name_string += '_' + g_conf.LOSS_FUNCTION
 
     # the parts of the data that were used.
 
