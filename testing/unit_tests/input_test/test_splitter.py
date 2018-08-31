@@ -187,119 +187,76 @@ class testSpliter(unittest.TestCase):
             splitted_steer_labels.append(splitter_steer)
 
 
-            # We assert if the new key is always bigger than the previous one
+
+    def test_splitter_brake(self):
 
 
-    def test_split_label_percentage(self):
+        root_path = '/home/felipecodevilla/Datasets/Carla100Test'
 
-        root_test_dir = '/home/felipecodevilla/Datasets/02HoursW1-3-6-8'
+        dataset = CoILDataset(root_path, transform=None)
 
-        print ('SPLITING REAL DATA !')
-        augmenter = Augmenter(g_conf.AUGMENTATION)
-        dataset = CoILDataset(root_test_dir, augmenter)
-        speed = dataset.measurements[10, :]
+        keys = splitter.split_brake(dataset.measurements, {'brake': [0]})
+        print (" number of keys ", len(dataset.measurements))
 
-        print (dataset.meta_data)
-        print (dataset.meta_data[:, 0])
-        print ( " Where is control ",np.where(dataset.meta_data[:, 0] == b'control'))
-        print (dataset.measurements[np.where(dataset.meta_data[:, 0] == b'pedestrian'), :][0][0].astype(np.bool))
-        print (dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0] == 1)
-        labels = dataset.measurements[np.where(dataset.meta_data[:, 0] == b'pedestrian'), :][0][0].astype(np.bool) & \
-                 (dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0] == 1)
+        print ( " Lenghts of bins brake")
+        sum_of_keys = 0
+        for key in keys:
+            print (len(key))
+            sum_of_keys += len(key)
 
-
-
-        keys = range(0, len(speed))
-
-        print (sum(labels))
-        print (sum(dataset.measurements[np.where(dataset.meta_data[:, 0] == b'pedestrian'), :][0][0].astype(np.bool)))
-
-        splitted_labels = splitter.label_split(labels, keys, 10)
-
-
-        #print (splitted_labels)
-
-        # Another level of splitting
-        splitted_steer_labels = []
-
-
-        for key in splitted_labels[0]:
-
-            self.assertEqual(labels[key], 1.0)
-
-        for key in splitted_labels[1]:
-
-            self.assertEqual(labels[key], 0.0)
-
-
-        # The first part should have all the label
+        print ("sum ", sum_of_keys)
 
 
 
-    def test_split_real_data_sequence(self):
+    def test_splitter_speed(self):
 
-        return
-        root_test_dir = 'testing/unit_tests/data'
+        root_path = '/home/felipecodevilla/Datasets/Carla100Test'
 
+        dataset = CoILDataset(root_path, transform=None)
 
-        g_conf.NUMBER_IMAGES_SEQUENCE = 20
-        g_conf.LABELS_DIVISION = [[0, 2, 5], [0, 2, 5], [0, 2, 5]]
-        dataset = CoILDataset(root_test_dir)
-        steerings = dataset.measurements[0, :]
-        print (dataset.meta_data)
-        # TODO: read meta data and turn into a coool dictionary ?
-        print (np.where(dataset.meta_data[:, 0] == 'control'))
-        labels = dataset.measurements[np.where(dataset.meta_data[:, 0] == 'control'), :]
+        keys = splitter.split_speed_module(dataset.measurements, {'speed_module': [0.8, 2.5, 4.7]})
 
-        print ("SEQUENCE LABELS ")
-        print (labels)
-        keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
+        print ( " Lenghts of bins speed")
+        sum_of_keys = 0
+        for key in keys:
+            print (len(key))
+            sum_of_keys += len(key)
+            print ("sum ", sum_of_keys)
 
-        splitted_labels = splitter.label_split(labels[0][0], keys, g_conf.LABELS_DIVISION)
-
-        # Another level of splitting
-        splitted_steer_labels = []
-        for keys in splitted_labels:
-            splitter_steer = splitter.float_split(steerings, keys,
-                                                 g_conf.STEERING_DIVISION)
-
-            print (splitter_steer)
+        print ("sum ", sum_of_keys)
 
 
-            for i in range(0, len(splitter_steer)):
-                sum_now = 0
-                for key in splitter_steer[i]:
-                    sum_now += steerings[key]
+
+    def test_splitter_speed_throttle(self):
+
+        root_path = '/home/felipecodevilla/Datasets/Carla100Test'
+
+        dataset = CoILDataset(root_path, transform=None)
+
+        keys = splitter.split_speed_module_throttle(dataset.measurements, {'speed_module': [0.8], 'throttle': [0.1]})
+
+        print ( " Lenghts of bins speed throtle")
+        sum_of_keys = 0
+        for key in keys:
+            print (len(key))
+            sum_of_keys += len(key)
+
+        print ("sum ", sum_of_keys)
 
 
-                avg_now = sum_now/len(splitter_steer[i])
-                #print (avg_now)
-                if i > 0:
-                    self.assertLess(avg_previous, avg_now)
+    def test_splitter_pedestrian_vehicle_tl(self):
+        root_path = '/home/felipecodevilla/Datasets/Carla100Test'
 
-                avg_previous = avg_now
+        dataset = CoILDataset(root_path, transform=None)
 
+        keys = splitter.split_pedestrian_vehicle_tl(dataset.measurements, {})
+        print ( " Lenghts of bins vehicle tl")
+        sum_of_keys = 0
+        for key in keys:
+            print (len(key))
+            sum_of_keys += len(key)
+            print ("sum ", sum_of_keys)
 
-            splitted_steer_labels.append(splitter_steer)
+        print ("sum ", sum_of_keys)
 
-
-            # We assert if the new key is always bigger than the previous one
-
-
-    def test_lambda_splitter(self):
-        float_data = np.random.randn(10, 3)
-        meta_data = {'speed': 0, 'brake': 1, 'throttle': 2}
-
-        keys = splitter.lambda_splitter(float_data, meta_data, [
-            lambda x,y: np.where(
-                np.logical_and(x[:, y['speed']]>0., x[:, y['brake']>0.]))[0],
-            lambda x,y: np.where(
-                x[:, y['throttle']] > 0)[0]
-            ])
-        if len(keys[0]) > 0:
-            for k in keys[0]:
-                assert float_data[k, 0] > 0 and float_data[k, 1] > 0.
-        if len(keys[1]) > 0:
-            for k in keys[1]:
-                assert float_data[k, 2] > 0
 
