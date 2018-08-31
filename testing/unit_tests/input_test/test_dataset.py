@@ -2,7 +2,6 @@ import os
 import numpy as np
 import time
 import unittest
-import torch
 import random
 import math
 
@@ -11,8 +10,6 @@ from PIL import Image
 from input import CoILDataset, Augmenter, BatchSequenceSampler, splitter
 
 from configs import g_conf
-
-from torchvision import transforms
 
 
 
@@ -144,5 +141,5 @@ class testCILDataset(unittest.TestCase):
             count += 1
             if count > g_conf.NUMBER_OF_ITERATIONS:
                 break
-                
+
         print("Imgs /s ", (120*120)/(time.time() - start_time))
