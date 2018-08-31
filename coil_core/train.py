@@ -152,9 +152,11 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
         # Put the output to a separate file
         if suppress_output:
-            sys.stdout = open(os.path.join('_output_logs',
+            sys.stdout = open(os.path.join('_output_logs', exp_alias + '_' +
                               g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
-
+            sys.stderr = open(os.path.join('_output_logs',
+                              exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
 
 
         checkpoint_file = get_latest_saved_checkpoint()
