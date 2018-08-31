@@ -21,6 +21,11 @@ def tryint(s):
     except:
         return s
 
+def unique(sequence):
+    seen = set()
+    return [x for x in sequence if not (x in seen or seen.add(x))]
+
+
 def alphanum_key(s):
     """ Turn a string into a list of string and number chunks.
         "z23a" -> ["z", 23, "a"]
