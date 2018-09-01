@@ -25,9 +25,9 @@ from utils.general import sort_nicely
 class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
-    def __init__(self, root_dir, transform=None, use_preload=False):
-        if use_preload:
-            self.measurements, self.sensor_data_names = np.load('dataset_preload.npy')
+    def __init__(self, root_dir, transform=None, use_preload=None):
+        if use_preload is not None:
+            self.measurements, self.sensor_data_names = np.load(use_preload)
         else:
             self.sensor_data_names, self.measurements = self.pre_load_image_folders(root_dir)
         self.transform = transform
