@@ -18,12 +18,12 @@ NUMBER_FRAMES_FUSION: 1
 NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
-SPEED_FACTOR: 10.0
+SPEED_FACTOR: 12.0
 TRAIN_DATASET_NAME: 'CARLA100_2'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
-NUMBER_OF_HOURS: 10
+NUMBER_OF_HOURS: 0.2
 
 #### Testing Related Parameters ####
 TEST_SCHEDULE: [ 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
