@@ -118,7 +118,7 @@ def select_balancing_strategy(dataset, iteration):
     # workers to get all the data.
     data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
                                               sampler=sampler,
-                                              num_workers=32,
+                                              num_workers=12,
                                               pin_memory=True)
 
 
