@@ -213,7 +213,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
         capture_time = time.time()
         for data in data_loader:
-            print ("READ TIME ", capture_time - time.time())
+            print ("READ TIME ", time.time() - capture_time)
             # get the control commands from float_data, size = [120,1]
 
             controls = data['directions']
