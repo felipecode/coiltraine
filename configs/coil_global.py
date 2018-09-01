@@ -89,7 +89,7 @@ _g_conf.SEQUENCE_STRIDE = 1
 _g_conf.TEST_SCHEDULE = range(0, 2000, 200)
 _g_conf.SPEED_FACTOR = 40.0
 _g_conf.AUGMENT_LATERAL_STEERINGS = 6
-_g_conf.NUMBER_OF_HOURS = 1
+_g_conf.NUMBER_OF_HOURS = 1.0
 
 
 """#### Network Related Parameters ####"""
