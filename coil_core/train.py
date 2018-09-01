@@ -260,7 +260,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             loss.backward()
             optimizer.step()
 
-            print ("Inference + opt + TIME ", capture_time - time.time())
+            print ("Inference + opt + TIME ", time.time() - capture_time)
             accumulated_time += time.time() - capture_time
             capture_time = time.time()
 
