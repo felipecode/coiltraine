@@ -118,7 +118,7 @@ def select_balancing_strategy(dataset, iteration):
     # workers to get all the data.
     data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
                                               sampler=sampler,
-                                              num_workers=2,
+                                              num_workers=32,
                                               pin_memory=True)
 
 
@@ -216,6 +216,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             print ("READ TIME ", time.time() - capture_time)
             # get the control commands from float_data, size = [120,1]
 
+            capture_time = time.time()
             controls = data['directions']
 
 
@@ -223,7 +224,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
             model.zero_grad()
-            capture_time = time.time()
             branches = model(torch.squeeze(data['rgb'].cuda()),
                              dataset.extract_inputs(data).cuda())
 
