@@ -304,6 +304,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
 
             del data
 
+            print ("The REST", time.time() - capture_time)
+            capture_time = time.time()
+
         coil_logger.add_message('Finished', {})
 
 
