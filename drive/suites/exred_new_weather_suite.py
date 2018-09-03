@@ -23,11 +23,11 @@ class ExredNewWeather(ExperimentSuite):
 
     @property
     def train_weathers(self):
-        return [4, 14]
+        return []
 
     @property
     def test_weathers(self):
-        return []
+        return [14]
     @property
     def collision_as_failure(self):
         return True

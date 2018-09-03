@@ -27,7 +27,7 @@ class ExredNewWeatherTown(ExperimentSuite):
 
     @property
     def test_weathers(self):
-        return [4, 14]
+        return [14]
 
     @property
     def collision_as_failure(self):
