@@ -118,7 +118,7 @@ def select_balancing_strategy(dataset, iteration):
     # workers to get all the data.
     data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
                                               sampler=sampler,
-                                              num_workers=2,
+                                              num_workers=12,
                                               pin_memory=True)
 
 
@@ -213,16 +213,17 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
         capture_time = time.time()
         for data in data_loader:
-
+            print ("READ TIME ", time.time() - capture_time)
             # get the control commands from float_data, size = [120,1]
 
+            capture_time = time.time()
             controls = data['directions']
+
 
 
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
             model.zero_grad()
-
             branches = model(torch.squeeze(data['rgb'].cuda()),
                              dataset.extract_inputs(data).cuda())
 
@@ -231,6 +232,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
                              controls.cuda(), dataset.extract_inputs(data).cuda(),
                              branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
                              variable_weights=g_conf.VARIABLE_WEIGHT)
+
+
 
 
             # TODO: All these logging things could go out to clean up the main
@@ -257,6 +260,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
             loss.backward()
             optimizer.step()
 
+            print ("Inference + opt + TIME ", time.time() - capture_time)
             accumulated_time += time.time() - capture_time
             capture_time = time.time()
 
@@ -299,6 +303,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
                 adjust_learning_rate(optimizer, iteration)
 
             del data
+
+            print ("The REST", time.time() - capture_time)
+            capture_time = time.time()
 
         coil_logger.add_message('Finished', {})
 
