@@ -98,10 +98,10 @@ class CoILDataset(Dataset):
 
             print('Episode ', episode)
 
-            if not os.path.exists(os.path.join(episode, "checked")):
-                # Episode was not checked. So we dont load it.
-                print (" Not checked")
-                continue
+            #if not os.path.exists(os.path.join(episode, "checked")):
+            #    # Episode was not checked. So we dont load it.
+            #    print (" Not checked")
+            #    continue
 
             if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
                  # The number of wanted hours achieved

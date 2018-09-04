@@ -31,16 +31,30 @@ class CoILICRA(nn.Module):
         sensor_input_shape = [number_first_layer_channels, sensor_input_shape[1],
                               sensor_input_shape[2]]
 
-        #out_size = \
-        #simulate_conv_out_size(number_first_layer_channels, params['perception']['conv'])
 
 
-        perception_convs = Conv(params={'channels': [number_first_layer_channels] +
-                                                      params['perception']['conv']['channels'],
-                                        'kernels': params['perception']['conv']['kernels'],
-                                        'strides': params['perception']['conv']['strides'],
-                                        'dropouts': params['perception']['conv']['dropouts'],
-                                        'end_layer': True})
+        # For this case we check if the perception layer is of the type "conv"
+        if 'conv' in params['perception']:
+
+            perception_convs = Conv(params={'channels': [number_first_layer_channels] +
+                                                          params['perception']['conv']['channels'],
+                                            'kernels': params['perception']['conv']['kernels'],
+                                            'strides': params['perception']['conv']['strides'],
+                                            'dropouts': params['perception']['conv']['dropouts'],
+                                            'end_layer': True})
+
+        elif 'res' in params['perception']:  # pre defined residual networks
+            resnet_module = __import__('.building_blocks.' + params['perception']['res']['name'] ,
+                                                 fromlist=['.building_blocks'])
+
+            # TODO: Check network drawing
+            perception_convs = resnet_module(num_classes=params['perception']['res']['num_classes'])
+
+        else:
+
+            raise ValueError("invalid convolution layer type")
+
+
 
         perception_fc = FC(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
                                               + params['perception']['fc']['neurons'],
