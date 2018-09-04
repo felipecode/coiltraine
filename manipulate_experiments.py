@@ -8,7 +8,7 @@ from utils.general import create_log_folder, create_exp_path, erase_logs, fix_dr
                             get_validation_datasets, get_driving_environments
 
 
-from visualization.exporter import export_csv, export_status
+from visualization.exporter import export_csv, export_status, export_csv_separate
 
 
 
@@ -55,10 +55,12 @@ if __name__ == '__main__':
 
 
     if args.export_results:
-        variables_to_export = ['episodes_fully_completed', 'collision_pedestrians', 'driven_kilometer']
+        variables_to_export = ['episodes_fully_completed', 'end_pedestrian_collision', 'end_vehicle_collision',
+                             'end_other_collision', 'driven_kilometers']
 
         # TODO: for now it basically will just export the best
-        export_csv(args.folder, variables_to_export)
+        export_csv_separate(args.folder, variables_to_export,
+                            ['empty', 'normal', 'cluttered'])
 
     if args.erase_experiments:
         pass
