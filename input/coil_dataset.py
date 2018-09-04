@@ -25,9 +25,13 @@ from utils.general import sort_nicely
 class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
-    def __init__(self, root_dir, transform=None, use_preload=None):
-        if use_preload is not None:
-            self.measurements, self.sensor_data_names = np.load(use_preload)
+    def __init__(self, root_dir, transform=None, preload_name=None):
+
+        self.preload_name = preload_name
+        if preload_name is not None and os.path.exists(os.path.join('_preloads', preload_name + '.npy')):
+            print ( " Loading from NPY ")
+            self.sensor_data_names, self.measurements  = np.load(os.path.join('_preloads', preload_name + '.npy'))
+            print (self.sensor_data_names)
         else:
             self.sensor_data_names, self.measurements = self.pre_load_image_folders(root_dir)
         self.transform = transform
@@ -187,6 +191,12 @@ class CoILDataset(Dataset):
 
         print ( " LOADED ", number_of_hours_pre_loaded, " This hours")
         print ()
+        # Make the path to save the pre loaded datasets
+        if not os.path.exists('_preloads'):
+            os.mkdir('_preloads')
+
+        np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
+
         return sensor_data_names, float_dicts
 
 

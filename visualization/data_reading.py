@@ -40,6 +40,58 @@ def read_summary_csv(control_csv_file):
     return summary_dict
 
 
+def read_summary_tasks_csv(control_csv_file):
+
+
+
+    f = open(control_csv_file, "rU")
+    header = f.readline()
+    header = header.split(',')
+    header[-1] = header[-1][:-2]
+    f.close()
+
+    print (header)
+
+    data_matrix = np.loadtxt(control_csv_file, delimiter=",", skiprows=1)
+    summary_dict = {}
+
+    if len(data_matrix) == 0:
+        return None
+
+    if len(data_matrix.shape) == 1:
+        data_matrix = np.expand_dims(data_matrix, axis=0)
+
+
+    task_list = []
+    for task in range(len(data_matrix)):
+        task_list.append(data_matrix[task, header.index('task')])
+
+    count = 0
+
+    for key in set(task_list):
+        task_dict = {}
+        for name in header:
+            if name == 'task':
+                  continue
+
+            # The list of values from this collumn of the matrix
+            value_list = []
+            for step in range(len(data_matrix)):
+                if data_matrix[step, header.index('task')] == key:
+
+                    value_list.append(data_matrix[step, count])
+
+                task_dict.update({header[count]: value_list})
+
+            count += 1
+
+        summary_dict.update({key: task_dict})
+
+
+
+    return summary_dict
+
+
 
 
 def read_control_csv(control_csv_file):
@@ -53,6 +105,7 @@ def read_control_csv(control_csv_file):
     header = header.split(',')
     header[-1] = header[-1][:-2]
     f.close()
+
 
     data_matrix = np.loadtxt(open(control_csv_file, "rb"), delimiter=",", skiprows=1)
     control_results_dic = {}

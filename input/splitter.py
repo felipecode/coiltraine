@@ -188,6 +188,7 @@ def split_sequence(data, var, positions):
 
 
     for i in range(len(positions[var])-1):
+        print (data[var] )
         print ( positions[var][i], positions[var][i+1])
         keys.append(np.where(
             np.logical_and(data[var] > positions[var][i], data[var] <= positions[var][i + 1]))[0])
@@ -248,6 +249,19 @@ def split_pedestrian_vehicle_traffic_lights(data, positions_dict):
                                                    data['vehicle'] == 1.),
                                      data['traffic_lights'] == 1.))[0]
 
+            ]
+    return keys
+
+def split_lateral_noise_longitudinal_noise(data, positions_dict):
+    data = convert_measurements(data)
+
+
+    keys = [np.where(data['steer'] != data['steer_noise'])[0],
+            np.where(np.logical_or(data['throttle'] != data['throttle_noise'],
+                                   data['brake'] != data['brake_noise']))[0],
+            np.where(np.logical_and(np.logical_and(data['steer'] == data['steer_noise'],
+                                                   data['throttle'] == data['throttle_noise']),
+                                    data['brake'] == data['brake_noise']))[0]
             ]
     return keys
 

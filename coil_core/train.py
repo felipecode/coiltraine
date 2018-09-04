@@ -16,6 +16,7 @@ from network import CoILModel, Loss, adjust_learning_rate
 from input import CoILDataset, PreSplittedSampler, splitter, Augmenter, RandomSampler
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
+from utils.general import softmax
 
 from torchvision import transforms
 
@@ -62,8 +63,8 @@ def select_data(dataset, keys):
 def parse_split_configuration(configuration):
     """
     Turns the configuration line of sliptting into a name and a set of params.
-
     """
+
     if configuration is None:
         return "None", None
     print ('conf', configuration)
@@ -78,6 +79,22 @@ def parse_split_configuration(configuration):
 
 
     return name, conf_dict
+
+# ToDO: Probably this could go to another code module.
+
+def get_inverse_freq_weights(keys, dataset_size):
+
+    invers_freq_weights = []
+    print (" frequency")
+    for key_vec in keys:
+        print (1.0/(len(key_vec)/dataset_size))
+        invers_freq_weights.append(1.0/(len(key_vec)/dataset_size))
+
+    return softmax(np.array(invers_freq_weights))
+
+
+
+
 
 
 
@@ -105,6 +122,13 @@ def select_balancing_strategy(dataset, iteration):
         print (" Weights ", params['weights'])
         keys = splitter_function(dataset.measurements, params)
 
+        if params['weights'] == 'inverse':
+            weights = get_inverse_freq_weights( keys, len(dataset.measurements) - g_conf.NUMBER_IMAGES_SEQUENCE)
+        else:
+            weights = params['weights']
+
+        print ( " final weights ")
+        print ( weights )
         sampler = PreSplittedSampler(keys, iteration * g_conf.BATCH_SIZE, params['weights'])
     else:
 
@@ -184,7 +208,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
         # into tensors.
         augmenter = Augmenter(g_conf.AUGMENTATION)
 
-        dataset = CoILDataset(full_dataset, transform=augmenter)
+        dataset = CoILDataset(full_dataset, transform=augmenter,
+                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
 
 
         data_loader = select_balancing_strategy(dataset, iteration)

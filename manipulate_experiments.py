@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
         # TODO: for now it basically will just export the best
         export_csv_separate(args.folder, variables_to_export,
-                            ['empty', 'normal', 'cluttered'])
+                            ['empty', 'cluttered'])
 
     if args.erase_experiments:
         pass

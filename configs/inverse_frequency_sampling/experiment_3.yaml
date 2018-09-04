@@ -14,16 +14,17 @@ BATCH_SIZE: 120
 NUMBER_ITERATIONS: 500000
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
+SPLIT: [['brake', [0]], ['weights', 'inverse']]  # name of function, --- the point of division, the weights used after division
 NUMBER_FRAMES_FUSION: 1
 NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 12.0
-TRAIN_DATASET_NAME: 'CARLA100_2'
+TRAIN_DATASET_NAME: 'CARLA100'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
-NUMBER_OF_HOURS: 1
+NUMBER_OF_HOURS: 10
 
 #### Testing Related Parameters ####
 TEST_SCHEDULE: [ 100000, 300000, 500000]  # The frequency the model is actually tested.
@@ -82,6 +83,7 @@ VARIABLE_WEIGHT:
 IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
+
 
 
 

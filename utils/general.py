@@ -14,6 +14,12 @@ def static_vars(**kwargs):
         return func
     return decorate
 
+def softmax(x):
+    """Compute softmax values for each sets of scores in x."""
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum()
+
+
 
 def tryint(s):
     try:

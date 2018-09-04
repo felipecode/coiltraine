@@ -26,7 +26,7 @@ USE_NOISE_DATA: True
 NUMBER_OF_HOURS: 1
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [ 16000, 100000, 300000, 500000] # The frequency the model is actually tested.
+TEST_SCHEDULE: [ 100000, 300000, 500000] # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
