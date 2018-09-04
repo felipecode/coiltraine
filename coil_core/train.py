@@ -129,7 +129,7 @@ def select_balancing_strategy(dataset, iteration):
 
         print ( " final weights ")
         print ( weights )
-        sampler = PreSplittedSampler(keys, iteration * g_conf.BATCH_SIZE, params['weights'])
+        sampler = PreSplittedSampler(keys, iteration * g_conf.BATCH_SIZE, weights)
     else:
 
         print (" Random Splitter ")
