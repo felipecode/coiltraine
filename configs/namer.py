@@ -71,18 +71,20 @@ def generate_name(g_conf):
     # Model Regularization
     # We start by checking if there is some kind of augmentation, and the schedule name.
 
-    if g_conf.AUGMENTATION is not None and g_conf.AUGMENTATION != 'None':
-        final_name_string += '_' + g_conf.AUGMENTATION
-    else:
-        # We check if there is dropout
-        if get_dropout_sum(g_conf.MODEL_CONFIGURATION) > 4:
-            final_name_string += '_highdropout'
-        elif get_dropout_sum(g_conf.MODEL_CONFIGURATION) > 2:
-            final_name_string += '_milddropout'
-        elif get_dropout_sum(g_conf.MODEL_CONFIGURATION) > 0:
-            final_name_string += '_lowdropout'
+    if 'conv' in g_conf.MODEL_CONFIGURATION['perception']:
+        if g_conf.AUGMENTATION is not None and g_conf.AUGMENTATION != 'None':
+            final_name_string += '_' + g_conf.AUGMENTATION
         else:
-            final_name_string += '_none'
+            # We check if there is dropout
+            if get_dropout_sum(g_conf.MODEL_CONFIGURATION) > 4:
+                final_name_string += '_highdropout'
+            elif get_dropout_sum(g_conf.MODEL_CONFIGURATION) > 2:
+                final_name_string += '_milddropout'
+            elif get_dropout_sum(g_conf.MODEL_CONFIGURATION) > 0:
+                final_name_string += '_lowdropout'
+            else:
+                final_name_string += '_none'
+
 
     # Temporal
 

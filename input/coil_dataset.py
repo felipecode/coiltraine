@@ -44,6 +44,7 @@ class CoILDataset(Dataset):
 
 
         img_path = self.sensor_data_names[index]
+        #print (img_path)
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
         if self.transform is not None:
@@ -103,6 +104,7 @@ class CoILDataset(Dataset):
             #    print (" Not checked")
             #    continue
 
+
             if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
                  # The number of wanted hours achieved
                  break
@@ -111,12 +113,15 @@ class CoILDataset(Dataset):
             measurements_list = glob.glob(os.path.join(episode, 'measurement*'))
             sort_nicely(measurements_list)
 
+            if len (measurements_list) == 0:
+                continue
+
             last_data_point_number = measurements_list[-1].split('_')[-1].split('.')[0]
             number_of_hours_pre_loaded += (float(last_data_point_number) / 10.0)/3600.0
             print (" Added ", ((float(last_data_point_number) / 10.0)/3600.0))
 
 
-            for measurement in measurements_list[:-2]:
+            for measurement in measurements_list[:-3]:
 
 
 

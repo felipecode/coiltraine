@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import math
 import torch.utils.model_zoo as model_zoo
@@ -107,8 +108,8 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        self.avgpool = nn.AvgPool2d(7, stride=1)
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.avgpool = nn.AvgPool2d(2, stride=0)
+        self.fc = nn.Linear(1536, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -135,21 +136,35 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        print (x.shape)
         x = self.conv1(x)
+        print (x.shape)
         x = self.bn1(x)
         x = self.relu(x)
+        print (x.shape)
         x = self.maxpool(x)
+        print (x.shape)
 
         x = self.layer1(x)
+        print (x.shape)
         x = self.layer2(x)
+        print (x.shape)
         x = self.layer3(x)
+        print (x.shape)
         x = self.layer4(x)
+        print (x.shape)
 
         x = self.avgpool(x)
+        print (x.shape)
         x = x.view(x.size(0), -1)
+        print (x.shape)
         x = self.fc(x)
+        print (x.shape)
+
 
         return x
+
+
 
 
 def resnet18(pretrained=False, **kwargs):

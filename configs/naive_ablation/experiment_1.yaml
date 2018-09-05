@@ -14,7 +14,6 @@ BATCH_SIZE: 120
 NUMBER_ITERATIONS: 500000
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
-SPLIT: [['speed_module', [0.0666]], ['throttle', [0]], ['weights', [0.25, 0.75]]]
 NUMBER_FRAMES_FUSION: 1
 NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
@@ -24,7 +23,7 @@ TRAIN_DATASET_NAME: 'CARLA100'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
-NUMBER_OF_HOURS: 10
+NUMBER_OF_HOURS: 1
 
 #### Testing Related Parameters ####
 TEST_SCHEDULE: [ 100000, 300000, 500000]  # The frequency the model is actually tested.

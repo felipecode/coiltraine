@@ -1,6 +1,7 @@
 from logger import coil_logger
 import torch.nn as nn
 import torch
+import importlib
 
 from configs import g_conf
 from utils.general import command_number_to_index
@@ -10,6 +11,8 @@ from .building_blocks import Branching
 from .building_blocks import FC
 from .building_blocks import Join
 
+
+# TODO: REFACTOR
 # TODO: it is interesting the posibility to loop over many models.
 # TODO: Having multiple experiments, over the same alias.
 class CoILICRA(nn.Module):
@@ -43,12 +46,24 @@ class CoILICRA(nn.Module):
                                             'dropouts': params['perception']['conv']['dropouts'],
                                             'end_layer': True})
 
-        elif 'res' in params['perception']:  # pre defined residual networks
-            resnet_module = __import__('.building_blocks.' + params['perception']['res']['name'] ,
-                                                 fromlist=['.building_blocks'])
+            perception_fc = FC(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
+                                                  + params['perception']['fc']['neurons'],
+                                       'dropouts': params['perception']['fc']['dropouts'],
+                                       'end_layer': False})
 
+            self.perception = nn.Sequential(*[perception_convs, perception_fc])
+
+            number_output_neurons = params['perception']['fc']['neurons'][-1]
+
+
+        elif 'res' in params['perception']:  # pre defined residual networks
+            resnet_module = importlib.import_module('network.models.building_blocks.resnet')
+            #+ params['perception']['res']['name']
+            #fromlist = ['resnet']
             # TODO: Check network drawing
-            perception_convs = resnet_module(num_classes=params['perception']['res']['num_classes'])
+            resnet_module = getattr(resnet_module, params['perception']['res']['name'])
+            self.perception = resnet_module(num_classes=params['perception']['res']['num_classes'])
+            number_output_neurons = params['perception']['res']['num_classes']
 
         else:
 
@@ -56,13 +71,7 @@ class CoILICRA(nn.Module):
 
 
 
-        perception_fc = FC(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
-                                              + params['perception']['fc']['neurons'],
-                                  'dropouts': params['perception']['fc']['dropouts'],
-                                  'end_layer': False})
 
-
-        self.perception = nn.Sequential(*[perception_convs, perception_fc])
 
 
 
@@ -81,7 +90,7 @@ class CoILICRA(nn.Module):
             params={'after_process':
                          FC(params={'neurons':
                                         [params['measurements']['fc']['neurons'][-1] +
-                                            params['perception']['fc']['neurons'][-1]] +
+                                         number_output_neurons] +
                                         params['join']['fc']['neurons'],
                                      'dropouts': params['join']['fc']['dropouts'],
                                      'end_layer': False}),
@@ -106,11 +115,16 @@ class CoILICRA(nn.Module):
 
         self.branches = Branching(branch_fc_vector) #  Here we set branching automatically
 
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-                nn.init.xavier_uniform_(m.weight)
-                nn.init.constant_(m.bias, 0.1)
-
+        if 'conv' in params['perception']:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                    nn.init.xavier_uniform_(m.weight)
+                    nn.init.constant_(m.bias, 0.1)
+        else:
+            for m in self.modules():
+                if isinstance(m, nn.Linear):
+                    nn.init.xavier_uniform_(m.weight)
+                    nn.init.constant_(m.bias, 0.1)
 
 
 
