@@ -16,6 +16,8 @@ def static_vars(**kwargs):
 
 def softmax(x):
     """Compute softmax values for each sets of scores in x."""
+    temp = 10
+    x = x/temp
     e_x = np.exp(x - np.max(x))
     return e_x / e_x.sum()
 

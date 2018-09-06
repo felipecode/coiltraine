@@ -237,6 +237,25 @@ def split_speed_module_throttle(data, positions_dict):
              ]
 
     return keys
+def split_pedestrian_vehicle_traffic_lights_move(data, positions_dict):
+    data = convert_measurements(data)
+    keys = [np.where(np.logical_and(data['pedestrian'] < 1.0,
+                                    data['pedestrian'] > 0.))[0],
+            np.where(data['pedestrian'] == 0.)[0],
+            np.where(data['vehicle'] < 1. )[0],
+            np.where(np.logical_and(data['traffic_lights'] < 1.0, data['speed_module'] >= 0.0666))[0],
+            np.where(np.logical_and(np.logical_and(data['pedestrian'] == 1.,
+                                                   data['vehicle'] == 1.),
+                                    np.logical_or(data['traffic_lights'] == 1.,
+                                                   np.logical_and(data['traffic_lights'] < 1.0,
+                                                                  data['speed_module'] < 0.066)
+                                                  )
+                                    )
+                     )[0]
+
+            ]
+    return keys
+
 
 def split_pedestrian_vehicle_traffic_lights(data, positions_dict):
     data = convert_measurements(data)

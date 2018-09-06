@@ -87,8 +87,8 @@ def get_inverse_freq_weights(keys, dataset_size):
     invers_freq_weights = []
     print (" frequency")
     for key_vec in keys:
-        print (1.0/(len(key_vec)/dataset_size))
-        invers_freq_weights.append(1.0/(len(key_vec)/dataset_size))
+        print ((len(key_vec)/dataset_size))
+        invers_freq_weights.append((len(key_vec)/dataset_size))
 
     return softmax(np.array(invers_freq_weights))
 
