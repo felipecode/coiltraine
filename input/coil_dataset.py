@@ -43,7 +43,8 @@ class CoILDataset(Dataset):
     def __getitem__(self, index):
 
 
-        img_path = self.sensor_data_names[index]
+        img_path = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME,
+                                self.sensor_data_names[index])
         #print (img_path)
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
@@ -153,7 +154,8 @@ class CoILDataset(Dataset):
                 )
 
                 rgb = 'CentralRGB_' + data_point_number + '.png'
-                sensor_data_names.append(os.path.join(episode, rgb))
+                print (os.path.join(episode.split('/')[-1], rgb))
+                sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
 
                 # We do measurements for the left side camera
                 # #TOdo the angle does not need to be hardcoded
@@ -173,7 +175,8 @@ class CoILDataset(Dataset):
                      'angle': -30.0}
                 )
                 rgb = 'LeftRGB_' + data_point_number + '.png'
-                sensor_data_names.append(os.path.join(episode, rgb))
+
+                sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
 
                 # We do measurements augmentation for the right side cameras
 
@@ -192,7 +195,7 @@ class CoILDataset(Dataset):
                      'angle': 30.0}
                 )
                 rgb = 'RightRGB_' + data_point_number + '.png'
-                sensor_data_names.append(os.path.join(episode, rgb))
+                sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
 
 
         print ( " LOADED ", number_of_hours_pre_loaded, " This hours")
