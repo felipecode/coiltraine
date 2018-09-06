@@ -32,14 +32,14 @@ def execute(weights, keys, iteration, checkpoint, gpu, n_batches=5000):
 
     # Setup sampler and data loader
     # full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], '5HoursW1-3-6-8')
-    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100_2')
+    full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100')
     augmenter = Augmenter(g_conf.AUGMENTATION)
     sampler = PreSplittedSampler(keys, iteration*g_conf.BATCH_SIZE, weights)
     dataset = CoILDataset(full_dataset, transform=augmenter, use_preload='10hours_train_preload.npy')
     data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
                                               shuffle=False,
                                               sampler=sampler,
-                                              num_workers=0,
+                                              num_workers=32,
                                               pin_memory=True)
 
     model = CoILModel(MODEL_TYPE, MODEL_CONFIGURATION)

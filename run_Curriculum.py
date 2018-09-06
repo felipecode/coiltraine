@@ -21,7 +21,7 @@ from visualization import plot_scatter
 
 # You could send the module to be executed and they could have the same interface.
 # GPUS_P100 = "0001111222233334444555566667777"
-GPUS_P100 = "01234567" * 6
+GPUS_P100 = "01234567" * 10
 
 
 def number_alive_process(process_deque):
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     # dataset = CoILDataset(full_dataset, transform=augmenter)
     # keys = splitter.full_split(dataset)
     # np.save('full_split_keys', keys)
-    keys = np.load('full_split_keys.npy')
+    keys = np.load('10hours_split_keys.npy')
     keys = [k['keys'] for k in keys]
 
     # define checkpoint list
