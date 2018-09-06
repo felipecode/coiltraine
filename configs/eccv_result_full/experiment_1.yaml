@@ -1,10 +1,10 @@
 
-#### General Configuration Parameters ####
+#### General Configuration Parameters ####
 SAVE_SCHEDULE: [2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]
 
 NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
 
-#### Input related parameters ####
+#### Input related parameters ####
 SENSORS:
   rgb: (3, 88, 200)
 MEASUREMENTS:
@@ -12,8 +12,6 @@ MEASUREMENTS:
 
 BATCH_SIZE: 120
 NUMBER_ITERATIONS: 500000
-STEERING_DIVISION: [0.05, 0.05, 0.1, 0.3, 0.3, 0.1, 0.05, 0.05]
-LABELS_DIVISION: [[0, 2, 5], [3], [4]]
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
 NUMBER_FRAMES_FUSION: 1
@@ -21,13 +19,14 @@ NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 40.0
-TRAIN_DATASET_NAME: '80HoursW1-3-6-8'
+TRAIN_DATASET_NAME: 'CARLA100_2'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
+NUMBER_OF_HOURS: 1
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [ 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [ 100000, 300000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
@@ -43,12 +42,12 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     fc:
       neurons: [512, 512]
-      dropouts: [0.0, 0.0]
+      dropouts: [0.0, 0.5]
 
   measurements:
     fc:
       neurons: [128, 128]
-      dropouts: [0.0, 0.0]
+      dropouts: [0.0, 0.5]
   join:
     fc:
       neurons: [512]
@@ -83,6 +82,7 @@ VARIABLE_WEIGHT:
 IMAGE_CUT: [115, 510]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
+
 
 
 

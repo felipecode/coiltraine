@@ -40,6 +40,20 @@ tform3_img = trans.ProjectiveTransform()
 tform3_img.estimate(np.array(rdst), np.array(rsrc))
 
 
+def draw_vbar_on(img,bar_intensity,x_pos,color=(0,0,255)):
+
+
+  bar_size = int(img.shape[1]/6 * bar_intensity)
+  initial_y_pos = img.shape[0] - img.shape[0]/6
+  #print bar_intensity
+
+  for i in range(bar_size):
+    if bar_intensity > 0.0:
+      y = initial_y_pos - i
+      for j in range(20):
+        img[y , x_pos +j] = color
+
+
 def generate_ncolors(num_colors):
     color_pallet = []
     for i in range(0, 360, 360 / num_colors):
@@ -243,6 +257,7 @@ class ScreenManager(object):
 
         self.set_array(sensor_data, screen_position)
 
+
         pygame.display.flip()
 
 
@@ -255,7 +270,7 @@ class ScreenManager(object):
 
         # draw_path_on(img, 10, -angle_steers*40.0)
 
-        draw_path_on(sensor_data, 20, -steer * 20.0, (255,0 , 0))
+        draw_path_on(sensor_data, 20, -steer * 20.0, (255, 0, 0))
 
         draw_path_on(sensor_data, 20, -noise * 20.0, (0, 255, 0))
 

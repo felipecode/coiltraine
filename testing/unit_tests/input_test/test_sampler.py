@@ -1,9 +1,10 @@
 import os
 import numpy as np
 import unittest
-
+import time
 import torch
 
+from coil_core.train import select_balancing_strategy
 from input.coil_sampler import BatchSequenceSampler, SubsetSampler, RandomSampler
 from input.coil_dataset import CoILDataset
 from input import Augmenter
@@ -23,7 +24,7 @@ from configs import g_conf
 class testSampler(unittest.TestCase):
 
     def test_regular_sampler(self):
-
+        return
         try:
             os.mkdir('_images')
         except:
@@ -115,3 +116,47 @@ class testSampler(unittest.TestCase):
         #plt.show()
 
 
+
+    def test_inverse_sampler(self):
+
+        test_images_write_path = 'testing/unit_tests/_test_images_inverse'
+
+        if not os.path.exists(test_images_write_path):
+            os.mkdir(test_images_write_path)
+
+        # augmenter = Augmenter(g_conf.AUGMENTATION)
+
+        root_path = '/home/felipecodevilla/Datasets/CARLA100'
+
+        dataset = CoILDataset(root_path, transform=None, preload_name='10hours_CARLA100')
+
+        g_conf.SPLIT = [['pedestrian', []], ['vehicle', []], ['traffic_lights_move', []], ['weights', 'inverse']]
+
+        data_loader = select_balancing_strategy(dataset, 0)
+
+        count = 0
+        capture_time = time.time()
+        for data in data_loader:
+            controls = data['directions']
+
+            # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
+
+            # print (controls)
+            # print (dataset.extract_inputs(data))
+            # print (dataset.extract_inputs(data))
+
+            print (data['rgb'].shape)
+
+            # image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+            # image_to_save.save(os.path.join(test_images_write_path,
+            #                                str(count)+'c.png'))
+
+            image_to_save = transforms.ToPILImage()((data['rgb'][1].cpu()*255).type(torch.ByteTensor))
+            image_to_save.save(os.path.join(test_images_write_path,
+                                            str(count)+'l.png'))
+
+            #image_to_save = transforms.ToPILImage()((data['rgb'][2].cpu()*255).type(torch.ByteTensor))
+            #image_to_save.save(os.path.join(test_images_write_path,
+            #                                str(count)+'r.png'))
+
+            count +=1

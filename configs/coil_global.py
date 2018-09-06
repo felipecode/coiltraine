@@ -143,16 +143,16 @@ def merge_with_yaml(yaml_filename):
 def get_names(folder):
     #
 
-    alias_in_folder = os.listdir(os.path.join('configs',folder))
+    alias_in_folder = os.listdir(os.path.join('configs', folder))
 
-    experiments_in_folder = []
+    experiments_in_folder = {}
 
     for experiment_alias in alias_in_folder:
 
         g_conf.immutable(False)
         merge_with_yaml(os.path.join('configs', folder, experiment_alias))
 
-        experiments_in_folder.append(g_conf.EXPERIMENT_GENERATED_NAME)
+        experiments_in_folder.update({experiment_alias: g_conf.EXPERIMENT_GENERATED_NAME})
 
     return experiments_in_folder
 

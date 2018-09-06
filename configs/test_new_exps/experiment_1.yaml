@@ -19,11 +19,11 @@ NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 12.0
-TRAIN_DATASET_NAME: 'CARLA100_2'
+TRAIN_DATASET_NAME: 'CARLA100'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
-NUMBER_OF_HOURS: 0.2
+NUMBER_OF_HOURS: 2
 
 #### Testing Related Parameters ####
 TEST_SCHEDULE: [ 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
@@ -36,7 +36,7 @@ MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
     res:
-      name: 'resnet18'
+      name: 'resnet34'
       num_classes: 512
 
   measurements:

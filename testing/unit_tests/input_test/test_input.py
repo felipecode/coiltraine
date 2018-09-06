@@ -34,15 +34,14 @@ class testInput(unittest.TestCase):
 
 
 
+
         #augmenter = Augmenter(g_conf.AUGMENTATION)
 
-        root_path = '/home/felipecodevilla/Datasets/Carla100Test2'
+        root_path = '/home/felipecodevilla/Datasets/CARLA100'
 
-        dataset = CoILDataset(root_path, transform=None)
+        dataset = CoILDataset(root_path, transform=None, preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_CARLA100')
 
-        g_conf.SPLIT = [['pedestrian', []], ['vehicle', []], ['traffic_lights', []],
-                        ['weights', [0.0, 0.0, 0.0, 0.0, 1]]]
-
+        g_conf.SPLIT = [['left', []], ['central', []], ['right', []], ['weights', [0., 0., 1.]]]
 
         data_loader = select_balancing_strategy(dataset, 0)
 
@@ -61,9 +60,9 @@ class testInput(unittest.TestCase):
 
             print (data['rgb'].shape)
 
-            image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
-            image_to_save.save(os.path.join(test_images_write_path,
-                                            str(count)+'c.png'))
+            #image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+            #image_to_save.save(os.path.join(test_images_write_path,
+            #                                str(count)+'c.png'))
             """
             image_to_save = transforms.ToPILImage()((data['rgb'][1].cpu()*255).type(torch.ByteTensor))
             image_to_save.save(os.path.join(test_images_write_path,
@@ -73,6 +72,10 @@ class testInput(unittest.TestCase):
             image_to_save.save(os.path.join(test_images_write_path,
                                             str(count)+'r.png'))
             """
+
+            for i in range( len(data['angle'])):
+
+                self.assertEqual(data['angle'][i], 30)
 
                                             
 

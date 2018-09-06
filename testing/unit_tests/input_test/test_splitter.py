@@ -191,7 +191,7 @@ class testSpliter(unittest.TestCase):
     def test_splitter_brake(self):
 
 
-        root_path = '/home/felipecodevilla/Datasets/Carla100Test'
+        root_path = '/home/felipecodevilla/Datasets/CARLA100'
 
         dataset = CoILDataset(root_path, transform=None)
 
@@ -206,15 +206,34 @@ class testSpliter(unittest.TestCase):
 
         print ("sum ", sum_of_keys)
 
+    def test_left_right_brake(self):
+
+
+        root_path = '/home/felipecodevilla/Datasets/CARLA100'
+
+        dataset = CoILDataset(root_path, transform=None)
+
+        keys = splitter.split_brake(dataset.measurements, {'left': [], 'central': [], 'right': []})
+        print (" number of keys ", len(dataset.measurements))
+
+        print ( " Lenghts of bins brake")
+        sum_of_keys = 0
+        for key in keys:
+            print (len(key))
+            sum_of_keys += len(key)
+
+        print ("sum ", sum_of_keys)
+
+
 
 
     def test_splitter_speed(self):
 
-        root_path = '/home/felipecodevilla/Datasets/Carla100Test'
+        root_path = '/home/felipecodevilla/Datasets/CARLA100'
 
         dataset = CoILDataset(root_path, transform=None)
 
-        keys = splitter.split_speed_module(dataset.measurements, {'speed_module': [0.8, 2.5, 4.7]})
+        keys = splitter.split_speed_module(dataset.measurements, {'speed_module': [0.0666,  0.208, 0.39]})
 
         print ( " Lenghts of bins speed")
         sum_of_keys = 0
@@ -229,7 +248,7 @@ class testSpliter(unittest.TestCase):
 
     def test_splitter_speed_throttle(self):
 
-        root_path = '/home/felipecodevilla/Datasets/Carla100Test'
+        root_path = '/home/felipecodevilla/Datasets/CARLA100'
 
         dataset = CoILDataset(root_path, transform=None)
 
@@ -245,7 +264,7 @@ class testSpliter(unittest.TestCase):
 
 
     def test_splitter_pedestrian_vehicle_tl(self):
-        root_path = '/home/felipecodevilla/Datasets/Carla100Test'
+        root_path = '/home/felipecodevilla/Datasets/CARLA100'
 
         dataset = CoILDataset(root_path, transform=None)
 

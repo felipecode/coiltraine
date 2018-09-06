@@ -24,7 +24,7 @@ class testCILDataset(unittest.TestCase):
 
 
     def test_pre_load_augmentation(self):
-        return
+
         if not os.path.exists(self.test_images_write_path + 'normal_steer'):
             os.mkdir(self.test_images_write_path + 'normal_steer')
 
@@ -109,7 +109,7 @@ class testCILDataset(unittest.TestCase):
         print("MAX STEER ", max_steer)
 
     def test_speed_reading(self):
-
+        return
         if not os.path.exists(self.test_images_write_path + 'normal_steer'):
             os.mkdir(self.test_images_write_path + 'normal_steer')
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100_2')

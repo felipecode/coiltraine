@@ -163,7 +163,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
     experiments_list = [experiment.split('.')[-2] for experiment in experiments_list]
 
     names_list = get_names(exp_batch)
-    sorted_keys = sorted(range(len(names_list)), key=lambda k: names_list[k])
+    sorted_keys = sorted(range(len(names_list)), key=lambda k: names_list[experiments_list[k]+'.yaml'])
 
 
     print (experiments_list)
@@ -171,7 +171,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
     for key in sorted_keys:
 
         experiment = experiments_list[key]
-        generated_name = names_list[key]
+        generated_name = names_list[experiment+'.yaml']
 
         if experiment == '':
             raise ValueError("Empty Experiment on List")

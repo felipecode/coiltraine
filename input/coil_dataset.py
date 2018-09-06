@@ -44,7 +44,8 @@ class CoILDataset(Dataset):
 
 
         img_path = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME,
-                                self.sensor_data_names[index])
+                                self.sensor_data_names[index].split('/')[-2],
+                                self.sensor_data_names[index].split('/')[-1])
         #print (img_path)
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 

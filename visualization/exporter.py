@@ -163,11 +163,12 @@ def export_status(exp_batch, validation_datasets, driving_environments):
 
         names_list = get_names(exp_batch)
         count = 0
+        print (names_list)
         for exp in experiments:
 
             if os.path.isdir(os.path.join(root_path, exp_batch, exp)):
 
-                f.write("%s,%s" % (exp, names_list[count]))
+                f.write("%s,%s" % (exp, names_list[exp+'.yaml']))
                 count += 1
                 print (exp)
                 merge_with_yaml(os.path.join('configs', exp_batch, exp + '.yaml'))
