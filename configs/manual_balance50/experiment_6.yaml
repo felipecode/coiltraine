@@ -24,7 +24,7 @@ TRAIN_DATASET_NAME: 'CARLA100'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
-NUMBER_OF_HOURS: 10
+NUMBER_OF_HOURS: 50
 
 #### Testing Related Parameters ####
 TEST_SCHEDULE: [ 100000, 300000, 500000]  # The frequency the model is actually tested.
