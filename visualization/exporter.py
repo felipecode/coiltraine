@@ -132,7 +132,7 @@ def export_csv_separate(exp_batch, variables_to_export, task_list):
                             f.write(",")
                             for task in task_list:
                                 if experiment_list[experiments.index(exp)][count][task]:
-                                    f.write("%f/" % experiment_list[experiments.index(exp)][count][task][variable])
+                                    f.write("%.2f/" % experiment_list[experiments.index(exp)][count][task][variable])
 
 
                         f.write("\n")
