@@ -41,7 +41,7 @@ def execute(checkpoint, output_file, gpu):
         # full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'Town02W14Noise')
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100')
         augmenter = Augmenter(None)
-        dataset = CoILDataset(full_dataset, transform=augmenter, use_preload='10hours_train')
+        dataset = CoILDataset(full_dataset, transform=augmenter, preload_name='10hours_train')
         data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
                                                   shuffle=False,
                                                   num_workers=32,
