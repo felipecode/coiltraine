@@ -60,7 +60,7 @@ def execute(weights, keys, iteration, checkpoint, gpu, n_batches=5000):
     #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
     capture_time = time.time()
     for data in data_loader:
-        print(data)
+        # print(data)
         # input_data, float_data = data
         # get the control commands from float_data, size = [120,1]
         controls = data['directions']  # float_data[:, dataset.controls_position(), :]
