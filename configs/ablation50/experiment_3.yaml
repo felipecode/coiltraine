@@ -32,17 +32,13 @@ TEST_SCHEDULE: [100000, 300000, 500000]  # The frequency the model is actually t
 #### Network Related Parameters ####
 
 
+
 MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
-    conv:
-      channels: [32, 32, 64, 64, 128, 128, 256, 256]
-      kernels: [5, 3, 3, 3, 3, 3, 3, 3]
-      strides: [2, 1, 2, 1, 2, 1, 1, 1]
-      dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    fc:
-      neurons: [512, 512]
-      dropouts: [0.0, 0.5]
+    res:
+      name: 'resnet34'
+      num_classes: 512
 
   measurements:
     fc:
@@ -73,9 +69,9 @@ BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05]
 LOSS_FUNCTION: 'L1'
 
 VARIABLE_WEIGHT:
-  Steer: 0.333
-  Gas: 0.333
-  Brake: 0.333
+  Steer: 0.5
+  Gas: 0.45
+  Brake: 0.05
 
 
 #### Simulation Related Parameters ####
