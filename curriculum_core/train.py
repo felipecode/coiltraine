@@ -35,7 +35,7 @@ def execute(weights, keys, iteration, checkpoint, gpu, n_batches=5000):
     full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100')
     augmenter = Augmenter(g_conf.AUGMENTATION)
     sampler = PreSplittedSampler(keys, iteration*g_conf.BATCH_SIZE, weights)
-    dataset = CoILDataset(full_dataset, transform=augmenter, use_preload='10hours_train_preload.npy')
+    dataset = CoILDataset(full_dataset, transform=augmenter, preload_name='10hours_train')
     data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
                                               shuffle=False,
                                               sampler=sampler,
@@ -60,7 +60,7 @@ def execute(weights, keys, iteration, checkpoint, gpu, n_batches=5000):
     #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
     capture_time = time.time()
     for data in data_loader:
-        print(data)
+        # print(data)
         # input_data, float_data = data
         # get the control commands from float_data, size = [120,1]
         controls = data['directions']  # float_data[:, dataset.controls_position(), :]
