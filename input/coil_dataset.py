@@ -101,11 +101,11 @@ class CoILDataset(Dataset):
 
             print('Episode ', episode)
 
-            if not os.path.exists(os.path.join(episode, "checked")) and not os.path.exists(os.path.join(episode, "processed2")) \
-                  and not os.path.exists(os.path.join(episode, "bad_episode")):
-                # Episode was not checked. So we dont load it.
-                print (" Not checked")
-                continue
+            #if not os.path.exists(os.path.join(episode, "checked")) and not os.path.exists(os.path.join(episode, "processed2")) \
+            #      and not os.path.exists(os.path.join(episode, "bad_episode")):
+            #    # Episode was not checked. So we dont load it.
+            #    print (" Not checked")
+            #    continue
 
 
             if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
@@ -144,8 +144,11 @@ class CoILDataset(Dataset):
 
                 float_dicts.append(
                     {'steer': measurement_data['steer'],
+                     'steer_noise': measurement_data['steer_noise'],
                      'throttle': measurement_data['throttle'],
+                     'throttle_noise': measurement_data['throttle_noise'],
                      'brake': measurement_data['brake'],
+                     'brake_noise': measurement_data['brake_noise'],
                      'speed_module': speed/g_conf.SPEED_FACTOR,
                      'directions': directions,
                      "pedestrian": measurement_data['stop_pedestrian'],
@@ -155,7 +158,6 @@ class CoILDataset(Dataset):
                 )
 
                 rgb = 'CentralRGB_' + data_point_number + '.png'
-                print (os.path.join(episode.split('/')[-1], rgb))
                 sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
 
                 # We do measurements for the left side camera
@@ -166,8 +168,11 @@ class CoILDataset(Dataset):
                 # We extract the interesting subset from the measurement dict
                 float_dicts.append(
                     {'steer': measurement_left['steer'],
+                     'steer_noise': measurement_left['steer_noise'],
                      'throttle': measurement_left['throttle'],
+                     'throttle_noise': measurement_left['throttle_noise'],
                      'brake': measurement_left['brake'],
+                     'brake_noise': measurement_left['brake_noise'],
                      'speed_module': speed/g_conf.SPEED_FACTOR,
                      'directions': directions,
                      "pedestrian": measurement_left['stop_pedestrian'],
@@ -186,8 +191,11 @@ class CoILDataset(Dataset):
 
                 float_dicts.append(
                     {'steer': measurement_right['steer'],
+                     'steer_noise': measurement_right['steer_noise'],
                      'throttle': measurement_right['throttle'],
+                     'throttle_noise': measurement_right['throttle_noise'],
                      'brake': measurement_right['brake'],
+                     'brake_noise': measurement_right['brake_noise'],
                      'speed_module': speed/g_conf.SPEED_FACTOR,
                      'directions': directions,
                      "pedestrian": measurement_right['stop_pedestrian'],
