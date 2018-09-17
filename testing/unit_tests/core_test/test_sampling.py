@@ -16,7 +16,9 @@ from torchvision import transforms
 from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_checkpoint_ready,\
     maximun_checkpoint_reach, get_next_checkpoint
 
-from  coil_core.train import select_balancing_strategy
+from coil_core.train import get_inverse_freq_weights
+
+from  coil_core.train import select_balancing_strategy, parse_split_configuration
 from configs import g_conf
 
 def create_log_folder(exp_batch_name):
@@ -54,11 +56,11 @@ class testValidation(unittest.TestCase):
 
     def test_core_validation(self):
 
-        dataset_name = 'CARLAValidationL1'
+        dataset_name = 'CARLA100'
 
         exp_batch  = 'eccv_debug'
         exp_alias = 'experiment_1'
-        full_dataset = os.path.join('/media/eder/Seagate Expansion Drive/', dataset_name)
+        full_dataset = os.path.join('/home/eder/data', dataset_name)
 
         os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -69,10 +71,12 @@ class testValidation(unittest.TestCase):
         # At this point the log file with the correct naming is created.
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
         set_type_of_process('drive', dataset_name)
-
         augmenter = Augmenter(None)
 
-        dataset = CoILDataset(full_dataset, transform=augmenter)
+        dataset = CoILDataset(full_dataset, transform=augmenter,
+                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+
+        g_conf.immutable(False)
 
         # Creates the sampler, this part is responsible for managing the keys. It divides
         # all keys depending on the measurements and produces a set of keys for each bach.
@@ -81,10 +85,20 @@ class testValidation(unittest.TestCase):
         # workers to get all the data.
         # TODO: batch size an number of workers go to some configuration file
 
-        g_conf.SPLIT = [['lateral_noise', []], ['longitudinal_noise', []], ['weights', [0.0, 0.0, 1.0]]]
+        #g_conf.SPLIT = [['lateral_noise', []], ['longitudinal_noise', []], ['weights', [0.0, 0.0, 1.0]]]
         data_loader = select_balancing_strategy(dataset, 0)
 
+
+
+        #name, params = parse_split_configuration(g_conf.SPLIT)
+        #splitter_function = getattr(splitter, name)
+
+        #keys = splitter_function(dataset.measurements, params)
+        #print (" The keys are ", keys)
+
+
         for data in data_loader:
+            print (data)
             for i in range(120):
                 print (data[i]['steer'], data[i]['steer_noise'])
                 self.assertEqual(data[i]['steer'], data[i]['steer_noise'])

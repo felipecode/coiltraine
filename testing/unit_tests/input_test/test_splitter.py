@@ -261,7 +261,21 @@ class testSpliter(unittest.TestCase):
             sum_of_keys += len(key)
 
         print ("sum ", sum_of_keys)
+    def test_lateral_noise_longitudinal_noise(self):
 
+        root_path = '/home/felipecodevilla/Datasets/CARLA100'
+
+        dataset = CoILDataset(root_path, transform=None)
+
+        keys = splitter.split_speed_module_throttle(dataset.measurements, {'speed_module': [0.8], 'throttle': [0.1]})
+
+        print ( " Lenghts of bins speed throtle")
+        sum_of_keys = 0
+        for key in keys:
+            print (len(key))
+            sum_of_keys += len(key)
+
+        print ("sum ", sum_of_keys)
 
     def test_splitter_pedestrian_vehicle_tl(self):
         root_path = '/home/felipecodevilla/Datasets/CARLA100'

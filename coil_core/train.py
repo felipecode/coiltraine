@@ -113,7 +113,8 @@ def select_balancing_strategy(dataset, iteration):
 
     #keys = select_data(dataset, keys)
     # In the case we are using the balancing
-    if g_conf.SPLIT is not None:
+    print (" Split is ", g_conf.SPLIT)
+    if g_conf.SPLIT is not None and g_conf.SPLIT is not "None":
         name, params = parse_split_configuration(g_conf.SPLIT)
         splitter_function = getattr(splitter, name)
 
