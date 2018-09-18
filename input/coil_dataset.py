@@ -20,17 +20,28 @@ from configs import g_conf
 
 from utils.general import sort_nicely
 
+def get_episode_weather(episode):
 
+    with open(os.path.join(episode, 'metadata.json')) as f:
+        metadata = json.load(f)
+    print (" WEATHER OF EPISODE ", metadata['weather'])
+    return int(metadata['weather'])
 
 class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
     def __init__(self, root_dir, transform=None, preload_name=None):
 
-        self.preload_name = preload_name
-        if preload_name is not None and os.path.exists(os.path.join('_preloads', preload_name + '.npy')):
+        # If all the weathers are present we keep without anything ( WE ASSUME THAT THIS HAS LENGHT 4)
+        if len(g_conf.WEATHERS) == 4:
+            self.preload_name = preload_name
+        else:  # The other case we just add the weather names after
+
+            self.preload_name = preload_name + '-'.join(str(e) for e in g_conf.WEATHERS)
+
+        if self.preload_name is not None and os.path.exists(os.path.join('_preloads', self.preload_name + '.npy')):
             print ( " Loading from NPY ")
-            self.sensor_data_names, self.measurements  = np.load(os.path.join('_preloads', preload_name + '.npy'))
+            self.sensor_data_names, self.measurements  = np.load(os.path.join('_preloads', self.preload_name + '.npy'))
             print (self.sensor_data_names)
         else:
             self.sensor_data_names, self.measurements = self.pre_load_image_folders(root_dir)
@@ -46,8 +57,11 @@ class CoILDataset(Dataset):
         img_path = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME,
                                 self.sensor_data_names[index].split('/')[-2],
                                 self.sensor_data_names[index].split('/')[-1])
-        #print (img_path)
+        print (img_path)
+
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+
+        print (img.shape)
 
         if self.transform is not None:
             img = self.transform(self.batch_read_number, img)
@@ -113,19 +127,27 @@ class CoILDataset(Dataset):
                  break
 
 
+
+
+
             measurements_list = glob.glob(os.path.join(episode, 'measurement*'))
             sort_nicely(measurements_list)
 
             if len (measurements_list) == 0:
+                print ("EMPTY EPISODE")
                 continue
+
+            if get_episode_weather(episode) not in g_conf.WEATHERS:
+                print("WEATHER NOT CORRECT")
+                continue
+
 
             last_data_point_number = measurements_list[-1].split('_')[-1].split('.')[0]
             number_of_hours_pre_loaded += (float(last_data_point_number) / 10.0)/3600.0
             print (" Added ", ((float(last_data_point_number) / 10.0)/3600.0))
-
+            print (" TOtal Hours (partial) ", number_of_hours_pre_loaded)
 
             for measurement in measurements_list[:-3]:
-
 
 
                 data_point_number = measurement.split('_')[-1].split('.')[0]

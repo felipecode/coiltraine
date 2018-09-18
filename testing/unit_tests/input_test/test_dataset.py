@@ -8,6 +8,7 @@ import math
 import torch
 from input import CoILDataset, Augmenter, BatchSequenceSampler, splitter
 
+from torchvision import transforms
 from configs import g_conf
 
 
@@ -24,7 +25,7 @@ class testCILDataset(unittest.TestCase):
 
 
     def test_pre_load_augmentation(self):
-
+        return
         if not os.path.exists(self.test_images_write_path + 'normal_steer'):
             os.mkdir(self.test_images_write_path + 'normal_steer')
 
@@ -64,6 +65,45 @@ class testCILDataset(unittest.TestCase):
 
             self.assertLess(data['speed_module'],1)
 
+            count += 1
+
+    def test_pre_load_weather_augmentation(self):
+
+        if not os.path.exists(self.test_images_write_path + 'weather_aug'):
+            os.mkdir(self.test_images_write_path + 'weather_aug')
+
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100')
+        # This depends on the number of fused frames. A image could have
+        # A certain number of fused frames
+        g_conf.TRAIN_DATASET_NAME = 'CARLA100'
+        g_conf.NUMBER_OF_HOURS = 25
+        g_conf.WEATHERS = [1]
+        augmenter = Augmenter(None)
+        dataset = CoILDataset(full_dataset, transform=augmenter,
+                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+
+        keys = range(0, len(dataset.sensor_data_names))
+
+
+        # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
+        #                                          shuffle=True, num_workers=12, pin_memory=True)
+        # capture_time = time.time()
+        data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
+                                                  shuffle=False, num_workers=12,
+                                                  pin_memory=True)
+        print('len ', len(data_loader))
+        max_steer = 0
+        count = 0
+        for data in data_loader:
+
+
+            image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+            image_to_save.save(os.path.join(self.test_images_write_path + 'weather_aug', str(count)+'l.png'))
+            # Test steerings after augmentation
+
+            #print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
+
+            #print ("directions", data['directions'], " speed_module", data['speed_module'])
             count += 1
 
 
