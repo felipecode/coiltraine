@@ -100,7 +100,7 @@ def get_inverse_freq_weights(keys, dataset_size):
 
 
 # TODO: for now is not posible to maybe balance just labels or just steering. Is either all or nothing
-def select_balancing_strategy(dataset, iteration):
+def select_balancing_strategy(dataset, iteration, number_of_workers):
 
 
     # TODO eliminate this function
@@ -143,7 +143,7 @@ def select_balancing_strategy(dataset, iteration):
     # workers to get all the data.
     data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
                                               sampler=sampler,
-                                              num_workers=12,
+                                              num_workers=number_of_workers,
                                               pin_memory=True)
 
 
@@ -152,7 +152,7 @@ def select_balancing_strategy(dataset, iteration):
 
 
 # The main function maybe we could call it with a default name
-def execute(gpu, exp_batch, exp_alias, suppress_output=True):
+def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=12):
     # We set the visible cuda devices
 
 
@@ -213,7 +213,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True):
                               preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
 
 
-        data_loader = select_balancing_strategy(dataset, iteration)
+        data_loader = select_balancing_strategy(dataset, iteration, number_of_workers)
 
 
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)

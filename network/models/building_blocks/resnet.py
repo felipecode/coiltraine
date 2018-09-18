@@ -109,7 +109,12 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AvgPool2d(2, stride=0)
-        self.fc = nn.Linear(1536, num_classes)
+
+        # TODO: THis is a super hardcoding ..., in order to fit my image size on resnet
+        if block.__name__ == 'Bottleneck':
+            self.fc = nn.Linear(6144, num_classes)
+        else:
+            self.fc = nn.Linear(1536, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):

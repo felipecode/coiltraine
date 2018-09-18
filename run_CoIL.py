@@ -92,6 +92,13 @@ if __name__ == '__main__':
         default=4.0
     )
     argparser.add_argument(
+        '-nw',
+        '--number-of-workers',
+        dest='number_of_workers',
+        type=int,
+        default=12
+    )
+    argparser.add_argument(
         '-dk', '--docker',
         action='store_true',
         dest='docker',
@@ -157,7 +164,7 @@ if __name__ == '__main__':
 
         if args.single_process == 'train':
             # TODO make without position, increases the legibility.
-            execute_train("0", args.folder, args.exp, False)
+            execute_train("0", args.folder, args.exp, False, args.number_of_workers)
 
         elif args.single_process == 'validation':
             execute_validation("0", args.folder, args.exp, args.validation_datasets[0], False)
@@ -195,7 +202,8 @@ if __name__ == '__main__':
             'validation_datasets': list(args.validation_datasets),
             'driving_environments': list(args.driving_environments),
             'driving_parameters': drive_params,
-            'allocation_parameters': allocation_parameters
+            'allocation_parameters': allocation_parameters,
+            'number_of_workers': args.number_of_works
 
         }
 

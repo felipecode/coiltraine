@@ -11,7 +11,7 @@ from logger import printer, monitorer
 from . import train, validate, run_drive
 
 
-def execute_train(gpu, exp_batch, exp_alias, suppress_output=True):
+def execute_train(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=12):
     """
 
     Args:
@@ -25,7 +25,7 @@ def execute_train(gpu, exp_batch, exp_alias, suppress_output=True):
     """
     create_exp_path(exp_batch, exp_alias)
     p = multiprocessing.Process(target=train.execute,
-                                args=(gpu, exp_batch, exp_alias, suppress_output))
+                                args=(gpu, exp_batch, exp_alias, suppress_output, number_of_workers))
     p.start()
 
 
