@@ -203,7 +203,7 @@ if __name__ == '__main__':
             'driving_environments': list(args.driving_environments),
             'driving_parameters': drive_params,
             'allocation_parameters': allocation_parameters,
-            'number_of_workers': args.number_of_works
+            'number_of_workers': args.number_of_workers
 
         }
 

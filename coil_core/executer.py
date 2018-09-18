@@ -142,7 +142,8 @@ def folder_execute(params=None):
                     free_gpus,
                     allocation_parameters['train_cost'])
 
-                execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
+                execute_train(gpu_number, process_specs['folder'], process_specs['experiment'],
+                              params['number_of_workers'])
                 process_specs.update({'gpu': gpu_number})
 
                 executing_processes.append(process_specs)
