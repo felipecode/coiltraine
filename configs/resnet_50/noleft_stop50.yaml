@@ -1,6 +1,6 @@
 
 #### General Configuration Parameters ####
-SAVE_SCHEDULE: range(0, 500000, 20000)
+SAVE_SCHEDULE: [2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]
 
 NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
 
@@ -14,7 +14,8 @@ BATCH_SIZE: 120
 NUMBER_ITERATIONS: 500000
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
-SPLIT: [['lateral_noise', []], ['longitudinal_noise', []], ['weights', [0.2, 0.0, 0.8]]] # This is a bit criptical, but works
+REMOVE: [['angle', 0], ['traffic_lights', 1]]  # name of function, --- the point of division, the weights used after division
+
 NUMBER_FRAMES_FUSION: 1
 NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
@@ -24,26 +25,22 @@ TRAIN_DATASET_NAME: 'CARLA100'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
-NUMBER_OF_HOURS: 100
+NUMBER_OF_HOURS: 50
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [ 100000, 300000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [100000, 300000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
 
 
+
 MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
-    conv:
-      channels: [32, 32, 64, 64, 128, 128, 256, 256]
-      kernels: [5, 3, 3, 3, 3, 3, 3, 3]
-      strides: [2, 1, 2, 1, 2, 1, 1, 1]
-      dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    fc:
-      neurons: [512, 512]
-      dropouts: [0.0, 0.5]
+    res:
+      name: 'resnet50'
+      num_classes: 512
 
   measurements:
     fc:
@@ -83,7 +80,6 @@ VARIABLE_WEIGHT:
 IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
-
 
 
 

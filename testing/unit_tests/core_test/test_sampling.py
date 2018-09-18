@@ -11,14 +11,14 @@ from PIL import Image
 # from utils.general import plot_test_image
 
 from configs import set_type_of_process, merge_with_yaml
-
+import torch
 from torchvision import transforms
 from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_checkpoint_ready,\
     maximun_checkpoint_reach, get_next_checkpoint
 
 from coil_core.train import get_inverse_freq_weights
 
-from  coil_core.train import select_balancing_strategy, parse_split_configuration
+from  coil_core.train import select_balancing_strategy, parse_split_configuration, select_data
 from configs import g_conf
 
 def create_log_folder(exp_batch_name):
@@ -53,18 +53,25 @@ class testValidation(unittest.TestCase):
 
     # self.test_images_write_path = 'testing/unit_tests/_test_images_'
 
+    def __init__(self, *args, **kwargs):
+        super(testValidation, self).__init__(*args, **kwargs)
+        self.root_test_dir = 'testing/unit_tests/data'
+        self.test_images_write_path = 'testing/unit_tests/_test_images_'
 
     def test_core_validation(self):
 
+        if not os.path.exists(self.test_images_write_path + 'weather_aug'):
+            os.mkdir(self.test_images_write_path + 'weather_aug')
+
         dataset_name = 'CARLA100'
 
-        exp_batch  = 'eccv_debug'
+        exp_batch  = 'manual_balance50'
         exp_alias = 'experiment_1'
         full_dataset = os.path.join('/home/eder/data', dataset_name)
 
         os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-        create_log_folder('eccv_debug')
+        create_log_folder('manual_balance50')
         create_exp_path(exp_batch, exp_alias)
 
 
@@ -85,8 +92,9 @@ class testValidation(unittest.TestCase):
         # workers to get all the data.
         # TODO: batch size an number of workers go to some configuration file
 
+
         #g_conf.SPLIT = [['lateral_noise', []], ['longitudinal_noise', []], ['weights', [0.0, 0.0, 1.0]]]
-        data_loader = select_balancing_strategy(dataset, 0)
+        data_loader = select_balancing_strategy(dataset, 0, 12)
 
 
 
@@ -95,16 +103,23 @@ class testValidation(unittest.TestCase):
 
         #keys = splitter_function(dataset.measurements, params)
         #print (" The keys are ", keys)
-
+        count = 0
 
         for data in data_loader:
-            print (data)
+            #print (data)
+
+
+
+            image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+            image_to_save.save(os.path.join(self.test_images_write_path + 'weather_aug', str(count)+'l.png'))
+
+            """
             for i in range(120):
                 print (data[i]['steer'], data[i]['steer_noise'])
                 self.assertEqual(data[i]['steer'], data[i]['steer_noise'])
                 self.assertEqual(data[i]['throttle'], data[i]['throttle_noise'])
                 self.assertEqual(data[i]['brake'], data[i]['brake_noise'])
-
+            """
 
 
 

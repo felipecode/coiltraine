@@ -22,8 +22,8 @@ from torchvision import transforms
 
 
 # TODO: check a smarter way to do this
-def select_data(dataset, keys):
-    pass
+def select_data_old(dataset, keys):
+
     """
     Given a dataset with the float data and a set of keys, get the subset of these keys.
     Args:
@@ -31,34 +31,70 @@ def select_data(dataset, keys):
         keys:
 
     Returns:
+    """
 
+    # The angle of each datapoint camera.
+    print (dataset)
+    camera_names =  [dpoint['angle'] for dpoint in dataset]
 
     if g_conf.DATA_USED == 'central':
 
-        camera_names =  dataset.measurements['angle']
+        keys = splitter.label_split(camera_names, keys, [[0]])[0]
 
 
-        keys = splitter.label_split(camera_names, keys, [[1]])[0]
     elif g_conf.DATA_USED == 'sides':
-        camera_names = \
-            dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
-        keys = splitter.label_split(camera_names, keys, [[0, 2]])[0]
+
+        keys = splitter.label_split(camera_names, keys, [[-30.0, 30.0]])[0]
+
     elif g_conf.DATA_USED != 'all':
         raise ValueError(" Invalid data used keyname")
 
 
-    if  not g_conf.USE_NOISE_DATA:
-        steerings = dataset.measurements[np.where(dataset.meta_data[:, 0] == b'steer'), :][0][0]
-        steerings_noise = dataset.measurements[np.where(dataset.meta_data[:, 0]
-                                                 == b'steer_noise'), :][0][0]
-        noise_vec = steerings[:] != steerings_noise[:]
-        non_noise_data = splitter.label_split(noise_vec, keys, [[0]])
-        keys = list(set(non_noise_data[0]).intersection(set(keys)))
-
-
     return keys
 
+def parse_remove_configuration(configuration):
     """
+    Turns the configuration line of sliptting into a name and a set of params.
+    """
+
+    if configuration is None:
+        return "None", None
+    print ('conf', configuration)
+    conf_dict = collections.OrderedDict(configuration)
+
+    name = 'remove'
+    for key in conf_dict.keys():
+        if key != 'weights':
+            name += '_'
+            name += key
+
+
+
+    return name, conf_dict
+
+
+def select_data(dataset):
+
+    """
+    Given a dataset with the float data and a set of keys, get the subset of these keys.
+    Args:
+        dataset:
+        keys:
+
+    Returns:
+    """
+
+    # The angle of each datapoint camera.
+    # This can be updated to enable many more configurations
+
+    name, params =  parse_remove_configuration(g_conf.REMOVE)
+    splitter_function = getattr(splitter, name)
+
+    print(" Function to remove", name)
+    print(" params ", params)
+
+    return  splitter_function(dataset, params)
+
 
 def parse_split_configuration(configuration):
     """
@@ -103,17 +139,16 @@ def get_inverse_freq_weights(keys, dataset_size):
 def select_balancing_strategy(dataset, iteration, number_of_workers):
 
 
-    # TODO eliminate this function
-
 
     # Creates the sampler, this part is responsible for managing the keys. It divides
     # all keys depending on the measurements and produces a set of keys for each bach.
-    keys = range(0, len(dataset.measurements) - g_conf.NUMBER_IMAGES_SEQUENCE)
 
+    keys = select_data(dataset.measurements)
 
-    #keys = select_data(dataset, keys)
     # In the case we are using the balancing
-    print (" Split is ", g_conf.SPLIT)
+    print(" Split is ", g_conf.SPLIT)
+
+    print (keys)
     if g_conf.SPLIT is not None and g_conf.SPLIT is not "None":
         name, params = parse_split_configuration(g_conf.SPLIT)
         splitter_function = getattr(splitter, name)
@@ -121,23 +156,33 @@ def select_balancing_strategy(dataset, iteration, number_of_workers):
         print (" Function to split", name)
         print (" params ", params)
         print (" Weights ", params['weights'])
-        keys = splitter_function(dataset.measurements, params)
+        keys_splitted = splitter_function(dataset.measurements, params)
+        print (keys_splitted)
+
+        for i in range(len(keys_splitted)):
+
+            keys_splitted[i] = np.array(list(set(keys_splitted[i]).intersection(set(keys))))
+
+        print (keys_splitted)
+        print (" number of kleys",len(keys_splitted))
 
         if params['weights'] == 'inverse':
-            weights = get_inverse_freq_weights( keys, len(dataset.measurements) - g_conf.NUMBER_IMAGES_SEQUENCE)
+            weights = get_inverse_freq_weights(keys_splitted, len(dataset.measurements) - g_conf.NUMBER_IMAGES_SEQUENCE)
         else:
             weights = params['weights']
 
         print ( " final weights ")
         print ( weights )
-        sampler = PreSplittedSampler(keys, iteration * g_conf.BATCH_SIZE, weights)
+        sampler = PreSplittedSampler(keys_splitted, iteration * g_conf.BATCH_SIZE, weights)
     else:
 
         print (" Random Splitter ")
+
+        #print(keys)
         sampler = RandomSampler(keys, iteration * g_conf.BATCH_SIZE)
 
 
-
+    print ( "Getting dataloader")
 
     # The data loader is the multi threaded module from pytorch that release a number of
     # workers to get all the data.

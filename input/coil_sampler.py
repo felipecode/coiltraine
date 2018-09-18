@@ -36,7 +36,7 @@ class RandomSampler(Sampler):
         self.keys = keys
 
     def __iter__(self):
-        return iter([random.randint(0, len(self.keys)) for _ in range(self.iterations_to_execute)])
+        return iter([random.choice(self.keys) for _ in range(self.iterations_to_execute)])
 
 
     def __len__(self):
@@ -94,6 +94,7 @@ class PreSplittedSampler(Sampler):
 
         """
         rank_keys = get_rank(self.keys)
+        print ("got rank", rank_keys)
 
 
         # First we check how many subdivisions there are

@@ -79,12 +79,12 @@ def select_data_sequence(control, selected_data):
                                    (count * g_conf.SEQUENCE_STRIDE) +
                                    g_conf.NUMBER_IMAGES_SEQUENCE):
 
-
             #print ("IMAGES SEQUENCE ", g_conf.NUMBER_IMAGES_SEQUENCE )
             # The position is one
 
             if control[iter_sequence] not in selected_data:
                 eliminated_positions += 1
+
 
             if (eliminated_positions) > g_conf.NUMBER_IMAGES_SEQUENCE/2:
                 del_pos.append(count * g_conf.SEQUENCE_STRIDE)
@@ -174,8 +174,35 @@ def float_split(output_to_split, keys, percentiles):
     return splitted_keys
 
 
+# READABILITY IS HORRIBLE
+
+def remove_angle_traffic_lights(data, positions_dict):
+    # will return all the keys that does not contain the expression.
+
+    data = convert_measurements(data)
+    keys = np.where(np.logical_or(data['angle'] != positions_dict['angle'],
+                                  np.logical_and(data['angle']==positions_dict['angle'],
+                                                 data['traffic_lights'] ==positions_dict['traffic_lights']
+                                                 )
+                                  )
+                    )[0]
+    return keys
+
+def remove_angle(data, positions_dict):
+    # This will remove a list of angles that you dont want
+    # Usually used to get just the central camera
+
+    data = convert_measurements(data)
+    keys = np.where(np.logical_and(data['angle'] != positions_dict['angle'][0],
+                                   data['angle'] != positions_dict['angle'][1]
+                                   )
+                    )[0]
+
+    return keys
 
 
+
+####################### SPLITTING FUNCTIONS #########################
 
 def split_sequence(data, var, positions):
 

@@ -56,6 +56,7 @@ _g_conf.SPEED_DIVISION = []
 _g_conf.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
 _g_conf.BATCH_SIZE = 120
 _g_conf.SPLIT = None
+_g_conf.REMOVE = None
 
 #_g_conf.AUGMENTATION_SUITE = [iag.ToGPU()]#, iag.Add((0, 0)), iag.Dropout(0, 0), iag.Multiply((1, 1.04)),
 #                             #iag.GaussianBlur(sigma=(0.0, 3.0)),
