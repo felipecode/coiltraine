@@ -147,7 +147,7 @@ class testCILDataset(unittest.TestCase):
             count += 1
 
     def test_pre_select_no_left_traffic(self):
-
+        return
         if not os.path.exists(self.test_images_write_path + 'central'):
             os.mkdir(self.test_images_write_path + 'central')
 
@@ -193,7 +193,55 @@ class testCILDataset(unittest.TestCase):
             #print ("directions", data['directions'], " speed_module", data['speed_module'])
             count += 1
 
+    def test_pre_select_no_dynamic(self):
 
+        if not os.path.exists(self.test_images_write_path + 'central'):
+            os.mkdir(self.test_images_write_path + 'central')
+
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100')
+        # This depends on the number of fused frames. A image could have
+        # A certain number of fused frames
+        g_conf.TRAIN_DATASET_NAME = 'CARLA100'
+        g_conf.NUMBER_OF_ITERATIONS = 10000
+        g_conf.NUMBER_OF_HOURS = 50
+        g_conf.DATA_USED = 'central'
+
+        g_conf.REMOVE = [['traffic_lights', 0]]
+
+        g_conf.SPLIT = [['speed_module', [0.0666,  0.208, 0.39]], ['weights', [1.0, 0.0, 0.0, 0.0]]]
+
+        augmenter = Augmenter(None)
+        dataset = CoILDataset(full_dataset, transform=augmenter,
+                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+
+
+
+        # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
+        #                                          shuffle=True, num_workers=12, pin_memory=True)
+        # capture_time = time.time()
+        data_loader = select_balancing_strategy(dataset, 0, 12)
+        print('len ', len(data_loader))
+        max_steer = 0
+        count = 0
+        for data in data_loader:
+            print (data['pedestrian'])
+            print (data['vehicle'])
+            print (data['traffic_lights'])
+            for i in range(120):
+
+
+                    self.assertEqual(data['traffic_lights'][i][0], 1)
+
+                    self.assertEqual(data['vehicle'][i][0], 1)
+
+                    self.assertEqual(data['pedestrian'][i][0], 1)
+
+            #image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+            #image_to_save.save(os.path.join(self.test_images_write_path + 'central', str(count)+'l.png'))
+            # Test steerings after augmentation
+            #print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
+            #print ("directions", data['directions'], " speed_module", data['speed_module'])
+            count += 1
 
     def test_steering_augmentation(self):
         return

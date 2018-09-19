@@ -202,6 +202,29 @@ def remove_angle(data, positions_dict):
 
 
 
+def remove_all(data, positions_dict):
+    # This will remove a list of angles that you dont want
+    # Usually used to get just the central camera
+
+    data = convert_measurements(data)
+    keys = np.where(np.logical_and(np.logical_and(data['pedestrian'] == 1,
+                                                  data['traffic_lights'] == 1,
+                                                  ),
+                                   data['vehicle'] == 1
+                                   )
+                    )[0]
+
+    return keys
+
+def remove_traffic_lights(data, positions_dict):
+    # This will remove a list of angles that you dont want
+    # Usually used to get just the central camera
+
+    data = convert_measurements(data)
+    keys = np.where(data['traffic_lights'] == 1)[0]
+    return keys
+
+
 ####################### SPLITTING FUNCTIONS #########################
 
 def split_sequence(data, var, positions):
@@ -264,6 +287,7 @@ def split_speed_module_throttle(data, positions_dict):
              ]
 
     return keys
+
 def split_pedestrian_vehicle_traffic_lights_move(data, positions_dict):
     data = convert_measurements(data)
     keys = [np.where(np.logical_and(data['pedestrian'] < 1.0,
