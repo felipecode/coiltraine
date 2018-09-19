@@ -1,6 +1,6 @@
 
 #### General Configuration Parameters ####
-SAVE_SCHEDULE: [2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]
+SAVE_SCHEDULE: range(0,1000000, 20000)
 
 NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
 
@@ -28,8 +28,7 @@ USE_NOISE_DATA: True
 NUMBER_OF_HOURS: 50
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [100000, 300000, 500000]  # The frequency the model is actually tested.
-
+TEST_SCHEDULE: [100000, 300000, 500000, 700000, 1000000]  # The frequency the model is actually tested.
 
 #### Network Related Parameters ####
 
@@ -63,7 +62,7 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
 
 
 LEARNING_RATE: 0.0002  # First
-LEARNING_RATE_DECAY_INTERVAL: 50000
+LEARNING_RATE_DECAY_INTERVAL: 100000
 LEARNING_RATE_DECAY_LEVEL: 0.5
 
 #TODO check how to use this part
