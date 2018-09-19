@@ -87,14 +87,16 @@ def select_data(dataset):
     # The angle of each datapoint camera.
     # This can be updated to enable many more configurations
 
-    name, params =  parse_remove_configuration(g_conf.REMOVE)
-    splitter_function = getattr(splitter, name)
+    if g_conf.REMOVE is not None and g_conf.REMOVE is not "None":
+        name, params =  parse_remove_configuration(g_conf.REMOVE)
+        splitter_function = getattr(splitter, name)
 
-    print(" Function to remove", name)
-    print(" params ", params)
+        print(" Function to remove", name)
+        print(" params ", params)
 
-    return  splitter_function(dataset, params)
-
+        return  splitter_function(dataset, params)
+    else:
+        return range(0, len(dataset) - g_conf.NUMBER_IMAGES_SEQUENCE)
 
 def parse_split_configuration(configuration):
     """
@@ -148,7 +150,6 @@ def select_balancing_strategy(dataset, iteration, number_of_workers):
     # In the case we are using the balancing
     print(" Split is ", g_conf.SPLIT)
 
-    print (keys)
     if g_conf.SPLIT is not None and g_conf.SPLIT is not "None":
         name, params = parse_split_configuration(g_conf.SPLIT)
         splitter_function = getattr(splitter, name)
