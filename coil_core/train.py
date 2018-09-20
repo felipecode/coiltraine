@@ -64,7 +64,7 @@ def parse_remove_configuration(configuration):
 
     name = 'remove'
     for key in conf_dict.keys():
-        if key != 'weights':
+        if key != 'weights' and key != 'boost':
             name += '_'
             name += key
 
@@ -110,7 +110,7 @@ def parse_split_configuration(configuration):
 
     name = 'split'
     for key in conf_dict.keys():
-        if key != 'weights':
+        if key != 'weights' and key != 'boost':
             name += '_'
             name += key
 

@@ -1,6 +1,7 @@
 import os
 import glob
 import traceback
+import collections
 import sys
 import math
 import copy
@@ -14,11 +15,32 @@ import cv2
 from torch.utils.data import Dataset
 
 from logger import coil_logger
+from . import splitter
 
 # TODO: Warning, maybe this does not need to be included everywhere.
 from configs import g_conf
 
 from utils.general import sort_nicely
+
+def parse_boost_configuration(configuration):
+    """
+    Turns the configuration line of sliptting into a name and a set of params.
+    """
+
+    if configuration is None:
+        return "None", None
+    print ('conf', configuration)
+    conf_dict = collections.OrderedDict(configuration)
+
+    name = 'get_boost'
+    for key in conf_dict.keys():
+        if key != 'weights' and key != 'boost':
+            name += '_'
+            name += key
+
+
+
+    return name, conf_dict
 
 def get_episode_weather(episode):
 
@@ -47,29 +69,35 @@ class CoILDataset(Dataset):
             self.sensor_data_names, self.measurements = self.pre_load_image_folders(root_dir)
         self.transform = transform
         self.batch_read_number = 0
+        name, self.boost_params = parse_boost_configuration(g_conf.SPLIT)
+        self.boost_function = getattr(splitter, name)
 
     def __len__(self):
         return len(self.measurements)
 
     def __getitem__(self, index):
 
-
         img_path = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME,
                                 self.sensor_data_names[index].split('/')[-2],
                                 self.sensor_data_names[index].split('/')[-1])
 
-
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
-
         if self.transform is not None:
-            img = self.transform(self.batch_read_number, img)
+            #if g_conf.SPLIT is not None and g_conf.SPLIT is not 'None' and 'boost' in self.boost_params:
+            #    boost = self.boost_function(self.measurements, index, self.boost_params)
+            #else:
+            #    boost = 1
+            boost = 1
+            img = self.transform(self.batch_read_number * boost, img)
+
         else:
             img = img.transpose(2, 0, 1)
 
         img = img.astype(np.float)
         img = torch.from_numpy(img).type(torch.FloatTensor)
         img = img / 255.
+
 
 
         measurements = self.measurements[index].copy()
@@ -79,6 +107,7 @@ class CoILDataset(Dataset):
 
         # TODO: here just one image
         measurements['rgb'] = img
+        self.batch_read_number += 100
 
         return measurements
 

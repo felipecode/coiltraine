@@ -347,6 +347,32 @@ def split_left_central_right(data, positions_dict):
     return keys
 
 
+##### GET the property so we can perform augmentation later.
+
+
+def get_boost_pedestrian_vehicle_traffic_lights(data, key, positions_dict):
+
+    boost = 0
+
+    #print (data['pedestrian'][key])
+    if data[key]['pedestrian']  < 1.0 and data[key]['pedestrian'] > 0:
+        boost += positions_dict['boost'][0]
+
+    if data[key]['pedestrian'] == 0.:
+        boost += positions_dict['boost'][1]
+
+    if data[key]['vehicle'] < 1.:
+        boost +=  positions_dict['boost'][2]
+
+    if data[key]['pedestrian'] == 1.0 and data[key]['vehicle'] == 1. and data[key]['traffic_lights'] == 1. :
+        boost += positions_dict['boost'][3]
+
+    return boost
+
+
+
+
+
 def full_split(dataset):
     
     S = np.zeros(len(dataset.measurements))
