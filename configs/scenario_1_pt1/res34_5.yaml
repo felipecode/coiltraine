@@ -36,15 +36,9 @@ TEST_SCHEDULE: [32000, 64000, 100000, 300000, 500000]  # The frequency the model
 MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
-    conv:
-      channels: [32, 64, 128, 256]
-      kernels: [5, 3, 3, 3]
-      strides: [2, 2, 2, 2]
-      dropouts: [0.0, 0.0, 0.0, 0.0]
-    fc:
-      neurons: [512, 512]
-      dropouts: [0.0, 0.5]
-
+    res:
+      name: 'resnet34'
+      num_classes: 512
   measurements:
     fc:
       neurons: [128, 128]
