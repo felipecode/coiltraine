@@ -12,7 +12,7 @@ MEASUREMENTS:
 
 BATCH_SIZE: 120
 NUMBER_ITERATIONS: 500000
-TARGETS: ['steer', 'throttle', 'brake']
+TARGETS: ['steer', 'throttle']
 INPUTS: ['speed_module']
 REMOVE: [['angle', -30],['traffic_lights', 1]]  # name of function, --- the point of division, the weights used after division
 NUMBER_FRAMES_FUSION: 1
@@ -75,8 +75,7 @@ LOSS_FUNCTION: 'L1'
 
 VARIABLE_WEIGHT:
   Steer: 0.5
-  Gas: 0.45
-  Brake: 0.05
+  Gas: 0.5
 
 
 #### Simulation Related Parameters ####

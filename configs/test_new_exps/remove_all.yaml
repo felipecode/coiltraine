@@ -14,7 +14,7 @@ BATCH_SIZE: 120
 NUMBER_ITERATIONS: 500000
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
-REMOVE: [['angle', 0],['traffic_lights', 1]]  # name of function, --- the point of division, the weights used after division
+REMOVE: [['all', 0]]  # name of function, --- the point of division, the weights used after division
 NUMBER_FRAMES_FUSION: 1
 NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
