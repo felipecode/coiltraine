@@ -176,29 +176,30 @@ def float_split(output_to_split, keys, percentiles):
 
 # READABILITY IS HORRIBLE
 
+
+
 def remove_angle_traffic_lights(data, positions_dict):
     # will return all the keys that does not contain the expression.
 
-    data = convert_measurements(data)
-    keys = np.where(np.logical_or(data['angle'] != positions_dict['angle'],
-                                  np.logical_and(data['angle']==positions_dict['angle'],
-                                                 data['traffic_lights'] ==positions_dict['traffic_lights']
-                                                 )
-                                  )
-                    )[0]
-    return keys
+    return (data['angle'] == positions_dict['angle'] and data['traffic_lights']!=positions_dict['traffic_lights'])
+
+
+
 
 def remove_angle(data, positions_dict):
     # This will remove a list of angles that you dont want
     # Usually used to get just the central camera
 
-    data = convert_measurements(data)
-    keys = np.where(np.logical_and(data['angle'] != positions_dict['angle'][0],
-                                   data['angle'] != positions_dict['angle'][1]
-                                   )
-                    )[0]
 
-    return keys
+    return data['angle'] == positions_dict['angle']
+
+    #data = convert_measurements(data)
+    #keys = np.where(np.logical_and(data['angle'] != positions_dict['angle'][0],
+    #                               data['angle'] != positions_dict['angle'][1]
+    #                               )
+    #                )[0]
+
+    #return keys
 
 
 
@@ -206,7 +207,8 @@ def remove_all(data, positions_dict):
     # This will remove a list of angles that you dont want
     # Usually used to get just the central camera
 
-    data = convert_measurements(data)
+    #data = convert_measurements(data)
+    return
     keys = np.where(np.logical_and(np.logical_and(data['pedestrian'] == 1,
                                                   data['traffic_lights'] == 1,
                                                   ),

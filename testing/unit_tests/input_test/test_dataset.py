@@ -1,4 +1,6 @@
 import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import time
 import unittest
@@ -6,12 +8,14 @@ import random
 import math
 
 import torch
-from input import CoILDataset, Augmenter, BatchSequenceSampler, splitter
+
+from PIL import Image
 
 from torchvision import transforms
 from configs import g_conf
 
 
+from input import CoILDataset, Augmenter, BatchSequenceSampler, splitter
 from coil_core.train import select_balancing_strategy
 
 
@@ -194,7 +198,7 @@ class testCILDataset(unittest.TestCase):
             count += 1
 
     def test_pre_select_no_dynamic(self):
-
+        return
         if not os.path.exists(self.test_images_write_path + 'central'):
             os.mkdir(self.test_images_write_path + 'central')
 
@@ -242,6 +246,180 @@ class testCILDataset(unittest.TestCase):
             #print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
             #print ("directions", data['directions'], " speed_module", data['speed_module'])
             count += 1
+    def test_add_remove_on_preload(self):
+        return
+
+        if not os.path.exists(self.test_images_write_path + 'augmentation'):
+            os.mkdir(self.test_images_write_path + 'augmentation')
+
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100')
+        # This depends on the number of fused frames. A image could have
+        # A certain number of fused frames
+        g_conf.TRAIN_DATASET_NAME = 'CARLA100'
+        g_conf.NUMBER_OF_ITERATIONS = 10000
+        g_conf.NUMBER_OF_HOURS = 50
+        g_conf.DATA_USED = 'central'
+
+        g_conf.REMOVE = [['angle', -30],['traffic_lights', 1]]
+
+        augmenter = Augmenter(None)
+        dataset = CoILDataset(full_dataset, transform=augmenter,
+                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+
+        # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
+        #                                          shuffle=True, num_workers=12, pin_memory=True)
+        # capture_time = time.time()
+        data_loader = select_balancing_strategy(dataset, 0, 12)
+        print('len ', len(data_loader))
+        max_steer = 0
+        count = 0
+        for data in data_loader:
+
+            print (data['angle'])
+            print (data['traffic_lights'])
+            for i in range(120):
+                if data['angle'][i][0] == -30:
+
+
+
+                    self.assertEqual(data['traffic_lights'][i][0], 1)
+
+
+            """
+            print (count)
+            count += 1
+            if count % 200 != 0:
+                continue
+
+            for i in range(120):
+                image_to_save = transforms.ToPILImage()((data['rgb'][i].cpu()*255).type(torch.ByteTensor))
+
+                b, g, r = image_to_save.split()
+                image_to_save = Image.merge("RGB", (r, g, b))
+
+                image_to_save.save(os.path.join(self.test_images_write_path + 'augmentation', str(count) + '_' + str(i) + '.png'))
+            """
+
+            # Test steerings after augmentation
+            # print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
+            # print ("directions", data['directions'], " speed_module", data['speed_module'])
+    def test_eliminating_brake(self):
+
+        if not os.path.exists(self.test_images_write_path + 'augmentation'):
+            os.mkdir(self.test_images_write_path + 'augmentation')
+
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100')
+        # This depends on the number of fused frames. A image could have
+        # A certain number of fused frames
+        g_conf.TARGETS = ['steer', 'throttle']
+        g_conf.TRAIN_DATASET_NAME = 'CARLA100'
+        g_conf.NUMBER_OF_ITERATIONS = 2000
+        g_conf.NUMBER_OF_HOURS = 1
+        g_conf.DATA_USED = 'all'
+
+
+        augmenter = Augmenter(None)
+        dataset = CoILDataset(full_dataset, transform=augmenter,
+                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+
+        # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
+        #                                          shuffle=True, num_workers=12, pin_memory=True)
+        # capture_time = time.time()
+        data_loader = select_balancing_strategy(dataset, 0, 12)
+        print('len ', len(data_loader))
+        max_steer = 0
+        count = 0
+        throttle_vec = []
+        for data in data_loader:
+            print (count)
+            for i in range(120):
+
+                throttle_vec.append(data['throttle'].cpu()[0])
+
+            count += 1
+            if count > 2000:
+                break
+
+            """
+            print (count)
+            count += 1
+            if count % 200 != 0:
+                continue
+
+            for i in range(120):
+                image_to_save = transforms.ToPILImage()((data['rgb'][i].cpu()*255).type(torch.ByteTensor))
+
+                b, g, r = image_to_save.split()
+                image_to_save = Image.merge("RGB", (r, g, b))
+
+                image_to_save.save(os.path.join(self.test_images_write_path + 'augmentation', str(count) + '_' + str(i) + '.png'))
+            """
+        x = range(len(throttle_vec))
+        plt.plot(x, throttle_vec)
+        plt.show()
+        # Test steerings after augmentation
+        # print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
+        # print ("directions", data['directions'], " speed_module", data['speed_module'])
+
+
+
+    def test_add_augmentation(self):
+        return
+        if not os.path.exists(self.test_images_write_path + 'augmentation'):
+            os.mkdir(self.test_images_write_path + 'augmentation')
+
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100')
+        # This depends on the number of fused frames. A image could have
+        # A certain number of fused frames
+        g_conf.TRAIN_DATASET_NAME = 'CARLA100'
+        g_conf.NUMBER_OF_ITERATIONS = 10000
+        g_conf.NUMBER_OF_HOURS = 50
+        g_conf.DATA_USED = 'central'
+
+        #g_conf.REMOVE = [['traffic_lights', 0]]
+
+        g_conf.SPLIT = \
+            [['pedestrian', []], ['vehicle', []], ['traffic_lights', []], ['weights', [0.2, 0.2, 0.2, 0.2, 0.2]],
+             ['boost', [20, 20, 0, 0, 0]]]
+
+        augmenter = Augmenter('soft_harder')
+        dataset = CoILDataset(full_dataset, transform=augmenter,
+                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+
+        # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
+        #                                          shuffle=True, num_workers=12, pin_memory=True)
+        # capture_time = time.time()
+        data_loader = select_balancing_strategy(dataset, 0, 12)
+        print('len ', len(data_loader))
+        max_steer = 0
+        count = 0
+        for data in data_loader:
+
+            """
+            for i in range(120):
+                self.assertEqual(data['traffic_lights'][i][0], 1)
+
+                self.assertEqual(data['vehicle'][i][0], 1)
+
+                self.assertEqual(data['pedestrian'][i][0], 1)
+            """
+            print (count)
+            count += 1
+            if count % 200 != 0:
+                continue
+
+            for i in range(120):
+                image_to_save = transforms.ToPILImage()((data['rgb'][i].cpu()*255).type(torch.ByteTensor))
+
+                b, g, r = image_to_save.split()
+                image_to_save = Image.merge("RGB", (r, g, b))
+
+                image_to_save.save(os.path.join(self.test_images_write_path + 'augmentation', str(count) + '_' + str(i) + '.png'))
+            # Test steerings after augmentation
+            # print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
+            # print ("directions", data['directions'], " speed_module", data['speed_module'])
+
+
 
     def test_steering_augmentation(self):
         return

@@ -42,6 +42,32 @@ def parse_boost_configuration(configuration):
 
     return name, conf_dict
 
+
+# THIS PARSING IS A BIT HARDCODED
+
+
+def parse_remove_configuration(configuration):
+    """
+    Turns the configuration line of sliptting into a name and a set of params.
+    """
+
+    if configuration is None:
+        return "None", None
+    print ('conf', configuration)
+    conf_dict = collections.OrderedDict(configuration)
+
+    name = 'remove'
+    for key in conf_dict.keys():
+        if key != 'weights' and key != 'boost':
+            name += '_'
+            name += key
+
+
+
+    return name, conf_dict
+
+
+
 def get_episode_weather(episode):
 
     with open(os.path.join(episode, 'metadata.json')) as f:
@@ -54,12 +80,23 @@ class CoILDataset(Dataset):
 
     def __init__(self, root_dir, transform=None, preload_name=None):
 
-        # If all the weathers are present we keep without anything ( WE ASSUME THAT THIS HAS LENGHT 4)
-        if len(g_conf.WEATHERS) == 4:
+        # We add to the preload name all the remove labels
+        if g_conf.REMOVE is not None and g_conf.REMOVE is not "None":
+            name, self._remove_params = parse_remove_configuration(g_conf.REMOVE)
+            self.preload_name = preload_name + '_' + name
+            self._check_remove_function = getattr(splitter, name)
+        else:
+            self._check_remove_function = lambda _, __: False
+            self._remove_params = []
             self.preload_name = preload_name
-        else:  # The other case we just add the weather names after
 
-            self.preload_name = preload_name + '-'.join(str(e) for e in g_conf.WEATHERS)
+        # Add no brake on the preload name if there is no brake
+        if 'brake' not in g_conf.TARGETS:
+            self.preload_name += '_nobrake'
+
+        # If  not all the weathers are present we keep without anything ( WE ASSUME THAT THIS HAS LENGHT 4)
+        if len(g_conf.WEATHERS) < 4:
+            self.preload_name = self.preload_name + '-'.join(str(e) for e in g_conf.WEATHERS)
 
         if self.preload_name is not None and os.path.exists(os.path.join('_preloads', self.preload_name + '.npy')):
             print ( " Loading from NPY ")
@@ -69,8 +106,8 @@ class CoILDataset(Dataset):
             self.sensor_data_names, self.measurements = self.pre_load_image_folders(root_dir)
         self.transform = transform
         self.batch_read_number = 0
-        name, self.boost_params = parse_boost_configuration(g_conf.SPLIT)
-        self.boost_function = getattr(splitter, name)
+        #name, self.boost_params = parse_boost_configuration(g_conf.SPLIT)
+        #self.boost_function = getattr(splitter, name)
 
     def __len__(self):
         return len(self.measurements)
@@ -111,6 +148,67 @@ class CoILDataset(Dataset):
 
         return measurements
 
+    def is_measurement_partof_experiment(self, measurement_data):
+
+        # If the measument data is not removable is because it is part of this experiment dataa
+        return not self._check_remove_function(measurement_data, self._remove_params)
+
+
+    def _get_final_measurement(self, speed, measurement_data, angle, directions):
+        """
+        Function to load the measurement with a certain angle and augmented direction.
+        Also, it will choose if the brake is gona be present or if acceleration -1,1 is the default.
+
+        :return:
+        """
+        if angle != 0:
+            measurement_augmented = self.augment_measurement(copy.copy(measurement_data), angle, 3.6 * speed)
+        else:
+            # We have to copy since it reference a file.
+            measurement_augmented = copy.copy(measurement_data)
+
+
+        if 'brake' not in g_conf.TARGETS:
+            # A bit of repeating code, but helps for the sake of clarity
+
+
+
+            if measurement_augmented['brake'] > 0.01:
+                final_throtle = -measurement_augmented['brake']
+                final_throtle_noise = -measurement_augmented['brake_noise']
+            else:
+                final_throtle = measurement_augmented['throttle']
+                final_throtle_noise = measurement_augmented['throttle_noise']
+
+
+            final_measurement = {'steer': measurement_augmented['steer'],
+                             'steer_noise': measurement_augmented['steer_noise'],
+                             'throttle': final_throtle,
+                             'throttle_noise': final_throtle_noise,
+                             'speed_module': speed/g_conf.SPEED_FACTOR,
+                             'directions': directions,
+                             "pedestrian": measurement_augmented['stop_pedestrian'],
+                             "traffic_lights": measurement_augmented['stop_traffic_lights'],
+                             "vehicle": measurement_augmented['stop_vehicle'],
+                             'angle': angle}
+
+        else:
+            final_measurement = {'steer': measurement_augmented['steer'],
+                             'steer_noise': measurement_augmented['steer_noise'],
+                             'throttle': measurement_augmented['throttle'],
+                             'throttle_noise': measurement_augmented['throttle_noise'],
+                             'brake': measurement_augmented['brake'],
+                             'brake_noise': measurement_augmented['brake_noise'],
+                             'speed_module': speed/g_conf.SPEED_FACTOR,
+                             'directions': directions,
+                             "pedestrian": measurement_augmented['stop_pedestrian'],
+                             "traffic_lights": measurement_augmented['stop_traffic_lights'],
+                             "vehicle": measurement_augmented['stop_vehicle'],
+                             'angle': angle}
+
+
+        return final_measurement
+
     def pre_load_image_folders(self, path):
         """
         Pre load the image folders for each episode, keep in mind that we only take
@@ -118,7 +216,7 @@ class CoILDataset(Dataset):
 
         args
             the path for the dataset
-
+0
 
         returns
          sensor data names: it is a vector with n dimensions being one for each sensor modality
@@ -156,7 +254,7 @@ class CoILDataset(Dataset):
 
 
 
-
+            # Get all the measuremensts from this episode
 
             measurements_list = glob.glob(os.path.join(episode, 'measurement*'))
             sort_nicely(measurements_list)
@@ -170,10 +268,9 @@ class CoILDataset(Dataset):
                 continue
 
 
-            last_data_point_number = measurements_list[-1].split('_')[-1].split('.')[0]
-            number_of_hours_pre_loaded += (float(last_data_point_number) / 10.0)/3600.0
-            print (" Added ", ((float(last_data_point_number) / 10.0)/3600.0))
-            print (" TOtal Hours (partial) ", number_of_hours_pre_loaded)
+
+            # A simple count to keep track how many measurements were added this episode.
+            count_added_measurements = 0
 
             for measurement in measurements_list[:-3]:
 
@@ -183,78 +280,69 @@ class CoILDataset(Dataset):
                 # TODO the dataset camera name can be a parameter
                 with open(measurement) as f:
                     measurement_data = json.load(f)
+
+                # depending on the configuration file, we eliminated the kind of measurements that are not
+                # going to be used for this experiment
+
+
+
                 # We extract the interesting subset from the measurement dict
                 if 'forwardSpeed' in  measurement_data['playerMeasurements']:
                     speed = measurement_data['playerMeasurements']['forwardSpeed']
                 else:
                     speed = 0
 
+
+
+
                 directions = self.augment_directions(measurement_data['directions'])
 
+                final_measurement = self._get_final_measurement(speed, measurement_data, 0, directions)
 
-                float_dicts.append(
-                    {'steer': measurement_data['steer'],
-                     'steer_noise': measurement_data['steer_noise'],
-                     'throttle': measurement_data['throttle'],
-                     'throttle_noise': measurement_data['throttle_noise'],
-                     'brake': measurement_data['brake'],
-                     'brake_noise': measurement_data['brake_noise'],
-                     'speed_module': speed/g_conf.SPEED_FACTOR,
-                     'directions': directions,
-                     "pedestrian": measurement_data['stop_pedestrian'],
-                     "traffic_lights": measurement_data['stop_traffic_lights'],
-                     "vehicle": measurement_data['stop_vehicle'],
-                     'angle': 0}
-                )
+                if self.is_measurement_partof_experiment(final_measurement):
+                    float_dicts.append(final_measurement)
+                    rgb = 'CentralRGB_' + data_point_number + '.png'
+                    sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
+                    count_added_measurements += 1
 
-                rgb = 'CentralRGB_' + data_point_number + '.png'
-                sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
 
                 # We do measurements for the left side camera
                 # #TOdo the angle does not need to be hardcoded
                 # We convert the speed to KM/h for the augmentaiton
-                measurement_left = self.augment_measurement(copy.copy(measurement_data), -30.0, 3.6*speed)
 
                 # We extract the interesting subset from the measurement dict
-                float_dicts.append(
-                    {'steer': measurement_left['steer'],
-                     'steer_noise': measurement_left['steer_noise'],
-                     'throttle': measurement_left['throttle'],
-                     'throttle_noise': measurement_left['throttle_noise'],
-                     'brake': measurement_left['brake'],
-                     'brake_noise': measurement_left['brake_noise'],
-                     'speed_module': speed/g_conf.SPEED_FACTOR,
-                     'directions': directions,
-                     "pedestrian": measurement_left['stop_pedestrian'],
-                     "traffic_lights": measurement_left['stop_traffic_lights'],
-                     "vehicle": measurement_left['stop_vehicle'],
-                     'angle': -30.0}
-                )
-                rgb = 'LeftRGB_' + data_point_number + '.png'
 
-                sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
+                final_measurement = self._get_final_measurement(speed, measurement_data, -30.0, directions)
+
+                if self.is_measurement_partof_experiment(final_measurement):
+                    float_dicts.append(final_measurement)
+                    rgb = 'LeftRGB_' + data_point_number + '.png'
+                    sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
+                    count_added_measurements += 1
 
                 # We do measurements augmentation for the right side cameras
 
-                measurement_right = self.augment_measurement(copy.copy(measurement_data), 30.0, 3.6*speed)
+
+                final_measurement = self._get_final_measurement(speed, measurement_data, 30.0, directions)
 
 
-                float_dicts.append(
-                    {'steer': measurement_right['steer'],
-                     'steer_noise': measurement_right['steer_noise'],
-                     'throttle': measurement_right['throttle'],
-                     'throttle_noise': measurement_right['throttle_noise'],
-                     'brake': measurement_right['brake'],
-                     'brake_noise': measurement_right['brake_noise'],
-                     'speed_module': speed/g_conf.SPEED_FACTOR,
-                     'directions': directions,
-                     "pedestrian": measurement_right['stop_pedestrian'],
-                     "traffic_lights": measurement_right['stop_traffic_lights'],
-                     "vehicle": measurement_right['stop_vehicle'],
-                     'angle': 30.0}
-                )
-                rgb = 'RightRGB_' + data_point_number + '.png'
-                sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
+                if self.is_measurement_partof_experiment(final_measurement):
+                    float_dicts.append(final_measurement)
+                    rgb = 'RightRGB_' + data_point_number + '.png'
+                    sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
+                    count_added_measurements += 1
+
+            # Check how many hours were actually added
+
+            last_data_point_number = measurements_list[-4].split('_')[-1].split('.')[0]
+            print ("last and float dicts len", last_data_point_number, count_added_measurements )
+
+            print ("ERASED ", float(last_data_point_number)*3 -  count_added_measurements)
+
+            number_of_hours_pre_loaded += (float(count_added_measurements / 10.0)/3600.0)
+            print (" Added ", ((float(count_added_measurements) / 10.0)/3600.0))
+            print (" TOtal Hours (partial) ", number_of_hours_pre_loaded)
+
 
 
         print ( " LOADED ", number_of_hours_pre_loaded, " This hours")
@@ -313,12 +401,9 @@ class CoILDataset(Dataset):
             Augment the steering of a measurement dict
 
         """
-
         new_steer = self.augment_steering(angle, measurements['steer'],
                                           speed)
-
         measurements['steer'] = new_steer
-
         return measurements
 
 

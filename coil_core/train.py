@@ -52,25 +52,6 @@ def select_data_old(dataset, keys):
 
     return keys
 
-def parse_remove_configuration(configuration):
-    """
-    Turns the configuration line of sliptting into a name and a set of params.
-    """
-
-    if configuration is None:
-        return "None", None
-    print ('conf', configuration)
-    conf_dict = collections.OrderedDict(configuration)
-
-    name = 'remove'
-    for key in conf_dict.keys():
-        if key != 'weights' and key != 'boost':
-            name += '_'
-            name += key
-
-
-
-    return name, conf_dict
 
 
 def select_data(dataset):
@@ -145,7 +126,8 @@ def select_balancing_strategy(dataset, iteration, number_of_workers):
     # Creates the sampler, this part is responsible for managing the keys. It divides
     # all keys depending on the measurements and produces a set of keys for each bach.
 
-    keys = select_data(dataset.measurements)
+    #keys = select_data(dataset.measurements)   I WILL TEST SELECTING DATA ON OTHER PART
+    keys = range(0, len(dataset) - g_conf.NUMBER_IMAGES_SEQUENCE)
 
     # In the case we are using the balancing
     print(" Split is ", g_conf.SPLIT)

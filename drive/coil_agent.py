@@ -222,11 +222,13 @@ class CoILAgent(Agent):
         model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), norm_speed,
                                                   directions_tensor)
 
-        # TODO: for now this is hard coded, but on the first week on TRI i will adapt
-        if 'waypoint1_angle' in g_conf.TARGETS:
-            steer, throttle, brake = self._process_model_outputs_wp(model_outputs[0])
-        else:
+
+        if 'brake' in g_conf.TARGETS:
+
             steer, throttle, brake = self._process_model_outputs(model_outputs[0])
+        else:
+
+            steer, throttle, brake = self._process_model_outputs_no_brake(model_outputs[0])
 
         control = carla_protocol.Control()
         control.steer = steer
@@ -314,6 +316,28 @@ class CoILAgent(Agent):
 
         if throttle > brake:
             brake = 0.0
+        # else:
+        #    throttle = throttle * 2
+        # if speed > 35.0 and brake == 0.0:
+        #    throttle = 0.0
+
+        return steer, throttle, brake
+
+    def _process_model_outputs_no_brake(self, outputs):
+        """
+         A bit of heuristics in the control, to eventually make car faster, for instance.
+        Returns:
+
+        """
+        steer, throttle_brake = outputs[0], outputs[1]
+
+        if throttle_brake >= 0.0:
+            throttle = throttle_brake
+            brake = 0.0
+        else:
+            brake = -throttle_brake
+            throttle = 0.0
+
         # else:
         #    throttle = throttle * 2
         # if speed > 35.0 and brake == 0.0:
