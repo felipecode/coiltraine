@@ -242,7 +242,8 @@ class CoILDataset(Dataset):
             print('Episode ', episode)
 
             if not os.path.exists(os.path.join(episode, "checked")) and not os.path.exists(os.path.join(episode, "processed2")) \
-                  and not os.path.exists(os.path.join(episode, "bad_episode")):
+                  and not os.path.exists(os.path.join(episode, "bad_episode")) and \
+                    not g_conf.TRAIN_DATASET_NAME == 'CARLA80TL':
                 # Episode was not checked. So we dont load it.
                 print (" Not checked")
                 continue
