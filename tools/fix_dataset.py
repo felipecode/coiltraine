@@ -108,7 +108,12 @@ if __name__ == '__main__':
     c_ep = 0
     for ep, h5 in enumerate(all_h5):
         print(ep)
+        if ep < 15000:
 
+            if ep % 20 == 0:
+                c_ep += 1
+
+            continue
 
         if ep % 20 == 0:
 

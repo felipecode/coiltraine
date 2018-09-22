@@ -19,11 +19,11 @@ NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 12.0
-TRAIN_DATASET_NAME: 'CARLA25EmptyTL'
+TRAIN_DATASET_NAME: 'CARLA80TL'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
-NUMBER_OF_HOURS: 3
+NUMBER_OF_HOURS: 240
 
 
 #### Testing Related Parameters ####
