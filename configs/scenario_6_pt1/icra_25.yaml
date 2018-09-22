@@ -74,9 +74,9 @@ BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05]
 LOSS_FUNCTION: 'L1'
 
 VARIABLE_WEIGHT:
-  Steer: 0.5
-  Gas: 0.45
-  Brake: 0.05
+  Steer: 0.4
+  Gas: 0.3
+  Brake: 0.3
 
 
 #### Simulation Related Parameters ####
