@@ -20,14 +20,15 @@ NUMBER_FRAMES_FUSION: 1
 NUMBER_IMAGES_SEQUENCE: 1
 SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
-SPEED_FACTOR: 40.0
-TRAIN_DATASET_NAME: '1HoursW1-3-6-8'
+SPEED_FACTOR: 12.0
+TRAIN_DATASET_NAME: 'CARLA100'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
+NUMBER_OF_HOURS: 1
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [ 2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
@@ -43,16 +44,16 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     fc:
       neurons: [512, 512]
-      dropouts: [0.0, 0.5]
+      dropouts: [0.5, 0.5]
 
   measurements:
     fc:
       neurons: [128, 128]
-      dropouts: [0.0, 0.5]
+      dropouts: [0.5, 0.5]
   join:
     fc:
       neurons: [512]
-      dropouts: [0.0]
+      dropouts: [0.5]
   speed_branch:
     fc:
       neurons: [256, 256]
@@ -83,7 +84,7 @@ VARIABLE_WEIGHT:
 
 #### Simulation Related Parameters ####
 IMAGE_CUT: [115, 510]  # How you should cut the input image that is received from the server
-USE_ORACLE: True
+USE_ORACLE: False
 
 
 
