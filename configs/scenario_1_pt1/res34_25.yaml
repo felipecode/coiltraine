@@ -22,11 +22,11 @@ TRAIN_DATASET_NAME: 'CARLA25Empty'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
-NUMBER_OF_HOURS: 15
+NUMBER_OF_HOURS: 75
 
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [64000, 100000, 300000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [100000, 300000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####

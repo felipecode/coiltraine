@@ -27,7 +27,7 @@ NUMBER_OF_HOURS: 240
 
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [32000, 64000, 100000, 300000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [64000, 100000, 300000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
@@ -80,7 +80,7 @@ VARIABLE_WEIGHT:
 
 
 #### Simulation Related Parameters ####
-IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
+IMAGE_CUT: [115, 510]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
 

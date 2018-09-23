@@ -1,3 +1,4 @@
+
 #### General Configuration Parameters ####
 SAVE_SCHEDULE: [2000, 4000, 8000, 16000, 32000, 64000, 100000, 200000, 300000, 400000, 500000]
 
@@ -22,11 +23,11 @@ TRAIN_DATASET_NAME: 'CARLA25Empty'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
-NUMBER_OF_HOURS: 15
+NUMBER_OF_HOURS: 75
 
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [64000, 100000, 300000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [100000, 300000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
@@ -35,9 +36,15 @@ TEST_SCHEDULE: [64000, 100000, 300000, 500000]  # The frequency the model is act
 MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
-    res:
-      name: 'resnet34'
-      num_classes: 512
+    conv:
+      channels: [32, 32, 64, 64, 128, 128, 256, 256]
+      kernels: [5, 3, 3, 3, 3, 3, 3, 3]
+      strides: [2, 1, 2, 1, 2, 1, 1, 1]
+      dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    fc:
+      neurons: [512, 512]
+      dropouts: [0.0, 0.5]
+
   measurements:
     fc:
       neurons: [128, 128]

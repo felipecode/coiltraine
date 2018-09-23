@@ -128,6 +128,8 @@ def select_balancing_strategy(dataset, iteration, number_of_workers):
 
     #keys = select_data(dataset.measurements)   I WILL TEST SELECTING DATA ON OTHER PART
     keys = range(0, len(dataset) - g_conf.NUMBER_IMAGES_SEQUENCE)
+    print (" ALL THE KEYS ")
+    print (len(keys))
 
     # In the case we are using the balancing
     print(" Split is ", g_conf.SPLIT)
@@ -272,6 +274,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             capture_time = time.time()
             controls = data['directions']
+            print (data['speed_module'])
 
 
 

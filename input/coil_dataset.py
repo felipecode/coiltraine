@@ -80,6 +80,8 @@ class CoILDataset(Dataset):
 
     def __init__(self, root_dir, transform=None, preload_name=None):
 
+
+        print("IONIT COIL DATASET")
         # We add to the preload name all the remove labels
         if g_conf.REMOVE is not None and g_conf.REMOVE is not "None":
             name, self._remove_params = parse_remove_configuration(g_conf.REMOVE)
@@ -98,15 +100,23 @@ class CoILDataset(Dataset):
         if len(g_conf.WEATHERS) < 4:
             self.preload_name = self.preload_name + '-'.join(str(e) for e in g_conf.WEATHERS)
 
+
+        print ("preload Name ", self.preload_name)
+
         if self.preload_name is not None and os.path.exists(os.path.join('_preloads', self.preload_name + '.npy')):
             print ( " Loading from NPY ")
             self.sensor_data_names, self.measurements  = np.load(os.path.join('_preloads', self.preload_name + '.npy'))
             print (self.sensor_data_names)
         else:
             self.sensor_data_names, self.measurements = self.pre_load_image_folders(root_dir)
+
+
+        print ("preload Name ", self.preload_name)
+
         self.transform = transform
         self.batch_read_number = 0
         #name, self.boost_params = parse_boost_configuration(g_conf.SPLIT)
+
         #self.boost_function = getattr(splitter, name)
 
     def __len__(self):
@@ -144,7 +154,8 @@ class CoILDataset(Dataset):
 
         # TODO: here just one image
         measurements['rgb'] = img
-        self.batch_read_number += 100
+
+        self.batch_read_number += 1
 
         return measurements
 
@@ -168,6 +179,11 @@ class CoILDataset(Dataset):
             measurement_augmented = copy.copy(measurement_data)
 
 
+        if 'gameTimestamp' in measurement_augmented:
+            time_stamp = measurement_augmented['gameTimestamp']
+        else:
+            time_stamp =measurement_augmented['game_time']
+
         if 'brake' not in g_conf.TARGETS:
             # A bit of repeating code, but helps for the sake of clarity
 
@@ -190,6 +206,7 @@ class CoILDataset(Dataset):
                              "pedestrian": measurement_augmented['stop_pedestrian'],
                              "traffic_lights": measurement_augmented['stop_traffic_lights'],
                              "vehicle": measurement_augmented['stop_vehicle'],
+                             "game_time": time_stamp,
                              'angle': angle}
 
         else:
@@ -204,7 +221,10 @@ class CoILDataset(Dataset):
                              "pedestrian": measurement_augmented['stop_pedestrian'],
                              "traffic_lights": measurement_augmented['stop_traffic_lights'],
                              "vehicle": measurement_augmented['stop_vehicle'],
+                             "game_time": time_stamp,
                              'angle': angle}
+
+
 
 
         return final_measurement
@@ -216,7 +236,7 @@ class CoILDataset(Dataset):
 
         args
             the path for the dataset
-0
+        0
 
         returns
          sensor data names: it is a vector with n dimensions being one for each sensor modality
@@ -229,8 +249,6 @@ class CoILDataset(Dataset):
         episodes_list = glob.glob(os.path.join(path, 'episode_*'))
         sort_nicely(episodes_list)
         print (path)
-        print (" Episodes list ")
-        print (episodes_list)
 
         sensor_data_names = []
         float_dicts = []
@@ -264,7 +282,7 @@ class CoILDataset(Dataset):
                 print ("EMPTY EPISODE")
                 continue
 
-            if get_episode_weather(episode) not in g_conf.WEATHERS:
+            if g_conf.TRAIN_DATASET_NAME != 'CARLA80TL' and get_episode_weather(episode) not in g_conf.WEATHERS:
                 print("WEATHER NOT CORRECT")
                 continue
 
@@ -294,9 +312,11 @@ class CoILDataset(Dataset):
                     speed = 0
 
 
-
-
-                directions = self.augment_directions(measurement_data['directions'])
+                # TODO: BEFORE DEADLINE HEURISTICS, TAKE CARE
+                if not g_conf.TRAIN_DATASET_NAME == 'CARLA80TL':
+                    directions = self.augment_directions(measurement_data['directions'])
+                else:
+                    directions = measurement_data['directions']
 
                 final_measurement = self._get_final_measurement(speed, measurement_data, 0, directions)
 
