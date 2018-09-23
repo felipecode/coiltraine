@@ -5,8 +5,10 @@ import traceback
 import sys
 import math
 import copy
-import json
 
+
+
+import gc
 import numpy as np
 
 from torch.utils.data import Dataset
@@ -16,9 +18,6 @@ from logger import coil_logger
 
 # TODO: Warning, maybe this does not need to be included everywhere.
 from configs import g_conf
-
-from utils.general import sort_nicely
-
 
 
 class CoILDataset(Dataset):
@@ -176,102 +175,6 @@ class CoILDataset(Dataset):
         #print('Angle', camera_angle, ' Steer ', old_steer, ' speed ', speed, 'new steer', steer)
         return steer
 
-    def augment_measurement(self, measurements, angle):
-        """
-
-            Augment the steering of a measurement dict
-
-
-        """
-
-        new_steer = self.augment_steering(angle, measurements['steer'],
-                                          measurements['playerMeasurements']['forwardSpeed'])
-
-        measurements['steer'] = new_steer
-        return measurements['steer']
-
-    def pre_load_image_folders(self, path):
-        """
-        Pre load the image folders for each episode, keep in mind that we only take
-        the measurements that we think that are interesting for now
-
-        args
-            the path for the dataset
-
-
-        returns
-         sensor data names: it is a vector with n dimensions being one for each sensor modality
-         for instance, rgb only dataset will have a single vector with all the image names.
-         float_data: all the wanted float data is loaded inside a vector, that is a vector
-         of dictionaries.
-
-        """
-
-        episodes_list = glob.glob(os.path.join(path, 'episode_*'))
-
-        sensor_data_names = []
-        float_dicts = []
-
-
-        for episode in episodes_list:
-            print ('Episode ', episode)
-
-            measurements_list = glob.glob(os.path.join(episode, 'measurement*'))
-            sort_nicely(measurements_list)
-
-            for measurement in measurements_list:
-                data_point_number = measurement.split('_')[-1].split('.')[0]
-
-                #TODO the dataset camera name can be a parameter
-                with open(measurement) as f:
-                    measurement_data = json.load(f)
-                # We extract the interesting subset from the measurement dict
-                float_dicts.append(
-                    {'steer': measurement_data['steer'],
-                     'throttle':  measurement_data['throttle'],
-                     'brake': measurement_data['brake'],
-                     'speed_module': measurement_data['playerMeasurements']['forwardSpeed'],
-                     'directions': measurement_data['directions']}
-                )
-
-                rgb = 'CentralRGB_' + data_point_number + '.jpg'
-                sensor_data_names.append(os.path.join(episode, rgb))
-
-                # We do measurements for the left side camera
-                # #TOdo the angle does not need to be hardcoded
-                measurement_left = self.augment_measurement(measurement_data, -30.0)
-
-                # We extract the interesting subset from the measurement dict
-                float_dicts.append(
-                    {'steer': measurement_left['steer'],
-                     'throttle':  measurement_left['throttle'],
-                     'brake': measurement_left['brake'],
-                     'speed_module': measurement_left['playerMeasurements']['forwardSpeed'],
-                     'directions': measurement_left['directions']}
-                )
-                rgb = 'LeftRGB_' + data_point_number + '.jpg'
-                sensor_data_names.append(os.path.join(episode, rgb))
-
-                # We do measurements augmentation for the right side cameras
-
-                measurement_right = self.augment_measurement(measurement_data, 30.0)
-                float_dicts.append(
-                    {'steer': measurement_right['steer'],
-                     'throttle':  measurement_right['throttle'],
-                     'brake': measurement_right['brake'],
-                     'speed_module': measurement_right['playerMeasurements']['forwardSpeed'],
-                     'directions': measurement_right['directions']}
-                )
-                rgb = 'RightRGB_' + data_point_number + '.jpg'
-                sensor_data_names.append(os.path.join(episode, rgb))
-
-
-
-
-        return sensor_data_names, float_dicts
-
-
-
 
     # file_names, image_dataset_names, dataset_names
     def pre_load_hdf5_files(self, path_for_files):
@@ -298,22 +201,6 @@ class CoILDataset(Dataset):
 
         folder_file_names = sorted(folder_file_names)
 
-
-        # THIS WILL CHECK IF THIS DATASET IS VALID
-        """
-        while True:
-            try:
-                if not is_hdf5_prepared(folder_file_names[0]):
-                    raise ValueError("The showed dataset is not prepared for training")
-                break
-            except OSError:
-                import traceback
-                time.sleep(0.5)
-                traceback.print_exc()
-                continue
-        """
-
-
         # Concatenate all the sensor names and measurements names
         # TODO: This structure is very ugly.
         meas_data_cat = [list([]) for _ in range(len(meas_names))]
@@ -323,7 +210,6 @@ class CoILDataset(Dataset):
         # that is important to be able to reference variables in a more legible way
         dataset = h5py.File(folder_file_names[0], "r")
         metadata_targets = np.array(dataset['metadata_' + meas_names[0]])
-        dataset.close()
 
         # Forcing the metadata to be bytes
         if not isinstance(metadata_targets[0][0], bytes):
@@ -333,6 +219,7 @@ class CoILDataset(Dataset):
 
         lastidx = 0
         count = 0
+        # TODO: More logs to be added ??
         coil_logger.add_message('Loading', {'FilesLoaded': folder_file_names,
                                             'NumberOfImages': len(folder_file_names)})
 
@@ -366,7 +253,6 @@ class CoILDataset(Dataset):
 
         # For the number of datasets names that are going to be used for measurements cat all.
         for i in range(len(meas_names)):
-            #print (meas_data_cat[i])
             meas_data_cat[i] = np.concatenate(meas_data_cat[i], axis=0)
             meas_data_cat[i] = meas_data_cat[i].transpose((1, 0))
 

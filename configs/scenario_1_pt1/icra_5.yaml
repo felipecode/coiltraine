@@ -27,7 +27,7 @@ NUMBER_OF_HOURS: 15
 
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [32000, 64000, 100000, 300000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [8000, 16000, 32000, 64000, 100000, 300000, 500000]  # The frequency the model is actually tested.
 
 
 #### Network Related Parameters ####
