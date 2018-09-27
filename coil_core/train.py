@@ -279,8 +279,11 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
             model.zero_grad()
-            branches, attention_vec = model(torch.squeeze(data['rgb'].cuda()),
+            branches = model(torch.squeeze(data['rgb'].cuda()),
                              dataset.extract_inputs(data).cuda())
+
+            # Make use of attention more general.
+            attention_vec = []
 
 
             #TODO: This requires some cleaning, there is two selection points for the loss
