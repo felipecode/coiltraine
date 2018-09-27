@@ -8,8 +8,6 @@ __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
            'resnet152']
 
 
-# TODO: MAYBE THIS CAN BE EASILY MERGED WITH THE REGULAR RESNET
-
 model_urls = {
     'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
     'resnet34': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',
@@ -89,7 +87,7 @@ class Bottleneck(nn.Module):
 
         if self.downsample is not None:
             residual = self.downsample(x)
-        """  SHOULD WE DO the attention  AFTER SUMMING THE RESIDUAL AND THE RELU ? PROBABLY YES"""
+
         out += residual
         out = self.relu(out)
 
@@ -98,16 +96,13 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, averaging_factors=[1, 1, 1], num_classes=1000):
+    def __init__(self, block, layers, num_classes=1000):
         self.inplanes = 64
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
                                bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
-        self.attention_0 = nn.AvgPool2d(kernel_size=averaging_factors[0], stride=0)
-        self.attention_1 = nn.AvgPool2d(kernel_size=averaging_factors[1], stride=0)
-        self.attention_2 = nn.AvgPool2d(kernel_size=averaging_factors[2], stride=0)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
@@ -146,8 +141,6 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-
-        """ Put also the activation as the real one."""
         print (x.shape)
         x = self.conv1(x)
         print (x.shape)
@@ -157,22 +150,14 @@ class ResNet(nn.Module):
         x = self.maxpool(x)
         print (x.shape)
         """ RETURN ALSO THE AVERAGE POOLING OF THE NETWORKS TO A CERTAIN SIZE """
-        x= self.layer1(x)
-        attention_0 = self.attention_0(x)
+        x = self.layer1(x)
         print (x.shape)
-        print ("attention ", attention_0.shape)
         x = self.layer2(x)
-        attention_1 = self.attention_1(x)
         print (x.shape)
-        print("attention ", attention_1.shape)
-        x= self.layer3(x)
-        attention_2 = self.attention_2(x)
+        x = self.layer3(x)
         print (x.shape)
-        print("attention ", attention_2.shape)
         x = self.layer4(x)
-        #attention_4 = self.attention(x)
         print (x.shape)
-        #print("attention ", attention_4.shape)
 
         x = self.avgpool(x)
         print (x.shape)
@@ -181,9 +166,8 @@ class ResNet(nn.Module):
         x = self.fc(x)
         print (x.shape)
 
-        attention = [attention_0, attention_1, attention_2]
 
-        return x, attention
+        return x
 
 
 

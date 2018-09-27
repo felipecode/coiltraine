@@ -469,6 +469,24 @@ class CoILDataset(Dataset):
 
         return torch.cat(inputs_vec, 1)
 
+    def extract_intentions(self, data):
+        """
+        Method used to get to know which positions from the dataset are the inputs
+        for this experiments
+        Args:
+            labels: the set of all float data got from the dataset
+
+        Returns:
+            the float data that is actually targets
+
+        Raises
+            value error when the configuration set targets that didn't exist in metadata
+        """
+        inputs_vec = []
+        for input_name in g_conf.INTENTIONS:
+            inputs_vec.append(data[input_name])
+
+        return torch.cat(inputs_vec, 1)
 
 
 

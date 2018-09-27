@@ -259,7 +259,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
 
 
-        print (model)
         if checkpoint_file is not None:
             accumulated_time = checkpoint['total_time']
         else:
@@ -274,21 +273,32 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             capture_time = time.time()
             controls = data['directions']
-            print (data['speed_module'])
 
 
 
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
             model.zero_grad()
-            branches = model(torch.squeeze(data['rgb'].cuda()),
+            branches, attention_vec = model(torch.squeeze(data['rgb'].cuda()),
                              dataset.extract_inputs(data).cuda())
 
 
-            loss = criterion(branches, dataset.extract_targets(data).cuda(),
-                             controls.cuda(), dataset.extract_inputs(data).cuda(),
-                             branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
-                             variable_weights=g_conf.VARIABLE_WEIGHT)
+            #TODO: This requires some cleaning, there is two selection points for the loss
+            if 'attention' in g_conf.LOSS_FUNCTION:
+                loss, loss_L1, loss_L2 = criterion(branches, dataset.extract_targets(data).cuda(),
+                                 controls.cuda(), dataset.extract_inputs(data).cuda(),
+                                 branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
+                                 variable_weights=g_conf.VARIABLE_WEIGHT,
+                                 attention= attention_vec,
+                                 intention_factors=dataset.extract_intentions(data).cuda())
+
+                coil_logger.add_scalar('L1', loss_L1.data, iteration)
+                coil_logger.add_scalar('L2', loss_L2.data, iteration)
+            else:
+                loss = criterion(branches, dataset.extract_targets(data).cuda(),
+                                 controls.cuda(), dataset.extract_inputs(data).cuda(),
+                                 branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
+                                 variable_weights=g_conf.VARIABLE_WEIGHT)
 
 
 
@@ -311,7 +321,20 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             print (" The produced loss")
             print (loss.data)
             coil_logger.add_scalar('Loss', loss.data, iteration)
+            print ("RGB")
             coil_logger.add_image('Image', torch.squeeze(data['rgb']), iteration)
+
+
+            count = 0
+            for attention in attention_vec:
+                print ("ATTENTION ", count)
+                attention = torch.pow(attention, 2)
+                attention = torch.mean(attention, 1, keepdim=True)
+                attention = torch.cat([attention, attention, attention], 1)
+                coil_logger.add_image('Attention ' + str(count), attention, iteration)
+                count += 1
+
+
 
 
             loss.backward()

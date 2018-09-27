@@ -62,8 +62,21 @@ class CoILICRA(nn.Module):
             #fromlist = ['resnet']
             # TODO: Check network drawing
             resnet_module = getattr(resnet_module, params['perception']['res']['name'])
-            self.perception = resnet_module(num_classes=params['perception']['res']['num_classes'])
+            self.perception  = resnet_module(num_classes=params['perception']['res']['num_classes'],
+                                             averaging_factors=params['perception']['res']['averaging_factors'])
+
             number_output_neurons = params['perception']['res']['num_classes']
+
+
+            #elif 'res_attention' in params['perception']:  # pre defined residual networks
+            #    resnet_module = importlib.import_module('network.models.building_blocks.resnet')
+            #    # + params['perception']['res']['name']
+            #    # fromlist = ['resnet']
+            #    # TODO: Check network drawing
+            #    resnet_module = getattr(resnet_module, params['perception']['res']['name'])
+            #    self.perception= resnet_module(num_classes=params['perception']['res']['num_classes'])#
+            #
+            #     number_output_neurons = params['perception']['res']['num_classes']
 
         else:
 
@@ -133,7 +146,7 @@ class CoILICRA(nn.Module):
 
 
         """ ###### APPLY THE PERCEPTION MODULE """
-        x = self.perception(x)
+        x, attention = self.perception(x)
 
 
         """ ###### APPLY THE MEASUREMENT MODUES """
@@ -149,7 +162,7 @@ class CoILICRA(nn.Module):
         speed_branch_output = self.speed_branch(x)
 
         # We concatenate speed with the rest.
-        return branch_outputs + [speed_branch_output]
+        return branch_outputs + [speed_branch_output], attention
 
     def forward_branch(self, x, a, branch_number):
         """

@@ -6,7 +6,56 @@ import torch
 from configs import g_conf
 
 
+def normalize(x, dim):
+    x_normed = x / x.max(dim, keepdim=True)[0]
+    return x_normed
+
 # TODO: needs some severe refactor to avoid hardcoding and repetition
+
+def compute_attention_loss(attention_maps, intention_factors):
+
+    """ Take the batch size from the number of channels on the attention maps"""
+    print (attention_maps[0].shape)
+    print (intention_factors.shape)
+    loss = torch.zeros([intention_factors.shape[0]], dtype=torch.float32).cuda()
+
+    intention, _ = torch.min(intention_factors, 1)
+    print (loss.shape)
+    print (intention.shape)
+
+    count = 0
+    for attention in attention_maps:
+        """ We compute the square ( L2) for each of the maps and them take the mean"""
+        L2 = torch.pow(attention, 2)
+        max_value = torch.max(L2.view(L2.shape[0], L2.shape[1], -1))
+        print (" max L2 ", max_value)
+        L2 = torch.div(L2, max_value)
+        L2 = torch.mean(torch.mean(torch.mean(L2, 3), 2), 1)
+
+        L1 = attention
+        max_value = torch.max(L1.view(L1.shape[0], L1.shape[1], -1))
+        print(" max L1 ", max_value)
+        L1 = torch.div(L1, max_value)
+        L1 = torch.mean(torch.mean(torch.mean(L1, 3), 2), 1)
+
+
+        print (" atention ", count)
+        print (" intention ", intention)
+        print (" L1 ", L1)
+        print (" L2", L2)
+        """ We take the measurements used as attention important and weight"""
+        # This part should have dimension second dimension 1
+        # TODO: Remove this hardcodeness
+        loss += (5*L2 * (1 -intention) + L1*intention )/len(attention_maps)
+
+        print (" Partial Loss ", loss)
+
+
+
+
+    return loss, L1, L2
+
+
 
 def L2(branches, targets, controls, speed_gt, size_average=True,
        reduce=True, variable_weights=None, branch_weights=None):
@@ -230,6 +279,123 @@ def L1(branches, targets, controls, speed_gt, size_average=True,
             mse_loss = torch.cat([mse_loss, loss_b5], 1)
 
     return mse_loss
+
+
+def L1_attention(branches, targets, controls, speed_gt, attention =None, intention_factors=None, size_average=True,
+       reduce=True, variable_weights=None, branch_weights=None):
+    """
+    Args:
+          branches - A list contains 5 branches results
+          targets - The target (here are steer, gas and brake)
+          controls - The control directions
+          size_average - By default, the losses are averaged over observations for each minibatch.
+                         However, if the field size_average is set to ``False``, the losses are instead
+                         summed for each minibatch. Only applies when reduce is ``True``. Default: ``True``
+          reduce - By default, the losses are averaged over observations for each minibatch, or summed,
+                   depending on size_average. When reduce is ``False``, returns a loss per input/target
+                   element instead and ignores size_average. Default: ``True``
+          *argv: weights - By default, the weights are all set to 1.0. To set different weights for different
+                           outputs, a list containing different lambda for each target item is required.
+                           The number of lambdas should be the same as the target items.
+
+    return: MSE Loss
+
+    """
+    if attention is None or intention_factors is None:
+        raise ValueError(" L1 atttention requires attention and interest factor to be passed")
+
+    # weight different target items with lambdas
+    if variable_weights:
+        if len(variable_weights) != targets.shape[1]:
+            raise ValueError('The input number of weight lambdas is '
+                             + str(len(branch_weights)) +
+                             ', while the number of branches items is '
+                             + str(targets.shape[1]))
+    else:
+
+        variable_weights = {'Gas': 1.0, 'Steer': 1.0, 'Brake': 1.0}
+
+    if branch_weights:
+        if len(branch_weights) != len(branches):
+            raise ValueError('The input number of branch weight lambdas is '
+                             + str(len(branch_weights)) +
+                             ', while the number of branches items is '
+                             + str(len(branches)))
+
+
+    else:
+        branch_weights = [1.0] * len(branches)
+
+    # TODO: improve this code quality
+    # command flags: 2 - follow lane; 3 - turn left; 4 - turn right; 5 - go strange
+
+    # when command = 2, branch 1 (follow lane) is activated
+    controls_b1 = (controls == 2)
+    controls_b1 = torch.tensor(controls_b1, dtype=torch.float32).cuda()
+    controls_b1 = torch.cat([controls_b1, controls_b1, controls_b1],
+                            1)  # activation for steer, gas and brake
+    # when command = 3, branch 2 (turn left) is activated
+    controls_b2 = (controls == 3)
+    controls_b2 = torch.tensor(controls_b2, dtype=torch.float32).cuda()
+    controls_b2 = torch.cat([controls_b2, controls_b2, controls_b2], 1)
+    # when command = 4, branch 3 (turn right) is activated
+    controls_b3 = (controls == 4)
+    controls_b3 = torch.tensor(controls_b3, dtype=torch.float32).cuda()
+    controls_b3 = torch.cat([controls_b3, controls_b3, controls_b3], 1)
+    # when command = 5, branch 4 (go strange) is activated
+    controls_b4 = (controls == 5)
+    controls_b4 = torch.tensor(controls_b4, dtype=torch.float32).cuda()
+    controls_b4 = torch.cat([controls_b4, controls_b4, controls_b4], 1)
+
+    # calculate loss for each branch with specific activation
+    loss_b1 = torch.abs((branches[0] - targets) * controls_b1) * branch_weights[0]
+    loss_b2 = torch.abs((branches[1] - targets) * controls_b2) * branch_weights[1]
+    loss_b3 = torch.abs((branches[2] - targets) * controls_b3) * branch_weights[2]
+    loss_b4 = torch.abs((branches[3] - targets) * controls_b4) * branch_weights[3]
+    loss_b5 = torch.abs(branches[4] - speed_gt) * branch_weights[4]
+
+    # Apply the variable weights
+    loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights[
+        'Gas'] \
+              + loss_b1[:, 2] * variable_weights['Brake']
+    loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights[
+        'Gas'] \
+              + loss_b2[:, 2] * variable_weights['Brake']
+    loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights[
+        'Gas'] \
+              + loss_b3[:, 2] * variable_weights['Brake']
+    loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights[
+        'Gas'] \
+              + loss_b4[:, 2] * variable_weights['Brake']
+    # add all branches losses together
+
+    loss, L1, L2 = compute_attention_loss(attention, intention_factors)
+    mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4 + loss
+    print (loss_b1)
+
+
+
+    if reduce:
+        if size_average:
+            mse_loss = torch.sum(mse_loss) / (mse_loss.shape[0]) \
+                       + torch.sum(loss_b5) / mse_loss.shape[0]
+
+            L1 = torch.sum(L1) / (L1.shape[0])
+            L2 = torch.sum(L2) / (L2.shape[0])
+
+        else:
+            mse_loss = torch.sum(mse_loss) + torch.sum(loss_b5)
+    else:
+        if size_average:
+            raise RuntimeError(
+                " size_average can not be applies when reduce is set to 'False' ")
+        else:
+            mse_loss = torch.cat([mse_loss, loss_b5], 1)
+
+
+    #L1 = 0
+    #L2 = 0
+    return mse_loss, L1, L2
 
 
 # TODO CLEAN THIS, PRE DEADLINE HARD CODE !
@@ -476,6 +642,9 @@ def Loss(loss_name):
     elif loss_name == 'L2':
 
         return L2
+    elif loss_name == 'L1_attention':
+
+        return L1_attention
     elif loss_name == 'L3':
 
         return L3
