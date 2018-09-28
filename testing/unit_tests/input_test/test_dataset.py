@@ -200,24 +200,24 @@ class testCILDataset(unittest.TestCase):
             count += 1
 
     def test_pre_select_no_dynamic(self):
-        return
+
         if not os.path.exists(self.test_images_write_path + 'central'):
             os.mkdir(self.test_images_write_path + 'central')
 
-        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100')
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100_S6')
         # This depends on the number of fused frames. A image could have
         # A certain number of fused frames
-        g_conf.TRAIN_DATASET_NAME = 'CARLA100'
+        g_conf.TRAIN_DATASET_NAME = 'CARLA100_S6'
         g_conf.NUMBER_OF_ITERATIONS = 10000
         g_conf.NUMBER_OF_HOURS = 50
-        g_conf.DATA_USED = 'central'
+        g_conf.DATA_USED = 'all'
 
-        g_conf.REMOVE = [['traffic_lights', 0]]
 
-        g_conf.SPLIT = [['speed_module', [0.0666,  0.208, 0.39]], ['weights', [1.0, 0.0, 0.0, 0.0]]]
-
-        augmenter = Augmenter(None)
-        dataset = CoILDataset(full_dataset, transform=augmenter,
+        #g_conf.SPLIT = [['pedestrian', []], ['vehicle', []], ['traffic_lights', []], ['weights', [0.25, 0.25, 0.25, 0.25, 0.0]]]
+        g_conf.SPLIT = [['pedestrian', []], ['vehicle', []], ['traffic_lights', []],
+                        ['weights', [0.0, 0.0, 0.0, 0.0, 1.0]]]
+        augmenter = input.Augmenter(None)
+        dataset = input.CoILDataset(full_dataset, transform=augmenter,
                               preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
 
 
@@ -230,24 +230,20 @@ class testCILDataset(unittest.TestCase):
         max_steer = 0
         count = 0
         for data in data_loader:
-            print (data['pedestrian'])
-            print (data['vehicle'])
-            print (data['traffic_lights'])
-            for i in range(120):
 
 
-                    self.assertEqual(data['traffic_lights'][i][0], 1)
+            image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+            b, g, r = image_to_save.split()
+            image_to_save = Image.merge("RGB", (r, g, b))
 
-                    self.assertEqual(data['vehicle'][i][0], 1)
-
-                    self.assertEqual(data['pedestrian'][i][0], 1)
-
-            #image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
-            #image_to_save.save(os.path.join(self.test_images_write_path + 'central', str(count)+'l.png'))
+            image_to_save.save(os.path.join(self.test_images_write_path + 'central', str(count)+'l.png'))
             # Test steerings after augmentation
             #print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
             #print ("directions", data['directions'], " speed_module", data['speed_module'])
             count += 1
+
+
+
     def test_add_remove_on_preload(self):
         return
 
@@ -365,8 +361,8 @@ class testCILDataset(unittest.TestCase):
         # print ("directions", data['directions'], " speed_module", data['speed_module'])
 
     def test_compare_hdf5_other(self):
-
-        print (" COMPARE HDF5")
+        return
+        print (" CO MPARE HDF5")
         if not os.path.exists(self.test_images_write_path + 'augmentation'):
             os.mkdir(self.test_images_write_path + 'augmentation')
 
