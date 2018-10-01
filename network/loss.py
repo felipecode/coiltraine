@@ -42,8 +42,8 @@ def compute_attention_loss(inter_layers, variable_weights, intention_factors):
 
         print (" atention ", count)
         print (" intention ", intention)
-        print (" L1 ", L1)
-        print (" L2", L2)
+        print (" L1 ", L1.shape)
+        print (" L2", L2.shape)
         """ We take the measurements used as attention important and weight"""
         # This part should have dimension second dimension 1
         # TODO: Remove this hardcodeness
