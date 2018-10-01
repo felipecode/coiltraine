@@ -59,10 +59,12 @@ def compute_attention_loss(inter_layers, variable_weights, intention_factors):
         """ We compute the square ( L2) for each of the maps and them take the mean"""
         L2 = compute_attention_map_L2(il)
         L2 = F.avg_pool2d(L2, variable_weights['AVGP_Kernel_Size'], 1)
+        L2 = L2.mean(1).mean(1)
 
         """ We compute the square (L1) for each of the maps and them take the mean"""
         L1 = compute_attention_map_L1(il)
         L1 = F.avg_pool2d(L1, variable_weights['AVGP_Kernel_Size'], 1)
+        L1 = L1.mean(1).mean(1)
 
         print (" atention ", count)
         print (" intention ", intention)
@@ -70,10 +72,11 @@ def compute_attention_loss(inter_layers, variable_weights, intention_factors):
         print (" L2", L2.shape)
         """ We take the measurements used as attention important and weight"""
         # This part should have dimension second dimension 1
-        # TODO: Remove this hardcodeness
-        loss +=  (variable_weights['L2']*L2 * intention +  variable_weights['L1']*L1*(1-intention))/len(inter_layer)
+        loss += (variable_weights['L2']*L2 * intention + variable_weights['L1']*L1*(1-intention))\
+                    / len(inter_layers)
 
         print (" Partial Loss ", loss)
+
 
     return loss, L1, L2
 
