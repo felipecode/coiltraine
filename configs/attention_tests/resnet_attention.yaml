@@ -41,7 +41,6 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
     res:
       name: 'resnet34'
       num_classes: 512
-      averaging_factors: [1,1,1]
 
   measurements:
     fc:
@@ -70,11 +69,18 @@ LEARNING_RATE_DECAY_LEVEL: 0.5
 #TODO check how to use this part
 BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05]
 LOSS_FUNCTION: 'L1_attention'
+USED_LAYERS_ATT: [1]
 
+
+# The variable weigths used when using the loss function
 VARIABLE_WEIGHT:
   Steer: 0.5
   Gas: 0.45
   Brake: 0.05
+  L1: 1.0
+  L2: 1.0
+  AVGP_Kernel_Size: 3  # The kernel size used for average pooling.
+
 
 
 #### Simulation Related Parameters ####
