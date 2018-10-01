@@ -48,8 +48,6 @@ class testMasking(unittest.TestCase):
 
 
 
-        g_conf.SPLIT = [['pedestrian', []], ['vehicle', []], ['traffic_lights', []],
-                        ['weights', [0.0, 0.0, 0.0, 0.0, 1.0]]]
 
         augmenter = input.Augmenter(None)
         dataset = input.CoILDataset(full_dataset, transform=augmenter,
@@ -67,7 +65,7 @@ class testMasking(unittest.TestCase):
         # capture_time = time.time()
         data_loader = select_balancing_strategy(dataset, 0, 12)
         print('len ', len(data_loader))
-        max_steer = 0
+
         count = 0
         for data in data_loader:
 
@@ -75,13 +73,58 @@ class testMasking(unittest.TestCase):
             branches = model(torch.squeeze(data['rgb'].cuda()),
                              dataset.extract_inputs(data).cuda())
 
+            inter_layers = [model.intermediate_layers[ula] for ula in g_conf.USED_LAYERS_ATT]
+            # here we call a function to get the wanted attention leyer
+
+            # We reshape the labels input to be the same size as the inter_layer
+            layer_count = 0
+            for il in inter_layers:
+                labels_reshaped = data['labels']  # TODO: Reshape here
 
 
-            #image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
-            #b, g, r = image_to_save.split()
-            #image_to_save = Image.merge("RGB", (r, g, b))
+                image_to_save = transforms.ToPILImage()(
+                    (data['rgb'][0].cpu() * 255).type(torch.ByteTensor))
+                b, g, r = image_to_save.split()
+                image_to_save = Image.merge("RGB", (r, g, b))
+                image_to_save.save(
+                    os.path.join(self.test_images_write_path + 'central', str(count) + 'l.png'))
 
-            #image_to_save.save(os.path.join(self.test_images_write_path + 'central', str(count)+'l.png'))
+                att = convert_to_attention(il)
+
+                image_to_save = transforms.ToPILImage()(
+                    (data['rgb'][0].cpu() * 255).type(torch.ByteTensor))
+                b, g, r = image_to_save.split()
+                image_to_save = Image.merge("RGB", (r, g, b))
+                image_to_save.save(
+                    os.path.join(self.test_images_write_path + 'central', str(count) + 'att.png'))
+
+                layer_count += 1
+
+                # Lets get the attention for CAR
+
+                print (" Amount of attention for cars ", sum(att[np.where(labels_reshaped==10)]))
+
+                # Lets get the attention on pedestrian labels
+
+
+                #inter_layers = where(labels_reshaped==4)
+
+                # Lets get the attention on road markings labels
+
+                #inter_layers = where(labels_reshaped==6)
+
+
+
+                # Labels is equal the traffic signs
+
+                #inter_layers = where(labels_reshaped==12)
+
+
+
+            image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+            b, g, r = image_to_save.split()
+            image_to_save = Image.merge("RGB", (r, g, b))
+            image_to_save.save(os.path.join(self.test_images_write_path + 'central', str(count)+'l.png'))
 
 
 

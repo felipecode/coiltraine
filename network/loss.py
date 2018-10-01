@@ -367,7 +367,7 @@ def L1_attention(branches, targets, controls, speed_gt, inter_layers =None, inte
               + loss_b4[:, 2] * variable_weights['Brake']
     # add all branches losses together
 
-    loss, L1, L2 = compute_attention_loss(inter_layers, intention_factors)
+    loss, L1, L2 = compute_attention_loss(inter_layers, variable_weights, intention_factors)
     mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4 + loss
     print (loss_b1)
 
