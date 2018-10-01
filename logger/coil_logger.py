@@ -191,7 +191,7 @@ def add_image(tag, images, iteration=None):
 
             new_images = [] 
             if images.shape[1] == 1:
-                cmap = plt.get_cmap('inferno')
+                cmap = plt.get_cmap()
                 for i in range(images.shape[0]):
                     new_images.append(cmap(images[i])[:, :, :3])
                 images = np.array(new_images).transpose(0, 3, 1, 2)
