@@ -66,10 +66,10 @@ def compute_attention_loss(inter_layers, variable_weights, intention_factors):
         L1 = F.avg_pool2d(L1, variable_weights['AVGP_Kernel_Size'], 1)
         L1 = L1.mean(1).mean(1)
 
-        print (" atention ", count)
-        print (" intention ", intention)
-        print (" L1 ", L1.shape)
-        print (" L2", L2.shape)
+        #print (" atention ", count)
+        #print (" intention ", intention)
+        #print (" L1 ", L1.shape)
+        #print (" L2", L2.shape)
         """ We take the measurements used as attention important and weight"""
         # This part should have dimension second dimension 1
         loss += (variable_weights['L2']*L2 * intention + variable_weights['L1']*L1*(1-intention))\
@@ -396,7 +396,7 @@ def L1_attention(branches, targets, controls, speed_gt, inter_layers =None, inte
 
     loss, L1, L2 = compute_attention_loss(inter_layers, variable_weights, intention_factors)
     mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4 + loss
-    print (loss_b1)
+
 
 
 
@@ -423,7 +423,7 @@ def L1_attention(branches, targets, controls, speed_gt, inter_layers =None, inte
     return mse_loss, L1, L2
 
 
-# TODO CLEAN THIS, PRE DEADLINE HARD CODE !
+# TODO: CLEAN THIS, PRE DEADLINE HARD CODE !
 
 def L1_no_brake(branches, targets, controls, speed_gt, size_average=True,
        reduce=True, variable_weights=None, branch_weights=None):

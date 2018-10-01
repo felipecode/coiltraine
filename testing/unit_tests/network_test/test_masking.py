@@ -14,6 +14,7 @@ from PIL import Image
 from torchvision import transforms
 from configs import g_conf
 
+from torch.nn import functional as F
 
 import input
 import reference
@@ -22,7 +23,7 @@ from coil_core.train import select_balancing_strategy
 from network import CoILModel
 
 
-#TODO: verify images, there should be something for that !!
+from network.loss import compute_attention_map_L2, compute_attention_map_L1
 
 
 class testMasking(unittest.TestCase):
@@ -79,7 +80,9 @@ class testMasking(unittest.TestCase):
             # We reshape the labels input to be the same size as the inter_layer
             layer_count = 0
             for il in inter_layers:
-                labels_reshaped = data['labels']  # TODO: Reshape here
+                labels_reshaped = F.downsample(data['labels'], size_new=(il.shape[1], il.shape[2]),
+                                               mode='bilinear')
+
 
 
                 image_to_save = transforms.ToPILImage()(
@@ -89,14 +92,15 @@ class testMasking(unittest.TestCase):
                 image_to_save.save(
                     os.path.join(self.test_images_write_path + 'central', str(count) + 'l.png'))
 
-                att = convert_to_attention(il)
+                att = compute_attention_map_L1(il)
 
                 image_to_save = transforms.ToPILImage()(
                     (data['rgb'][0].cpu() * 255).type(torch.ByteTensor))
                 b, g, r = image_to_save.split()
                 image_to_save = Image.merge("RGB", (r, g, b))
                 image_to_save.save(
-                    os.path.join(self.test_images_write_path + 'central', str(count) + 'att.png'))
+                    os.path.join(self.test_images_write_path + 'central', str(count) + 'att'
+                                 + str(layer_count) + '.png'))
 
                 layer_count += 1
 

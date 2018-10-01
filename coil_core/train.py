@@ -289,7 +289,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                              dataset.extract_inputs(data).cuda())
 
             # Make use of attention more general.
-            attention_vec = []
+
 
 
             #TODO: This requires some cleaning, there is two selection points for the loss
@@ -338,20 +338,12 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
             print (" The produced loss")
-            print (loss.data)
+
             coil_logger.add_scalar('Loss', loss.data, iteration)
             print ("RGB")
             coil_logger.add_image('Image', torch.squeeze(data['rgb']), iteration)
 
 
-            count = 0
-            for attention in attention_vec:
-                print ("ATTENTION ", count)
-                attention = torch.pow(attention, 2)
-                attention = torch.mean(attention, 1, keepdim=True)
-                attention = torch.cat([attention, attention, attention], 1)
-                coil_logger.add_image('Attention ' + str(count), attention, iteration)
-                count += 1
 
 
 
