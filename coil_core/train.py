@@ -13,6 +13,7 @@ import collections
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss, adjust_learning_rate
+from network.loss import compute_attention_map_L2, compute_attention_map_L1
 from input import CoILDataset, PreSplittedSampler, splitter, Augmenter, RandomSampler
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
@@ -303,6 +304,11 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
                 coil_logger.add_scalar('L1', loss_L1.data, iteration)
                 coil_logger.add_scalar('L2', loss_L2.data, iteration)
+
+
+                for il in inter_layers:
+                    coil_logger.add_image('Attention', compute_attention_map_L1(il))
+
             else:
                 loss = criterion(branches, dataset.extract_targets(data).cuda(),
                                  controls.cuda(), dataset.extract_inputs(data).cuda(),

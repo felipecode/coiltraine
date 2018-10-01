@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import json
 import logging
 import os
+import matplotlib.pyplot as plt
 
 from .json_formatter import filelogger, closeFileLogger
 from .tensorboard_logger import Logger
@@ -178,14 +179,25 @@ def add_image(tag, images, iteration=None):
     # TODO: change to sampling 10 images instead
     if iteration is not None:
         if iteration % IMAGE_LOG_FREQUENCY == 0:
+
+
             print (images.shape)
 
             images = images.view(-1, images.shape[1],
                                      images.shape[2],
                                      images.shape[3])[:10].cpu().data.numpy()
+
+
+            if images.shape[1] == 1:
+                cmap = plt.get_cmap()
+                for i in range(images.shape[0]):
+
+                    images[i] = cmap(images[i])
+
+
             print ("Converted")
             print (images.shape)
-            print (images)
+
             tl.image_summary(tag, images, iteration + 1)
 
 
