@@ -166,7 +166,7 @@ class ResNet(nn.Module):
         print (x.shape)
 
 
-        return x, [x0, x1, x2, x3, x4, x5]  # output, intermediate
+        return x, [x0, x1, x2, x3, x4]  # output, intermediate
 
 
 
