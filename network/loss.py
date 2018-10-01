@@ -12,32 +12,33 @@ def normalize(x, dim):
 
 # TODO: needs some severe refactor to avoid hardcoding and repetition
 
-def compute_attention_loss(attention_maps, intention_factors):
+def compute_attention_loss(inter_layers, variable_weights, intention_factors):
 
     """ Take the batch size from the number of channels on the attention maps"""
-    print (attention_maps[0].shape)
+    print (inter_layers[0].shape)
     print (intention_factors.shape)
     loss = torch.zeros([intention_factors.shape[0]], dtype=torch.float32).cuda()
 
     intention, _ = torch.min(intention_factors, 1)
+    intention = (1. > intention).float()
     print (loss.shape)
     print (intention.shape)
 
     count = 0
-    for attention in attention_maps:
+    for il in inter_layers:
         """ We compute the square ( L2) for each of the maps and them take the mean"""
-        L2 = torch.pow(attention, 2)
-        max_value = torch.max(L2.view(L2.shape[0], L2.shape[1], -1))
-        print (" max L2 ", max_value)
+        L2 = torch.pow(il, 2)
+        L2 = L2.mean(1)  # channel pooling
+        max_value = torch.max(L2.view(L2.shape[0],  -1))
+        print (" max L2 ", max_value.mean())
         L2 = torch.div(L2, max_value)
-        L2 = torch.mean(torch.mean(torch.mean(L2, 3), 2), 1)
+        L2 = F.avg_pool2d(L2, variable_weights['AVGP_Kernel_Size'], 1)
 
-        L1 = attention
-        max_value = torch.max(L1.view(L1.shape[0], L1.shape[1], -1))
-        print(" max L1 ", max_value)
-        L1 = torch.div(L1, max_value)
-        L1 = torch.mean(torch.mean(torch.mean(L1, 3), 2), 1)
-
+        L1 = il.mean(1)
+        l1_max_value = torch.max(L1.view(L1.shape[0],  -1))
+        print (" max L1 ", l1_max_value.mean())
+        L1 = torch.div(L1, l1_max_value)
+        L1 = F.avg_pool2d(L1, variable_weights['AVGP_Kernel_Size'], 1)
 
         print (" atention ", count)
         print (" intention ", intention)
@@ -46,12 +47,9 @@ def compute_attention_loss(attention_maps, intention_factors):
         """ We take the measurements used as attention important and weight"""
         # This part should have dimension second dimension 1
         # TODO: Remove this hardcodeness
-        loss += (5*L2 * (1 -intention) + L1*intention )/len(attention_maps)
+        loss +=  (variable_weights['L2']*L2 * intention +  variable_weights['L1']*L1*(1-intention))/len(inter_layer)
 
         print (" Partial Loss ", loss)
-
-
-
 
     return loss, L1, L2
 
@@ -281,7 +279,7 @@ def L1(branches, targets, controls, speed_gt, size_average=True,
     return mse_loss
 
 
-def L1_attention(branches, targets, controls, speed_gt, attention =None, intention_factors=None, size_average=True,
+def L1_attention(branches, targets, controls, speed_gt, inter_layers =None, intention_factors=None, size_average=True,
        reduce=True, variable_weights=None, branch_weights=None):
     """
     Args:
@@ -301,8 +299,8 @@ def L1_attention(branches, targets, controls, speed_gt, attention =None, intenti
     return: MSE Loss
 
     """
-    if attention is None or intention_factors is None:
-        raise ValueError(" L1 atttention requires attention and interest factor to be passed")
+    if inter_layers is None or intention_factors is None:
+        raise ValueError(" L1 atttention requires inter_layers and interest factor to be passed")
 
     # weight different target items with lambdas
     if variable_weights:
@@ -369,7 +367,7 @@ def L1_attention(branches, targets, controls, speed_gt, attention =None, intenti
               + loss_b4[:, 2] * variable_weights['Brake']
     # add all branches losses together
 
-    loss, L1, L2 = compute_attention_loss(attention, intention_factors)
+    loss, L1, L2 = compute_attention_loss(inter_layers, intention_factors)
     mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4 + loss
     print (loss_b1)
 

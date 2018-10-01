@@ -20,6 +20,7 @@ class CoILICRA(nn.Module):
     def __init__(self, params):
         # TODO: Improve the model autonaming function
 
+        self.intermediate_layerss = None
         super(CoILICRA, self).__init__()
 
         # TODO: Make configurable function on the config files by reading other dictionary
@@ -145,13 +146,12 @@ class CoILICRA(nn.Module):
 
 
         """ ###### APPLY THE PERCEPTION MODULE """
-        x = self.perception(x)
-
+        x, inter = self.perception(x)
+        self.intermediate_layers = inter
 
         """ ###### APPLY THE MEASUREMENT MODUES """
 
         m = self.measurements(a)
-
 
         """ Join measurements and perception"""
         j = self.join(x, m)

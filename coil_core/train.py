@@ -21,6 +21,11 @@ from utils.general import softmax
 from torchvision import transforms
 
 
+def get_attention_vec(tensors, func=torch.abs, layer=0):
+    att = tensors[layer]
+    att = func(att).sum(1)  # channel pooling
+    
+
 # TODO: check a smarter way to do this
 def select_data_old(dataset, keys):
 
@@ -288,11 +293,12 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             #TODO: This requires some cleaning, there is two selection points for the loss
             if 'attention' in g_conf.LOSS_FUNCTION:
+                inter_layers = [self.intermediate_layers[ula] for ula in g_conf.USED_LAYERS_ATT] 
                 loss, loss_L1, loss_L2 = criterion(branches, dataset.extract_targets(data).cuda(),
                                  controls.cuda(), dataset.extract_inputs(data).cuda(),
                                  branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
                                  variable_weights=g_conf.VARIABLE_WEIGHT,
-                                 attention= attention_vec,
+                                 inter_layers=inter_layers,
                                  intention_factors=dataset.extract_intentions(data).cuda())
 
                 coil_logger.add_scalar('L1', loss_L1.data, iteration)

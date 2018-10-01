@@ -77,7 +77,7 @@ class Conv(nn.Module):
         x = x.view(-1, self.num_flat_features(x))
 
 
-        return x
+        return x, None  # output, intermediate
 
 
     def num_flat_features(self, x):
