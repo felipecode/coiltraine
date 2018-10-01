@@ -188,13 +188,13 @@ def add_image(tag, images, iteration=None):
                                      images.shape[3])[:10].cpu().data.numpy()
 
 
+            new_images = [] 
             if images.shape[1] == 1:
                 cmap = plt.get_cmap()
                 for i in range(images.shape[0]):
-
-                    images[i] = cmap(images[i])
-
-
+                    new_images.append(cmap(images[i])[None, :, :, :3])
+                new_images = np.concatenate(new_images, 0).transpose(0, 3, 1, 2)
+                
             print ("Converted")
             print (images.shape)
 
