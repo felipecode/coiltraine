@@ -305,9 +305,13 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                 coil_logger.add_scalar('L1', loss_L1.data, iteration)
                 coil_logger.add_scalar('L2', loss_L2.data, iteration)
 
-
+                count = 0
                 for il in inter_layers:
-                    coil_logger.add_image('Attention', compute_attention_map_L1(il))
+                    coil_logger.add_image('Attention L1 ' + str(count),
+                                          compute_attention_map_L1(il).unsqueeze(1))
+                    coil_logger.add_image('Attention L2 ' + str(count),
+                                          compute_attention_map_L1(il).unsqueeze(1))
+                    count += 1
 
             else:
                 loss = criterion(branches, dataset.extract_targets(data).cuda(),
