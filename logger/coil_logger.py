@@ -205,7 +205,7 @@ def add_image(tag, images, iteration=None):
 
         images = images.view(-1, images.shape[1],
                              images.shape[2],
-                             images.shape[3])[:10].cpu().numpy()
+                             images.shape[3])[:10].cpu().data.numpy()
         tl.image_summary(tag, images, iteration + 1)
 
 

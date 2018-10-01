@@ -308,9 +308,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                 count = 0
                 for il in inter_layers:
                     coil_logger.add_image('Attention L1 ' + str(count),
-                                          compute_attention_map_L1(il).unsqueeze(1))
+                                          compute_attention_map_L1(il).unsqueeze(1), iteration)
                     coil_logger.add_image('Attention L2 ' + str(count),
-                                          compute_attention_map_L1(il).unsqueeze(1))
+                                          compute_attention_map_L1(il).unsqueeze(1), iteration)
                     count += 1
 
             else:
