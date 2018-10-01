@@ -303,15 +303,15 @@ def L1_attention(branches, targets, controls, speed_gt, inter_layers =None, inte
         raise ValueError(" L1 atttention requires inter_layers and interest factor to be passed")
 
     # weight different target items with lambdas
-    if variable_weights:
-        if len(variable_weights) != targets.shape[1]:
-            raise ValueError('The input number of weight lambdas is '
-                             + str(len(branch_weights)) +
-                             ', while the number of branches items is '
-                             + str(targets.shape[1]))
-    else:
+    # if variable_weights:
+    #     if len(variable_weights) != targets.shape[1]:
+    #         raise ValueError('The input number of weight lambdas is '
+    #                          + str(len(branch_weights)) +
+    #                          ', while the number of branches items is '
+    #                          + str(targets.shape[1]))
+    # else:
 
-        variable_weights = {'Gas': 1.0, 'Steer': 1.0, 'Brake': 1.0}
+    #     variable_weights = {'Gas': 1.0, 'Steer': 1.0, 'Brake': 1.0}
 
     if branch_weights:
         if len(branch_weights) != len(branches):
