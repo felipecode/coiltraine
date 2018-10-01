@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import matplotlib.pyplot as plt
+import numpy as np
 
 from .json_formatter import filelogger, closeFileLogger
 from .tensorboard_logger import Logger
