@@ -12,6 +12,36 @@ def normalize(x, dim):
 
 # TODO: needs some severe refactor to avoid hardcoding and repetition
 
+def compute_attention_map_L2(il):
+
+    """
+    THis compute the attention map that is actually viewable for L2
+    :param il:
+    :return:
+    """
+
+    L2 = torch.pow(il, 2)
+    L2 = L2.mean(1)  # channel pooling
+    max_value = torch.max(L2.view(L2.shape[0], -1))
+    print (" max L2 ", max_value.mean())
+    L2 = torch.div(L2, max_value)
+
+    return L2
+
+def compute_attention_map_L1(il):
+    """
+    THis compute the attention map that is actually viewable for L1
+    :param il:
+    :return:
+    """
+
+    L1 = il.mean(1)
+    l1_max_value = torch.max(L1.view(L1.shape[0], -1))
+    print (" max L1 ", l1_max_value.mean())
+    L1 = torch.div(L1, l1_max_value)
+
+    return L1
+
 def compute_attention_loss(inter_layers, variable_weights, intention_factors):
 
     """ Take the batch size from the number of channels on the attention maps"""
@@ -27,23 +57,17 @@ def compute_attention_loss(inter_layers, variable_weights, intention_factors):
     count = 0
     for il in inter_layers:
         """ We compute the square ( L2) for each of the maps and them take the mean"""
-        L2 = torch.pow(il, 2)
-        L2 = L2.mean(1)  # channel pooling
-        max_value = torch.max(L2.view(L2.shape[0],  -1))
-        print (" max L2 ", max_value.mean())
-        L2 = torch.div(L2, max_value)
+        L2 = compute_attention_map_L2(il)
         L2 = F.avg_pool2d(L2, variable_weights['AVGP_Kernel_Size'], 1)
 
-        L1 = il.mean(1)
-        l1_max_value = torch.max(L1.view(L1.shape[0],  -1))
-        print (" max L1 ", l1_max_value.mean())
-        L1 = torch.div(L1, l1_max_value)
+        """ We compute the square (L1) for each of the maps and them take the mean"""
+        L1 = compute_attention_map_L1(il)
         L1 = F.avg_pool2d(L1, variable_weights['AVGP_Kernel_Size'], 1)
 
         print (" atention ", count)
         print (" intention ", intention)
-        print (" L1 ", L1)
-        print (" L2", L2)
+        print (" L1 ", L1.shape)
+        print (" L2", L2.shape)
         """ We take the measurements used as attention important and weight"""
         # This part should have dimension second dimension 1
         # TODO: Remove this hardcodeness
