@@ -293,7 +293,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             #TODO: This requires some cleaning, there is two selection points for the loss
             if 'attention' in g_conf.LOSS_FUNCTION:
-                inter_layers = [self.intermediate_layers[ula] for ula in g_conf.USED_LAYERS_ATT] 
+                inter_layers = [model.intermediate_layers[ula] for ula in g_conf.USED_LAYERS_ATT]
                 loss, loss_L1, loss_L2 = criterion(branches, dataset.extract_targets(data).cuda(),
                                  controls.cuda(), dataset.extract_inputs(data).cuda(),
                                  branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
