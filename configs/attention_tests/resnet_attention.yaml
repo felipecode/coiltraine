@@ -81,8 +81,6 @@ VARIABLE_WEIGHT:
   L2: 1.0
   AVGP_Kernel_Size: 3  # The kernel size used for average pooling.
 
-
-
 #### Simulation Related Parameters ####
 IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
