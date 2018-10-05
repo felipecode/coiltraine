@@ -106,6 +106,7 @@ _g_conf.LEARNING_RATE_DECAY_INTERVAL = 50000
 _g_conf.LEARNING_RATE_DECAY_LEVEL = 0.5
 #TODO check how to use this part
 
+_g_conf.WEIGHT_DECAY = 0
 _g_conf.LEARNING_RATE = 0.0002  # First
 _g_conf.BRANCH_LOSS_WEIGHT = [0.95, 0.95, 0.95, 0.95, 0.05]
 _g_conf.VARIABLE_WEIGHT = {'Steer': 0.5, 'Gas': 0.45, 'Brake': 0.05}

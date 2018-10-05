@@ -262,7 +262,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
         criterion = Loss(g_conf.LOSS_FUNCTION)
 
-        optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
+        optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE, weight_decay=g_conf.WEIGHT_DECAY)
 
 
         if checkpoint_file is not None:
