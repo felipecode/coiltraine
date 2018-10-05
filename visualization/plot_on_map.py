@@ -284,7 +284,7 @@ def plot_episodes_tracks_sameimage(exp_batch, experiment, checkpoint,
 if __name__ == '__main__':
 
 
-    episode_list = [4,1,5,23]
+    episode_list = [4,5,6,7]
 
     # 4,1,5, 23
 

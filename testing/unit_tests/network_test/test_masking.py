@@ -39,10 +39,10 @@ class testMasking(unittest.TestCase):
         if not os.path.exists(self.test_images_write_path + 'central'):
             os.mkdir(self.test_images_write_path + 'central')
 
-        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100')
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'ValTraining')
         # This depends on the number of fused frames. A image could have
         # A certain number of fused frames
-        g_conf.TRAIN_DATASET_NAME = 'AttValidation'
+        g_conf.TRAIN_DATASET_NAME = 'ValTraining'
         g_conf.NUMBER_OF_ITERATIONS = 10000
         g_conf.NUMBER_OF_HOURS = 50
         g_conf.DATA_USED = 'all'
@@ -80,17 +80,19 @@ class testMasking(unittest.TestCase):
             # We reshape the labels input to be the same size as the inter_layer
             layer_count = 0
             for il in inter_layers:
+
+                # Down sample does not exist. But maybe upsample does the same.
                 labels_reshaped = F.downsample(data['labels'], size_new=(il.shape[1], il.shape[2]),
                                                mode='bilinear')
 
 
-
+                # Try to convert this to a label image.
                 image_to_save = transforms.ToPILImage()(
                     (data['rgb'][0].cpu() * 255).type(torch.ByteTensor))
                 b, g, r = image_to_save.split()
                 image_to_save = Image.merge("RGB", (r, g, b))
                 image_to_save.save(
-                    os.path.join(self.test_images_write_path + 'central', str(count) + 'l.png'))
+                    os.path.join(self.test_images_write_path + 'central', str(count) + 'label.png'))
 
                 att = compute_attention_map_L1(il)
 
@@ -128,7 +130,7 @@ class testMasking(unittest.TestCase):
             image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
             b, g, r = image_to_save.split()
             image_to_save = Image.merge("RGB", (r, g, b))
-            image_to_save.save(os.path.join(self.test_images_write_path + 'central', str(count)+'l.png'))
+            image_to_save.save(os.path.join(self.test_images_write_path + 'central', str(count)+'rgb.png'))
 
 
 
