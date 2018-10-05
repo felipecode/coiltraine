@@ -71,7 +71,7 @@ class testMasking(unittest.TestCase):
         for data in data_loader:
 
 
-            branches = model(torch.squeeze(data['rgb'].cuda()),
+            _ = model(torch.squeeze(data['rgb'].cuda()),
                              dataset.extract_inputs(data).cuda())
 
             inter_layers = [model.intermediate_layers[ula] for ula in g_conf.USED_LAYERS_ATT]
