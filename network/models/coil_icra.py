@@ -27,8 +27,10 @@ class CoILICRA(nn.Module):
         number_first_layer_channels = 0
 
 
-        for _, sizes in g_conf.SENSORS.items():
-            number_first_layer_channels += sizes[0] * g_conf.NUMBER_FRAMES_FUSION
+        for name, sizes in g_conf.SENSORS.items():
+            """ We check to see if the sensor is in the list of sensors to be input"""
+            if name in g_conf.INPUT_SENSORS:
+                number_first_layer_channels += sizes[0] * g_conf.NUMBER_FRAMES_FUSION
 
         # Get one item from the dict
         sensor_input_shape = next(iter(g_conf.SENSORS.values()))

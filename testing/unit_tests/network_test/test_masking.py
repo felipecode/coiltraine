@@ -12,7 +12,7 @@ import torch
 from PIL import Image
 
 from torchvision import transforms
-from configs import g_conf
+from configs import g_conf, merge_with_yaml
 
 from torch.nn import functional as F
 
@@ -39,6 +39,13 @@ class testMasking(unittest.TestCase):
         if not os.path.exists(self.test_images_write_path + 'central'):
             os.mkdir(self.test_images_write_path + 'central')
 
+        exp_batch = 'test_new_exps'
+        experiment = 'less_drop50_countatt'
+
+        merge_with_yaml(os.path.join('configs', exp_batch, experiment + '.yaml'))
+
+        g_conf.immutable(False)
+
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'ValTraining')
         # This depends on the number of fused frames. A image could have
         # A certain number of fused frames
@@ -47,6 +54,7 @@ class testMasking(unittest.TestCase):
         g_conf.NUMBER_OF_HOURS = 50
         g_conf.DATA_USED = 'all'
 
+        # JUST A TRICK TO CONTAIN THE CURRENT LIMITATIONS
 
 
 
@@ -82,7 +90,7 @@ class testMasking(unittest.TestCase):
             for il in inter_layers:
 
                 # Down sample does not exist. But maybe upsample does the same.
-                labels_reshaped = F.downsample(data['labels'], size_new=(il.shape[1], il.shape[2]),
+                labels_reshaped = F.upsample(data['labels'], size_new=(il.shape[1], il.shape[2]),
                                                mode='bilinear')
 
 
