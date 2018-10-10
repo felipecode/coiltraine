@@ -218,14 +218,15 @@ class CoILAgent(Agent):
             self._add_image_and_record(sensor_data, measurements.player_measurements,
                                        measurements.game_timestamp)
 
-
-        model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), norm_speed,
+        """ Compute the forward pass trought the network
+            This function return the model outputs and the speed prediction"""
+        model_outputs, speed_pred = self.model.forward_branch(self._process_sensors(sensor_data), norm_speed,
                                                   directions_tensor)
 
 
         if 'brake' in g_conf.TARGETS:
-
-            steer, throttle, brake = self._process_model_outputs(model_outputs[0])
+            steer, throttle, brake = self._process_model_outputs(model_outputs[0], speed_pred,
+                                                                 norm_speed)
         else:
 
             steer, throttle, brake = self._process_model_outputs_no_brake(model_outputs[0])
@@ -304,7 +305,7 @@ class CoILAgent(Agent):
 
         return image_input
 
-    def _process_model_outputs(self, outputs):
+    def _process_model_outputs(self, outputs, speed_pred, speed_gt):
         """
          A bit of heuristics in the control, to eventually make car faster, for instance.
         Returns:
@@ -316,6 +317,18 @@ class CoILAgent(Agent):
 
         if throttle > brake:
             brake = 0.0
+
+        """ If avoid stopping is activated, use the speed prediction to push the car a little bit
+        """
+        if g_conf.AVOID_STOPPING:
+            real_speed = speed_gt * 25.0
+
+            real_predicted = speed_pred * 25.0
+            if real_speed < 2.0 and real_predicted > 3.0:
+                # If (Car Stooped) and
+                #  ( It should not have stopped, use the speed prediction branch for that)
+                throttle = 1 * (5.6 / 25.0 - speed_gt) + speed_pred
+                brake = 0.0
         # else:
         #    throttle = throttle * 2
         # if speed > 35.0 and brake == 0.0:
