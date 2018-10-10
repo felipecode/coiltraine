@@ -184,7 +184,7 @@ class CoILICRA(nn.Module):
         output_vec = torch.stack(self.forward(x, a)[0:4])
 
 
-        return self.extract_branch(output_vec, branch_number), self.forward(x, a)[5]
+        return self.extract_branch(output_vec, branch_number), self.forward(x, a)[-1]
 
 
 
