@@ -119,6 +119,7 @@ _g_conf.LOSS_FUNCTION = 'L2'
 _g_conf.IMAGE_CUT = [115, 510]  # How you should cut the input image that is received from the server
 _g_conf.USE_ORACLE = True
 _g_conf.USE_FULL_ORACLE = False
+_g_conf.AVOID_STOPPING = False
 
 
 def _check_integrity():
