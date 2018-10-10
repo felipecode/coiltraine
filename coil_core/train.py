@@ -262,7 +262,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
         criterion = Loss(g_conf.LOSS_FUNCTION)
 
-        optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE, weight_decay=g_conf.WEIGHT_DECAY)
+        optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
 
 
         if checkpoint_file is not None:
@@ -301,6 +301,15 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                                  variable_weights=g_conf.VARIABLE_WEIGHT,
                                  inter_layers=inter_layers,
                                  intention_factors=dataset.extract_intentions(data).cuda())
+
+                # my weight decay
+                if g_conf.WEIGHT_DECAY != 0:
+                    wdecay = 0
+                    for w in model.parameters():
+                        if w.requires_grad:
+                            wdecay = torch.add(wdecay, torch.sum(w**2))
+                    loss = torch.add(loss, g_conf.WEIGHT_DECAY * wdecay)
+
 
                 coil_logger.add_scalar('L1', loss_L1.data, iteration)
                 coil_logger.add_scalar('L2', loss_L2.data, iteration)

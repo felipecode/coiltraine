@@ -417,7 +417,6 @@ def L1_attention(branches, targets, controls, speed_gt, inter_layers =None, inte
         else:
             mse_loss = torch.cat([mse_loss, loss_b5], 1)
 
-
     #L1 = 0
     #L2 = 0
     return mse_loss, L1, L2
