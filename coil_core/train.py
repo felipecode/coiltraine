@@ -307,7 +307,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                     wdecay = 0
                     for w in model.parameters():
                         if w.requires_grad:
-                            wdecay = torch.add(wdecay, torch.sum(w**2))
+                            wdecay = torch.add(torch.sum(w**2), wdecay)
                     loss = torch.add(loss, g_conf.WEIGHT_DECAY * wdecay)
 
 
