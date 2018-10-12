@@ -22,7 +22,7 @@ def compute_attention_map_L2(il):
 
     L2 = torch.pow(il, 2)
     L2 = L2.mean(1)  # channel pooling
-    max_value, _ = torch.max(L2.view(L2.shape[0], -1), 1, keepdim=True)
+    max_value, _ = torch.max(L2.view(L2.shape[0], -1), 1, keepdim=True).view(-1, 1, 1, 1)
     # print (" max L2 ", max_value.mean())
     L2 = torch.div(L2, max_value)
 
@@ -36,7 +36,7 @@ def compute_attention_map_L1(il):
     """
 
     L1 = il.mean(1)
-    l1_max_value, _ = torch.max(L1.view(L1.shape[0], -1), 1, keepdim=True)
+    l1_max_value, _ = torch.max(L1.view(L1.shape[0], -1), 1, keepdim=True).view(-1, 1, 1, 1)
     print (" max L1 ", l1_max_value.mean())
     L1 = torch.div(L1, l1_max_value)
 
