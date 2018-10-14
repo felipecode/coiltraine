@@ -84,7 +84,7 @@ class Adam(Optimizer):
     return step
 
 class CMAES:
-  '''CMA-ES wrapper.'''
+  """CMA-ES wrapper."""
   def __init__(self, num_params,      # number of model parameters
                sigma_init=0.10,       # initial standard deviation
                popsize=255,           # population size
@@ -113,7 +113,7 @@ class CMAES:
     return np.mean(np.sqrt(sigma*sigma))
 
   def ask(self):
-    '''returns a list of parameters'''
+    """returns a list of parameters"""
     self.solutions = np.array(self.es.ask())
     return self.solutions
 
@@ -138,7 +138,7 @@ class CMAES:
     return r[0], -r[1], -r[1], r[6]
 
 class SimpleGA:
-  '''Simple Genetic Algorithm.'''
+  """Simple Genetic Algorithm."""
   def __init__(self, num_params,      # number of model parameters
                sigma_init=0.1,        # initial standard deviation
                sigma_decay=0.999,     # anneal standard deviation
@@ -171,7 +171,7 @@ class SimpleGA:
     return self.sigma # same sigma for all parameters.
 
   def ask(self):
-    '''returns a list of parameters'''
+    """returns a list of parameters"""
     self.epsilon = np.random.randn(self.popsize, self.num_params) * self.sigma
     solutions = []
 
@@ -238,7 +238,7 @@ class SimpleGA:
     return self.best_param, self.best_reward, self.curr_best_reward, self.sigma
 
 class OpenES:
-  ''' Basic Version of OpenAI Evolution Strategies.'''
+  """ Basic Version of OpenAI Evolution Strategies."""
   def __init__(self, num_params,             # number of model parameters
                sigma_init=0.1,               # initial standard deviation
                sigma_decay=0.999,            # anneal standard deviation
@@ -284,7 +284,7 @@ class OpenES:
     return np.mean(np.sqrt(sigma*sigma))
 
   def ask(self):
-    '''returns a list of parameters'''
+    """returns a list of parameters"""
     # antithetic sampling
     if self.antithetic:
       self.epsilon_half = np.random.randn(self.half_popsize, self.num_params)
@@ -356,7 +356,7 @@ class OpenES:
     return self.best_mu, self.best_reward, self.curr_best_reward, self.sigma
 
 class PEPG:
-  '''Extension of PEPG with bells and whistles.'''
+  """Extension of PEPG with bells and whistles."""
   def __init__(self, num_params,             # number of model parameters
                sigma_init=0.10,              # initial standard deviation
                sigma_alpha=0.20,             # learning rate for standard deviation
@@ -418,7 +418,7 @@ class PEPG:
     return np.mean(np.sqrt(sigma*sigma))
 
   def ask(self):
-    '''returns a list of parameters'''
+    """returns a list of parameters"""
     # antithetic sampling
     self.epsilon = np.random.randn(self.batch_size, self.num_params) * self.sigma.reshape(1, self.num_params)
     self.epsilon_full = np.concatenate([self.epsilon, - self.epsilon])
