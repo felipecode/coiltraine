@@ -88,7 +88,7 @@ class CarScreenRecorder(object):
 
     def set_array(self, array, screen_position, position=(0, 0), scale=None):
 
-        if scale == None:
+        if scale is None:
             scale = self._scale
 
         if array.shape[0] != self._resolution[1] or array.shape[1] != self._resolution[0]:
