@@ -235,9 +235,8 @@ class CoILDataset(Dataset):
                 except:
                     raise ValueError(" A folder inside a sensor dataset is not a number")
 
-            for i in range(len(number_of_images_folder)):
-
-                sensors_data_cat[i].append( (number_of_images_folder[i], ))
+            for j in range(len(number_of_images_folder)):
+                sensors_data_cat[j].append( (number_of_images_folder[j], ))
 
 
 

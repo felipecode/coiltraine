@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 DEBUG=$1
 PARAM_FOLDER=visualization/plotting_params
 TEMPLATE_FILE=plotting_template.py

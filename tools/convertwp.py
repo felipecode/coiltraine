@@ -84,10 +84,10 @@ if __name__ == "__main__":
 
     for h_num in sequence_num:
 
-        if (not (h_num in exception_list)):
+        if not (h_num in exception_list):
             print (" SEQUENCE NUMBER ", h_num)
             data = h5py.File(path_in + 'data_' + str(h_num).zfill(5) + '.h5', "r")
-            if (addWPs):  # Add waypoints or just update them
+            if addWPs:  # Add waypoints or just update them
                 num_data_entry = data['targets'][0].shape[0]
             else:
                 num_data_entry = data['targets'][0].shape[0] - num_new_entries
@@ -105,7 +105,7 @@ if __name__ == "__main__":
                 depth[i] = data['depth'][i]
 
                 target_array = np.zeros(num_data_entry + num_new_entries)
-                if (addWPs):
+                if addWPs:
                     target_array[:-num_new_entries] = data['targets'][i]
                 else:
                     target_array = data['targets'][i]

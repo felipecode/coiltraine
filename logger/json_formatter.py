@@ -105,12 +105,12 @@ def readJSONlog(logfile, filterfunction=(lambda x: True), customjson=None):
     Returns:
         A list of Python objects built from JSON records that passed the filterfunction.
     """
-    JSONrecords = []
+    json_records = []
     for x in logfile:
         # if the record in the logfile returns true from the filter function convert it to JSON and add it the records to return
         rec = loads(x[:-1], object_hook=customjson)
-        if filterfunction(rec): JSONrecords.append(rec)
-    return JSONrecords
+        if filterfunction(rec): json_records.append(rec)
+    return json_records
 
 
 class JSONFormatter(Formatter):
@@ -161,7 +161,7 @@ class JSONFormatter(Formatter):
             Returns:
                 An object to convert to JSON - either an ordered dict if recordfields are supplied or the record.msg attribute
         """
-        if (len(self.recordfields) > 0):
+        if len(self.recordfields) > 0:
             fields = []
             for x in self.recordfields:
                 fields.append((x, getattr(record, x)))

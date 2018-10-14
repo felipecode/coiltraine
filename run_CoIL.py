@@ -178,8 +178,7 @@ if __name__ == '__main__':
             # list(args.driving_environments)[0], suppress_output=False,
                           #no_screen=args.no_screen, docker=args.docker)
         else:
-
-            raise (" Invalid name for single process, chose from (train, validation, test)")
+            raise Exception("Invalid name for single process, chose from (train, validation, test)")
 
 
     else:

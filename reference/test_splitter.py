@@ -10,7 +10,7 @@ class testSpliter(unittest.TestCase):
     def generate_float_data(self):
 
 
-        return np.random.normal(scale=0.1, size=(1400))
+        return np.random.normal(scale=0.1, size=1400)
 
 
 

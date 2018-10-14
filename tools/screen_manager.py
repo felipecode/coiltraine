@@ -101,7 +101,7 @@ def perspective_tform(x, y):
 # ***** functions to draw lines *****
 def draw_pt(img, x, y, color, sz=1):
     row, col = perspective_tform(x, y)
-    if row >= 0 and row < img.shape[0] and col >= 0 and col < img.shape[1]:
+    if 0 <= row < img.shape[0] and 0 <= col < img.shape[1]:
         img[int(row - sz):int(row + sz), int(col - sz - 65):int(col + sz - 65)] = color
 
 
@@ -193,7 +193,7 @@ class ScreenManager(object):
 
     def set_array(self, array, screen_position, position=(0, 0), scale=None):
 
-        if scale == None:
+        if scale is None:
             scale = self._scale
 
         if array.shape[0] != self._resolution[1] or array.shape[1] != self._resolution[0]:
