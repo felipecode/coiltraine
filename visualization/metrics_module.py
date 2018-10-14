@@ -168,22 +168,22 @@ def compute_cumulative_displacement(data_item, param):
 
 
 def compute_correlation(data_item, param):
-    def calc_score(gtsAnn, resAnn):
+    def calc_score(gts_ann, res_ann):
         """
         Computer CC score. A simple implementation
-        :param gtsAnn : ground-truth fixation map
-        :param resAnn : predicted saliency map
+        :param gts_ann : ground-truth fixation map
+        :param res_ann : predicted saliency map
         :return score: int : score
         """
 
-        fixationMap = gtsAnn - np.mean(gtsAnn)
-        if np.max(fixationMap) > 0:
-            fixationMap = fixationMap / np.std(fixationMap)
-        salMap = resAnn - np.mean(resAnn)
-        if np.max(salMap) > 0:
-            salMap = salMap / np.std(salMap)
+        fixation_map = gts_ann - np.mean(gts_ann)
+        if np.max(fixation_map) > 0:
+            fixation_map = fixation_map / np.std(fixation_map)
+        sal_map = res_ann - np.mean(res_ann)
+        if np.max(sal_map) > 0:
+            sal_map = sal_map / np.std(sal_map)
 
-        return np.corrcoef(salMap.reshape(-1), fixationMap.reshape(-1))[0][1]
+        return np.corrcoef(sal_map.reshape(-1), fixation_map.reshape(-1))[0][1]
 
     return calc_score(data_item['steer_pred']*np.absolute(data_item['speed_input'])
                       , data_item['steer_gt']*np.absolute(data_item['speed_input']))

@@ -129,8 +129,8 @@ class CoILAgent(Agent):
 
 
                 with open(os.path.join(collision_path, 'measurements' + str(count) + '.json'), 'w') as fo:
-                    jsonObj = MessageToDict(meas_clip[count])
-                    fo.write(json.dumps(jsonObj, sort_keys=True, indent=4))
+                    json_obj = MessageToDict(meas_clip[count])
+                    fo.write(json.dumps(json_obj, sort_keys=True, indent=4))
 
                 count += 1
 

@@ -33,8 +33,8 @@ from utils.general import compute_average_std_separatetasks, get_latest_path, wr
     snakecase_to_camelcase, write_data_point_control_summary, camelcase_to_snakecase, unique
 
 
-def frame2numpy(frame, frameSize):
-    return np.resize(np.fromstring(frame, dtype='uint8'), (frameSize[1], frameSize[0], 3))
+def frame2numpy(frame, frame_size):
+    return np.resize(np.fromstring(frame, dtype='uint8'), (frame_size[1], frame_size[0], 3))
 
 
 

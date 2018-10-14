@@ -220,8 +220,8 @@ def make_scatter_plot_analysis(all_metrics, plot_param, out_file = None):
     # Color map
     plt.set_cmap('jet')
     cm = plt.get_cmap()
-    cNorm  = colors.Normalize(vmin=0, vmax=50)
-    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
+    c_norm = colors.Normalize(vmin=0, vmax=50)
+    scalar_map = cmx.ScalarMappable(norm=c_norm, cmap=cm)
 
     #  Font size
     plt.rc('font', size=16)          # controls default text sizes
@@ -279,7 +279,7 @@ def make_scatter_plot_analysis(all_metrics, plot_param, out_file = None):
         data_y = data_y[np.invert(nans)]
 
         # the actual plotting
-        color_val = scalarMap.to_rgba(hash(experiment) % 50)
+        color_val = scalar_map.to_rgba(hash(experiment) % 50)
         color_vec = [color_val] * len(data_x)
         # print('color_vec', color_vec)
         # print('data[\'color\']', data['color'])
