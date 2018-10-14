@@ -357,7 +357,7 @@ def get_boost_pedestrian_vehicle_traffic_lights(data, key, positions_dict):
     boost = 0
 
     #print (data['pedestrian'][key])
-    if data[key]['pedestrian']  < 1.0 and data[key]['pedestrian'] > 0:
+    if 0 < data[key]['pedestrian'] < 1.0:
         boost += positions_dict['boost'][0]
 
     if data[key]['pedestrian'] == 0.:

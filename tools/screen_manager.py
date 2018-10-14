@@ -101,7 +101,7 @@ def perspective_tform(x, y):
 # ***** functions to draw lines *****
 def draw_pt(img, x, y, color, sz=1):
     row, col = perspective_tform(x, y)
-    if row >= 0 and row < img.shape[0] and col >= 0 and col < img.shape[1]:
+    if 0 <= row < img.shape[0] and 0 <= col < img.shape[1]:
         img[int(row - sz):int(row + sz), int(col - sz - 65):int(col + sz - 65)] = color
 
 

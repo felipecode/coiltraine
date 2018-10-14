@@ -73,7 +73,7 @@ def filled_circle(map_image, position, colour=[255, 0, 0, 255], radius=6):
 
 def plot_point(map_image, x, y, colour):
 
-    if (x <map_image.shape[1]  and x > 0) and (y <map_image.shape[0]  and y > 0):
+    if (0 < x < map_image.shape[1]) and (0 < x < map_image.shape[0]):
         map_image[x, y] = colour
 
 
