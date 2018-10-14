@@ -217,7 +217,7 @@ def _read_control_data(full_path, control_to_use):
         control, _ = read_control_csv(os.path.join(full_path, 'control_output' + control_to_use +
                                                    '.csv'))
     except:
-        raise ValueError("exception on control_csv reading full_path = %s,  " % (full_path))
+        raise ValueError("exception on control_csv reading full_path = %s,  " % full_path)
 
 
     # resend the none to eliminate this dataset

@@ -417,7 +417,7 @@ class testCILDataset(unittest.TestCase):
             h_images, h_labels = next(data_loader_hdf5)
             i_data = next(data_loader_images)
 
-            print ('hdf5 ', (h_labels[0][2].data), ' ', h_labels[0][26], ' ', h_labels[0][20],
+            print ('hdf5 ', h_labels[0][2].data, ' ', h_labels[0][26], ' ', h_labels[0][20],
                    'images ', i_data['brake'].data, ' ', i_data['angle'], ' ', i_data['game_time'])
 
 

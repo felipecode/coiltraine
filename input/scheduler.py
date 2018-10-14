@@ -161,7 +161,7 @@ def high(image_iteration):
 def medium_harder(image_iteration):
 
 
-    iteration = image_iteration/(120)
+    iteration = image_iteration / 120
     frequency_factor = 0.05 + float(iteration)/1000000.0
     color_factor = float(iteration)/1000000.0
     dropout_factor = 0.198667 + (0.03856658 - 0.198667) / (1 + (iteration / 196416.6) ** 1.863486)
@@ -213,7 +213,7 @@ def medium_harder(image_iteration):
 def hard_harder(image_iteration):
 
 
-    iteration = image_iteration/(120)
+    iteration = image_iteration / 120
     frequency_factor = min(0.05 + float(iteration)/200000.0, 1.0)
     color_factor = float(iteration)/1000000.0
     dropout_factor = 0.198667 + (0.03856658 - 0.198667) / (1 + (iteration / 196416.6) ** 1.863486)
@@ -265,7 +265,7 @@ def hard_harder(image_iteration):
 
 def soft_harder(image_iteration):
 
-    iteration = image_iteration/(120)
+    iteration = image_iteration / 120
     frequency_factor = 0.05 + float(iteration)/1200000.0
     color_factor = float(iteration)/1200000.0
     dropout_factor = 0.198667 + (0.03856658 - 0.198667) / (1 + (iteration / 196416.6) ** 1.863486)

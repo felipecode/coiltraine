@@ -60,9 +60,9 @@ def write_csv_data(filename, float_data):
     for value in float_data:
 
         if first_time:
-            csv_outfile.write("%f" % (value))
+            csv_outfile.write("%f" % value)
         else:
-            csv_outfile.write(",%f" % (value))
+            csv_outfile.write(",%f" % value)
         first_time = False
 
 

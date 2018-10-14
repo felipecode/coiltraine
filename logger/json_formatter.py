@@ -161,7 +161,7 @@ class JSONFormatter(Formatter):
             Returns:
                 An object to convert to JSON - either an ordered dict if recordfields are supplied or the record.msg attribute
         """
-        if (len(self.recordfields) > 0):
+        if len(self.recordfields) > 0:
             fields = []
             for x in self.recordfields:
                 fields.append((x, getattr(record, x)))

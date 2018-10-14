@@ -86,7 +86,7 @@ def select_data_sequence(control, selected_data):
                 eliminated_positions += 1
 
 
-            if (eliminated_positions) > g_conf.NUMBER_IMAGES_SEQUENCE/2:
+            if eliminated_positions > g_conf.NUMBER_IMAGES_SEQUENCE/2:
                 del_pos.append(count * g_conf.SEQUENCE_STRIDE)
                 break_sequence = True
                 break

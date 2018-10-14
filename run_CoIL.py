@@ -179,7 +179,7 @@ if __name__ == '__main__':
                           #no_screen=args.no_screen, docker=args.docker)
         else:
 
-            raise (" Invalid name for single process, chose from (train, validation, test)")
+            raise " Invalid name for single process, chose from (train, validation, test)"
 
 
     else:
