@@ -30,7 +30,8 @@ class RandomSampler(Sampler):
         indices (list): a list of indices
     """
 
-    def __init__(self, keys, executed_iterations):
+    def __init__(self, keys, executed_iterations, data_source):
+        super().__init__(data_source)
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
                                      executed_iterations + g_conf.BATCH_SIZE
         self.keys = keys
@@ -50,7 +51,8 @@ class SubsetSampler(Sampler):
         indices (list): a list of indices
     """
 
-    def __init__(self, indices):
+    def __init__(self, indices, data_source):
+        super().__init__(data_source)
         self.indices = indices
 
     def __iter__(self):
@@ -67,8 +69,9 @@ class PreSplittedSampler(Sampler):
     """
 
 
-    def __init__(self, keys, executed_iterations, weights=None):
+    def __init__(self, keys, executed_iterations, data_source, weights=None):
 
+        super().__init__(data_source)
         self.keys = keys
         if weights is None:
             self.weights = np.asarray([1.0/float(len(self.keys))]*len(self.keys), dtype=np.float)
@@ -133,9 +136,10 @@ class LogitSplittedSampler(Sampler):
     """
 
 
-    def __init__(self, keys, executed_iterations, weights=None):
+    def __init__(self, keys, executed_iterations, data_source, weights=None):
 
 
+        super().__init__(data_source)
         self.keys = keys
         if weights is None:
             self.weights = torch.tensor([1.0/float(len(self.keys))]*len(self.keys), dtype=torch.double)
