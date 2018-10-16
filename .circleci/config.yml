@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  analyze:
+    docker:
+      - image: circleci/python:3.6.4
+    steps:
+      - checkout
+      - run: sudo pip install pylint
+      - run: ./run_pylint.sh
+  test:
+    docker:
+      - image: circleci/python:3.6.4
+    steps:
+      - checkout
+      - run: echo "Testing"
+workflows:
+  version: 2
+  analyze_and_test:
+    jobs:
+      - analyze
+      - test
