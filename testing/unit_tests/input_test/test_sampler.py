@@ -28,7 +28,7 @@ class testSampler(unittest.TestCase):
         return
         try:
             os.mkdir('_images')
-        except:
+        except BaseException:
             pass
         augmenter = Augmenter(g_conf.AUGMENTATION)
 
@@ -88,7 +88,7 @@ class testSampler(unittest.TestCase):
                                                   batch_sampler=sampler,
                                                   num_workers=0,
                                                   pin_memory=True)
-        dist_calc = [0] * (len(keys)+1)
+        dist_calc = [0] * (len(keys) + 1)
 
         print (len(dist_calc))
 
@@ -141,9 +141,9 @@ class testSampler(unittest.TestCase):
             #                                str(count)+'c.png'))
 
             image_to_save = transforms.ToPILImage()(
-                (data['rgb'][1].cpu()*255).type(torch.ByteTensor))
+                (data['rgb'][1].cpu() * 255).type(torch.ByteTensor))
             image_to_save.save(os.path.join(test_images_write_path,
-                                            str(count)+'l.png'))
+                                            str(count) + 'l.png'))
 
             #image_to_save = transforms.ToPILImage()((data['rgb'][2].cpu()*255).type(torch.ByteTensor))
             # image_to_save.save(os.path.join(test_images_write_path,

@@ -82,7 +82,7 @@ def select_data_sequence(control, selected_data):
             if control[iter_sequence] not in selected_data:
                 eliminated_positions += 1
 
-            if eliminated_positions > g_conf.NUMBER_IMAGES_SEQUENCE/2:
+            if eliminated_positions > g_conf.NUMBER_IMAGES_SEQUENCE / 2:
                 del_pos.append(count * g_conf.SEQUENCE_STRIDE)
                 break_sequence = True
                 break
@@ -121,7 +121,7 @@ def label_split(labels, keys, selected_data):
         if not isinstance(selected_data, int):
             raise ValueError(" Invalid type for scalar label selection")
 
-        selected_data_vec = [[1]] + int(100/selected_data - 1) * [[0]]
+        selected_data_vec = [[1]] + int(100 / selected_data - 1) * [[0]]
 
     print (selected_data_vec)
 
@@ -174,7 +174,8 @@ def float_split(output_to_split, keys, percentiles):
 def remove_angle_traffic_lights(data, positions_dict):
     # will return all the keys that does not contain the expression.
 
-    return (data['angle'] == positions_dict['angle'] and data['traffic_lights'] != positions_dict['traffic_lights'])
+    return (data['angle'] == positions_dict['angle']
+            and data['traffic_lights'] != positions_dict['traffic_lights'])
 
 
 def remove_angle(data, positions_dict):
@@ -227,9 +228,9 @@ def split_sequence(data, var, positions):
     print (positions)
     keys = [np.where(data[var] <= positions[var][0])[0]]
 
-    for i in range(len(positions[var])-1):
+    for i in range(len(positions[var]) - 1):
         print (data[var])
-        print (positions[var][i], positions[var][i+1])
+        print (positions[var][i], positions[var][i + 1])
         keys.append(np.where(
             np.logical_and(data[var] > positions[var][i], data[var] <= positions[var][i + 1]))[0])
 
@@ -382,18 +383,18 @@ def full_split(dataset):
 
     counter = 0
     for c in range(3):  # control
-        for s in range(len(steering)-1):  # steer
-            for t in range(len(throttle)-1):  # throttle
-                for b in range(len(brake)-1):  # brake
-                    for v in range(len(speed)-1):  # speed
+        for s in range(len(steering) - 1):  # steer
+            for t in range(len(throttle) - 1):  # throttle
+                for b in range(len(brake) - 1):  # brake
+                    for v in range(len(speed) - 1):  # speed
                         true_c = [False, ] * C.shape[0]
                         for vals in control[c]:
                             true_c = np.logical_or(true_c, C == vals)
                         # true_c = [m in control[c] for m in M[D[b'control']]]
-                        true_s = np.logical_and(S >= steering[s], S < steering[s+1])
-                        true_t = np.logical_and(T >= throttle[t], T < throttle[t+1])
-                        true_b = np.logical_and(B >= brake[b], B < brake[b+1])
-                        true_v = np.logical_and(V >= speed[v], V < speed[v+1])
+                        true_s = np.logical_and(S >= steering[s], S < steering[s + 1])
+                        true_t = np.logical_and(T >= throttle[t], T < throttle[t + 1])
+                        true_b = np.logical_and(B >= brake[b], B < brake[b + 1])
+                        true_v = np.logical_and(V >= speed[v], V < speed[v + 1])
                         k1 = np.logical_and(true_c, true_s)
                         k2 = np.logical_and(true_t, true_b)
                         k3 = np.logical_and(k1, k2)

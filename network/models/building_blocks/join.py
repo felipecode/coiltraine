@@ -22,7 +22,8 @@ class Join(nn.Module):
             raise ValueError(" Missing the after_process parameter ")
 
         """" ------------------ IMAGE MODULE ---------------- """
-        # Conv2d(input channel, output channel, kernel size, stride), Xavier initialization and 0.1 bias initialization
+        # Conv2d(input channel, output channel, kernel size, stride), Xavier
+        # initialization and 0.1 bias initialization
 
         self.after_process = params['after_process']
         self.mode = params['mode']

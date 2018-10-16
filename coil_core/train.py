@@ -107,13 +107,14 @@ def get_inverse_freq_weights(keys, dataset_size):
     invers_freq_weights = []
     print (" frequency")
     for key_vec in keys:
-        print ((len(key_vec)/dataset_size))
-        invers_freq_weights.append((len(key_vec)/dataset_size))
+        print ((len(key_vec) / dataset_size))
+        invers_freq_weights.append((len(key_vec) / dataset_size))
 
     return softmax(np.array(invers_freq_weights))
 
 
-# TODO: for now is not posible to maybe balance just labels or just steering. Is either all or nothing
+# TODO: for now is not posible to maybe balance just labels or just
+# steering. Is either all or nothing
 def select_balancing_strategy(dataset, iteration, number_of_workers):
 
     # Creates the sampler, this part is responsible for managing the keys. It divides
@@ -198,9 +199,11 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         # Put the output to a separate file
         if suppress_output:
             sys.stdout = open(os.path.join('_output_logs', exp_alias + '_' +
-                                           g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+                                           g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
             sys.stderr = open(os.path.join('_output_logs',
-                                           exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                                           exp_alias + '_err_' + g_conf.PROCESS_NAME + '_' +
+                                           str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
         checkpoint_file = get_latest_saved_checkpoint()
@@ -217,7 +220,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             best_loss = 10000.0
             best_loss_iter = 0
 
-        # TODO: The checkpoint will continue, so it should erase everything up to the iteration on tensorboard
+        # TODO: The checkpoint will continue, so it should erase everything up to the iteration on
+        # tensorboard
         # Define the dataset. This structure is has the __get_item__ redefined in a way
         # that you can access the HD_FILES positions from the root directory as a in a vector.
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
@@ -229,7 +233,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         augmenter = Augmenter(g_conf.AUGMENTATION)
 
         dataset = CoILDataset(full_dataset, transform=augmenter,
-                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' +
+                                           g_conf.TRAIN_DATASET_NAME)
 
         data_loader = select_balancing_strategy(dataset, iteration, number_of_workers)
 
@@ -250,7 +255,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         else:
             accumulated_time = 0  # We accumulate iteration time and keep the average speed
 
-        # TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
+        # TODO: test experiment continuation. Is the data sampler going to
+        # continue were it started.. ?
         capture_time = time.time()
         for data in data_loader:
             print ("READ TIME ", time.time() - capture_time)
@@ -271,11 +277,13 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             if 'attention' in g_conf.LOSS_FUNCTION or 'regularization' in g_conf.LOSS_FUNCTION:
                 inter_layers = [model.intermediate_layers[ula] for ula in g_conf.USED_LAYERS_ATT]
                 loss, loss_L1, loss_L2 = criterion(branches, dataset.extract_targets(data).cuda(),
-                                                   controls.cuda(), dataset.extract_inputs(data).cuda(),
+                                                   controls.cuda(),
+                                                   dataset.extract_inputs(data).cuda(),
                                                    branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
                                                    variable_weights=g_conf.VARIABLE_WEIGHT,
                                                    inter_layers=inter_layers,
-                                                   intention_factors=dataset.extract_intentions(data).cuda())
+                                                   intention_factors=
+                                                       dataset.extract_intentions(data).cuda())
 
                 coil_logger.add_scalar('L1', loss_L1.data, iteration)
                 coil_logger.add_scalar('L2', loss_L2.data, iteration)
@@ -300,12 +308,13 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                 best_loss_iter = iteration
 
             # Log a random position
-            position = random.randint(0, len(data)-1)
+            position = random.randint(0, len(data) - 1)
 
             output = model.extract_branch(torch.stack(branches[0:4]), controls)
             error = torch.abs(output - dataset.extract_targets(data).cuda())
 
-            # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
+            # TODO: For now we are computing the error for just the correct branch, it
+            # could be multi- branch,
             print (" The produced loss")
 
             coil_logger.add_scalar('Loss', loss.data, iteration)
@@ -324,7 +333,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             coil_logger.add_message('Iterating',
                                     {'Iteration': iteration,
                                      'Loss': loss.data.tolist(),
-                                     'Images/s': (iteration*g_conf.BATCH_SIZE)/accumulated_time,
+                                     'Images/s': (iteration * g_conf.BATCH_SIZE) / accumulated_time,
                                      'BestLoss': best_loss, 'BestLossIteration': best_loss_iter,
                                      'Output': output[position].data.tolist(),
                                      'GroundTruth': dataset.extract_targets(data)[position].data.tolist(),
@@ -332,7 +341,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                                      'Inputs': dataset.extract_inputs(data)[position].data.tolist()},
                                     iteration)
 
-            # TODO: For now we are computing the error for just the correct branch, it could be multi-branch,
+            # TODO: For now we are computing the error for just the correct branch, it
+            # could be multi-branch,
 
             # TODO: save also the optimizer state dictionary
             if is_ready_to_save(iteration):
@@ -365,6 +375,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
     except KeyboardInterrupt:
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
 
-    except:
+    except BaseException:
         traceback.print_exc()
         coil_logger.add_message('Error', {'Message': 'Something Happened'})

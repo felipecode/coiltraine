@@ -42,7 +42,7 @@ class testValidation(unittest.TestCase):
         os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
         # At this point the log file with the correct naming is created.
-        merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
+        merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
         set_type_of_process('validation', dataset_name)
 
         augmenter = Augmenter(None)
@@ -111,7 +111,7 @@ class testValidation(unittest.TestCase):
 
                 iteration_on_checkpoint += 1
 
-            checkpoint_average_loss = accumulated_loss/(len(data_loader))
+            checkpoint_average_loss = accumulated_loss / (len(data_loader))
 
             checkpoint_avg_loss_vec.append(checkpoint_average_loss)
 

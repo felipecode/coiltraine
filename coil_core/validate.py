@@ -50,7 +50,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
         # At this point the log file with the correct naming is created.
-        merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
+        merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
         set_type_of_process('validation', dataset_name)
 
         if not os.path.exists('_output_logs'):
@@ -58,9 +58,11 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         if suppress_output:
             sys.stdout = open(os.path.join('_output_logs',
-                                           g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+                                           g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
 
-        if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
+        if monitorer.get_status(exp_batch, exp_alias + '.yaml',
+                                g_conf.PROCESS_NAME)[0] == "Finished":
             # TODO: print some cool summary or not ?
             return
 
@@ -134,7 +136,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     loss = torch.mean(
                         (output - dataset.extract_targets(float_data).cuda())**2).data.tolist()
                     mean_error = torch.mean(
-                        torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
+                        torch.abs(output -
+                                  dataset.extract_targets(float_data).cuda())).data.tolist()
                     #print ("Loss", loss)
                     #print ("output", output[0])
                     accumulated_error += mean_error
@@ -146,7 +149,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     #print (output[position].data.tolist())
                     coil_logger.add_message('Iterating',
                                             {'Checkpoint': latest,
-                                             'Iteration': (str(iteration_on_checkpoint*120)+'/'+str(len(dataset))),
+                                             'Iteration': (str(iteration_on_checkpoint * 120) +
+                                                           '/' + str(len(dataset))),
                                                 'MeanError': mean_error,
                                                 'Loss': loss,
                                                 'Output': output[position].data.tolist(),
@@ -156,9 +160,9 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                                             latest)
                     iteration_on_checkpoint += 1
 
-                checkpoint_average_loss = accumulated_loss/(len(data_loader))
+                checkpoint_average_loss = accumulated_loss / (len(data_loader))
 
-                checkpoint_average_error = accumulated_error/(len(data_loader))
+                checkpoint_average_error = accumulated_error / (len(data_loader))
 
                 coil_logger.add_scalar('Loss', checkpoint_average_loss, latest, True)
                 coil_logger.add_scalar('Error', checkpoint_average_error, latest, True)
@@ -202,7 +206,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
     except KeyboardInterrupt:
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
 
-    except:
+    except BaseException:
         traceback.print_exc()
 
         coil_logger.add_message('Error', {'Message': 'Something Happened'})

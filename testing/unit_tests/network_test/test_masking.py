@@ -114,11 +114,11 @@ class testMasking(unittest.TestCase):
                 #inter_layers = where(labels_reshaped==12)
 
             image_to_save = transforms.ToPILImage()(
-                (data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+                (data['rgb'][0].cpu() * 255).type(torch.ByteTensor))
             b, g, r = image_to_save.split()
             image_to_save = Image.merge("RGB", (r, g, b))
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'central', str(count)+'rgb.png'))
+                                            'central', str(count) + 'rgb.png'))
 
             # Test steerings after augmentation
             #print("steer: ", data['steer'][0], "angle: ", data['angle'][0])

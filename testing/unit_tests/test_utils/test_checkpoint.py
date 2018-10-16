@@ -32,7 +32,7 @@ class testCheckpoint(unittest.TestCase):
 
         self.assertEqual(checkpoint, None)
 
-        for iteration in range(0, int(g_conf.NUMBER_ITERATIONS/2)):
+        for iteration in range(0, int(g_conf.NUMBER_ITERATIONS / 2)):
 
             if is_ready_to_save(iteration):
 
@@ -43,7 +43,7 @@ class testCheckpoint(unittest.TestCase):
                 torch.save(state, os.path.join('_logs', exp_batch, exp_alias,
                                                'checkpoints', str(iteration) + '.pth'))
 
-        for validation in g_conf.TEST_SCHEDULE[0:int(len(g_conf.TEST_SCHEDULE)/2)]:
+        for validation in g_conf.TEST_SCHEDULE[0:int(len(g_conf.TEST_SCHEDULE) / 2)]:
 
             if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
 
@@ -54,7 +54,7 @@ class testCheckpoint(unittest.TestCase):
                 print (latest)
         self.assertEqual(latest, 800)
 
-        for iteration in range(int(g_conf.NUMBER_ITERATIONS/2),
+        for iteration in range(int(g_conf.NUMBER_ITERATIONS / 2),
                                g_conf.NUMBER_ITERATIONS):
 
             if is_ready_to_save(iteration):

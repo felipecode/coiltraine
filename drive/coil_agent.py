@@ -24,7 +24,8 @@ from torchvision import transforms
 from carla.agent import Agent, CommandFollower
 
 
-# TODO: The network is defined and toguether there is as forward pass operation to be used for testing, depending on the configuration
+# TODO: The network is defined and toguether there is as forward pass
+# operation to be used for testing, depending on the configuration
 
 from network import CoILModel
 from configs import g_conf
@@ -129,7 +130,8 @@ class CoILAgent(Agent):
 
             if (player_measurements.collision_vehicles - previous_vehicle_collision) > thresh_vehicle:
                 return True
-            if (player_measurements.collision_pedestrians - previous_pedestrian_collision) > thresh_pedestrian:
+            if (player_measurements.collision_pedestrians -
+                    previous_pedestrian_collision) > thresh_pedestrian:
                 return True
             if (player_measurements.collision_other - previous_other_collision) > thresh_other:
                 return True
@@ -142,7 +144,7 @@ class CoILAgent(Agent):
                (player_measurements.collision_pedestrians - self._previous_pedestrian_collision))
 
         # TODO We will hardcode the sensor that is going to be used as RGB to record the collisions
-        if len(self._image_queue) < clip_size*10:
+        if len(self._image_queue) < clip_size * 10:
 
             self._image_queue.append(sensor_data['rgb'])
             self._measurements_queue.append(player_measurements)
@@ -163,9 +165,9 @@ class CoILAgent(Agent):
                 and self._collision_time == -1:
             # This use of col time helps it to make sure that you dont overlap collisions
             #print (" COLLLLIDED")
-            self._collision_time = game_timestamp/100.0
+            self._collision_time = game_timestamp / 100.0
 
-        if self._collision_time > 0 and ((game_timestamp/100.0) - self._collision_time) > \
+        if self._collision_time > 0 and ((game_timestamp / 100.0) - self._collision_time) > \
                 after_collision_clip_size:
             # This use of col time helps it to make sure that you dont overlap collisions
             self._collision_time = -1

@@ -1,5 +1,5 @@
 """
-    A simple factory module that returns instances of possible modules 
+    A simple factory module that returns instances of possible modules
 
 """
 

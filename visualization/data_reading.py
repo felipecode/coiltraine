@@ -158,7 +158,8 @@ def _read_step_data(step_path):
     # On this step we read all predictions for this benchmark step.
     predictions = np.loadtxt(step_path, delimiter=",", skiprows=0, usecols=([0]))
 
-    # Get the ground truth directly from the datasets path with the already generated steer and speed
+    # Get the ground truth directly from the datasets path with the already
+    # generated steer and speed
     ground_truth = get_ground_truth(val_dataset_name)
 
     step_dictionary.update({'steer_pred': predictions})
@@ -166,7 +167,8 @@ def _read_step_data(step_path):
     #steer_gt = np.loadtxt(step_path + '_seq_gt_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
     step_dictionary.update({'steer_gt': ground_truth})
 
-    #steer_error = np.loadtxt(step_path + '_seq_error_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
+    #steer_error = np.loadtxt(step_path + '_seq_error_val.csv', delimiter=" ", skiprows=0,
+    # usecols=([0]))
     #step_dictionary.update({'steer_error': compute_error(predictions, ground_truth)})
 
     step_dictionary.update({'speed_input': get_speed_ground_truth(val_dataset_name)})
@@ -184,7 +186,7 @@ def _read_control_data(full_path, control_to_use):
     try:
         control, _ = read_control_csv(os.path.join(full_path, 'control_output' + control_to_use +
                                                    '.csv'))
-    except:
+    except BaseException:
         raise ValueError("exception on control_csv reading full_path = %s,  " % full_path)
 
     # resend the none to eliminate this dataset
@@ -217,7 +219,7 @@ def _read_data(full_path, benchmarked_steps):
             town_dictionary.update(prediction_data)
         except KeyboardInterrupt:
             raise
-        except:
+        except BaseException:
             traceback.print_exc()
             return None
 

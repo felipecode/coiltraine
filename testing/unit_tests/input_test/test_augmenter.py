@@ -55,11 +55,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_basic_add', str(count)+'b.png'))
+                                            'test_basic_add', str(count) + 'b.png'))
             result = add_random_augmenter(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_basic_add', str(count)+'.png'))
+                                            'test_basic_add', str(count) + '.png'))
             count += 1
 
     def test_random_add_color(self):
@@ -74,12 +74,12 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'add_random_augmenter_color', str(count)+'b.png'))
+                                            'add_random_augmenter_color', str(count) + 'b.png'))
             result = add_random_augmenter_color(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
 
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'add_random_augmenter_color', str(count)+'.png'))
+                                            'add_random_augmenter_color', str(count) + '.png'))
             count += 1
 
     def test_random_add_color_cpu(self):
@@ -99,7 +99,7 @@ class testAugmenter(unittest.TestCase):
             image_to_save = transforms.ToPILImage()(image['rgb'][1][0].byte())
 
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'add_random_augmenter_color_cpu', str(count)+'.png'))
+                                            'add_random_augmenter_color_cpu', str(count) + '.png'))
 
             count += 1
 
@@ -112,7 +112,7 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             result = mul_test_augmenter(count, image['rgb'])
             self.assertAlmostEqual(torch.mean(result[0].cpu()),
-                                   torch.mean(image['rgb'][0][0]),  places=5)
+                                   torch.mean(image['rgb'][0][0]), places=5)
 
             count += 1
 
@@ -126,11 +126,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_basic_mul', str(count)+'b.png'))
+                                            'test_basic_mul', str(count) + 'b.png'))
             result = mul_random_augmenter(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_basic_mul', str(count)+'.png'))
+                                            'test_basic_mul', str(count) + '.png'))
             count += 1
 
     def test_random_mul_color(self):
@@ -144,11 +144,11 @@ class testAugmenter(unittest.TestCase):
 
             image_to_save = transforms.ToPILImage()(image['rgb'][count][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_random_mul_color',
-                                            str(count)+'b.png'))
+                                            str(count) + 'b.png'))
             result = mul_random_augmenter_color(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[count].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_random_mul_color',
-                                            str(count)+'.png'))
+                                            str(count) + '.png'))
             count += 1
 
     def test_random_mul_color_sometimes(self):
@@ -162,11 +162,11 @@ class testAugmenter(unittest.TestCase):
 
             image_to_save = transforms.ToPILImage()(image['rgb'][count][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_random_mul_color_sometimes',
-                                            str(count)+'b.png'))
+                                            str(count) + 'b.png'))
             result = mult_random_color_sometimes(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[count].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_random_mul_color_sometimes',
-                                            str(count)+'.png'))
+                                            str(count) + '.png'))
             count += 1
 
     # TODO: We should remind our dear user to visually check the images after a test.
@@ -181,11 +181,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_dropout',
-                                            str(count)+'b.png'))
+                                            str(count) + 'b.png'))
             result = dropout_random(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_dropout',
-                                            str(count)+'.png'))
+                                            str(count) + '.png'))
             count += 1
 
     def test_dropout_color(self):
@@ -198,11 +198,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_dropout_color',
-                                            str(count)+'b.png'))
+                                            str(count) + 'b.png'))
             result = dropout_random_color(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_dropout_color',
-                                            str(count)+'.png'))
+                                            str(count) + '.png'))
             count += 1
 
     def test_coarse_dropout(self):
@@ -215,11 +215,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][count][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_coarse_dropout',
-                                            str(count)+'b.png'))
+                                            str(count) + 'b.png'))
             result = coarse_dropout_random(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[count].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_coarse_dropout',
-                                            str(count)+'.png'))
+                                            str(count) + '.png'))
             count += 1
 
     def test_coarse_dropout_color(self):
@@ -232,11 +232,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_coarse_dropout_color',
-                                            str(count)+'b.png'))
+                                            str(count) + 'b.png'))
             result = coarse_dropout_random_color(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path + 'test_coarse_dropout_color',
-                                            str(count)+'.png'))
+                                            str(count) + '.png'))
             count += 1
 
     def test_dropout_cpu(self):
@@ -254,7 +254,7 @@ class testAugmenter(unittest.TestCase):
             image_to_save = transforms.ToPILImage()(image['rgb'][count][0].byte())
 
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_dropout_cpu', str(count)+'.png'))
+                                            'test_dropout_cpu', str(count) + '.png'))
 
             count += 1
 
@@ -274,7 +274,7 @@ class testAugmenter(unittest.TestCase):
             image_to_save = transforms.ToPILImage()(image['rgb'][count][0].byte())
 
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_coarse_dropout_cpu', str(count)+'.png'))
+                                            'test_coarse_dropout_cpu', str(count) + '.png'))
 
             count += 1
 
@@ -288,11 +288,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_grayscale', str(count)+'b.png'))
+                                            'test_grayscale', str(count) + 'b.png'))
             result = grayscale_test(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_grayscale', str(count)+'.png'))
+                                            'test_grayscale', str(count) + '.png'))
             count += 1
 
     def test_grayscale_cpu(self):
@@ -325,11 +325,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_gaussian_blur', str(count)+'b.png'))
+                                            'test_gaussian_blur', str(count) + 'b.png'))
             result = gaussian_blur_test(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_gaussian_blur', str(count)+'.png'))
+                                            'test_gaussian_blur', str(count) + '.png'))
             count += 1
 
     def test_gaussian_blur_cpu(self):
@@ -362,11 +362,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_contrast_normalization', str(count)+'b.png'))
+                                            'test_contrast_normalization', str(count) + 'b.png'))
             result = contrast_normalization_test(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_contrast_normalization', str(count)+'.png'))
+                                            'test_contrast_normalization', str(count) + '.png'))
             count += 1
 
     def test_contrast_normalization_color(self):
@@ -379,11 +379,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_contrast_normalization_color', str(count)+'b.png'))
+                                            'test_contrast_normalization_color', str(count) + 'b.png'))
             result = contrast_normalization_test_color(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_contrast_normalization_color', str(count)+'.png'))
+                                            'test_contrast_normalization_color', str(count) + '.png'))
             count += 1
 
     def test_contrast_normalization_cpu(self):
@@ -416,11 +416,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_additive_gaussian', str(count)+'b.png'))
+                                            'test_additive_gaussian', str(count) + 'b.png'))
             result = additive_gaussian_test(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_additive_gaussian', str(count)+'.png'))
+                                            'test_additive_gaussian', str(count) + '.png'))
             count += 1
 
     def test_additive_gaussian_color(self):
@@ -433,11 +433,11 @@ class testAugmenter(unittest.TestCase):
             image, labels = data
             image_to_save = transforms.ToPILImage()(image['rgb'][0][0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_additive_gaussian_color', str(count)+'b.png'))
+                                            'test_additive_gaussian_color', str(count) + 'b.png'))
             result = additive_gaussian_test_color(count, image['rgb'])
             image_to_save = transforms.ToPILImage()(result[0].cpu())
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'test_additive_gaussian_color', str(count)+'.png'))
+                                            'test_additive_gaussian_color', str(count) + '.png'))
             count += 1
 
     def test_additive_gaussian_cpu(self):

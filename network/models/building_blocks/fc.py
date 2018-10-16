@@ -27,18 +27,18 @@ class FC(nn.Module):
         if 'end_layer' not in params:
             raise ValueError(" Missing the end module parameter ")
 
-        if len(params['dropouts']) != len(params['neurons'])-1:
+        if len(params['dropouts']) != len(params['neurons']) - 1:
             raise ValueError("Dropouts should be from the len of kernels minus 1")
 
         self.layers = []
 
         for i in range(0, len(params['neurons']) - 1):
 
-            fc = nn.Linear(params['neurons'][i], params['neurons'][i+1])
+            fc = nn.Linear(params['neurons'][i], params['neurons'][i + 1])
             dropout = nn.Dropout2d(p=params['dropouts'][i])
             relu = nn.ReLU(inplace=True)
 
-            if i == len(params['neurons'])-2 and params['end_layer']:
+            if i == len(params['neurons']) - 2 and params['end_layer']:
                 self.layers.append(nn.Sequential(*[fc, dropout]))
             else:
                 self.layers.append(nn.Sequential(*[fc, dropout, relu]))

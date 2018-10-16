@@ -52,13 +52,15 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
     carla_out_file = os.path.join('_output_logs',
                                   'CARLA_' + g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
     carla_out_file_err = os.path.join('_output_logs',
-                                      'CARLA_err_' + g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
+                                      'CARLA_err_' + g_conf.PROCESS_NAME + '_' + str(os.getpid()) +
+                                      ".out")
 
     port = find_free_port()
 
     if docker:
 
-        sp = subprocess.Popen(['docker', 'run', '--rm', '-d', '-p', str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
+        sp = subprocess.Popen(['docker', 'run', '--rm', '-d', '-p', str(port) + '-' +
+                               str(port + 2) + ':' + str(port) + '-' + str(port + 2),
                                '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES=' +
                                str(gpu), 'carlagear',
                                '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name, '-windowed',
@@ -67,9 +69,9 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
 
         (out, err) = sp.communicate()
 
-        # print (['docker', 'run', '--rm', '-p '+str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
-        #                      '--runtime=nvidia', '-e  NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
-        #                       '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
+        # print (['docker', 'run', '--rm', '-p '+str(port)+'-'+str(port+2)+':'+str(port)+'-'+
+        #  str(port+2), '--runtime=nvidia', '-e  NVIDIA_VISIBLE_DEVICES='+str(gpu),
+        # 'carlasim/carla:0.8.4', '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
         #                       '-benchmark', '-fps=10', '-world-port=' + str(port)])
 
     else:
@@ -77,23 +79,25 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
         carla_path = os.environ['CARLA_PATH']
         if not no_screen:
             os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
-            sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
-                                   '-windowed',
-                                   '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
-                                  stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+            sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' +
+                                   town_name, '-windowed', '-benchmark', '-fps=10', '-world-port=' +
+                                   str(port)], shell=False, stdout=open(carla_out_file, 'w'),
+                                  stderr=open(carla_out_file_err, 'w'))
 
         else:
             os.environ['DISPLAY'] = ":5"
             sp = subprocess.Popen(['vglrun', '-d', ':7.' + str(gpu),
                                    carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
                                    '/Game/Maps/' + town_name, '-windowed', '-benchmark',
-                                   '-fps=10', '-world-port='+str(port)],
+                                   '-fps=10', '-world-port=' + str(port)],
                                   shell=False,
-                                  stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+                                  stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err,
+                                                                                'w'))
         out = "0"
 
-    coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4'
-                                        '-windowed' + '-benchmark' + '-fps=10' + '-world-port=' + str(port)})
+    coil_logger.add_message('Loading', {'CARLA': '/CarlaUE4/Binaries/Linux/CarlaUE4'
+                                        '-windowed' + '-benchmark' + '-fps=10' + '-world-port=' +
+                                                 str(port)})
 
     return sp, port, out
 
@@ -103,7 +107,8 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
 # TODO: Add all the necessary logging.
 
 # OBS : I AM FIXING host as localhost now
-# TODO :  Memory use should also be adaptable with a limit, for now that seems to be doing fine in PYtorch
+# TODO :  Memory use should also be adaptable with a limit, for now that
+# seems to be doing fine in PYtorch
 
 
 def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
@@ -129,7 +134,8 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
         else:
             control_filename = 'control_output'
 
-        experiment_suite_module = __import__('drive.suites.' + camelcase_to_snakecase(exp_set_name) + '_suite',
+        experiment_suite_module = __import__('drive.suites.' +
+                                             camelcase_to_snakecase(exp_set_name) + '_suite',
                                              fromlist=[exp_set_name])
 
         experiment_suite_module = getattr(experiment_suite_module, exp_set_name)
@@ -143,7 +149,8 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                                            g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
             sys.stderr = open(os.path.join('_output_logs',
-                                           exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                                           exp_alias + '_err_' + g_conf.PROCESS_NAME + '_' +
+                                           str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
@@ -177,10 +184,12 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             try:
                 # Get the correct checkpoint
                 # We check it for some task name, all of then are ready at the same time
-                if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE, control_filename + '_' + task_list[0]):
+                if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE,
+                                            control_filename + '_' + task_list[0]):
 
                     carla_process, port, out = start_carla_simulator(gpu, town_name,
-                                                                     params['no_screen'], params['docker'])
+                                                                     params['no_screen'],
+                                                                     params['docker'])
 
                     latest = get_next_checkpoint(
                         g_conf.TEST_SCHEDULE, control_filename + '_' + task_list[0])
@@ -193,7 +202,8 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
                     run_driving_benchmark(coil_agent, experiment_set, town_name,
                                           exp_batch + '_' + exp_alias + '_' + str(latest)
-                                          + '_drive_' + control_filename, True, params['host'], port)
+                                          + '_drive_' + control_filename, True, params['host'],
+                                          port)
 
                     path = exp_batch + '_' + exp_alias + '_' + str(latest) \
                         + '_' + g_conf.PROCESS_NAME.split('_')[0] + '_' + control_filename \
@@ -207,9 +217,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                         benchmark_dict = json.loads(f.read())
 
                     print (" number of episodes ", len(experiment_set.build_experiments()))
-                    averaged_dict = compute_average_std_separatetasks([benchmark_dict],
-                                                                      experiment_set.weathers,
-                                                                      len(experiment_set.build_experiments()))
+                    averaged_dict = \
+                        compute_average_std_separatetasks([benchmark_dict], experiment_set.weathers,
+                                                          len(experiment_set.build_experiments()))
 
                     file_base = os.path.join('_logs', exp_batch, exp_alias,
                                              g_conf.PROCESS_NAME + '_csv', control_filename)
@@ -220,8 +230,10 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                     print (task_list)
 
                     for i in range(len(task_list)):
-                        #write_data_point_control_summary(file_base, 'empty', averaged_dict, latest, 0)
-                        #write_data_point_control_summary(file_base, 'normal', averaged_dict, latest, 1)
+                        # write_data_point_control_summary(file_base, 'empty', averaged_dict,
+                        # latest, 0)
+                        # write_data_point_control_summary(file_base, 'normal', averaged_dict,
+                        # latest, 1)
                         write_data_point_control_summary(
                             file_base, task_list[i], averaged_dict, latest, i)
 
@@ -247,7 +259,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                 subprocess.call(['docker', 'stop', out[:-1]])
                 coil_logger.add_message('Error', {'Message': 'Killed By User'})
                 exit(1)
-            except:
+            except BaseException:
                 traceback.print_exc()
                 carla_process.kill()
                 subprocess.call(['docker', 'stop', out[:-1]])
@@ -260,6 +272,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
         traceback.print_exc()
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
 
-    except:
+    except BaseException:
         traceback.print_exc()
         coil_logger.add_message('Error', {'Message': 'Something happened'})

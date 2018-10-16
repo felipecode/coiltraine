@@ -102,9 +102,8 @@ def folder_execute(params=None):
 
     executing_processes = []
 
-    free_gpus, resources_on_most_free_gpu, executing_processes = get_gpu_resources(allocated_gpus,
-                                                                                   executing_processes,
-                                                                                   allocation_parameters)
+    free_gpus, resources_on_most_free_gpu, executing_processes = \
+        get_gpu_resources(allocated_gpus, executing_processes, allocation_parameters)
 
     # Is a queue of tasks to be executed. The priority is always train.
     # then test then val.
@@ -118,7 +117,8 @@ def folder_execute(params=None):
 
     print(tasks_queue)
 
-    # TODO: the while should go outside, so the monitorer process is independent of the type of execution
+    # TODO: the while should go outside, so the monitorer process is
+    # independent of the type of execution
 
     while True:
         #        if not done or executing  get to the list

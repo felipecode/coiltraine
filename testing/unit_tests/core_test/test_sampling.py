@@ -76,7 +76,7 @@ class testValidation(unittest.TestCase):
         create_exp_path(exp_batch, exp_alias)
 
         # At this point the log file with the correct naming is created.
-        merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
+        merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
         set_type_of_process('drive', dataset_name)
         augmenter = Augmenter(None)
 
@@ -106,9 +106,9 @@ class testValidation(unittest.TestCase):
             #print (data)
 
             image_to_save = transforms.ToPILImage()(
-                (data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+                (data['rgb'][0].cpu() * 255).type(torch.ByteTensor))
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'weather_aug', str(count)+'l.png'))
+                                            'weather_aug', str(count) + 'l.png'))
 
             """
             for i in range(120):

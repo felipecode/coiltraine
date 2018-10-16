@@ -14,7 +14,7 @@ class testSpliter(unittest.TestCase):
 
     def generate_label_data(self):
 
-        return [2]*650 + [3]*400 + [4]*400
+        return [2] * 650 + [3] * 400 + [4] * 400
 
     def test_split(self):
         return
@@ -35,7 +35,7 @@ class testSpliter(unittest.TestCase):
                 for key in splitter_steer[i]:
                     sum_now += measurements[key]
 
-                avg_now = sum_now/len(splitter_steer[i])
+                avg_now = sum_now / len(splitter_steer[i])
                 print (avg_now)
                 if i > 0:
                     self.assertLess(avg_previous, avg_now)
@@ -65,7 +65,7 @@ class testSpliter(unittest.TestCase):
                 for key in splitter_steer[i]:
                     sum_now += measurements[key]
 
-                avg_now = sum_now/len(splitter_steer[i])
+                avg_now = sum_now / len(splitter_steer[i])
                 print (avg_now)
                 # if i > 0:
                 #self.assertLess(avg_previous, avg_now)
@@ -107,7 +107,7 @@ class testSpliter(unittest.TestCase):
                 for key in splitter_steer[i]:
                     sum_now += steerings[key]
 
-                avg_now = sum_now/len(splitter_steer[i])
+                avg_now = sum_now / len(splitter_steer[i])
                 #print (avg_now)
                 if i > 0:
                     self.assertLess(avg_previous, avg_now)
@@ -151,7 +151,7 @@ class testSpliter(unittest.TestCase):
                 for key in splitter_steer[i]:
                     sum_now += speed[key]
 
-                avg_now = sum_now/len(splitter_steer[i])
+                avg_now = sum_now / len(splitter_steer[i])
                 print (avg_now)
                 if i > 0:
                     self.assertLess(avg_previous, avg_now)
@@ -201,7 +201,7 @@ class testSpliter(unittest.TestCase):
         dataset = CoILDataset(root_path, transform=None)
 
         keys = splitter.split_speed_module(
-            dataset.measurements, {'speed_module': [0.0666,  0.208, 0.39]})
+            dataset.measurements, {'speed_module': [0.0666, 0.208, 0.39]})
 
         print (" Lenghts of bins speed")
         sum_of_keys = 0

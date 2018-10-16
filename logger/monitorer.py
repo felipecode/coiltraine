@@ -40,7 +40,7 @@ def get_episode_number(benchmark_log_name):
     # TODO: weird bug on data reading that eats the last letter
     try:
         return len(control_dict['result'])
-    except:
+    except BaseException:
         return len(control_dict['resul'])
 
 
@@ -51,7 +51,7 @@ def get_number_episodes_completed(benchmark_log_name):
         return None
     try:
         return sum(control_dict['result'])
-    except:
+    except BaseException:
         return sum(control_dict['resul'])
 
 
@@ -105,7 +105,7 @@ def get_latest_checkpoint_validation():
     if g_conf.TEST_SCHEDULE.index(not_evaluated_logs[0]) == 0:
         return None
 
-    return g_conf.TEST_SCHEDULE[g_conf.TEST_SCHEDULE.index(not_evaluated_logs[0])-1]
+    return g_conf.TEST_SCHEDULE[g_conf.TEST_SCHEDULE.index(not_evaluated_logs[0]) - 1]
 
 
 def get_latest_checkpoint_drive(control_filename):

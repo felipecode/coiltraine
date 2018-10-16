@@ -49,7 +49,8 @@ class CarScreenRecorder(object):
     # If we were to load the steering wheel load it
 
     # take into consideration the resolution when ploting
-    # TODO: Resize properly to fit the screen ( MAYBE THIS COULD BE DONE DIRECTLY RESIZING screen and keeping SURFACES)
+    # TODO: Resize properly to fit the screen ( MAYBE THIS COULD BE DONE
+    # DIRECTLY RESIZING screen and keeping SURFACES)
 
     def start_screen(self, resolution, aspect_ratio, scale=1):
 

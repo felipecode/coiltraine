@@ -127,8 +127,7 @@ def export_csv_separate(exp_batch, variables_to_export, task_list):
                             f.write(",")
                             for task in task_list:
                                 if experiment_list[experiments.index(exp)][count][task]:
-                                    f.write(
-                                        "%.2f/" % experiment_list[experiments.index(exp)][count][task][variable])
+                                    f.write( "%.2f/" % experiment_list[experiments.index(exp)][count][task][variable])
 
                         f.write("\n")
                     count += 1
@@ -159,7 +158,7 @@ def export_status(exp_batch, validation_datasets, driving_environments):
 
             if os.path.isdir(os.path.join(root_path, exp_batch, exp)):
 
-                f.write("%s,%s" % (exp, names_list[exp+'.yaml']))
+                f.write("%s,%s" % (exp, names_list[exp + '.yaml']))
                 count += 1
                 print (exp)
                 merge_with_yaml(os.path.join('configs', exp_batch, exp + '.yaml'))
@@ -197,7 +196,8 @@ def export_status(exp_batch, validation_datasets, driving_environments):
                                 root_path, exp_batch, exp, log, output_name)
                             control_csv = read_summary_csv(csv_file_path)
 
-                            if control_csv is not None and (g_conf.TEST_SCHEDULE[-1]) == int(control_csv['step'][-1]):
+                            if control_csv is not None and (
+                                    g_conf.TEST_SCHEDULE[-1]) == int(control_csv['step'][-1]):
 
                                 f.write(",Done")
                             else:

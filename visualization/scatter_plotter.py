@@ -30,7 +30,8 @@ root_path = 'eccv_results'
 camera_labels_1 = np.array(map(int, map(float, open('camera_label_file_Town01_1.txt'))))
 camera_labels_1_noise = np.array(map(int, map(float, open('camera_label_file_Town01_1_noise.txt'))))
 camera_labels_2 = np.array(map(int, map(float, open('camera_label_file_Town02_14.txt'))))
-camera_labels_2_noise = np.array(map(int, map(float, open('camera_label_file_Town02_14_noise.txt'))))
+camera_labels_2_noise = np.array(map(int, map(float, 
+                                              open('camera_label_file_Town02_14_noise.txt'))))
 """
 
 
@@ -85,7 +86,8 @@ def read_data(exp_batch, experiment, town, data_params, noise):
 def filter_data(data, filter_param, noise):
 
     if filter_param:
-        #list_cameras = {'Town01_1': 'camera_label_file_Town01_1.txt', 'Town02_14': 'camera_label_file_Town02_14.txt'}
+        #list_cameras = {'Town01_1': 'camera_label_file_Town01_1.txt',
+        # 'Town02_14': 'camera_label_file_Town02_14.txt'}
         if 'camera' in filter_param:
             print (" GOING TO FILTER CENTER ", filter_param)
             # prepare the mask
@@ -133,27 +135,28 @@ def filter_data(data, filter_param, noise):
         data_filtered = data
     return data_filtered
 
-# TODO implement. Returns a list? Or a numpy array? With the length equal to the number_of_iterations*2 (train and test)?
+# TODO implement. Returns a list? Or a numpy array? With the length equal
+# to the number_of_iterations*2 (train and test)?
 
 
 def compute_lims(data_x, data_y):
     x_std = max(np.std(data_x), 0.001)
     y_std = max(np.std(data_y), 0.001)
     margin = 0.3
-    x_max = np.max(data_x) + margin*x_std
-    x_min = np.min(data_x) - margin*x_std
-    y_max = np.max(data_y) + margin*y_std
-    y_min = np.min(data_y) - margin*y_std
-    spread_ratio = ((x_max - x_min)/x_std) / ((y_max-y_min)/y_std)
+    x_max = np.max(data_x) + margin * x_std
+    x_min = np.min(data_x) - margin * x_std
+    y_max = np.max(data_y) + margin * y_std
+    y_min = np.min(data_y) - margin * y_std
+    spread_ratio = ((x_max - x_min) / x_std) / ((y_max - y_min) / y_std)
     if spread_ratio > 1:
-        extra = (spread_ratio-1) * (y_max-y_min) / 2
+        extra = (spread_ratio - 1) * (y_max - y_min) / 2
         y_min -= extra
         y_max += extra
     else:
-        extra = (1/spread_ratio-1) * (x_max-x_min) / 2
+        extra = (1 / spread_ratio - 1) * (x_max - x_min) / 2
         x_min -= extra
         x_max += extra
-    assert(np.abs(((x_max - x_min)/x_std) / ((y_max-y_min)/y_std)) < 1.0001)
+    assert(np.abs(((x_max - x_min) / x_std) / ((y_max - y_min) / y_std)) < 1.0001)
     return [x_min, x_max], [y_min, y_max]
 
 
@@ -179,25 +182,41 @@ def process_data(data, processing_params, noise):
 
 def make_scatter_plot_analysis(all_metrics, plot_param, out_file=None):
     if 'Regularization' in plot_param['title']:
-        model_to_legend = {'25_nor_no_single_ctrl_bal_regr_all': 'No regularization', '25_nor_ndrop_single_ctrl_bal_regr_all': 'Dropout',
-                           '25_nor_saug_single_ctrl_bal_regr_all': 'Dropout + mild aug.', '25_nor_maug_single_ctrl_bal_regr_all': 'Dropout + heavy aug.'}
-        model_to_id = {'25_nor_no_single_ctrl_bal_regr_all': 1, '25_nor_ndrop_single_ctrl_bal_regr_all': 2,
-                       '25_nor_saug_single_ctrl_bal_regr_all': 3, '25_nor_maug_single_ctrl_bal_regr_all': 4}
+        model_to_legend = {'25_nor_no_single_ctrl_bal_regr_all': 'No regularization',
+                           '25_nor_ndrop_single_ctrl_bal_regr_all': 'Dropout',
+                           '25_nor_saug_single_ctrl_bal_regr_all': 'Dropout + mild aug.',
+                           '25_nor_maug_single_ctrl_bal_regr_all': 'Dropout + heavy aug.'}
+        model_to_id = {'25_nor_no_single_ctrl_bal_regr_all': 1,
+                       '25_nor_ndrop_single_ctrl_bal_regr_all': 2,
+                       '25_nor_saug_single_ctrl_bal_regr_all': 3,
+                       '25_nor_maug_single_ctrl_bal_regr_all': 4}
     elif 'Data distribution' in plot_param['title']:
-        model_to_legend = {'25_nor_ndrop_single_ctrl_bal_regr_all': 'Three cameras with noise', '25_nor_ndrop_single_ctrl_bal_regr_jcen': 'Central camera with noise',
-                           '25_nor_ndrop_single_ctrl_bal_regr_nnjc': 'Central camera, no noise', '25_nor_ndrop_single_ctrl_seq_regr_all': 'Three cameras with noise, no balancing'}
-        model_to_id = {'25_nor_ndrop_single_ctrl_bal_regr_nnjc': 1, '25_nor_ndrop_single_ctrl_bal_regr_jcen': 2,
-                       '25_nor_ndrop_single_ctrl_bal_regr_all': 3, '25_nor_ndrop_single_ctrl_seq_regr_all': 4}
+        model_to_legend = {'25_nor_ndrop_single_ctrl_bal_regr_all': 'Three cameras with noise',
+                           '25_nor_ndrop_single_ctrl_bal_regr_jcen': 'Central camera with noise',
+                           '25_nor_ndrop_single_ctrl_bal_regr_nnjc': 'Central camera, no noise',
+                           '25_nor_ndrop_single_ctrl_seq_regr_all': 'Three cameras with noise, no balancing'}
+        model_to_id = {'25_nor_ndrop_single_ctrl_bal_regr_nnjc': 1,
+                       '25_nor_ndrop_single_ctrl_bal_regr_jcen': 2,
+                       '25_nor_ndrop_single_ctrl_bal_regr_all': 3,
+                       '25_nor_ndrop_single_ctrl_seq_regr_all': 4}
     elif 'Model architecture' in plot_param['title']:
-        model_to_legend = {'25_small_ndrop_single_ctrl_bal_regr_all': 'Shallow CNN', '25_nor_ndrop_single_ctrl_bal_regr_all': 'Standard CNN',
-                           '25_deep_ndrop_single_ctrl_bal_regr_all': 'Deep CNN', '25_nor_ndrop_lstm_ctrl_bal_regr_all': 'Standard LSTM'}
-        model_to_id = {'25_small_ndrop_single_ctrl_bal_regr_all': 1, '25_nor_ndrop_single_ctrl_bal_regr_all': 2,
-                       '25_deep_ndrop_single_ctrl_bal_regr_all': 3, '25_nor_ndrop_lstm_ctrl_bal_regr_all': 4}
+        model_to_legend = {'25_small_ndrop_single_ctrl_bal_regr_all': 'Shallow CNN',
+                           '25_nor_ndrop_single_ctrl_bal_regr_all': 'Standard CNN',
+                           '25_deep_ndrop_single_ctrl_bal_regr_all': 'Deep CNN',
+                           '25_nor_ndrop_lstm_ctrl_bal_regr_all': 'Standard LSTM'}
+        model_to_id = {'25_small_ndrop_single_ctrl_bal_regr_all': 1,
+                       '25_nor_ndrop_single_ctrl_bal_regr_all': 2,
+                       '25_deep_ndrop_single_ctrl_bal_regr_all': 3,
+                       '25_nor_ndrop_lstm_ctrl_bal_regr_all': 4}
     else:
-        model_to_legend = {'1_nor_maug_single_ctrl_bal_regr_all': '1 hour', '5_nor_maug_single_ctrl_bal_regr_all': '5 hours',
-                           '25_nor_maug_single_ctrl_bal_regr_all': '25 hours', '80_nor_maug_single_ctrl_bal_regr_all': '80 hours'}
-        model_to_id = {'1_nor_maug_single_ctrl_bal_regr_all': 1, '5_nor_maug_single_ctrl_bal_regr_all': 2,
-                       '25_nor_maug_single_ctrl_bal_regr_all': 3, '80_nor_maug_single_ctrl_bal_regr_all': 4}
+        model_to_legend = {'1_nor_maug_single_ctrl_bal_regr_all': '1 hour',
+                           '5_nor_maug_single_ctrl_bal_regr_all': '5 hours',
+                           '25_nor_maug_single_ctrl_bal_regr_all': '25 hours',
+                           '80_nor_maug_single_ctrl_bal_regr_all': '80 hours'}
+        model_to_id = {'1_nor_maug_single_ctrl_bal_regr_all': 1,
+                       '5_nor_maug_single_ctrl_bal_regr_all': 2,
+                       '25_nor_maug_single_ctrl_bal_regr_all': 3,
+                       '80_nor_maug_single_ctrl_bal_regr_all': 4}
 
     town_to_legend = {'Town01_1': 'Town 1', 'Town02_14': 'Town 2'}
     town_to_id = {'Town01_1': 1, 'Town02_14': 2}
@@ -238,9 +257,9 @@ def make_scatter_plot_analysis(all_metrics, plot_param, out_file=None):
 
     # compute limits so that x and y scaled w.r.t. their std
     print(np.log(plot_param['x_lim']) if plot_param['x']['log'] else plot_param['x_lim'])
-    ax.set_xlim(np.log(plot_param['x_lim'])/np.log(10.)
+    ax.set_xlim(np.log(plot_param['x_lim']) / np.log(10.)
                 if plot_param['x']['log'] else plot_param['x_lim'])
-    ax.set_ylim(np.log(plot_param['y_lim'])/np.log(10.)
+    ax.set_ylim(np.log(plot_param['y_lim']) / np.log(10.)
                 if plot_param['y']['log'] else plot_param['y_lim'])
 
     # set num ticks
@@ -268,15 +287,16 @@ def make_scatter_plot_analysis(all_metrics, plot_param, out_file=None):
             data[key] = np.array(metrics[plot_param[key]['data']])
 
         # remove nans
-        # if np.any(np.isnan(data['x'])) or np.any(np.isnan(data['y']) or np.any(np.isinf(data['x']) or np.any(np.isinf(data['y']))
+        # if np.any(np.isnan(data['x'])) or np.any(np.isnan(data['y']) or
+        # np.any(np.isinf(data['x']) or np.any(np.isinf(data['y']))
         nans = np.logical_or.reduce((np.isnan(data['x']), np.isnan(
             data['y']), np.isinf(data['x']), np.isinf(data['y'])))
         print('\n ** Removing %d NaNs and infs before log **' % np.sum(nans))
         for key in data:
             data[key] = data[key][np.invert(nans)]
 
-        data_x = np.log(data['x'])/np.log(10) if plot_param['x']['log'] else np.copy(data['x'])
-        data_y = np.log(data['y'])/np.log(10) if plot_param['y']['log'] else np.copy(data['y'])
+        data_x = np.log(data['x']) / np.log(10) if plot_param['x']['log'] else np.copy(data['x'])
+        data_y = np.log(data['y']) / np.log(10) if plot_param['y']['log'] else np.copy(data['y'])
 
         nans = np.logical_or.reduce((np.isnan(data_x), np.isnan(data_y),
                                      np.isinf(data_x), np.isinf(data_y)))
@@ -334,13 +354,13 @@ def make_scatter_plot(all_metrics, plot_param, out_file=None):
     if 'plot_best_n_percent' in plot_param and plot_param['plot_best_n_percent']:
         sorting_indices = np.argsort(data['x'])
         selected_indices = sorting_indices[:int(
-            plot_param['plot_best_n_percent']/100.*len(sorting_indices))]
+            plot_param['plot_best_n_percent'] / 100. * len(sorting_indices))]
         for key in data:
             data[key] = data[key][selected_indices]
 
     # take log if needed
-    data_x = np.log(data['x'])/np.log(10) if plot_param['x']['log'] else np.copy(data['x'])
-    data_y = np.log(data['y'])/np.log(10) if plot_param['y']['log'] else np.copy(data['y'])
+    data_x = np.log(data['x']) / np.log(10) if plot_param['x']['log'] else np.copy(data['x'])
+    data_y = np.log(data['y']) / np.log(10) if plot_param['y']['log'] else np.copy(data['y'])
 
     # Remove nans after log again - these typically come from LSTM
     # TODO may need to make this more principled
@@ -494,7 +514,8 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
             print('\n ** Plotting %s **' % plot_label)
             if 'analysis' in plot_param:
                 make_scatter_plot_analysis(all_metrics, plot_param,
-                                           out_file=os.path.join(out_path, plot_label + town + '.pdf'))
+                                           out_file=os.path.join(out_path, plot_label + town +
+                                                                 '.pdf'))
             else:
                 if town == 'Town01':
                     make_scatter_plot(all_metrics_town01, plot_param,

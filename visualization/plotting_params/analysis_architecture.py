@@ -8,8 +8,8 @@ list_of_experiments = [
 ]
 
 data_params = {'control': '_auto', 'root_path': 'eccv_results', 'towns': []}
-processing_params = {'Success rate':   {'metric': 'control_success_rate', 'filter': {}, 'params': {}},
-                     'Average completion':   {'metric': 'control_average_completion', 'filter': {}, 'params': {}},
+processing_params = {'Success rate': {'metric': 'control_success_rate', 'filter': {}, 'params': {}},
+                     'Average completion': {'metric': 'control_average_completion', 'filter': {}, 'params': {}},
                      'Km per infraction': {'metric': 'km_per_infraction', 'filter': {}, 'params': {}},
                      'Steering absolute error': {'metric': 'steering_error', 'filter': {'camera': 'central'}, 'params': {}},
                      'Steering absolute error three cameras': {'metric': 'steering_error', 'filter': {}, 'params': {}},

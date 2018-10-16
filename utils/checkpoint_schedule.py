@@ -84,18 +84,21 @@ def is_next_checkpoint_ready(checkpoint_schedule, control_filename):
     if ltst_check is None:  # This means no checkpoints were evaluated
         next_check = checkpoint_schedule[0]  # Return the first one
     else:
-        next_check = checkpoint_schedule[checkpoint_schedule.index(ltst_check)+1]
+        next_check = checkpoint_schedule[checkpoint_schedule.index(ltst_check) + 1]
 
     # Check if the file is in the checkpoints list.
     if os.path.exists(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
                                    g_conf.EXPERIMENT_NAME, 'checkpoints')):
 
         # test if the file exist:
-        if str(next_check) + '.pth' in os.listdir(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
-                                                               g_conf.EXPERIMENT_NAME, 'checkpoints')):
+        if str(next_check) + '.pth' in os.listdir(os.path.join('_logs',
+                                                               g_conf.EXPERIMENT_BATCH_NAME,
+                                                               g_conf.EXPERIMENT_NAME,
+                                                               'checkpoints')):
             # now check if someone is writing to it, if it is the case return false
             return not is_open(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
-                                            g_conf.EXPERIMENT_NAME, 'checkpoints', str(next_check) + '.pth'))
+                                            g_conf.EXPERIMENT_NAME, 'checkpoints', str(next_check) +
+                                            '.pth'))
 
         else:
             return False
@@ -131,11 +134,14 @@ def get_next_checkpoint(checkpoint_schedule, filename):
 #         if match:
 #             checkpoint_number = match.group(1)
 #
-#             if int(checkpoint_number) == (self._checkpoint_schedule[self._current_checkpoint_number]):
-#                 self._checkpoint_number_to_test = str(self._checkpoint_schedule[self._current_checkpoint_number])
+#             if int(checkpoint_number) == (self._checkpoint_schedule[
+#                                               self._current_checkpoint_number]):
+#                 self._checkpoint_number_to_test = str(self._checkpoint_schedule[
+#                                                           self._current_checkpoint_number])
 #
 #                 return True
-#     logging.info('Checkpoint Not Found, Will wait for %d' % self._checkpoint_schedule[self._current_checkpoint_number] )
+#     logging.info('Checkpoint Not Found, Will wait for %d' % self._checkpoint_schedule[
+#                                                               self._current_checkpoint_number] )
 #     return False
 #
 # def get_test_name():

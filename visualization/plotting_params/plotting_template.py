@@ -7,8 +7,8 @@ data_params = {'control': '_auto', 'root_path': '_logs', 'towns': ['Town01', 'To
 
 
 data_filter = {@CAMERA@}
-processing_params = {'Success rate':   {'metric': 'control_success_rate', 'filter': {}, 'params': {}},
-                     'Average completion':   {'metric': 'control_average_completion', 'filter': {}, 'params': {}},
+processing_params = {'Success rate': {'metric': 'control_success_rate', 'filter': {}, 'params': {}},
+                     'Average completion': {'metric': 'control_average_completion', 'filter': {}, 'params': {}},
                      'Km per infraction': {'metric': 'km_per_infraction', 'filter': {}, 'params': {}},
                      'Steering absolute error': {'metric': 'steering_error', 'filter': data_filter,
                                                  'params': {}},

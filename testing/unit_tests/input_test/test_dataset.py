@@ -98,9 +98,9 @@ class testCILDataset(unittest.TestCase):
         for data in data_loader:
 
             image_to_save = transforms.ToPILImage()(
-                (data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+                (data['rgb'][0].cpu() * 255).type(torch.ByteTensor))
             image_to_save.save(os.path.join(self.test_images_write_path +
-                                            'weather_aug', str(count)+'l.png'))
+                                            'weather_aug', str(count) + 'l.png'))
             # Test steerings after augmentation
 
             #print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
@@ -159,7 +159,7 @@ class testCILDataset(unittest.TestCase):
 
         g_conf.REMOVE = [['angle', -30], ['traffic_lights', 1]]
 
-        g_conf.SPLIT = [['speed_module', [0.0666,  0.208, 0.39]], ['weights', [1.0, 0.0, 0.0, 0.0]]]
+        g_conf.SPLIT = [['speed_module', [0.0666, 0.208, 0.39]], ['weights', [1.0, 0.0, 0.0, 0.0]]]
 
         augmenter = Augmenter(None)
         dataset = CoILDataset(full_dataset, transform=augmenter,
@@ -217,12 +217,12 @@ class testCILDataset(unittest.TestCase):
         for data in data_loader:
 
             image_to_save = transforms.ToPILImage()(
-                (data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+                (data['rgb'][0].cpu() * 255).type(torch.ByteTensor))
             b, g, r = image_to_save.split()
             image_to_save = Image.merge("RGB", (r, g, b))
 
             image_to_save.save(os.path.join(
-                self.test_images_write_path + 'central', str(count)+'l.png'))
+                self.test_images_write_path + 'central', str(count) + 'l.png'))
             # Test steerings after augmentation
             #print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
             #print ("directions", data['directions'], " speed_module", data['speed_module'])
@@ -471,7 +471,7 @@ class testCILDataset(unittest.TestCase):
         for i in range(5000):
             i_data = next(data_loader_images)
 
-            print('images ', i_data['speed_module'].data*12.0, ' ', i_data['angle'], ' ', i_data['game_time'],
+            print('images ', i_data['speed_module'].data * 12.0, ' ', i_data['angle'], ' ', i_data['game_time'],
                   'images_speed ', i_data['speed_module'].data * 3.6 * 12.0, ' ', i_data['angle'], ' ', i_data['game_time'])
 
     def test_old_data(self):
@@ -584,7 +584,7 @@ class testCILDataset(unittest.TestCase):
 
             for i in range(120):
                 image_to_save = transforms.ToPILImage()(
-                    (data['rgb'][i].cpu()*255).type(torch.ByteTensor))
+                    (data['rgb'][i].cpu() * 255).type(torch.ByteTensor))
 
                 b, g, r = image_to_save.split()
                 image_to_save = Image.merge("RGB", (r, g, b))
@@ -663,4 +663,4 @@ class testCILDataset(unittest.TestCase):
             if count > g_conf.NUMBER_OF_ITERATIONS:
                 break
 
-        print("Imgs /s ", (120*120)/(time.time() - start_time))
+        print("Imgs /s ", (120 * 120) / (time.time() - start_time))

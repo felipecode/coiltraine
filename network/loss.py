@@ -73,7 +73,8 @@ def compute_attention_loss(inter_layers, variable_weights, intention_factors):
         #print (" L2", L2.shape)
         """ We take the measurements used as attention important and weight"""
         # This part should have dimension second dimension 1
-        loss += (variable_weights['L2']*L2 * intention + variable_weights['L1']*L1*(1-intention))\
+        loss += (variable_weights['L2'] * L2 * intention + variable_weights['L1'] * L1 *
+                 (1 - intention))\
             / len(inter_layers)
 
         print (" Partial Loss ", loss)
@@ -89,14 +90,16 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
           targets - The target (here are steer, gas and brake)
           controls - The control directions
           size_average - By default, the losses are averaged over observations for each minibatch.
-                         However, if the field size_average is set to ``False``, the losses are instead
-                         summed for each minibatch. Only applies when reduce is ``True``. Default: ``True``
-          reduce - By default, the losses are averaged over observations for each minibatch, or summed,
-                   depending on size_average. When reduce is ``False``, returns a loss per input/target
-                   element instead and ignores size_average. Default: ``True``
-          *argv: weights - By default, the weights are all set to 1.0. To set different weights for different
-                           outputs, a list containing different lambda for each target item is required.
-                           The number of lambdas should be the same as the target items.
+                         However, if the field size_average is set to ``False``, the losses are
+                         instead summed for each minibatch. Only applies when reduce is ``True``.
+                         Default: ``True``
+          reduce - By default, the losses are averaged over observations for each minibatch, or
+                         summed, depending on size_average. When reduce is ``False``, returns a
+                         loss per input/target element instead and ignores size_average.
+                         Default: ``True``
+          *argv: weights - By default, the weights are all set to 1.0. To set different weights for
+                         different outputs, a list containing different lambda for each target item
+                         is required. The number of lambdas should be the same as the target items.
 
     return: MSE Loss
 
@@ -105,7 +108,7 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
     # weight different target items with lambdas
 
     print ("variable ", variable_weights, ' Targets ',
-           targets.shape[1], 'conf targets',  g_conf.TARGETS)
+           targets.shape[1], 'conf targets', g_conf.TARGETS)
     if variable_weights:
         if len(variable_weights) != targets.shape[1]:
             raise ValueError('The input number of weight lambdas is '
@@ -158,32 +161,40 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
     # TODO; the variable and its weigths should be sincronized in the same variable.
     # TODO: very dangerous part. Instead of indexing it should use variable names
     if 'W1A' in variable_weights:   # TODO: FIX this hardcodedism
-        loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
+        loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] \
+            + loss_b1[:, 1] * variable_weights['Gas'] \
             + loss_b1[:, 2] * variable_weights['Brake'] \
             + loss_b1[:, 3] * variable_weights['W1A'] \
             + loss_b1[:, 4] * variable_weights['W2A']
-        loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights['Gas'] \
+        loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] \
+            + loss_b2[:, 1] * variable_weights['Gas'] \
             + loss_b2[:, 2] * variable_weights['Brake'] \
             + loss_b2[:, 3] * variable_weights['W1A'] \
             + loss_b2[:, 4] * variable_weights['W2A']
 
-        loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights['Gas'] \
+        loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] \
+            + loss_b3[:, 1] * variable_weights['Gas'] \
             + loss_b3[:, 2] * variable_weights['Brake'] \
             + loss_b3[:, 3] * variable_weights['W1A'] \
             + loss_b3[:, 4] * variable_weights['W2A']
 
-        loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights['Gas'] \
+        loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] \
+            + loss_b4[:, 1] * variable_weights['Gas'] \
             + loss_b4[:, 2] * variable_weights['Brake'] \
             + loss_b4[:, 3] * variable_weights['W1A'] \
             + loss_b4[:, 4] * variable_weights['W2A']
     else:
-        loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
+        loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] \
+            + loss_b1[:, 1] * variable_weights['Gas'] \
             + loss_b1[:, 2] * variable_weights['Brake']
-        loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights['Gas'] \
+        loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] \
+            + loss_b2[:, 1] * variable_weights['Gas'] \
             + loss_b2[:, 2] * variable_weights['Brake']
-        loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights['Gas'] \
+        loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] \
+            + loss_b3[:, 1] * variable_weights['Gas'] \
             + loss_b3[:, 2] * variable_weights['Brake']
-        loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights['Gas'] \
+        loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] \
+            + loss_b4[:, 1] * variable_weights['Gas'] \
             + loss_b4[:, 2] * variable_weights['Brake']
     # add all branches losses together
     mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4
@@ -211,14 +222,15 @@ def L1(branches, targets, controls, speed_gt, size_average=True,
           targets - The target (here are steer, gas and brake)
           controls - The control directions
           size_average - By default, the losses are averaged over observations for each minibatch.
-                         However, if the field size_average is set to ``False``, the losses are instead
-                         summed for each minibatch. Only applies when reduce is ``True``. Default: ``True``
-          reduce - By default, the losses are averaged over observations for each minibatch, or summed,
-                   depending on size_average. When reduce is ``False``, returns a loss per input/target
-                   element instead and ignores size_average. Default: ``True``
-          *argv: weights - By default, the weights are all set to 1.0. To set different weights for different
-                           outputs, a list containing different lambda for each target item is required.
-                           The number of lambdas should be the same as the target items.
+                         However, if the field size_average is set to ``False``, the losses are
+                         instead summed for each minibatch. Only applies when reduce is ``True``.
+                         Default: ``True``
+          reduce - By default, the losses are averaged over observations for each minibatch, or
+                   summed, depending on size_average. When reduce is ``False``, returns a loss per
+                   input/target element instead and ignores size_average. Default: ``True``
+          *argv: weights - By default, the weights are all set to 1.0. To set different weights for
+                   different outputs, a list containing different lambda for each target item is
+                   required. The number of lambdas should be the same as the target items.
 
     return: MSE Loss
 
@@ -305,7 +317,8 @@ def L1(branches, targets, controls, speed_gt, size_average=True,
     return mse_loss
 
 
-def L1_attention(branches, targets, controls, speed_gt, inter_layers=None, intention_factors=None, size_average=True,
+def L1_attention(branches, targets, controls, speed_gt, inter_layers=None, intention_factors=None,
+                 size_average=True,
                  reduce=True, variable_weights=None, branch_weights=None):
     """
     Args:
@@ -313,14 +326,16 @@ def L1_attention(branches, targets, controls, speed_gt, inter_layers=None, inten
           targets - The target (here are steer, gas and brake)
           controls - The control directions
           size_average - By default, the losses are averaged over observations for each minibatch.
-                         However, if the field size_average is set to ``False``, the losses are instead
-                         summed for each minibatch. Only applies when reduce is ``True``. Default: ``True``
-          reduce - By default, the losses are averaged over observations for each minibatch, or summed,
-                   depending on size_average. When reduce is ``False``, returns a loss per input/target
-                   element instead and ignores size_average. Default: ``True``
-          *argv: weights - By default, the weights are all set to 1.0. To set different weights for different
-                           outputs, a list containing different lambda for each target item is required.
-                           The number of lambdas should be the same as the target items.
+                         However, if the field size_average is set to ``False``, the losses are
+                         instead summed for each minibatch. Only applies when reduce is ``True``.
+                         Default: ``True``
+          reduce - By default, the losses are averaged over observations for each minibatch, or
+                   summed, depending on size_average. When reduce is ``False``, returns a loss per
+                   input/target element instead and ignores size_average. Default: ``True``
+          *argv: weights - By default, the weights are all set to 1.0. To set different weights for
+                           different outputs, a list containing different lambda for each target
+                           item is required. The number of lambdas should be the same as the target
+                           items.
 
     return: MSE Loss
 
@@ -427,14 +442,16 @@ def L1_no_brake(branches, targets, controls, speed_gt, size_average=True,
           targets - The target (here are steer, gas and brake)
           controls - The control directions
           size_average - By default, the losses are averaged over observations for each minibatch.
-                         However, if the field size_average is set to ``False``, the losses are instead
-                         summed for each minibatch. Only applies when reduce is ``True``. Default: ``True``
-          reduce - By default, the losses are averaged over observations for each minibatch, or summed,
-                   depending on size_average. When reduce is ``False``, returns a loss per input/target
-                   element instead and ignores size_average. Default: ``True``
-          *argv: weights - By default, the weights are all set to 1.0. To set different weights for different
-                           outputs, a list containing different lambda for each target item is required.
-                           The number of lambdas should be the same as the target items.
+                         However, if the field size_average is set to ``False``, the losses are
+                         instead summed for each minibatch. Only applies when reduce is ``True``.
+                         Default: ``True``
+          reduce - By default, the losses are averaged over observations for each minibatch, or
+                   summed, depending on size_average. When reduce is ``False``, returns a loss per
+                   input/target element instead and ignores size_average. Default: ``True``
+          *argv: weights - By default, the weights are all set to 1.0. To set different weights for
+                           different outputs, a list containing different lambda for each target
+                           item is required. The number of lambdas should be the same as the target
+                           items.
 
     return: MSE Loss
 
@@ -524,14 +541,16 @@ def L3(branches, targets, controls, speed_gt, size_average=True,
           targets - The target (here are steer, gas and brake)
           controls - The control directions
           size_average - By default, the losses are averaged over observations for each minibatch.
-                         However, if the field size_average is set to ``False``, the losses are instead
-                         summed for each minibatch. Only applies when reduce is ``True``. Default: ``True``
-          reduce - By default, the losses are averaged over observations for each minibatch, or summed,
-                   depending on size_average. When reduce is ``False``, returns a loss per input/target
-                   element instead and ignores size_average. Default: ``True``
-          *argv: weights - By default, the weights are all set to 1.0. To set different weights for different
-                           outputs, a list containing different lambda for each target item is required.
-                           The number of lambdas should be the same as the target items.
+                         However, if the field size_average is set to ``False``, the losses are
+                         instead summed for each minibatch. Only applies when reduce is ``True``.
+                         Default: ``True``
+          reduce - By default, the losses are averaged over observations for each minibatch, or
+                   summed, depending on size_average. When reduce is ``False``, returns a loss per
+                   input/target element instead and ignores size_average. Default: ``True``
+          *argv: weights - By default, the weights are all set to 1.0. To set different weights for
+                           different outputs, a list containing different lambda for each target
+                           item is required. The number of lambdas should be the same as the target
+                           items.
 
     return: MSE Loss
 
@@ -540,7 +559,7 @@ def L3(branches, targets, controls, speed_gt, size_average=True,
     # weight different target items with lambdas
 
     print ("variable ", variable_weights, ' Targets ',
-           targets.shape[1], 'conf targets',  g_conf.TARGETS)
+           targets.shape[1], 'conf targets', g_conf.TARGETS)
     if variable_weights:
         if len(variable_weights) != targets.shape[1]:
             raise ValueError('The input number of weight lambdas is '
@@ -593,32 +612,40 @@ def L3(branches, targets, controls, speed_gt, size_average=True,
     # TODO; the variable and its weigths should be sincronized in the same variable.
     # TODO: very dangerous part. Instead of indexing it should use variable names
     if 'W1A' in variable_weights:   # TODO: FIX this hardcodedism
-        loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
+        loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] \
+            + loss_b1[:, 1] * variable_weights['Gas'] \
             + loss_b1[:, 2] * variable_weights['Brake'] \
             + loss_b1[:, 3] * variable_weights['W1A'] \
             + loss_b1[:, 4] * variable_weights['W2A']
-        loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights['Gas'] \
+        loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] \
+            + loss_b2[:, 1] * variable_weights['Gas'] \
             + loss_b2[:, 2] * variable_weights['Brake'] \
             + loss_b2[:, 3] * variable_weights['W1A'] \
             + loss_b2[:, 4] * variable_weights['W2A']
 
-        loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights['Gas'] \
+        loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] \
+            + loss_b3[:, 1] * variable_weights['Gas'] \
             + loss_b3[:, 2] * variable_weights['Brake'] \
             + loss_b3[:, 3] * variable_weights['W1A'] \
             + loss_b3[:, 4] * variable_weights['W2A']
 
-        loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights['Gas'] \
+        loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] \
+            + loss_b4[:, 1] * variable_weights['Gas'] \
             + loss_b4[:, 2] * variable_weights['Brake'] \
             + loss_b4[:, 3] * variable_weights['W1A'] \
             + loss_b4[:, 4] * variable_weights['W2A']
     else:
-        loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
+        loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] \
+            + loss_b1[:, 1] * variable_weights['Gas'] \
             + loss_b1[:, 2] * variable_weights['Brake']
-        loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights['Gas'] \
+        loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] \
+            + loss_b2[:, 1] * variable_weights['Gas'] \
             + loss_b2[:, 2] * variable_weights['Brake']
-        loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights['Gas'] \
+        loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] \
+            + loss_b3[:, 1] * variable_weights['Gas'] \
             + loss_b3[:, 2] * variable_weights['Brake']
-        loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights['Gas'] \
+        loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] \
+            + loss_b4[:, 1] * variable_weights['Gas'] \
             + loss_b4[:, 2] * variable_weights['Brake']
     # add all branches losses together
     mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4
@@ -638,7 +665,8 @@ def L3(branches, targets, controls, speed_gt, size_average=True,
     return mse_loss
 
 
-def L1_regularization(branches, targets, controls, speed_gt, inter_layers=None, intention_factors=None, size_average=True,
+def L1_regularization(branches, targets, controls, speed_gt, inter_layers=None,
+                      intention_factors=None, size_average=True,
                       reduce=True, variable_weights=None, branch_weights=None):
     """
     Args:
@@ -646,14 +674,16 @@ def L1_regularization(branches, targets, controls, speed_gt, inter_layers=None, 
           targets - The target (here are steer, gas and brake)
           controls - The control directions
           size_average - By default, the losses are averaged over observations for each minibatch.
-                         However, if the field size_average is set to ``False``, the losses are instead
-                         summed for each minibatch. Only applies when reduce is ``True``. Default: ``True``
-          reduce - By default, the losses are averaged over observations for each minibatch, or summed,
-                   depending on size_average. When reduce is ``False``, returns a loss per input/target
-                   element instead and ignores size_average. Default: ``True``
-          *argv: weights - By default, the weights are all set to 1.0. To set different weights for different
-                           outputs, a list containing different lambda for each target item is required.
-                           The number of lambdas should be the same as the target items.
+                         However, if the field size_average is set to ``False``, the losses are
+                         instead summed for each minibatch. Only applies when reduce is ``True``.
+                         Default: ``True``
+          reduce - By default, the losses are averaged over observations for each minibatch, or
+                   summed, depending on size_average. When reduce is ``False``, returns a loss per
+                   input/target element instead and ignores size_average. Default: ``True``
+          *argv: weights - By default, the weights are all set to 1.0. To set different weights for
+                           different outputs, a list containing different lambda for each target
+                           item is required. The number of lambdas should be the same as the target
+                           items.
 
     return: MSE Loss
 

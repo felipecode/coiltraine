@@ -18,7 +18,7 @@ def static_vars(**kwargs):
 def softmax(x):
     """Compute softmax values for each sets of scores in x."""
     temp = 10
-    x = x/temp
+    x = x / temp
     e_x = np.exp(x - np.max(x))
     return e_x / e_x.sum()
 
@@ -26,7 +26,7 @@ def softmax(x):
 def tryint(s):
     try:
         return int(s)
-    except:
+    except BaseException:
         return s
 
 
@@ -51,7 +51,7 @@ def sort_nicely(l):
 # TODO: there should be a more natural way to do that
 def command_number_to_index(command_vector):
 
-    return command_vector-2
+    return command_vector - 2
 
 
 def camelcase_to_snakecase(name):
@@ -150,7 +150,7 @@ def get_driving_environments(exp_batch_name):
                 folder_file = os.path.join(root_path, exp_batch_name, exp, log)
                 if not os.path.isdir(folder_file) and 'drive' in folder_file:
                     driving_environments.add(folder_file.split(
-                        '_')[-2]+'_'+folder_file.split('_')[-1])
+                        '_')[-2] + '_' + folder_file.split('_')[-1])
 
     return list(driving_environments)
 
@@ -203,7 +203,7 @@ def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list, ):
 
                 try:
                     len_of_csv_file = len(np.loadtxt(csv_file_path, delimiter=","))
-                except:
+                except BaseException:
                     print ("    wrong file")
                     print ("    deleting")
                     os.remove(csv_file_path)
@@ -249,7 +249,7 @@ def get_latest_path(path):
     """ Considering a certain path for experiments, get the latest one."""
     import glob
     print (path)
-    files_list = glob.glob(os.path.join('_benchmarks_results', path+'*'))
+    files_list = glob.glob(os.path.join('_benchmarks_results', path + '*'))
     print (files_list)
     sort_nicely(files_list)
 
@@ -272,8 +272,8 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
     """
     There are two types of outputs, these come packed in a dictionary
 
-    Success metrics, these are averaged between weathers, is basically the percentage of completion for a
-    single task.
+    Success metrics, these are averaged between weathers, is basically the percentage of completion
+    for a single task.
 
     Infractions, these are summed and divided by the total number of driven kilometers
 
@@ -311,7 +311,7 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
     # The average results between the dictionaries.
     average_results_matrix = {}
 
-    for metric_name in (metrics_to_average+infraction_metrics+metrics_to_sum):
+    for metric_name in (metrics_to_average + infraction_metrics + metrics_to_sum):
         average_results_matrix.update({metric_name: np.zeros((number_of_tasks, len(dic_list)))})
 
     count_dic_pos = 0
@@ -339,7 +339,8 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
             for i in range(len(metric_sum_values)):
                 average_results_matrix[metric][i][count_dic_pos] = metric_sum_values[i]
 
-        # For the metrics we sum over all the weathers here, this is to better subdivide the driving envs
+        # For the metrics we sum over all the weathers here, this is to better
+        # subdivide the driving envs
         for metric in infraction_metrics:
             values_driven = metrics_summary['driven_kilometers']
             values = metrics_summary[metric]
@@ -412,7 +413,7 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
 
         if metric in metrics_to_average:
             average_results_matrix[metric] = np.sum(average_results_matrix[metric]) /\
-                (len(average_results_matrix[metric])*25)
+                (len(average_results_matrix[metric]) * 25)
 
         if metric in infraction_metrics:
             average_results_matrix[metric] = average_results_matrix['driven_kilometers'] / \
@@ -424,7 +425,7 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
         """
         for i in range(len(vectors)):
 
-            
+
             average_results_matrix[metric][i] = np.mean(average_results_matrix[metric][i])
 
         """
@@ -444,7 +445,7 @@ def write_header_control_summary(path, task):
                       % ('step', 'episodes_completion', 'intersection_offroad',
                           'collision_pedestrians', 'collision_vehicles', 'episodes_fully_completed',
                          'driven_kilometers', 'end_pedestrian_collision',
-                         'end_vehicle_collision',  'end_other_collision', 'intersection_otherlane'))
+                         'end_vehicle_collision', 'end_other_collision', 'intersection_otherlane'))
     csv_outfile.close()
 
 
@@ -481,8 +482,8 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1):
     """
     There are two types of outputs, these come packed in a dictionary
 
-    Success metrics, these are averaged between weathers, is basically the percentage of completion for a
-    single task.
+    Success metrics, these are averaged between weathers, is basically the percentage of completion
+    for a single task.
 
     Infractions, these are summed and divided by the total number of driven kilometers
 
@@ -547,9 +548,10 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1):
 
             for i in range(len(metric_sum_values)):
                 average_results_matrix[metric][i][count_dic_pos] = metric_sum_values[i] / \
-                    (25*len(weathers))
+                    (25 * len(weathers))
 
-        # For the metrics we sum over all the weathers here, this is to better subdivide the driving envs
+        # For the metrics we sum over all the weathers here, this is to better
+        # subdivide the driving envs
         for metric in infraction_metrics:
             values_driven = metrics_summary['driven_kilometers']
             values = metrics_summary[metric]
@@ -609,7 +611,7 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1):
             print (" metric sum ", metric_sum_values)
             for i in range(len(metric_sum_values)):
                 average_results_matrix[metric][i][count_dic_pos] = metric_sum_values[i] / \
-                    (25*len(weathers))
+                    (25 * len(weathers))
 
         count_dic_pos += 1
 

@@ -92,13 +92,15 @@ class CoILDataset(Dataset):
         if 'brake' not in g_conf.TARGETS:
             self.preload_name += '_nobrake'
 
-        # If  not all the weathers are present we keep without anything ( WE ASSUME THAT THIS HAS LENGHT 4)
+        # If  not all the weathers are present we keep without anything ( WE
+        # ASSUME THAT THIS HAS LENGHT 4)
         if len(g_conf.WEATHERS) < 4:
             self.preload_name = self.preload_name + '-'.join(str(e) for e in g_conf.WEATHERS)
 
         print ("preload Name ", self.preload_name)
 
-        if self.preload_name is not None and os.path.exists(os.path.join('_preloads', self.preload_name + '.npy')):
+        if self.preload_name is not None and os.path.exists(
+                os.path.join('_preloads', self.preload_name + '.npy')):
             print (" Loading from NPY ")
             self.sensor_data_names, self.measurements = np.load(
                 os.path.join('_preloads', self.preload_name + '.npy'))
@@ -190,7 +192,7 @@ class CoILDataset(Dataset):
                                  'steer_noise': measurement_augmented['steer_noise'],
                                  'throttle': final_throtle,
                                  'throttle_noise': final_throtle_noise,
-                                 'speed_module': speed/g_conf.SPEED_FACTOR,
+                                 'speed_module': speed / g_conf.SPEED_FACTOR,
                                  'directions': directions,
                                  "pedestrian": measurement_augmented['stop_pedestrian'],
                                  "traffic_lights": measurement_augmented['stop_traffic_lights'],
@@ -205,7 +207,7 @@ class CoILDataset(Dataset):
                                  'throttle_noise': measurement_augmented['throttle_noise'],
                                  'brake': measurement_augmented['brake'],
                                  'brake_noise': measurement_augmented['brake_noise'],
-                                 'speed_module': speed/g_conf.SPEED_FACTOR,
+                                 'speed_module': speed / g_conf.SPEED_FACTOR,
                                  'directions': directions,
                                  "pedestrian": measurement_augmented['stop_pedestrian'],
                                  "traffic_lights": measurement_augmented['stop_traffic_lights'],
@@ -265,7 +267,8 @@ class CoILDataset(Dataset):
                 print ("EMPTY EPISODE")
                 continue
 
-            if g_conf.TRAIN_DATASET_NAME != 'CARLA80TL' and get_episode_weather(episode) not in g_conf.WEATHERS:
+            if g_conf.TRAIN_DATASET_NAME != 'CARLA80TL' and get_episode_weather(
+                    episode) not in g_conf.WEATHERS:
                 print("WEATHER NOT CORRECT")
                 continue
 
@@ -335,10 +338,10 @@ class CoILDataset(Dataset):
             last_data_point_number = measurements_list[-4].split('_')[-1].split('.')[0]
             print ("last and float dicts len", last_data_point_number, count_added_measurements)
 
-            print ("ERASED ", float(last_data_point_number)*3 - count_added_measurements)
+            print ("ERASED ", float(last_data_point_number) * 3 - count_added_measurements)
 
-            number_of_hours_pre_loaded += (float(count_added_measurements / 10.0)/3600.0)
-            print (" Added ", ((float(count_added_measurements) / 10.0)/3600.0))
+            number_of_hours_pre_loaded += (float(count_added_measurements / 10.0) / 3600.0)
+            print (" Added ", ((float(count_added_measurements) / 10.0) / 3600.0))
             print (" TOtal Hours (partial) ", number_of_hours_pre_loaded)
 
         print (" LOADED ", number_of_hours_pre_loaded, " This hours")

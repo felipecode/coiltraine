@@ -18,7 +18,7 @@ from imgaug.augmenters.arithmetic import ContrastNormalization as ContrastNormal
 add_test_composition = [ToGPU(), Add(10), Add(-10)]
 add_random_composition = [ToGPU(), Add((-20, 20))]
 
-mult_test_composition = [ToGPU(), Multiply(1.3), Multiply(1/1.3)]
+mult_test_composition = [ToGPU(), Multiply(1.3), Multiply(1 / 1.3)]
 mult_random_composition = [ToGPU(), Multiply((0.7, 1.3))]
 
 
@@ -77,12 +77,13 @@ grayscale_test_cpu = Augmenter([GrayscaleCPU(alpha=(0.0, 1.0))])
 
 # Test Additive gaussian noise
 
-additive_gaussian_test = Augmenter([ToGPU(), AdditiveGaussianNoise(loc=0, scale=(0.0, 0.10*255))])
+additive_gaussian_test = Augmenter([ToGPU(), AdditiveGaussianNoise(loc=0, scale=(0.0, 0.10 * 255))])
 
 additive_gaussian_test_color = Augmenter(
-    [ToGPU(), AdditiveGaussianNoise(loc=0, scale=(0.0, 0.10*255), per_channel=0.5)])
+    [ToGPU(), AdditiveGaussianNoise(loc=0, scale=(0.0, 0.10 * 255), per_channel=0.5)])
 
-additive_gaussian_test_cpu = AugmenterCPU([AdditiveGaussianNoiseCPU(loc=0, scale=(0.0, 0.10*255))])
+additive_gaussian_test_cpu = AugmenterCPU(
+    [AdditiveGaussianNoiseCPU(loc=0, scale=(0.0, 0.10 * 255))])
 
 # Test the contrast normalization
 

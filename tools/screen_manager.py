@@ -42,8 +42,8 @@ tform3_img.estimate(np.array(rdst), np.array(rsrc))
 
 def draw_vbar_on(img, bar_intensity, x_pos, color=(0, 0, 255)):
 
-    bar_size = int(img.shape[1]/6 * bar_intensity)
-    initial_y_pos = img.shape[0] - img.shape[0]/6
+    bar_size = int(img.shape[1] / 6 * bar_intensity)
+    initial_y_pos = img.shape[0] - img.shape[0] / 6
     #print bar_intensity
 
     for i in range(bar_size):
@@ -153,7 +153,8 @@ class ScreenManager(object):
     # If we were to load the steering wheel load it
 
     # take into consideration the resolution when ploting
-    # TODO: Resize properly to fit the screen ( MAYBE THIS COULD BE DONE DIRECTLY RESIZING screen and keeping SURFACES)
+    # TODO: Resize properly to fit the screen ( MAYBE THIS COULD BE DONE
+    # DIRECTLY RESIZING screen and keeping SURFACES)
 
     def start_screen(self, resolution, aspect_ratio, scale=1):
 

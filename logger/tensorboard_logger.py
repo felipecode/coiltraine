@@ -33,7 +33,7 @@ class Logger(object):
             # Write the image to a string
             try:
                 s = StringIO()
-            except:
+            except BaseException:
                 s = BytesIO()
             scipy.misc.toimage(img).save(s, format="png")
 

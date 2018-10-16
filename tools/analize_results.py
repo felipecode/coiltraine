@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     name_keys = []
     for key in all_metrics_dict.keys():
-        name_keys.append(key[(key.index(':')+1):])
+        name_keys.append(key[(key.index(':') + 1):])
 
     sorted_keys = sorted(name_keys)
     with open("tested_experiments.csv", 'w') as f:

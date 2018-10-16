@@ -111,7 +111,7 @@ if __name__ == '__main__':
     for gpu in args.gpus:
         try:
             int(gpu)
-        except:
+        except BaseException:
             raise ValueError(" Gpu is not a valid int number")
 
     if args.folder is None:

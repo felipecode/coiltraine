@@ -40,7 +40,8 @@ def get_gpu_resources(gpu_resources, executing_processes, allocation_params):
 
         if status == "Finished" or status == 'Error':
 
-            gpu_resources[process_specs['gpu']] += allocation_params[process_specs['type']+'_cost']
+            gpu_resources[process_specs['gpu']
+                          ] += allocation_params[process_specs['type'] + '_cost']
 
         else:
             still_executing_processes.append(process_specs)
@@ -92,8 +93,8 @@ def execvec_to_names(executing_processes):
     Args:
         List of executing process
 
-    returns 
-        List of name vecs 
+    returns
+        List of name vecs
     """
 
     process_name_vec = []
@@ -104,7 +105,8 @@ def execvec_to_names(executing_processes):
 
 
 # TODO: function need severe refactoring  !!! !
-def mount_experiment_heap(folder, experiments_list, is_training, executing_processes, old_tasks_queue,
+def mount_experiment_heap(folder, experiments_list, is_training, executing_processes,
+                          old_tasks_queue,
                           validation_datasets, drive_environments, restart_error=True):
 
     tasks_queue = []
@@ -114,7 +116,8 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
 
         # Train is always priority. # TODO: some system to check priority depending on iterations
         task_to_add = None
-        # TODO: One thing is error other thing is stop. However at a first step we can try to restart all error things
+        # TODO: One thing is error other thing is stop. However at a first step we
+        # can try to restart all error things
 
         if is_training:
             if monitorer.get_status(folder, experiment, 'train')[0] == "Not Started":
@@ -141,7 +144,8 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
 
         for val_data in validation_datasets:
             task_to_add = None
-            if monitorer.get_status(folder, experiment, 'validation_' + val_data)[0] == "Not Started":
+            if monitorer.get_status(folder, experiment, 'validation_' +
+                                    val_data)[0] == "Not Started":
                 task_to_add = (2, experiment + '_validation_' + val_data,
                                {'type': 'validation', 'folder': folder,
                                 'experiment': experiment, 'dataset': val_data})
@@ -168,7 +172,8 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
                                {'type': 'drive', 'folder': folder,
                                 'experiment': experiment, 'environment': drive_env})
 
-            elif restart_error and monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] == "Error":
+            elif restart_error and monitorer.get_status(folder, experiment,
+                                                        'drive_' + drive_env)[0] == "Error":
                 task_to_add = (1, experiment + '_drive_' + drive_env,
                                {'type': 'drive', 'folder': folder,
                                 'experiment': experiment, 'environment': drive_env})

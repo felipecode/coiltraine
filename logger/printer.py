@@ -128,7 +128,7 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
     #print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE +
     #       str(averaged_metrics[float(print_drive_summary.previous_checkpoint)]
     #           [header.index('collision_pedestrians')-1]) + END)
-    
+
     """
 
 
@@ -153,14 +153,14 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
     names_list = get_names(exp_batch)
     sorted_keys = sorted(range(len(names_list)),
-                         key=lambda k: names_list[experiments_list[k]+'.yaml'])
+                         key=lambda k: names_list[experiments_list[k] + '.yaml'])
 
     print (experiments_list)
 
     for key in sorted_keys:
 
         experiment = experiments_list[key]
-        generated_name = names_list[experiment+'.yaml']
+        generated_name = names_list[experiment + '.yaml']
 
         if experiment == '':
             raise ValueError("Empty Experiment on List")
@@ -174,7 +174,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
         for process in process_names:
             try:
                 output = get_status(exp_batch, experiment, process)
-            except:
+            except BaseException:
                 import traceback
                 traceback.print_exc()
 
@@ -220,7 +220,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
                     # TODO: Check -- Not using this for now
                     """
-                                        
+
                     csv_file_path = os.path.join('_logs', exp_batch, experiment,
                                                  process + '_csv', control_filename)
                     """

@@ -48,9 +48,9 @@ def aggregate_metric(metric_raw, param):
 
 def compute_id(data, param):
     if data['town'] == 'Town01':
-        return [0]*len(data['values'].items())
+        return [0] * len(data['values'].items())
     elif data['town'] == 'Town02':
-        return [1]*len(data['values'].items())
+        return [1] * len(data['values'].items())
     else:
         raise Exception('Unknown town', data['town'])
 
@@ -62,7 +62,7 @@ def compute_experiment(data, param):
 def compute_step(data, param):
     step_data = []
     for step, data_item in data['values'].items():
-        step_data.append(float(step)/1000.0)
+        step_data.append(float(step) / 1000.0)
     return step_data
 
 
@@ -88,10 +88,10 @@ def compute_km_per_infraction(data_item, param):
 
     km_run = data_item['control'][-1]
     infraction_vec = np.array(data_item['control'][2:6])
-    infraction_vec = infraction_vec/km_run
+    infraction_vec = infraction_vec / km_run
 
     infraction_vec[infraction_vec == 0] = 0.01
-    km_per_infraction = np.sum(infraction_vec)*km_run
+    km_per_infraction = np.sum(infraction_vec) * km_run
     return km_per_infraction
 
 
@@ -150,9 +150,9 @@ def compute_steering_avg_l1(data_item, param):
 
 def compute_steering_avg_l1_speed(data_item, param):
     steer_gt = data_item['steer_gt'][np.where(
-        data_item['speed_input'] > (param['thresh_speed']*40))]
+        data_item['speed_input'] > (param['thresh_speed'] * 40))]
     steer_pred = data_item['steer_pred'][np.where(
-        data_item['speed_input'] > (param['thresh_speed']*40))]
+        data_item['speed_input'] > (param['thresh_speed'] * 40))]
 
     return np.mean(abs(steer_gt - steer_pred))
 
@@ -169,7 +169,8 @@ def compute_steering_avg_mse_filter_gt(data_item, param):
 
 
 def compute_displacement(data_item, param):
-    return np.multiply(abs(data_item['steer_gt'] - data_item['steer_pred']), np.absolute(data_item['speed_input']))
+    return np.multiply(abs(data_item['steer_gt'] - data_item['steer_pred']),
+                       np.absolute(data_item['speed_input']))
 
 
 def compute_displacement_steer(data_item, param):
@@ -185,11 +186,13 @@ def compute_cumulative_displacement(data_item, param):
     cummulative_displacement_vec = []
     for i in range(0, len(data_item['steer_pred']) - param['window']):
         displacement_vec_pred = [steer * math.fabs(speed) * param['timestep'] for steer, speed in
-                                 zip(data_item['steer_pred'][(i):(i + param['window'])], data_item['speed_input'][(i):(i + param['window'])])]
+                                 zip(data_item['steer_pred'][(i):(i + param['window'])],
+                                     data_item['speed_input'][(i):(i + param['window'])])]
         displacement_vec_gt = [steer * math.fabs(speed) * param['timestep'] for steer, speed in
-                               zip(data_item['steer_gt'][(i):(i + param['window'])], data_item['speed_input'][(i):(i + param['window'])])]
+                               zip(data_item['steer_gt'][(i):(i + param['window'])],
+                                   data_item['speed_input'][(i):(i + param['window'])])]
         cummulative_displacement_vec.append(
-            math.fabs(sum(displacement_vec_pred)-sum(displacement_vec_gt)))
+            math.fabs(sum(displacement_vec_pred) - sum(displacement_vec_gt)))
 
     return cummulative_displacement_vec
 
@@ -212,7 +215,8 @@ def compute_correlation(data_item, param):
 
         return np.corrcoef(sal_map.reshape(-1), fixation_map.reshape(-1))[0][1]
 
-    return calc_score(data_item['steer_pred']*np.absolute(data_item['speed_input']), data_item['steer_gt']*np.absolute(data_item['speed_input']))
+    return calc_score(data_item['steer_pred'] * np.absolute(data_item['speed_input']),
+                      data_item['steer_gt'] * np.absolute(data_item['speed_input']))
 
 
 '''
@@ -236,17 +240,24 @@ def compute_average_displacement(data, param):
         cummulative_displacement_vec = []
         for i in range(0, len(data_item['steer_pred']) - param['window']):
 
-            #displacement_vec = [steer * math.fabs(speed) * param['timestep']  for steer, speed in zip(steer_error[(i):(i + param['window'])],
+            #displacement_vec = [steer * math.fabs(speed) * param['timestep']  for steer, 
+            speed in zip(steer_error[(i):(i + param['window'])],
             #                   data_item['speed_input'][(i):(i + param['window'])])]
-            displacement_vec_pred = [math.fabs(steer) * math.fabs(speed) * param['timestep'] for steer, speed in
-                                zip(data_item['steer_pred'][(i):(i + param['window'])], data_item['speed_input'][(i):(i + param['window'])])]
+            displacement_vec_pred = [math.fabs(steer) * math.fabs(speed) * 
+            param['timestep'] for steer, speed in
+                                zip(data_item['steer_pred'][(i):(i + param['window'])], 
+                                data_item['speed_input'][(i):(i + param['window'])])]
 
-            displacement_vec_gt = [math.fabs(steer) * math.fabs(speed) * param['timestep'] for steer, speed in
-                                zip(data_item['steer_gt'][(i):(i + param['window'])], data_item['speed_input'][(i):(i + param['window'])])]
+            displacement_vec_gt = [math.fabs(steer) * math.fabs(speed) * param['timestep'] 
+            for steer, speed in
+                                zip(data_item['steer_gt'][(i):(i + param['window'])], 
+                                data_item['speed_input'][(i):(i + param['window'])])]
 
-            cummulative_displacement_vec.append(math.fabs(sum(displacement_vec_pred)-sum(displacement_vec_gt)))
+            cummulative_displacement_vec.append(math.fabs(sum(displacement_vec_pred)-
+            sum(displacement_vec_gt)))
 
-        metric_data.append(math.fabs(sum(cummulative_displacement_vec) / len(cummulative_displacement_vec)))
+        metric_data.append(math.fabs(sum(cummulative_displacement_vec) / 
+        len(cummulative_displacement_vec)))
 
     return metric_data
 '''
@@ -262,22 +273,26 @@ def compute_count_errors_weighted(data_item, param):
         count = 1.0
 
     #nans = np.isnan(abs(data_item['steer_gt'] - data_item['steer_pred']))
-    # abs(data_item['steer_gt'] - data_item['steer_pred']) = abs(data_item['steer_gt'] - data_item['steer_pred'])[np.invert(nans)]
-    # For sure, temporality is important. Even taking into account this naive idea already can be very good
+    # abs(data_item['steer_gt'] - data_item['steer_pred']) = abs(data_item['steer_gt'] -
+    # data_item['steer_pred'])[np.invert(nans)]
+    # For sure, temporality is important. Even taking into account this naive
+    # idea already can be very good
 
     return count
 
 
 def compute_relative_error_smoothed(data_item, param):
-    assert param['steer_smooth'] > 1e-6, 'Smooth parameter must be at least 1e-8 to avoid numerical problems'
+    assert param['steer_smooth'] > 1e-6, \
+        'Smooth parameter must be at least 1e-8 to avoid numerical problems'
 
-    return abs(data_item['steer_gt'] - data_item['steer_pred']) / (np.abs(data_item['steer_gt']) + param['steer_smooth'])
+    return abs(data_item['steer_gt'] - data_item['steer_pred']) / \
+        (np.abs(data_item['steer_gt']) + param['steer_smooth'])
 
 
 def compute_count_errors_weighted_speed(data_item, param):
     # YOu divide by the maximun speed
     speed_weighted_coeff = param['coeff'] * \
-        np.sqrt(np.absolute(data_item['speed_input']) * (1.0/40.0))
+        np.sqrt(np.absolute(data_item['speed_input']) * (1.0 / 40.0))
 
     weighted_gt = np.multiply(data_item['steer_gt'], speed_weighted_coeff)
 
@@ -320,4 +335,5 @@ def compute_count_cumulative_displacement(data_item, param):
         cummulative_displacement_vec.append(sum(displacement_vec))
         cummulative_ground_truth_disp.append(sum(ground_truth_disp))
 
-    return float(sum(cummulative_displacement_vec > (cummulative_ground_truth_disp*param['coeff']))) / float(len(cummulative_displacement_vec))
+    return float(sum(cummulative_displacement_vec >
+                     (cummulative_ground_truth_disp *param['coeff']))) / float(len(cummulative_displacement_vec))

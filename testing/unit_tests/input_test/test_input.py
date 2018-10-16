@@ -74,4 +74,4 @@ class testInput(unittest.TestCase):
 
             count += 1
 
-        print ("Time =  ", ((time.time() - capture_time)/len(dataset.sensor_data_names)))
+        print ("Time =  ", ((time.time() - capture_time) / len(dataset.sensor_data_names)))

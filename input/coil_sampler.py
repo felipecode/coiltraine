@@ -19,7 +19,7 @@ def get_rank(input_array):
             length = len(input_array)
             input_array = input_array[0]
             rank += 1
-        except:
+        except BaseException:
             return rank
 
 
@@ -71,7 +71,8 @@ class PreSplittedSampler(Sampler):
         super().__init__(data_source)
         self.keys = keys
         if weights is None:
-            self.weights = np.asarray([1.0/float(len(self.keys))]*len(self.keys), dtype=np.float)
+            self.weights = np.asarray([1.0 / float(len(self.keys))] *
+                                      len(self.keys), dtype=np.float)
         else:
             self.weights = np.asarray(weights)
 
@@ -132,7 +133,7 @@ class LogitSplittedSampler(Sampler):
         super().__init__(data_source)
         self.keys = keys
         if weights is None:
-            self.weights = torch.tensor([1.0/float(len(self.keys))] *
+            self.weights = torch.tensor([1.0 / float(len(self.keys))] *
                                         len(self.keys), dtype=torch.double)
         else:
             self.weights = torch.from_numpy(weights)
@@ -212,7 +213,7 @@ class BatchSequenceSampler(object):
         batch = []
         for idx in self.sampler:
             for seq in range(0, self.sequence_size * self.sequence_stride, self.sequence_stride):
-                batch.append(int(idx)+seq)
+                batch.append(int(idx) + seq)
             if len(batch) == self.batch_size:
                 yield batch
                 batch = []
