@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-pylint **/*.py || exit 0
+pylint **/*.py $@ || exit 0
