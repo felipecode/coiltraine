@@ -20,15 +20,10 @@ class Branching(nn.Module):
 
         self.branched_modules = nn.ModuleList(branched_modules)
 
-
-
-
     # TODO: iteration control should go inside the logger, somehow
 
     def forward(self, x):
         # get only the speeds from measurement labels
-
-
 
         # TODO: we could easily place this speed outside
 
@@ -37,7 +32,6 @@ class Branching(nn.Module):
             branches_outputs.append(branch(x))
 
         return branches_outputs
-
 
     def load_network(self, checkpoint):
         """
@@ -50,13 +44,8 @@ class Branching(nn.Module):
 
         """
         coil_logger.add_message('Loading', {
-                    "Model": {"Loaded checkpoint: " + str(checkpoint) }
+            "Model": {"Loaded checkpoint: " + str(checkpoint)}
 
-                })
-
-
+        })
 
         # TODO: implement
-
-
-

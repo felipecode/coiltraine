@@ -16,12 +16,10 @@ clock = pygame.time.Clock()
 import sys
 
 
-
 def draw_vbar_on(img, bar_intensity, x_pos, color=(0, 0, 255)):
     bar_size = int(img.shape[1] / 6 * bar_intensity)
     initial_y_pos = img.shape[0] - img.shape[0] / 6
     # print bar_intensity
-
 
     for i in range(bar_size):
         if bar_intensity > 0.0:
@@ -31,7 +29,6 @@ def draw_vbar_on(img, bar_intensity, x_pos, color=(0, 0, 255)):
 
 
 class CarScreenRecorder(object):
-
 
     def __init__(self, writting_path, plot_episodes=False, load_wheel=False):
 
@@ -44,7 +41,8 @@ class CarScreenRecorder(object):
         self._plot_episodes = plot_episodes
         if load_wheel:
             self._wheel = cv2.imread('drive/wheel.png')  # ,cv2.IMREAD_UNCHANGED)
-            self._wheel = cv2.resize(self._wheel, (int(0.08 * self._wheel.shape[0]), int(0.08 * self._wheel.shape[1])))
+            self._wheel = cv2.resize(
+                self._wheel, (int(0.08 * self._wheel.shape[0]), int(0.08 * self._wheel.shape[1])))
 
         self.start_screen([800, 600], [1, 1], 1)
 
@@ -73,13 +71,14 @@ class CarScreenRecorder(object):
             camera_surface = pygame.surface.Surface(resolution, 0, 24).convert()
 
             self._camera_surfaces.append(camera_surface)
+
     def paint_on_screen(self, size, content, color, position, screen_position):
 
         myfont = pygame.font.SysFont("monospace", size * self._scale, bold=True)
 
         position = (position[0] * self._scale, position[1] * self._scale)
 
-        final_position = (position[0] + self._resolution[0] * (self._scale * (screen_position[0])), \
+        final_position = (position[0] + self._resolution[0] * (self._scale * (screen_position[0])),
                           position[1] + (self._resolution[1] * (self._scale * (screen_position[1]))))
 
         content_to_write = myfont.render(content, 1, color)
@@ -97,7 +96,7 @@ class CarScreenRecorder(object):
 
         # print array.shape, self._resolution
 
-        final_position = (position[0] + self._resolution[0] * (scale * (screen_position[0])), \
+        final_position = (position[0] + self._resolution[0] * (scale * (screen_position[0])),
                           position[1] + (self._resolution[1] * (scale * (screen_position[1]))))
 
         # pygame.surfarray.array_colorkey(self._camera_surfaces[screen_number])
@@ -116,12 +115,14 @@ class CarScreenRecorder(object):
 
         cols, rows, c = self._wheel.shape
         M = cv2.getRotationMatrix2D((cols / 2, rows / 2), -90 * steer, 1)
-        rot_wheel = cv2.warpAffine(self._wheel, M, (cols, rows), borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0))
+        rot_wheel = cv2.warpAffine(self._wheel, M, (cols, rows),
+                                   borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0))
         # scale = 0.5
         position = (self._resolution[0] / 2 - cols / 2, int(self._resolution[1] / 1.5) - rows / 2)
         # print position
 
-        wheel_surface = pygame.surface.Surface((rot_wheel.shape[1], rot_wheel.shape[0]), 0, 24).convert()
+        wheel_surface = pygame.surface.Surface(
+            (rot_wheel.shape[1], rot_wheel.shape[0]), 0, 24).convert()
         # print array.shape, self._resolution
 
         # final_position = (position[0] + self._resolution[0]*(scale*(screen_number%3)),\
@@ -132,7 +133,6 @@ class CarScreenRecorder(object):
         pygame.surfarray.blit_array(wheel_surface, rot_wheel.swapaxes(0, 1))
 
         self._screen.blit(wheel_surface, position)
-
 
     def record_frame(self, sensor_data, control, direction,
                      measurements, screen_position=[0, 0]):
@@ -145,7 +145,6 @@ class CarScreenRecorder(object):
         print(sensor_data.shape)
         #sensor_data = np.rot90(sensor_data, 2)
 
-
         #start_to_print = time.time()
         steer = control.steer
         acc = control.throttle
@@ -154,7 +153,7 @@ class CarScreenRecorder(object):
 
         # Define our fonts
 
-        #print()
+        # print()
         draw_vbar_on(sensor_data, acc, int(1.5 * sensor_data.shape[0] / 8), (0, 255, 0))
         draw_vbar_on(sensor_data, brake, int(1.5 * sensor_data.shape[0] / 8) + 97, (255, 0, 0))
         initial_y_pos = int(size_x - size_x / 6 + 5)
@@ -193,12 +192,3 @@ class CarScreenRecorder(object):
                                                      "img" + str(self._render_iter) + ".png"))
 
         self._render_iter += 1
-
-
-
-
-
-
-
-
-

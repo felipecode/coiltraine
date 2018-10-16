@@ -47,8 +47,6 @@ def read_data(exp_batch, experiment, town, data_params, noise):
     else:
         raise ValueError('InvalidTownName')
 
-
-
     control_dataset = data_params['drive_environments'][town] + '_' + town
     # read the data
     data = {}
@@ -66,7 +64,6 @@ def read_data(exp_batch, experiment, town, data_params, noise):
         print ("control is none")
         return None
 
-
     print (" read control")
 
     # We get the path for the validation csvs
@@ -74,7 +71,6 @@ def read_data(exp_batch, experiment, town, data_params, noise):
                                         'validation_' + val_dataset + '_csv')
 
     # Based on the control data, we read the rest of the data
-
 
     values = data_reading._read_data(full_path_validation, control_data)
 
@@ -85,9 +81,8 @@ def read_data(exp_batch, experiment, town, data_params, noise):
 
     return data
 
+
 def filter_data(data, filter_param, noise):
-
-
 
     if filter_param:
         #list_cameras = {'Town01_1': 'camera_label_file_Town01_1.txt', 'Town02_14': 'camera_label_file_Town02_14.txt'}
@@ -106,9 +101,6 @@ def filter_data(data, filter_param, noise):
                 val_dataset = data['town'] + 'W14'
             else:
                 raise ValueError('InvalidTownName')
-
-
-
 
             camera_labels = data_reading.get_camera_labels(val_dataset)
 
@@ -143,6 +135,7 @@ def filter_data(data, filter_param, noise):
 
 # TODO implement. Returns a list? Or a numpy array? With the length equal to the number_of_iterations*2 (train and test)?
 
+
 def compute_lims(data_x, data_y):
     x_std = max(np.std(data_x), 0.001)
     y_std = max(np.std(data_y), 0.001)
@@ -163,6 +156,7 @@ def compute_lims(data_x, data_y):
     assert(np.abs(((x_max - x_min)/x_std) / ((y_max-y_min)/y_std)) < 1.0001)
     return [x_min, x_max], [y_min, y_max]
 
+
 def compute_metric(metric_name, data, param):
     metric_func = getattr(metrics_module, 'compute_' + metric_name)
     if metric_name in ['id', 'step', 'experiment']:
@@ -171,7 +165,8 @@ def compute_metric(metric_name, data, param):
         metric_results = metrics_module.compute_and_aggregate(metric_func, data, param)
     return metric_results
 
-def process_data(data, processing_params,noise):
+
+def process_data(data, processing_params, noise):
     metrics = {}
 
     for metric_label, metric_param in processing_params.items():
@@ -181,22 +176,32 @@ def process_data(data, processing_params,noise):
 
     return metrics
 
-def make_scatter_plot_analysis(all_metrics, plot_param, out_file = None):
+
+def make_scatter_plot_analysis(all_metrics, plot_param, out_file=None):
     if 'Regularization' in plot_param['title']:
-        model_to_legend = {'25_nor_no_single_ctrl_bal_regr_all': 'No regularization', '25_nor_ndrop_single_ctrl_bal_regr_all': 'Dropout', '25_nor_saug_single_ctrl_bal_regr_all': 'Dropout + mild aug.', '25_nor_maug_single_ctrl_bal_regr_all': 'Dropout + heavy aug.'}
-        model_to_id = {'25_nor_no_single_ctrl_bal_regr_all': 1, '25_nor_ndrop_single_ctrl_bal_regr_all': 2, '25_nor_saug_single_ctrl_bal_regr_all': 3, '25_nor_maug_single_ctrl_bal_regr_all': 4}
+        model_to_legend = {'25_nor_no_single_ctrl_bal_regr_all': 'No regularization', '25_nor_ndrop_single_ctrl_bal_regr_all': 'Dropout',
+                           '25_nor_saug_single_ctrl_bal_regr_all': 'Dropout + mild aug.', '25_nor_maug_single_ctrl_bal_regr_all': 'Dropout + heavy aug.'}
+        model_to_id = {'25_nor_no_single_ctrl_bal_regr_all': 1, '25_nor_ndrop_single_ctrl_bal_regr_all': 2,
+                       '25_nor_saug_single_ctrl_bal_regr_all': 3, '25_nor_maug_single_ctrl_bal_regr_all': 4}
     elif 'Data distribution' in plot_param['title']:
-        model_to_legend = {'25_nor_ndrop_single_ctrl_bal_regr_all': 'Three cameras with noise', '25_nor_ndrop_single_ctrl_bal_regr_jcen': 'Central camera with noise', '25_nor_ndrop_single_ctrl_bal_regr_nnjc': 'Central camera, no noise', '25_nor_ndrop_single_ctrl_seq_regr_all': 'Three cameras with noise, no balancing'}
-        model_to_id = {'25_nor_ndrop_single_ctrl_bal_regr_nnjc': 1, '25_nor_ndrop_single_ctrl_bal_regr_jcen': 2, '25_nor_ndrop_single_ctrl_bal_regr_all': 3, '25_nor_ndrop_single_ctrl_seq_regr_all': 4}
+        model_to_legend = {'25_nor_ndrop_single_ctrl_bal_regr_all': 'Three cameras with noise', '25_nor_ndrop_single_ctrl_bal_regr_jcen': 'Central camera with noise',
+                           '25_nor_ndrop_single_ctrl_bal_regr_nnjc': 'Central camera, no noise', '25_nor_ndrop_single_ctrl_seq_regr_all': 'Three cameras with noise, no balancing'}
+        model_to_id = {'25_nor_ndrop_single_ctrl_bal_regr_nnjc': 1, '25_nor_ndrop_single_ctrl_bal_regr_jcen': 2,
+                       '25_nor_ndrop_single_ctrl_bal_regr_all': 3, '25_nor_ndrop_single_ctrl_seq_regr_all': 4}
     elif 'Model architecture' in plot_param['title']:
-        model_to_legend = {'25_small_ndrop_single_ctrl_bal_regr_all': 'Shallow CNN', '25_nor_ndrop_single_ctrl_bal_regr_all': 'Standard CNN', '25_deep_ndrop_single_ctrl_bal_regr_all': 'Deep CNN', '25_nor_ndrop_lstm_ctrl_bal_regr_all': 'Standard LSTM'}
-        model_to_id = {'25_small_ndrop_single_ctrl_bal_regr_all': 1, '25_nor_ndrop_single_ctrl_bal_regr_all': 2, '25_deep_ndrop_single_ctrl_bal_regr_all': 3, '25_nor_ndrop_lstm_ctrl_bal_regr_all': 4}
+        model_to_legend = {'25_small_ndrop_single_ctrl_bal_regr_all': 'Shallow CNN', '25_nor_ndrop_single_ctrl_bal_regr_all': 'Standard CNN',
+                           '25_deep_ndrop_single_ctrl_bal_regr_all': 'Deep CNN', '25_nor_ndrop_lstm_ctrl_bal_regr_all': 'Standard LSTM'}
+        model_to_id = {'25_small_ndrop_single_ctrl_bal_regr_all': 1, '25_nor_ndrop_single_ctrl_bal_regr_all': 2,
+                       '25_deep_ndrop_single_ctrl_bal_regr_all': 3, '25_nor_ndrop_lstm_ctrl_bal_regr_all': 4}
     else:
-        model_to_legend = {'1_nor_maug_single_ctrl_bal_regr_all': '1 hour', '5_nor_maug_single_ctrl_bal_regr_all': '5 hours', '25_nor_maug_single_ctrl_bal_regr_all': '25 hours', '80_nor_maug_single_ctrl_bal_regr_all': '80 hours'}
-        model_to_id = {'1_nor_maug_single_ctrl_bal_regr_all': 1, '5_nor_maug_single_ctrl_bal_regr_all': 2, '25_nor_maug_single_ctrl_bal_regr_all': 3, '80_nor_maug_single_ctrl_bal_regr_all': 4}
+        model_to_legend = {'1_nor_maug_single_ctrl_bal_regr_all': '1 hour', '5_nor_maug_single_ctrl_bal_regr_all': '5 hours',
+                           '25_nor_maug_single_ctrl_bal_regr_all': '25 hours', '80_nor_maug_single_ctrl_bal_regr_all': '80 hours'}
+        model_to_id = {'1_nor_maug_single_ctrl_bal_regr_all': 1, '5_nor_maug_single_ctrl_bal_regr_all': 2,
+                       '25_nor_maug_single_ctrl_bal_regr_all': 3, '80_nor_maug_single_ctrl_bal_regr_all': 4}
 
     town_to_legend = {'Town01_1': 'Town 1', 'Town02_14': 'Town 2'}
     town_to_id = {'Town01_1': 1, 'Town02_14': 2}
+
     def exp_to_legend_and_idx(exp):
         legend = exp
         idx = []
@@ -213,9 +218,8 @@ def make_scatter_plot_analysis(all_metrics, plot_param, out_file = None):
         legend = legend.replace('_', ', ')
         return legend, idx
 
-
-    #3 Prepare the axes
-    fig, ax = plt.subplots(figsize=(8,8))
+    # 3 Prepare the axes
+    fig, ax = plt.subplots(figsize=(8, 8))
 
     # Color map
     plt.set_cmap('jet')
@@ -234,8 +238,10 @@ def make_scatter_plot_analysis(all_metrics, plot_param, out_file = None):
 
     # compute limits so that x and y scaled w.r.t. their std
     print(np.log(plot_param['x_lim']) if plot_param['x']['log'] else plot_param['x_lim'])
-    ax.set_xlim(np.log(plot_param['x_lim'])/np.log(10.) if plot_param['x']['log'] else plot_param['x_lim'])
-    ax.set_ylim(np.log(plot_param['y_lim'])/np.log(10.) if plot_param['y']['log'] else plot_param['y_lim'])
+    ax.set_xlim(np.log(plot_param['x_lim'])/np.log(10.)
+                if plot_param['x']['log'] else plot_param['x_lim'])
+    ax.set_ylim(np.log(plot_param['y_lim'])/np.log(10.)
+                if plot_param['y']['log'] else plot_param['y_lim'])
 
     # set num ticks
     plt.locator_params(axis='x', nbins=4)
@@ -263,7 +269,8 @@ def make_scatter_plot_analysis(all_metrics, plot_param, out_file = None):
 
         # remove nans
         # if np.any(np.isnan(data['x'])) or np.any(np.isnan(data['y']) or np.any(np.isinf(data['x']) or np.any(np.isinf(data['y']))
-        nans = np.logical_or.reduce((np.isnan(data['x']), np.isnan(data['y']), np.isinf(data['x']), np.isinf(data['y'])))
+        nans = np.logical_or.reduce((np.isnan(data['x']), np.isnan(
+            data['y']), np.isinf(data['x']), np.isinf(data['y'])))
         print('\n ** Removing %d NaNs and infs before log **' % np.sum(nans))
         for key in data:
             data[key] = data[key][np.invert(nans)]
@@ -271,7 +278,8 @@ def make_scatter_plot_analysis(all_metrics, plot_param, out_file = None):
         data_x = np.log(data['x'])/np.log(10) if plot_param['x']['log'] else np.copy(data['x'])
         data_y = np.log(data['y'])/np.log(10) if plot_param['y']['log'] else np.copy(data['y'])
 
-        nans = np.logical_or.reduce((np.isnan(data_x), np.isnan(data_y), np.isinf(data_x), np.isinf(data_y)))
+        nans = np.logical_or.reduce((np.isnan(data_x), np.isnan(data_y),
+                                     np.isinf(data_x), np.isinf(data_y)))
         print('\n ** Removing %d NaNs and infs after log **' % np.sum(nans))
         for key in data:
             data[key] = data[key][np.invert(nans)]
@@ -284,17 +292,18 @@ def make_scatter_plot_analysis(all_metrics, plot_param, out_file = None):
         # print('color_vec', color_vec)
         # print('data[\'color\']', data['color'])
         # print(len(data_x))
-        scatter_handles[experiment] = ax.scatter(data_x, data_y, s=data['size'], c=color_vec, alpha=0.5)
+        scatter_handles[experiment] = ax.scatter(
+            data_x, data_y, s=data['size'], c=color_vec, alpha=0.5)
         ax.plot(data_x, data_y, color=color_val)
 
     sorted_keys = sorted(scatter_handles.keys(), key=lambda x: exp_to_legend_and_idx(x)[1])
-    ax.legend([scatter_handles[k] for k in sorted_keys], [exp_to_legend_and_idx(k)[0] for k in sorted_keys])
+    ax.legend([scatter_handles[k] for k in sorted_keys], [
+              exp_to_legend_and_idx(k)[0] for k in sorted_keys])
     plt.title(plot_param['title'])
 
     # Save to out_file
     if plot_param['print']:
         fig.savefig(out_file, bbox_inches='tight')
-
 
     # red_patch = mpatches.Patch(color='red', label='Generalization')
     #
@@ -303,7 +312,8 @@ def make_scatter_plot_analysis(all_metrics, plot_param, out_file = None):
     # #ax.set_xlabel('Steer Prediction Error for Threhold')
     # ax.legend(handles=[red_patch, blue_patch])
 
-def make_scatter_plot(all_metrics, plot_param, out_file = None):
+
+def make_scatter_plot(all_metrics, plot_param, out_file=None):
     # Rearrange the data
     data = {'x': [], 'y': [], 'size': [], 'color': []}
     for experiment, metrics in all_metrics.items():
@@ -315,14 +325,16 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
         data[key] = np.array(data[key])
 
     # remove nans
-    nans = np.logical_or.reduce((np.isnan(data['x']), np.isnan(data['y']), np.isinf(data['x']), np.isinf(data['y'])))
+    nans = np.logical_or.reduce((np.isnan(data['x']), np.isnan(
+        data['y']), np.isinf(data['x']), np.isinf(data['y'])))
     print('\n ** Removing %d NaNs and infs before log **' % np.sum(nans))
     for key in data:
         data[key] = data[key][np.invert(nans)]
 
     if 'plot_best_n_percent' in plot_param and plot_param['plot_best_n_percent']:
         sorting_indices = np.argsort(data['x'])
-        selected_indices = sorting_indices[:int(plot_param['plot_best_n_percent']/100.*len(sorting_indices))]
+        selected_indices = sorting_indices[:int(
+            plot_param['plot_best_n_percent']/100.*len(sorting_indices))]
         for key in data:
             data[key] = data[key][selected_indices]
 
@@ -330,8 +342,10 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
     data_x = np.log(data['x'])/np.log(10) if plot_param['x']['log'] else np.copy(data['x'])
     data_y = np.log(data['y'])/np.log(10) if plot_param['y']['log'] else np.copy(data['y'])
 
-    # Remove nans after log again - these typically come from LSTM TODO may need to make this more principled
-    nans = np.logical_or.reduce((np.isnan(data_x), np.isnan(data_y), np.isinf(data_x), np.isinf(data_y)))
+    # Remove nans after log again - these typically come from LSTM
+    # TODO may need to make this more principled
+    nans = np.logical_or.reduce((np.isnan(data_x), np.isnan(data_y),
+                                 np.isinf(data_x), np.isinf(data_y)))
 
     print('\n ** Removing %d NaNs and infs after log **' % np.sum(nans))
     for key in data:
@@ -341,7 +355,7 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
     data_y = data_y[np.invert(nans)]
 
     ###
-    ### Plotting
+    # Plotting
     ###
     fig, ax = plt.subplots(figsize=(8, 8))
 
@@ -372,7 +386,7 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
     if plot_param['y']['log']:
         y_label += ' (log)'
         ax.set_yticklabels(['%.2f' % np.power(10, float(t)) for t in ax.get_yticks()])
-    else:    
+    else:
         ax.set_yticklabels(['%.2f' % float(t) for t in ax.get_yticks()])
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
@@ -382,13 +396,13 @@ def make_scatter_plot(all_metrics, plot_param, out_file = None):
     ax.scatter(data_x, data_y, s=data['size'], c=data['color'], alpha=0.5)
 
     # Correlation
-    corr = np.corrcoef(data_x, data_y)[0,1]
+    corr = np.corrcoef(data_x, data_y)[0, 1]
     print('Correlation %f' % corr)
     if 'title' in plot_param:
         title = plot_param['title']
     else:
         title = plot_param['y']['data'] + ' vs ' + plot_param['x']['data']
-    # NOTE removed by Alexey for the paper 
+    # NOTE removed by Alexey for the paper
     # plt.title(title + '\ncorrelation %.2f' % corr)
     plt.title('Correlation %.2f' % corr)
 
@@ -414,12 +428,10 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
     # save the parameters
     print ("Out path", out_path)
     with open(os.path.join(out_path, 'params.txt'), 'w') as f:
-        f.write('list_of_experiments:\n' + pprint.pformat(list_of_experiments,indent=4))
-        f.write('\n\ndata_params:\n' + pprint.pformat(data_params,indent=4))
-        f.write('\n\nprocessing_params:\n' + pprint.pformat(processing_params,indent=4))
-        f.write('\n\nplot_params:\n' + pprint.pformat(plot_params,indent=4))
-
-
+        f.write('list_of_experiments:\n' + pprint.pformat(list_of_experiments, indent=4))
+        f.write('\n\ndata_params:\n' + pprint.pformat(data_params, indent=4))
+        f.write('\n\nprocessing_params:\n' + pprint.pformat(processing_params, indent=4))
+        f.write('\n\nplot_params:\n' + pprint.pformat(plot_params, indent=4))
 
     list_of_exps_names = get_names(exp_batch)
     print ('list, expnames', list_of_exps_names)
@@ -431,15 +443,17 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
 
     for experiment in list_of_experiments:
 
-        #if '25_nor_no' in experiment or '5_small_ndrop_single_wp' in experiment:
+        # if '25_nor_no' in experiment or '5_small_ndrop_single_wp' in experiment:
         #    continue
 
         for town in data_params['towns']:
-            print('\n === Experiment %s _ %s %s ===\n' % (list_of_exps_names[list_of_experiments.index(experiment)]
-                                                          , town, data_params['noise']))
+            print('\n === Experiment %s _ %s %s ===\n' % (
+                list_of_exps_names[list_of_experiments.index(experiment)], town,
+                data_params['noise']))
             print('\n ** Reading the data **\n')
-            data = read_data(exp_batch, experiment, town, data_params, data_params['noise']) # this reads the data and infers the masks (or offsets) for different cameras
-            if data is None: # This folder didnt work out, probably is missing important data
+            # this reads the data and infers the masks (or offsets) for different cameras
+            data = read_data(exp_batch, experiment, town, data_params, data_params['noise'])
+            if data is None:  # This folder didnt work out, probably is missing important data
                 print('\n ** Missing Data on Folder **\n')
                 continue
 
@@ -447,16 +461,23 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
             print(data['town'])
             for step, data_item in data['values'].items():
                 print(step)
-                for k,v in data_item.items():
+                for k, v in data_item.items():
                     print(k, len(v))
             print('\n ** Processing the data **\n')
-            metrics = process_data(data, processing_params, data_params['noise']) # Compute metrics from the data. Can be multiple metrics, given by the processing_params list. Should be vectorized as much as possible. The output is a list of the same size as processing_params.
+            # Compute metrics from the data. Can be multiple metrics, given by the processing_params
+            # list. Should be vectorized as much as possible. The output is a list of the same size
+            # as processing_params.
+            metrics = process_data(data, processing_params, data_params['noise'])
             if town == 'Town01':
-                all_metrics_town01[experiment + ' : ' + list_of_exps_names[list_of_experiments.index(experiment)]
-                            + '_' + town] = metrics # append to the computed list of metrics to the dictionary of results.
+                # append to the computed list of metrics to the dictionary of results.
+                all_metrics_town01[experiment + ' : ' +
+                                   list_of_exps_names[list_of_experiments.index(experiment)] +
+                                   '_' + town] = metrics
             else:
-                all_metrics_town02[experiment + ' : ' + list_of_exps_names[list_of_experiments.index(experiment)]
-                            + '_' + town] = metrics # append to the computed list of metrics to the dictionary of results.
+                # append to the computed list of metrics to the dictionary of results.
+                all_metrics_town02[experiment + ' : ' +
+                                   list_of_exps_names[list_of_experiments.index(experiment)] +
+                                   '_' + town] = metrics
 
     # Plot the results
 
@@ -477,14 +498,10 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
             else:
                 if town == 'Town01':
                     make_scatter_plot(all_metrics_town01, plot_param,
-                                  out_file=os.path.join(out_path, plot_label + town + '.pdf'))
+                                      out_file=os.path.join(out_path, plot_label + town + '.pdf'))
                 else:
                     make_scatter_plot(all_metrics_town02, plot_param,
-                                  out_file=os.path.join(out_path, plot_label + town + '.pdf'))
-
-
-
-
+                                      out_file=os.path.join(out_path, plot_label + town + '.pdf'))
 
 
 # TODO Should we cache the computed metrics? The metrics should have unique names then

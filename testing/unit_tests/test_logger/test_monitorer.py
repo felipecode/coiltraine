@@ -10,9 +10,7 @@ from logger import readJSONlog
 from configs import g_conf, set_type_of_process, merge_with_yaml
 
 
-
 class testMonitorer(unittest.TestCase):
-
 
     def __init__(self, *args, **kwargs):
 
@@ -22,9 +20,6 @@ class testMonitorer(unittest.TestCase):
         if os.path.exists('_logs/monitor_test'):
             shutil.rmtree('_logs/monitor_test')
 
-
-
-
     def test_check_status_not_existent(self):
 
         # Check if status could be check for unexistent experiments
@@ -33,8 +28,6 @@ class testMonitorer(unittest.TestCase):
         status = monitorer.get_status('monitor_test', 'experiment_3.yaml',
                                       g_conf.PROCESS_NAME)
         self.assertEqual(status[0], "Does Not Exist")
-
-
 
     def test_check_status_to_run(self):
 
@@ -47,7 +40,6 @@ class testMonitorer(unittest.TestCase):
                                       g_conf.PROCESS_NAME)
         self.assertEqual(status[0], "Not Started")
 
-
     def test_check_status_running_loading(self):
 
         g_conf.immutable(False)
@@ -57,28 +49,20 @@ class testMonitorer(unittest.TestCase):
         # JUST A TRICK TO CONTAIN THE CURRENT LIMITATIONS
         set_type_of_process('train')
 
+        coil_logger.add_message('Loading', {
+            "Keys_Division": [1, 123, 1, 1, 2, 12, 3, 12, 31, 2, 1, 1]
+        })
 
-
-
-        coil_logger.add_message('Loading',{
-                                    "Keys_Division": [1,123,1,1,2,12,3,12,31,2,1,1]
-                                })
-
-        coil_logger.add_message('Loading',{
-                                    "Models_loaded": ' VUALA ',
-                                    "Checkpoint": "988765"
-                                })
-
+        coil_logger.add_message('Loading', {
+            "Models_loaded": ' VUALA ',
+            "Checkpoint": "988765"
+        })
 
         # TODO: Check how the alias will work.
         status = monitorer.get_status('monitor_test', 'experiment_running_loading.yaml',
                                       g_conf.PROCESS_NAME)
 
         self.assertEqual(status[0], "Loading")
-
-
-
-
 
     def test_check_status_running_iter(self):
 
@@ -98,22 +82,19 @@ class testMonitorer(unittest.TestCase):
             "Checkpoint": "988765"
         })
 
-
-
         for i in range(0, 10):
 
             coil_logger.add_message('Iterating', {
-                                        "Iteration": i,
-                                        "ReadKeys": [1, 123, 5, 1, 34, 1, 23]
+                "Iteration": i,
+                "ReadKeys": [1, 123, 5, 1, 34, 1, 23]
 
-                                    },
-                                    i)
+            },
+                i)
             coil_logger.add_message('Iterating', {
-                                        "Iteration": i,
-                                        "Output": ["output"]
-                                    },
-                                    i)
-
+                "Iteration": i,
+                "Output": ["output"]
+            },
+                i)
 
         # TODO: Check how the alias will work.
         status = monitorer.get_status('monitor_test', 'experiment_running_iter.yaml',
@@ -121,9 +102,6 @@ class testMonitorer(unittest.TestCase):
 
         self.assertEqual(status[0], "Iterating")
         print(status[1])
-
-
-
 
     def test_check_status_error(self):
 
@@ -144,36 +122,31 @@ class testMonitorer(unittest.TestCase):
             "Checkpoint": "988765"
         })
 
-
-
         for i in range(0, 10):
 
             coil_logger.add_message('Iterating', {
-                                        "Iteration": i,
-                                        "ReadKeys": [1, 123, 5, 1, 34, 1, 23]
+                "Iteration": i,
+                "ReadKeys": [1, 123, 5, 1, 34, 1, 23]
 
-                                    })
+            })
             coil_logger.add_message('Iterating', {
-                                        "Iteration": i,
-                                        "Output": ["output"]
-                                    })
+                "Iteration": i,
+                "Output": ["output"]
+            })
 
         coil_logger.add_message('Error', {
-                    "Iteration": 10,
-                    "Message": " Some data integrity problems ! "
+            "Iteration": 10,
+            "Message": " Some data integrity problems ! "
 
-                })
+        })
 
         # TODO: Check how the alias will work.
-
 
         status = monitorer.get_status('monitor_test', 'experiment_running_error.yaml',
                                       g_conf.PROCESS_NAME)
 
         self.assertEqual(status[0], "Error")
         print(status[1])
-
-
 
     def test_check_status_finished(self):
 
@@ -197,23 +170,20 @@ class testMonitorer(unittest.TestCase):
             "Checkpoint": "988765"
         })
 
-
-
         for i in range(0, 21):
 
             coil_logger.add_message('Iterating', {
-                                        "Iteration": i,
-                                        "ReadKeys": [1, 123, 5, 1, 34, 1, 23]
+                "Iteration": i,
+                "ReadKeys": [1, 123, 5, 1, 34, 1, 23]
 
-                                    },
-                                    i)
+            },
+                i)
             coil_logger.add_message('Iterating', {
-                                        "Iteration": i,
-                                        "Output": ["output"]
-                                    },
-                                    i
-                                    )
-
+                "Iteration": i,
+                "Output": ["output"]
+            },
+                i
+            )
 
         # TODO: Check how the alias will work.
 
@@ -222,14 +192,11 @@ class testMonitorer(unittest.TestCase):
 
         self.assertEqual(status[0], "Finished")
 
-
-
     def test_plot_of_folders(self):
-
 
         validation_datasets = ['SmallTest', 'OtherSmallTest']
         drive_environments = ['Town01', 'Town02']
 
         monitorer.plot_folder_summaries('monitor_test', ['train',
-                                               'validation_SmallTest', 'validation_OtherSmallTest',
-                                               'drive_Town01', 'drive_Town02'])
+                                                         'validation_SmallTest', 'validation_OtherSmallTest',
+                                                         'drive_Town01', 'drive_Town02'])

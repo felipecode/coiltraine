@@ -4,6 +4,7 @@ from .data_reading import read_control_csv, read_summary_csv
 
 from configs.coil_global import get_names, merge_with_yaml, g_conf
 
+
 def export_csv(exp_batch, variables_to_export):
     # TODO: add parameter for auto versus auto.
 
@@ -19,7 +20,6 @@ def export_csv(exp_batch, variables_to_export):
     # Make the header of the exported csv
     csv_outfile = os.path.join(root_path, exp_batch, 'result.csv')
 
-
     with open(csv_outfile, 'w') as f:
         f.write("experiment,environment")
         for variable in variables_to_export:
@@ -32,7 +32,8 @@ def export_csv(exp_batch, variables_to_export):
             experiments_logs = os.listdir(os.path.join(root_path, exp_batch, exp))
             for log in experiments_logs:
                 if 'drive' in log and '_csv' in log:
-                    csv_file_path = os.path.join(root_path, exp_batch, exp, log, 'control_output.csv')
+                    csv_file_path = os.path.join(
+                        root_path, exp_batch, exp, log, 'control_output.csv')
 
                     if not os.path.exists(csv_file_path):
                         continue
@@ -68,16 +69,12 @@ def export_csv_separate(exp_batch, variables_to_export, task_list):
     # Make the header of the exported csv
     csv_outfile = os.path.join(root_path, exp_batch, 'result.csv')
 
-
     with open(csv_outfile, 'w') as f:
         f.write("experiment,environment")
         for variable in variables_to_export:
             f.write(",%s" % variable)
 
         f.write("\n")
-
-
-
 
     experiment_list = []
     for exp in experiments:
@@ -91,7 +88,8 @@ def export_csv_separate(exp_batch, variables_to_export, task_list):
 
                 for task in task_list:
                     if 'drive' in log and '_csv' in log:
-                        csv_file_path = os.path.join(root_path, exp_batch, exp, log, 'control_output_' + task + '.csv')
+                        csv_file_path = os.path.join(
+                            root_path, exp_batch, exp, log, 'control_output_' + task + '.csv')
 
                         if not os.path.exists(csv_file_path):
                             continue
@@ -103,19 +101,17 @@ def export_csv_separate(exp_batch, variables_to_export, task_list):
                         position_of_max_success = np.argmax(control_csv['episodes_fully_completed'])
                         print (dicts_to_write)
 
-
                         for variable in variables_to_export:
-                            dicts_to_write[task].update({variable: control_csv[variable][position_of_max_success]})
+                            dicts_to_write[task].update(
+                                {variable: control_csv[variable][position_of_max_success]})
 
                 scenario.append(dicts_to_write)
             experiment_list.append(scenario)
-
 
     print (" FULL DICT")
     print (experiment_list)
 
     with open(csv_outfile, 'a') as f:
-
 
         for exp in experiments:
             print ("EXP ", exp)
@@ -128,16 +124,14 @@ def export_csv_separate(exp_batch, variables_to_export, task_list):
                         f.write("%s,%s" % (exp, log.split('_')[1]))
                         for variable in variables_to_export:
 
-
                             f.write(",")
                             for task in task_list:
                                 if experiment_list[experiments.index(exp)][count][task]:
-                                    f.write("%.2f/" % experiment_list[experiments.index(exp)][count][task][variable])
-
+                                    f.write(
+                                        "%.2f/" % experiment_list[experiments.index(exp)][count][task][variable])
 
                         f.write("\n")
                     count += 1
-
 
 
 def export_status(exp_batch, validation_datasets, driving_environments):
@@ -145,8 +139,6 @@ def export_status(exp_batch, validation_datasets, driving_environments):
     root_path = '_logs'
 
     experiments = os.listdir(os.path.join(root_path, exp_batch))
-
-
 
     # Make the header of the exported csv
     csv_outfile = os.path.join(root_path, exp_batch, 'status.csv')
@@ -159,7 +151,6 @@ def export_status(exp_batch, validation_datasets, driving_environments):
             f.write("," + driving)
 
         f.write('\n')
-
 
         names_list = get_names(exp_batch)
         count = 0
@@ -178,7 +169,6 @@ def export_status(exp_batch, validation_datasets, driving_environments):
                 for validation in validation_datasets:
 
                     log = 'validation_' + validation + '_csv'
-
 
                     if log in os.listdir(os.path.join(root_path, exp_batch, exp)):
 
@@ -200,13 +190,12 @@ def export_status(exp_batch, validation_datasets, driving_environments):
 
                             output_name = 'control_output.csv'
 
-
                         print (log)
                         if output_name in os.listdir(os.path.join(root_path, exp_batch, exp, log)):
 
-                            csv_file_path = os.path.join(root_path, exp_batch, exp, log, output_name)
+                            csv_file_path = os.path.join(
+                                root_path, exp_batch, exp, log, output_name)
                             control_csv = read_summary_csv(csv_file_path)
-
 
                             if control_csv is not None and (g_conf.TEST_SCHEDULE[-1]) == int(control_csv['step'][-1]):
 
@@ -217,7 +206,5 @@ def export_status(exp_batch, validation_datasets, driving_environments):
                             f.write(", ")
                     else:
                         f.write(", ")
-
-
 
                 f.write("\n")

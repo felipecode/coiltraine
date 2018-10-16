@@ -12,8 +12,8 @@ def normalize(x, dim):
 
 # TODO: needs some severe refactor to avoid hardcoding and repetition
 
-def compute_attention_map_L2(il):
 
+def compute_attention_map_L2(il):
     """
     THis compute the attention map that is actually viewable for L2
     :param il:
@@ -27,6 +27,7 @@ def compute_attention_map_L2(il):
     L2 = torch.div(L2, max_value)
 
     return L2
+
 
 def compute_attention_map_L1(il):
     """
@@ -42,8 +43,8 @@ def compute_attention_map_L1(il):
 
     return L1
 
-def compute_attention_loss(inter_layers, variable_weights, intention_factors):
 
+def compute_attention_loss(inter_layers, variable_weights, intention_factors):
     """ Take the batch size from the number of channels on the attention maps"""
     print (inter_layers[0].shape)
     print (intention_factors.shape)
@@ -73,13 +74,11 @@ def compute_attention_loss(inter_layers, variable_weights, intention_factors):
         """ We take the measurements used as attention important and weight"""
         # This part should have dimension second dimension 1
         loss += (variable_weights['L2']*L2 * intention + variable_weights['L1']*L1*(1-intention))\
-                    / len(inter_layers)
+            / len(inter_layers)
 
         print (" Partial Loss ", loss)
 
-
     return loss, L1, L2
-
 
 
 def L2(branches, targets, controls, speed_gt, size_average=True,
@@ -105,7 +104,8 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
 
     # weight different target items with lambdas
 
-    print ( "variable ", variable_weights, ' Targets ', targets.shape[1], 'conf targets',  g_conf.TARGETS)
+    print ("variable ", variable_weights, ' Targets ',
+           targets.shape[1], 'conf targets',  g_conf.TARGETS)
     if variable_weights:
         if len(variable_weights) != targets.shape[1]:
             raise ValueError('The input number of weight lambdas is '
@@ -122,7 +122,6 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
                              + str(len(branch_weights)) +
                              ', while the number of branches items is '
                              + str(len(branches)))
-
 
     else:
         branch_weights = [1.0] * len(branches)
@@ -160,39 +159,39 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
     # TODO: very dangerous part. Instead of indexing it should use variable names
     if 'W1A' in variable_weights:   # TODO: FIX this hardcodedism
         loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
-                  + loss_b1[:, 2] * variable_weights['Brake'] \
-                  + loss_b1[:, 3] * variable_weights['W1A'] \
-                  + loss_b1[:, 4] * variable_weights['W2A']
+            + loss_b1[:, 2] * variable_weights['Brake'] \
+            + loss_b1[:, 3] * variable_weights['W1A'] \
+            + loss_b1[:, 4] * variable_weights['W2A']
         loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights['Gas'] \
-                  + loss_b2[:, 2] * variable_weights['Brake'] \
-                  + loss_b2[:, 3] * variable_weights['W1A'] \
-                  + loss_b2[:, 4] * variable_weights['W2A']
+            + loss_b2[:, 2] * variable_weights['Brake'] \
+            + loss_b2[:, 3] * variable_weights['W1A'] \
+            + loss_b2[:, 4] * variable_weights['W2A']
 
         loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights['Gas'] \
-                  + loss_b3[:, 2] * variable_weights['Brake'] \
-                  + loss_b3[:, 3] * variable_weights['W1A'] \
-                  + loss_b3[:, 4] * variable_weights['W2A']
+            + loss_b3[:, 2] * variable_weights['Brake'] \
+            + loss_b3[:, 3] * variable_weights['W1A'] \
+            + loss_b3[:, 4] * variable_weights['W2A']
 
         loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights['Gas'] \
-                  + loss_b4[:, 2] * variable_weights['Brake'] \
-                  + loss_b4[:, 3] * variable_weights['W1A'] \
-                  + loss_b4[:, 4] * variable_weights['W2A']
+            + loss_b4[:, 2] * variable_weights['Brake'] \
+            + loss_b4[:, 3] * variable_weights['W1A'] \
+            + loss_b4[:, 4] * variable_weights['W2A']
     else:
         loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
-                  + loss_b1[:, 2] * variable_weights['Brake']
+            + loss_b1[:, 2] * variable_weights['Brake']
         loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights['Gas'] \
-                  + loss_b2[:, 2] * variable_weights['Brake']
+            + loss_b2[:, 2] * variable_weights['Brake']
         loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights['Gas'] \
-                  + loss_b3[:, 2] * variable_weights['Brake']
+            + loss_b3[:, 2] * variable_weights['Brake']
         loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights['Gas'] \
-                  + loss_b4[:, 2] * variable_weights['Brake']
+            + loss_b4[:, 2] * variable_weights['Brake']
     # add all branches losses together
     mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4
 
     if reduce:
         if size_average:
             mse_loss = torch.sum(mse_loss) / (mse_loss.shape[0]) \
-                       + torch.sum(loss_b5) / mse_loss.shape[0]
+                + torch.sum(loss_b5) / mse_loss.shape[0]
         else:
             mse_loss = torch.sum(mse_loss) + torch.sum(loss_b5)
     else:
@@ -202,6 +201,7 @@ def L2(branches, targets, controls, speed_gt, size_average=True,
             mse_loss = torch.cat([mse_loss, loss_b5], 1)
 
     return mse_loss
+
 
 def L1(branches, targets, controls, speed_gt, size_average=True,
        reduce=True, variable_weights=None, branch_weights=None):
@@ -242,7 +242,6 @@ def L1(branches, targets, controls, speed_gt, size_average=True,
                              ', while the number of branches items is '
                              + str(len(branches)))
 
-
     else:
         branch_weights = [1.0] * len(branches)
 
@@ -277,23 +276,23 @@ def L1(branches, targets, controls, speed_gt, size_average=True,
     # Apply the variable weights
     loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b1[:, 2] * variable_weights['Brake']
+        + loss_b1[:, 2] * variable_weights['Brake']
     loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b2[:, 2] * variable_weights['Brake']
+        + loss_b2[:, 2] * variable_weights['Brake']
     loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b3[:, 2] * variable_weights['Brake']
+        + loss_b3[:, 2] * variable_weights['Brake']
     loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b4[:, 2] * variable_weights['Brake']
+        + loss_b4[:, 2] * variable_weights['Brake']
     # add all branches losses together
     mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4
 
     if reduce:
         if size_average:
             mse_loss = torch.sum(mse_loss) / (mse_loss.shape[0]) \
-                       + torch.sum(loss_b5) / mse_loss.shape[0]
+                + torch.sum(loss_b5) / mse_loss.shape[0]
         else:
             mse_loss = torch.sum(mse_loss) + torch.sum(loss_b5)
     else:
@@ -306,8 +305,8 @@ def L1(branches, targets, controls, speed_gt, size_average=True,
     return mse_loss
 
 
-def L1_attention(branches, targets, controls, speed_gt, inter_layers =None, intention_factors=None, size_average=True,
-       reduce=True, variable_weights=None, branch_weights=None):
+def L1_attention(branches, targets, controls, speed_gt, inter_layers=None, intention_factors=None, size_average=True,
+                 reduce=True, variable_weights=None, branch_weights=None):
     """
     Args:
           branches - A list contains 5 branches results
@@ -347,7 +346,6 @@ def L1_attention(branches, targets, controls, speed_gt, inter_layers =None, inte
                              ', while the number of branches items is '
                              + str(len(branches)))
 
-
     else:
         branch_weights = [1.0] * len(branches)
 
@@ -382,28 +380,25 @@ def L1_attention(branches, targets, controls, speed_gt, inter_layers =None, inte
     # Apply the variable weights
     loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b1[:, 2] * variable_weights['Brake']
+        + loss_b1[:, 2] * variable_weights['Brake']
     loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b2[:, 2] * variable_weights['Brake']
+        + loss_b2[:, 2] * variable_weights['Brake']
     loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b3[:, 2] * variable_weights['Brake']
+        + loss_b3[:, 2] * variable_weights['Brake']
     loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b4[:, 2] * variable_weights['Brake']
+        + loss_b4[:, 2] * variable_weights['Brake']
     # add all branches losses together
 
     loss, L1, L2 = compute_attention_loss(inter_layers, variable_weights, intention_factors)
     mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4 + loss
 
-
-
-
     if reduce:
         if size_average:
             mse_loss = torch.sum(mse_loss) / (mse_loss.shape[0]) \
-                       + torch.sum(loss_b5) / mse_loss.shape[0]
+                + torch.sum(loss_b5) / mse_loss.shape[0]
 
             L1 = torch.sum(L1) / (L1.shape[0])
             L2 = torch.sum(L2) / (L2.shape[0])
@@ -417,7 +412,6 @@ def L1_attention(branches, targets, controls, speed_gt, inter_layers =None, inte
         else:
             mse_loss = torch.cat([mse_loss, loss_b5], 1)
 
-
     #L1 = 0
     #L2 = 0
     return mse_loss, L1, L2
@@ -426,7 +420,7 @@ def L1_attention(branches, targets, controls, speed_gt, inter_layers =None, inte
 # TODO: CLEAN THIS, PRE DEADLINE HARD CODE !
 
 def L1_no_brake(branches, targets, controls, speed_gt, size_average=True,
-       reduce=True, variable_weights=None, branch_weights=None):
+                reduce=True, variable_weights=None, branch_weights=None):
     """
     Args:
           branches - A list contains 5 branches results
@@ -463,7 +457,6 @@ def L1_no_brake(branches, targets, controls, speed_gt, size_average=True,
                              + str(len(branch_weights)) +
                              ', while the number of branches items is '
                              + str(len(branches)))
-
 
     else:
         branch_weights = [1.0] * len(branches)
@@ -510,7 +503,7 @@ def L1_no_brake(branches, targets, controls, speed_gt, size_average=True,
     if reduce:
         if size_average:
             mse_loss = torch.sum(mse_loss) / (mse_loss.shape[0]) \
-                       + torch.sum(loss_b5) / mse_loss.shape[0]
+                + torch.sum(loss_b5) / mse_loss.shape[0]
         else:
             mse_loss = torch.sum(mse_loss) + torch.sum(loss_b5)
     else:
@@ -521,10 +514,6 @@ def L1_no_brake(branches, targets, controls, speed_gt, size_average=True,
             mse_loss = torch.cat([mse_loss, loss_b5], 1)
 
     return mse_loss
-
-
-
-
 
 
 def L3(branches, targets, controls, speed_gt, size_average=True,
@@ -550,7 +539,8 @@ def L3(branches, targets, controls, speed_gt, size_average=True,
 
     # weight different target items with lambdas
 
-    print ( "variable ", variable_weights, ' Targets ', targets.shape[1], 'conf targets',  g_conf.TARGETS)
+    print ("variable ", variable_weights, ' Targets ',
+           targets.shape[1], 'conf targets',  g_conf.TARGETS)
     if variable_weights:
         if len(variable_weights) != targets.shape[1]:
             raise ValueError('The input number of weight lambdas is '
@@ -567,7 +557,6 @@ def L3(branches, targets, controls, speed_gt, size_average=True,
                              + str(len(branch_weights)) +
                              ', while the number of branches items is '
                              + str(len(branches)))
-
 
     else:
         branch_weights = [1.0] * len(branches)
@@ -605,39 +594,39 @@ def L3(branches, targets, controls, speed_gt, size_average=True,
     # TODO: very dangerous part. Instead of indexing it should use variable names
     if 'W1A' in variable_weights:   # TODO: FIX this hardcodedism
         loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
-                  + loss_b1[:, 2] * variable_weights['Brake'] \
-                  + loss_b1[:, 3] * variable_weights['W1A'] \
-                  + loss_b1[:, 4] * variable_weights['W2A']
+            + loss_b1[:, 2] * variable_weights['Brake'] \
+            + loss_b1[:, 3] * variable_weights['W1A'] \
+            + loss_b1[:, 4] * variable_weights['W2A']
         loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights['Gas'] \
-                  + loss_b2[:, 2] * variable_weights['Brake'] \
-                  + loss_b2[:, 3] * variable_weights['W1A'] \
-                  + loss_b2[:, 4] * variable_weights['W2A']
+            + loss_b2[:, 2] * variable_weights['Brake'] \
+            + loss_b2[:, 3] * variable_weights['W1A'] \
+            + loss_b2[:, 4] * variable_weights['W2A']
 
         loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights['Gas'] \
-                  + loss_b3[:, 2] * variable_weights['Brake'] \
-                  + loss_b3[:, 3] * variable_weights['W1A'] \
-                  + loss_b3[:, 4] * variable_weights['W2A']
+            + loss_b3[:, 2] * variable_weights['Brake'] \
+            + loss_b3[:, 3] * variable_weights['W1A'] \
+            + loss_b3[:, 4] * variable_weights['W2A']
 
         loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights['Gas'] \
-                  + loss_b4[:, 2] * variable_weights['Brake'] \
-                  + loss_b4[:, 3] * variable_weights['W1A'] \
-                  + loss_b4[:, 4] * variable_weights['W2A']
+            + loss_b4[:, 2] * variable_weights['Brake'] \
+            + loss_b4[:, 3] * variable_weights['W1A'] \
+            + loss_b4[:, 4] * variable_weights['W2A']
     else:
         loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights['Gas'] \
-                  + loss_b1[:, 2] * variable_weights['Brake']
+            + loss_b1[:, 2] * variable_weights['Brake']
         loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights['Gas'] \
-                  + loss_b2[:, 2] * variable_weights['Brake']
+            + loss_b2[:, 2] * variable_weights['Brake']
         loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights['Gas'] \
-                  + loss_b3[:, 2] * variable_weights['Brake']
+            + loss_b3[:, 2] * variable_weights['Brake']
         loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights['Gas'] \
-                  + loss_b4[:, 2] * variable_weights['Brake']
+            + loss_b4[:, 2] * variable_weights['Brake']
     # add all branches losses together
     mse_loss = loss_b1 + loss_b2 + loss_b3 + loss_b4
 
     if reduce:
         if size_average:
             mse_loss = torch.sum(mse_loss) / (mse_loss.shape[0]) \
-                       + torch.sum(loss_b5) / mse_loss.shape[0]
+                + torch.sum(loss_b5) / mse_loss.shape[0]
         else:
             mse_loss = torch.sum(mse_loss) + torch.sum(loss_b5)
     else:
@@ -649,7 +638,7 @@ def L3(branches, targets, controls, speed_gt, size_average=True,
     return mse_loss
 
 
-def L1_regularization(branches, targets, controls, speed_gt, inter_layers =None, intention_factors=None, size_average=True,
+def L1_regularization(branches, targets, controls, speed_gt, inter_layers=None, intention_factors=None, size_average=True,
                       reduce=True, variable_weights=None, branch_weights=None):
     """
     Args:
@@ -691,7 +680,6 @@ def L1_regularization(branches, targets, controls, speed_gt, inter_layers =None,
                              ', while the number of branches items is '
                              + str(len(branches)))
 
-
     else:
         branch_weights = [1.0] * len(branches)
 
@@ -726,16 +714,16 @@ def L1_regularization(branches, targets, controls, speed_gt, inter_layers =None,
     # Apply the variable weights
     loss_b1 = loss_b1[:, 0] * variable_weights['Steer'] + loss_b1[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b1[:, 2] * variable_weights['Brake']
+        + loss_b1[:, 2] * variable_weights['Brake']
     loss_b2 = loss_b2[:, 0] * variable_weights['Steer'] + loss_b2[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b2[:, 2] * variable_weights['Brake']
+        + loss_b2[:, 2] * variable_weights['Brake']
     loss_b3 = loss_b3[:, 0] * variable_weights['Steer'] + loss_b3[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b3[:, 2] * variable_weights['Brake']
+        + loss_b3[:, 2] * variable_weights['Brake']
     loss_b4 = loss_b4[:, 0] * variable_weights['Steer'] + loss_b4[:, 1] * variable_weights[
         'Gas'] \
-              + loss_b4[:, 2] * variable_weights['Brake']
+        + loss_b4[:, 2] * variable_weights['Brake']
     # add all branches losses together
 
     loss, L1, L2 = compute_attention_loss(inter_layers, variable_weights, intention_factors)
@@ -744,7 +732,7 @@ def L1_regularization(branches, targets, controls, speed_gt, inter_layers =None,
     if reduce:
         if size_average:
             mse_loss = torch.sum(mse_loss) / (mse_loss.shape[0]) \
-                       + torch.sum(loss_b5) / mse_loss.shape[0]
+                + torch.sum(loss_b5) / mse_loss.shape[0]
 
             L1 = torch.sum(L1) / (L1.shape[0])
             L2 = torch.sum(L2) / (L2.shape[0])
@@ -757,7 +745,6 @@ def L1_regularization(branches, targets, controls, speed_gt, inter_layers =None,
                 " size_average can not be applies when reduce is set to 'False' ")
         else:
             mse_loss = torch.cat([mse_loss, loss_b5], 1)
-
 
     #L1 = 0
     #L2 = 0
@@ -794,5 +781,3 @@ def Loss(loss_name):
 
     else:
         raise ValueError(" Not found Loss name")
-
-

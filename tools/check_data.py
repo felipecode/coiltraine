@@ -16,7 +16,6 @@ from prepare_data import is_hdf5_prepared
 import glob
 
 
-
 sensors = {'RGB': 3, 'labels': 3, 'depth': 3}
 resolution = [200, 88]
 camera_id_position = 25
@@ -45,12 +44,6 @@ def join_classes(labels_image, join_dic):
 
 
 
-
-
-
-
-
-
 # ***** main loop *****
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Path viewer')
@@ -65,8 +58,6 @@ if __name__ == "__main__":
     steering_pred = []
     steering_gt = []
 
-
-
     files = glob.glob(os.path.join(path, 'data_*.h5'))
 
     files = sorted(files)
@@ -76,6 +67,3 @@ if __name__ == "__main__":
 
         if not is_hdf5_prepared(f):
             raise ValueError("Not working ")
-
-
-

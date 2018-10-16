@@ -15,7 +15,7 @@ from carla.settings import CarlaSettings
 from carla.driving_benchmark.experiment_suites.experiment_suite import ExperimentSuite
 
 
-#TODO: maybe add aditional tasks ( NO dynamic obstacles for instace !)
+# TODO: maybe add aditional tasks ( NO dynamic obstacles for instace !)
 
 class TestSuite(ExperimentSuite):
 
@@ -25,17 +25,14 @@ class TestSuite(ExperimentSuite):
     @property
     def train_weathers(self):
         return [1]
+
     @property
     def test_weathers(self):
         return [1]
 
-
     def _poses(self):
 
-
         return [[[19, 66], [79, 14]]]
-
-
 
     def build_experiments(self):
         """
@@ -57,8 +54,6 @@ class TestSuite(ExperimentSuite):
         poses_tasks = self._poses()
         vehicles_tasks = [0, 0, 0, 15]
         pedestrians_tasks = [0, 0, 0, 50]
-
-
 
         experiments_vector = []
 
@@ -90,5 +85,3 @@ class TestSuite(ExperimentSuite):
                 experiments_vector.append(experiment)
 
         return experiments_vector
-
-

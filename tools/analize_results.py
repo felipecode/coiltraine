@@ -6,7 +6,6 @@ import numpy as np
 
 if __name__ == '__main__':
 
-
     argparser = argparse.ArgumentParser(description=__doc__)
 
     argparser.add_argument(
@@ -15,63 +14,58 @@ if __name__ == '__main__':
         default=None,
         help='The folder of experiments you want to plot')
 
-
     argparser.add_argument('-c',
-        '--control',
-        metavar='C',
-        default='auto',
-        help='IP of the host server (default: localhost)')
+                           '--control',
+                           metavar='C',
+                           default='auto',
+                           help='IP of the host server (default: localhost)')
 
     argparser.add_argument('-f',
-        '--folder-name',
-        metavar='F',
-        default='eccv',
-        help='IP of the host server (default: localhost)')
+                           '--folder-name',
+                           metavar='F',
+                           default='eccv',
+                           help='IP of the host server (default: localhost)')
 
     argparser.add_argument('-p',
-        '--plot-folder',
-        metavar='P',
-        default='',
-        help='Params module (default: USERNAME)')
+                           '--plot-folder',
+                           metavar='P',
+                           default='',
+                           help='Params module (default: USERNAME)')
 
     argparser.add_argument('-t',
-        '--towns',
-        metavar='T',
-        nargs='+',
-        type=int,
-        default=[],
-        help='Params module (default: USERNAME_params)')
+                           '--towns',
+                           metavar='T',
+                           nargs='+',
+                           type=int,
+                           default=[],
+                           help='Params module (default: USERNAME_params)')
 
     argparser.add_argument('-s',
-       '--strings-to-contain',
-       metavar='S',
-       default=None,
-       help='IP of the host server (default: localhost)')
-
+                           '--strings-to-contain',
+                           metavar='S',
+                           default=None,
+                           help='IP of the host server (default: localhost)')
 
     args = argparser.parse_args()
 
     root_path = '_logs'
     all_metrics_dict_json_path = os.path.join(root_path, args.folder_name, 'plots',
-                                               args.plot_folder, 'all_metricsTown02.json')
+                                              args.plot_folder, 'all_metricsTown02.json')
     with open(all_metrics_dict_json_path, 'r') as f:
         all_metrics_dict = json.loads(f.read())
 
-
     # Experiments with absolute error < 0.05 and success < 0.32
-    absolute_error_name  = 'Steering absolute error'
-    count_01             = 'Counting realtive 0.1 (Alexey)'
-    count_003             = 'Counting realtive 0.03 (Alexey)'
-    success_rate_name    = 'Success rate'
-    found_experiments    = []
-
+    absolute_error_name = 'Steering absolute error'
+    count_01 = 'Counting realtive 0.1 (Alexey)'
+    count_003 = 'Counting realtive 0.03 (Alexey)'
+    success_rate_name = 'Success rate'
+    found_experiments = []
 
     experiments_to_print = ['experiment_59', 'experiment_22']
 
-
     name_keys = []
     for key in all_metrics_dict.keys():
-        name_keys.append( key[(key.index(':')+1):])
+        name_keys.append(key[(key.index(':')+1):])
 
     sorted_keys = sorted(name_keys)
     with open("tested_experiments.csv", 'w') as f:
@@ -83,9 +77,8 @@ if __name__ == '__main__':
                     f.write(i)
                     first = False
                 else:
-                    f.write(',' +i)
+                    f.write(',' + i)
             f.write('\n')
-
 
     for key, value in all_metrics_dict.items():
 
@@ -98,7 +91,7 @@ if __name__ == '__main__':
             continue
 
         print (key)
-        for i in  range(len(all_metrics_dict[key][absolute_error_name])):
+        for i in range(len(all_metrics_dict[key][absolute_error_name])):
             print ('%3f' % all_metrics_dict[key][absolute_error_name][i], end=' ')
 
         print ()
@@ -115,6 +108,5 @@ if __name__ == '__main__':
         print (condition)
         if sum(condition) > 0:
             found_experiments.append(key)
-
 
     print (found_experiments)

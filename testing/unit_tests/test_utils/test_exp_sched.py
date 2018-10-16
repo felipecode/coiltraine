@@ -10,12 +10,9 @@ from configs import g_conf, merge_with_yaml, set_type_of_process
 from utils.experiment_schedule import *
 
 
-
-
 class testExpSched(unittest.TestCase):
 
     def test_mount_experiment_heap(self):
-
 
         path = 'configs'
         folder = 'eccv'
@@ -24,20 +21,14 @@ class testExpSched(unittest.TestCase):
         validation_datasets = ['SmallTest', 'OtherSmallTest']
         drive_environments = ['Town01', 'Town02']
 
-
-
         heap_of_exp = mount_experiment_heap(folder, experiments_list, True,
-                              validation_datasets, drive_environments)
-
-
+                                            validation_datasets, drive_environments)
 
         print ("Number of experiment", len(heap_of_exp))
 
         print ("Returns")
 
-
         print(heap_of_exp)
-
 
     def test_gpu_poping(self):
 
@@ -59,8 +50,8 @@ class testExpSched(unittest.TestCase):
         executing_processes = []
 
         free_gpus, resources_on_most_free_gpu, executing_processes = get_gpu_resources(allocated_gpus,
-                                                                           executing_processes,
-                                                                           allocation_parameters)
+                                                                                       executing_processes,
+                                                                                       allocation_parameters)
         print (" Free GPUS, resources on the most free")
         print (free_gpus, resources_on_most_free_gpu)
 
@@ -76,10 +67,10 @@ class testExpSched(unittest.TestCase):
         while True:
 
             while resources_on_most_free_gpu > min([allocation_parameters['train_cost'],
-                                                 allocation_parameters['validation_cost'],
-                                                 allocation_parameters['drive_cost']])\
+                                                    allocation_parameters['validation_cost'],
+                                                    allocation_parameters['drive_cost']])\
                     and tasks_queue != []:
-                #Allocate all the gpus
+                # Allocate all the gpus
                 print ("TASKS ", tasks_queue)
                 popped_thing = heapq.heappop(tasks_queue)
                 process_specs = popped_thing[2]  # To get directly the dict
@@ -88,17 +79,17 @@ class testExpSched(unittest.TestCase):
 
                 if process_specs['type'] == 'train' and resources_on_most_free_gpu >= allocation_parameters['train_cost']:
                     free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
-                                                                 free_gpus,
-                                                                 allocation_parameters['train_cost'])
+                        free_gpus,
+                        allocation_parameters['train_cost'])
                     #execute_train(gpu_number, process_specs['folder'], process_specs['experiment'])
                     process_specs.update({'gpu': gpu_number})
                     executing_processes.append(process_specs)
 
                 elif process_specs['type'] == 'validation' and resources_on_most_free_gpu >= allocation_parameters['validation_cost']:
                     free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
-                                                                 free_gpus,
-                                                                 allocation_parameters['validation_cost'])
-                    #execute_validation(gpu_number, process_specs['folder'], process_specs['experiment'],
+                        free_gpus,
+                        allocation_parameters['validation_cost'])
+                    # execute_validation(gpu_number, process_specs['folder'], process_specs['experiment'],
                     #                        process_specs['dataset'])
                     process_specs.update({'gpu': gpu_number})
                     executing_processes.append(process_specs)
@@ -106,14 +97,12 @@ class testExpSched(unittest.TestCase):
                 elif process_specs['type'] == 'drive' and resources_on_most_free_gpu >= allocation_parameters['drive_cost']:
 
                     free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
-                                                                 free_gpus,
-                                                                 allocation_parameters['drive_cost'])
-                    #execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
+                        free_gpus,
+                        allocation_parameters['drive_cost'])
+                    # execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
                     #                   process_specs['environment'])
                     process_specs.update({'gpu': gpu_number})
                     executing_processes.append(process_specs)
-
-
 
             random_process = random.choice(executing_processes)
             print ('random process', random_process)
@@ -131,19 +120,19 @@ class testExpSched(unittest.TestCase):
 
             random_message = random.choice(['Finished', 'Error', 'Iterating'])
 
-            print ('set ', random_process['type'], ' from ', random_process['experiment'], ' to ', random_message  )
+            print ('set ', random_process['type'], ' from ',
+                   random_process['experiment'], ' to ', random_message)
 
-            if  random_message == 'Iterating':
+            if random_message == 'Iterating':
                 coil_logger.add_message(random_message, {'Iteration': 1}, 1)
                 coil_logger.add_message(random_message, {'Iteration': 2}, 2)
             else:
                 coil_logger.add_message(random_message, {})
 
-
             free_gpus, resources_on_most_free_gpu, executing_processes = get_gpu_resources(
-                                                                      allocated_gpus,
-                                                                      executing_processes,
-                                                                      allocation_parameters)
+                allocated_gpus,
+                executing_processes,
+                allocation_parameters)
 
             coil_logger.close()
             if len(executing_processes) == 0:

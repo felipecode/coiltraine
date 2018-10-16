@@ -14,7 +14,6 @@ from utils.general import erase_wrong_plotting_summaries
 
 if __name__ == '__main__':
 
-
     argparser = argparse.ArgumentParser(description=__doc__)
 
     argparser.add_argument(
@@ -23,38 +22,37 @@ if __name__ == '__main__':
         default=None,
         help='The folder of experiments you want to plot')
 
-
     argparser.add_argument('-c',
-        '--control',
-        metavar='C',
-        default='auto',
-        help='IP of the host server (default: localhost)')
+                           '--control',
+                           metavar='C',
+                           default='auto',
+                           help='IP of the host server (default: localhost)')
 
     argparser.add_argument('-f',
-        '--folder-name',
-        metavar='F',
-        default='test',
-        help='IP of the host server (default: localhost)')
+                           '--folder-name',
+                           metavar='F',
+                           default='test',
+                           help='IP of the host server (default: localhost)')
 
     argparser.add_argument('-p',
-        '--params-file',
-        metavar='P',
-        default='sample_plot',
-        help='Params module (default: USERNAME)')
+                           '--params-file',
+                           metavar='P',
+                           default='sample_plot',
+                           help='Params module (default: USERNAME)')
 
     argparser.add_argument('-t',
-        '--towns',
-        metavar='T',
-        nargs='+',
-        type=int,
-        default=[],
-        help='Params module (default: USERNAME_params)')
+                           '--towns',
+                           metavar='T',
+                           nargs='+',
+                           type=int,
+                           default=[],
+                           help='Params module (default: USERNAME_params)')
 
     argparser.add_argument('-s',
-       '--strings-to-contain',
-       metavar='S',
-       default=None,
-       help='IP of the host server (default: localhost)')
+                           '--strings-to-contain',
+                           metavar='S',
+                           default=None,
+                           help='IP of the host server (default: localhost)')
     argparser.add_argument(
         '-ebv', '--erase-bad-validations',
         action='store_true',
@@ -65,8 +63,6 @@ if __name__ == '__main__':
     argparser.add_argument('--ignore-lstm', action='store_true')
 
     argparser.add_argument('--add-noise', action='store_true')
-
-
 
     """
     You can either generate images for a experiment list
@@ -87,13 +83,11 @@ if __name__ == '__main__':
         list_of_experiments = os.listdir(os.path.join('configs', args.folder))
 
         # TODO: the ignore lstm goes after getting exps names.
-        #if args.ignore_lstm:
+        # if args.ignore_lstm:
         #    list_of_experiments = [l for l in list_of_experiments if 'lstm' not in l]
 
     else:
         list_of_experiments = []
-
-
 
     if args.strings_to_contain is not None:
         final_list_of_experiments = []
@@ -120,14 +114,14 @@ if __name__ == '__main__':
         data_params['towns'] = towns
 
     if hasattr(params_module, 'list_of_experiments'):
-        assert (not (final_list_of_experiments and params_module.list_of_experiments)), 'List of experiments should either be given by flags or in the param file, not both'
+        assert (not (final_list_of_experiments and params_module.list_of_experiments)
+                ), 'List of experiments should either be given by flags or in the param file, not both'
         final_list_of_experiments = params_module.list_of_experiments
 
     print('final_list_experiments', final_list_of_experiments)
     print('data params', data_params)
     print('process params', params_module.processing_params)
     print('plot params', params_module.plot_params)
-
 
     if args.erase_bad_validations:
         validations = ['Town01W1Noise', 'Town02W14Noise', 'Town01W1', 'Town02W14']

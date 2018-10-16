@@ -30,22 +30,16 @@ class Conv(nn.Module):
         if len(params['dropouts']) != len(params['channels'])-1:
             raise ValueError("Dropouts should be from the len of channel_sizes minus 1")
 
-
-
-
         """" ------------------ IMAGE MODULE ---------------- """
         # Conv2d(input channel, output channel, kernel size, stride), Xavier initialization and 0.1 bias initialization
-
 
         self.layers = []
 
         # TODO: need to log the loaded networks
 
-
         for i in range(0, len(params['channels'])-1):
             conv = nn.Conv2d(in_channels=params['channels'][i], out_channels=params['channels'][i+1],
                              kernel_size=params['kernels'][i], stride=params['strides'][i])
-
 
             dropout = nn.Dropout2d(p=params['dropouts'][i])
             relu = nn.ReLU(inplace=True)
@@ -58,10 +52,6 @@ class Conv(nn.Module):
         self.layers = nn.Sequential(*self.layers)
         self.module_name = module_name
 
-
-
-
-
     # TODO: iteration control should go inside the logger, somehow
 
     def forward(self, x):
@@ -70,15 +60,12 @@ class Conv(nn.Module):
         # TODO: TRACK NANS OUTPUTS
         # TODO: Maybe change the name
         # TODO: Maybe add internal logs !
-
         """ conv1 + batch normalization + dropout + relu """
         x = self.layers(x)
 
         x = x.view(-1, self.num_flat_features(x))
 
-
         return x, None  # output, intermediate
-
 
     def num_flat_features(self, x):
         size = x.size()[1:]  # all dimensions except the batch dimension
@@ -86,7 +73,6 @@ class Conv(nn.Module):
         for s in size:
             num_features *= s
         return num_features
-
 
     def get_conv_output(self, shape):
         """
@@ -98,4 +84,3 @@ class Conv(nn.Module):
         output_feat = self.forward(input)
         n_size = output_feat.data.view(bs, -1).size(1)
         return n_size
-

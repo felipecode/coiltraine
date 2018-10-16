@@ -9,11 +9,10 @@ def get_remainig_exps(executing_processes, experiment_list):
     for process in executing_processes:
         executing_list.append(process['experiment'])
 
-    return list(set(experiment_list)- set(executing_list))
+    return list(set(experiment_list) - set(executing_list))
 
 
 def get_gpu_resources(gpu_resources, executing_processes, allocation_params):
-
     """
 
     Args:
@@ -37,7 +36,7 @@ def get_gpu_resources(gpu_resources, executing_processes, allocation_params):
             name = process_specs['type']
 
         status = monitorer.get_status(process_specs['folder'], process_specs['experiment'],
-                                     name)[0]
+                                      name)[0]
 
         if status == "Finished" or status == 'Error':
 
@@ -45,7 +44,6 @@ def get_gpu_resources(gpu_resources, executing_processes, allocation_params):
 
         else:
             still_executing_processes.append(process_specs)
-
 
     return gpu_resources, max(gpu_resources.values()), still_executing_processes
 
@@ -68,6 +66,7 @@ def allocate_gpu_resources(gpu_resources, amount_to_allocate):
             return gpu_resources, max(gpu_resources.values()), gpu
 
     raise ValueError("Not enough gpu resources to allocate")
+
 
 def dict_to_namevec(process_dict):
     """
@@ -92,13 +91,10 @@ def execvec_to_names(executing_processes):
     Creates a name_vec for each the dictonary on the list of executing processss
     Args:
         List of executing process
-        
+
     returns 
         List of name vecs 
     """
-
-
-
 
     process_name_vec = []
     for process_dict in executing_processes:
@@ -111,35 +107,29 @@ def execvec_to_names(executing_processes):
 def mount_experiment_heap(folder, experiments_list, is_training, executing_processes, old_tasks_queue,
                           validation_datasets, drive_environments, restart_error=True):
 
-
     tasks_queue = []
 
     exec_name_vec = execvec_to_names(executing_processes)
     for experiment in experiments_list:
 
-
         # Train is always priority. # TODO: some system to check priority depending on iterations
         task_to_add = None
         # TODO: One thing is error other thing is stop. However at a first step we can try to restart all error things
-
-
 
         if is_training:
             if monitorer.get_status(folder, experiment, 'train')[0] == "Not Started":
 
                 task_to_add = (0, experiment + '_train',
-                                         {'type': 'train', 'folder': folder,
-                                          'experiment': experiment})
+                               {'type': 'train', 'folder': folder,
+                                'experiment': experiment})
 
             elif restart_error and monitorer.get_status(folder, experiment, 'train')[0] \
-                            == "Error":
+                    == "Error":
 
                 task_to_add = (0, experiment + '_train',
                                {'type': 'train', 'folder': folder,
                                 'experiment': experiment})
 
-
-
             if task_to_add is not None:
                 task_name_vec = dict_to_namevec(task_to_add[2])
                 if task_name_vec in exec_name_vec:
@@ -148,22 +138,19 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
 
             if task_to_add is not None and task_to_add not in old_tasks_queue:
                 heapq.heappush(tasks_queue, task_to_add)
-
-
 
         for val_data in validation_datasets:
             task_to_add = None
             if monitorer.get_status(folder, experiment, 'validation_' + val_data)[0] == "Not Started":
                 task_to_add = (2, experiment + '_validation_' + val_data,
-                                             {'type': 'validation', 'folder': folder,
-                                              'experiment': experiment, 'dataset': val_data})
+                               {'type': 'validation', 'folder': folder,
+                                'experiment': experiment, 'dataset': val_data})
 
             elif restart_error and monitorer.get_status(folder, experiment, 'validation_'
-                                                                + val_data)[0] == "Error":
+                                                        + val_data)[0] == "Error":
                 task_to_add = (2, experiment + '_validation_' + val_data,
-                                             {'type': 'validation', 'folder': folder,
-                                              'experiment': experiment, 'dataset': val_data})
-
+                               {'type': 'validation', 'folder': folder,
+                                'experiment': experiment, 'dataset': val_data})
 
             if task_to_add is not None:
                 task_name_vec = dict_to_namevec(task_to_add[2])
@@ -174,21 +161,17 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
             if task_to_add is not None and task_to_add not in old_tasks_queue:
                 heapq.heappush(tasks_queue, task_to_add)
 
-
-
         for drive_env in drive_environments:
             task_to_add = None
             if monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] == "Not Started":
                 task_to_add = (1, experiment + '_drive_' + drive_env,
-                                             {'type': 'drive', 'folder': folder,
-                                              'experiment': experiment, 'environment': drive_env})
-
-            elif restart_error and monitorer.get_status(folder, experiment, 'drive_' + drive_env)\
-                                                        [0] == "Error":
-                task_to_add = (1, experiment + '_drive_' + drive_env,
                                {'type': 'drive', 'folder': folder,
                                 'experiment': experiment, 'environment': drive_env})
 
+            elif restart_error and monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] == "Error":
+                task_to_add = (1, experiment + '_drive_' + drive_env,
+                               {'type': 'drive', 'folder': folder,
+                                'experiment': experiment, 'environment': drive_env})
 
             if task_to_add is not None:
                 task_name_vec = dict_to_namevec(task_to_add[2])

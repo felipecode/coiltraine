@@ -3,7 +3,6 @@ from logger import coil_logger
 import numpy as np
 
 
-
 def order_sequence(steerings, keys_sequence):
     sequence_average = []
     # print 'keys'
@@ -30,7 +29,7 @@ def partition_keys_by_percentiles(steerings, keys, percentiles):
     for i in range(1, len(percentiles)):
         quad_vec.append(quad_vec[-1] + percentiles[i])
 
-    #print(quad_vec)
+    # print(quad_vec)
 
     for i in range(0, len(steerings)):
 
@@ -46,7 +45,6 @@ def partition_keys_by_percentiles(steerings, keys, percentiles):
             # The number of keys for this split
             # print ([steerings[i], len(splited_keys)])
             coil_logger.add_message('Loading', {'SplitPoints': [steerings[i], len(splited_keys)]})
-
 
     return splited_keys
 
@@ -66,7 +64,6 @@ def select_data_sequence(control, selected_data):
 
     break_sequence = False
 
-
     count = 0
     del_pos = []
 
@@ -84,7 +81,6 @@ def select_data_sequence(control, selected_data):
 
             if control[iter_sequence] not in selected_data:
                 eliminated_positions += 1
-
 
             if eliminated_positions > g_conf.NUMBER_IMAGES_SEQUENCE/2:
                 del_pos.append(count * g_conf.SEQUENCE_STRIDE)
@@ -125,7 +121,7 @@ def label_split(labels, keys, selected_data):
         if not isinstance(selected_data, int):
             raise ValueError(" Invalid type for scalar label selection")
 
-        selected_data_vec = [[1]] + int(100/selected_data -1) * [[0]]
+        selected_data_vec = [[1]] + int(100/selected_data - 1) * [[0]]
 
     print (selected_data_vec)
 
@@ -153,7 +149,6 @@ def float_split(output_to_split, keys, percentiles):
 
     """
 
-
     # We use this keys to grab the steerings we want... divided into groups
     # TODO: Test the spliting based on median.
     #print ('Start keys ',keys)
@@ -170,37 +165,31 @@ def float_split(output_to_split, keys, percentiles):
     else:
         splitted_keys = []
 
-
     return splitted_keys
 
 
 # READABILITY IS HORRIBLE
 
 
-
 def remove_angle_traffic_lights(data, positions_dict):
     # will return all the keys that does not contain the expression.
 
-    return (data['angle'] == positions_dict['angle'] and data['traffic_lights']!=positions_dict['traffic_lights'])
-
-
+    return (data['angle'] == positions_dict['angle'] and data['traffic_lights'] != positions_dict['traffic_lights'])
 
 
 def remove_angle(data, positions_dict):
     # This will remove a list of angles that you dont want
     # Usually used to get just the central camera
 
-
     return data['angle'] == positions_dict['angle']
 
     #data = convert_measurements(data)
-    #keys = np.where(np.logical_and(data['angle'] != positions_dict['angle'][0],
+    # keys = np.where(np.logical_and(data['angle'] != positions_dict['angle'][0],
     #                               data['angle'] != positions_dict['angle'][1]
     #                               )
     #                )[0]
 
-    #return keys
-
+    # return keys
 
 
 def remove_all(data, positions_dict):
@@ -217,6 +206,7 @@ def remove_all(data, positions_dict):
                     )[0]
 
     return keys
+
 
 def remove_traffic_lights(data, positions_dict):
     # This will remove a list of angles that you dont want
@@ -237,15 +227,11 @@ def split_sequence(data, var, positions):
     print (positions)
     keys = [np.where(data[var] <= positions[var][0])[0]]
 
-
-
     for i in range(len(positions[var])-1):
-        print (data[var] )
-        print ( positions[var][i], positions[var][i+1])
+        print (data[var])
+        print (positions[var][i], positions[var][i+1])
         keys.append(np.where(
             np.logical_and(data[var] > positions[var][i], data[var] <= positions[var][i + 1]))[0])
-
-
 
     keys.append(np.where(data[var] > positions[var][-1])[0])
 
@@ -262,10 +248,8 @@ def convert_measurements(measurements):
         for key, value in data_point.items():
             conv_measurements[key].append(value)
 
-
     for key in conv_measurements.keys():
         conv_measurements[key] = np.array(conv_measurements[key])
-
 
     return conv_measurements
 
@@ -279,29 +263,32 @@ def split_speed_module(data, positions):
     data = convert_measurements(data)
     return split_sequence(data, 'speed_module', positions)
 
+
 def split_speed_module_throttle(data, positions_dict):
     data = convert_measurements(data)
     keys = [np.where(np.logical_and(data['speed_module'] < positions_dict['speed_module'][0],
-                                                           data['throttle'] > positions_dict['throttle'][0]))[0],
-                         np.where(np.logical_or(np.logical_and(data['speed_module'] < positions_dict['speed_module'][0],
-                                                           data['throttle'] <= positions_dict['throttle'][0]),
-                                                data['speed_module'] >= positions_dict['speed_module'][0]))[0]
-             ]
+                                    data['throttle'] > positions_dict['throttle'][0]))[0],
+            np.where(np.logical_or(np.logical_and(data['speed_module'] < positions_dict['speed_module'][0],
+                                                  data['throttle'] <= positions_dict['throttle'][0]),
+                                   data['speed_module'] >= positions_dict['speed_module'][0]))[0]
+            ]
 
     return keys
+
 
 def split_pedestrian_vehicle_traffic_lights_move(data, positions_dict):
     data = convert_measurements(data)
     keys = [np.where(np.logical_and(data['pedestrian'] < 1.0,
                                     data['pedestrian'] > 0.))[0],
             np.where(data['pedestrian'] == 0.)[0],
-            np.where(data['vehicle'] < 1. )[0],
-            np.where(np.logical_and(data['traffic_lights'] < 1.0, data['speed_module'] >= 0.0666))[0],
+            np.where(data['vehicle'] < 1.)[0],
+            np.where(np.logical_and(data['traffic_lights'] <
+                                    1.0, data['speed_module'] >= 0.0666))[0],
             np.where(np.logical_and(np.logical_and(data['pedestrian'] == 1.,
                                                    data['vehicle'] == 1.),
                                     np.logical_or(data['traffic_lights'] == 1.,
-                                                   np.logical_and(data['traffic_lights'] < 1.0,
-                                                                  data['speed_module'] < 0.066)
+                                                  np.logical_and(data['traffic_lights'] < 1.0,
+                                                                 data['speed_module'] < 0.066)
                                                   )
                                     )
                      )[0]
@@ -315,18 +302,18 @@ def split_pedestrian_vehicle_traffic_lights(data, positions_dict):
     keys = [np.where(np.logical_and(data['pedestrian'] < 1.0,
                                     data['pedestrian'] > 0.))[0],
             np.where(data['pedestrian'] == 0.)[0],
-            np.where(data['vehicle'] < 1. )[0],
+            np.where(data['vehicle'] < 1.)[0],
             np.where(data['traffic_lights'] < 1.0)[0],
             np.where(np.logical_and(np.logical_and(data['pedestrian'] == 1.,
                                                    data['vehicle'] == 1.),
-                                     data['traffic_lights'] == 1.))[0]
+                                    data['traffic_lights'] == 1.))[0]
 
             ]
     return keys
 
+
 def split_lateral_noise_longitudinal_noise(data, positions_dict):
     data = convert_measurements(data)
-
 
     keys = [np.where(data['steer'] != data['steer_noise'])[0],
             np.where(np.logical_or(data['throttle'] != data['throttle_noise'],
@@ -341,15 +328,14 @@ def split_lateral_noise_longitudinal_noise(data, positions_dict):
 def split_left_central_right(data, positions_dict):
     data = convert_measurements(data)
 
-
     keys = [np.where(data['angle'] == -30.)[0],
-            np.where(data['angle'] == 0. )[0],
-            np.where(data['angle'] == 30.) [0]
+            np.where(data['angle'] == 0.)[0],
+            np.where(data['angle'] == 30.)[0]
             ]
     return keys
 
 
-##### GET the property so we can perform augmentation later.
+# GET the property so we can perform augmentation later.
 
 
 def get_boost_pedestrian_vehicle_traffic_lights(data, key, positions_dict):
@@ -364,19 +350,16 @@ def get_boost_pedestrian_vehicle_traffic_lights(data, key, positions_dict):
         boost += positions_dict['boost'][1]
 
     if data[key]['vehicle'] < 1.:
-        boost +=  positions_dict['boost'][2]
+        boost += positions_dict['boost'][2]
 
-    if data[key]['pedestrian'] == 1.0 and data[key]['vehicle'] == 1. and data[key]['traffic_lights'] == 1. :
+    if data[key]['pedestrian'] == 1.0 and data[key]['vehicle'] == 1. and data[key]['traffic_lights'] == 1.:
         boost += positions_dict['boost'][3]
 
     return boost
 
 
-
-
-
 def full_split(dataset):
-    
+
     S = np.zeros(len(dataset.measurements))
     T = np.zeros(len(dataset.measurements))
     B = np.zeros(len(dataset.measurements))
@@ -389,40 +372,41 @@ def full_split(dataset):
         B[i] = M['brake']
         V[i] = M['speed_module']
         C[i] = M['directions']
-    
+
     control = [[0, 2, 5], [3], [4]]
     steering = [-1.1, -0.9, -0.8, -0.6, 0, 0.6, 0.8, 0.9, 1.1]
     throttle = [0., 0.1, 0.3, 0.5, 1.1]
     brake = [0., 0.1, 0.3, 0.5, 1.1]
     speed = [-1., 2., 4., 6., 8., 11.]
     keys = list()
-    
+
     counter = 0
     for c in range(3):  # control
         for s in range(len(steering)-1):  # steer
-            for t in range(len(throttle)-1): # throttle
-                for b in range(len(brake)-1): # brake
-                    for v in range(len(speed)-1): # speed
+            for t in range(len(throttle)-1):  # throttle
+                for b in range(len(brake)-1):  # brake
+                    for v in range(len(speed)-1):  # speed
                         true_c = [False, ] * C.shape[0]
                         for vals in control[c]:
-                            true_c = np.logical_or(true_c, C==vals)
+                            true_c = np.logical_or(true_c, C == vals)
                         # true_c = [m in control[c] for m in M[D[b'control']]]
-                        true_s = np.logical_and(S>=steering[s], S<steering[s+1])
-                        true_t = np.logical_and(T>=throttle[t], T<throttle[t+1])
-                        true_b = np.logical_and(B>=brake[b], B<brake[b+1])
-                        true_v = np.logical_and(V>=speed[v], V<speed[v+1])
+                        true_s = np.logical_and(S >= steering[s], S < steering[s+1])
+                        true_t = np.logical_and(T >= throttle[t], T < throttle[t+1])
+                        true_b = np.logical_and(B >= brake[b], B < brake[b+1])
+                        true_v = np.logical_and(V >= speed[v], V < speed[v+1])
                         k1 = np.logical_and(true_c, true_s)
                         k2 = np.logical_and(true_t, true_b)
                         k3 = np.logical_and(k1, k2)
                         k = np.logical_and(k3, true_v)
                         k = np.where(k)[0]
                         counter += 1
-                 
+
                         print(counter, end="\r")
 
                         if len(k) > 0:
-                            this_d = {'keys': k, 'control': c, 'steer': s, 'throttle': t, 'brake': b, 'speed': v}
+                            this_d = {'keys': k, 'control': c, 'steer': s,
+                                      'throttle': t, 'brake': b, 'speed': v}
                             keys.append(this_d)
-    
+
     print('\nNumber key splits: {}'.format(len(keys)))
     return keys

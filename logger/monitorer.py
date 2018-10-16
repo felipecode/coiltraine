@@ -13,7 +13,6 @@ from visualization.data_reading import read_summary_csv
 # Check the log and also put it to tensorboard
 
 
-
 def get_current_iteration(exp):
     """
 
@@ -56,29 +55,25 @@ def get_number_episodes_completed(benchmark_log_name):
         return sum(control_dict['resul'])
 
 
-
-
 def get_latest_output(data):
 
     # Find the one that has an iteration .........
     for i in range(1, len(data)):
         if 'Iterating' in data[-i] and ('Iteration' in data[-i]['Iterating'] or
-                                            'Checkpoint' in data[-i]['Iterating']) and \
-                                       'Summary' not in data[-i]['Iterating']:
+                                        'Checkpoint' in data[-i]['Iterating']) and \
+                'Summary' not in data[-i]['Iterating']:
 
             return data[-i]
 
 
-
 def get_summary(data):
-
 
     # IT HAS TO BE ITERATING  ! ! !  ! ! !
     for i in range(1, len(data)):
         # Find the summary log in the logging file
         if 'Iterating' in data[-i]:  # Test if it is an iterating log
             if 'Summary' in data[-i]['Iterating']:
-                return data[-i] # found the summary.
+                return data[-i]  # found the summary.
     else:  # NO SUMMARY YET COMPUTED
         return ''
 
@@ -110,8 +105,8 @@ def get_latest_checkpoint_validation():
     if g_conf.TEST_SCHEDULE.index(not_evaluated_logs[0]) == 0:
         return None
 
-
     return g_conf.TEST_SCHEDULE[g_conf.TEST_SCHEDULE.index(not_evaluated_logs[0])-1]
+
 
 def get_latest_checkpoint_drive(control_filename):
 
@@ -125,7 +120,6 @@ def get_latest_checkpoint_drive(control_filename):
     print (" TESTED PATHJ ", csv_file_path)
     if not os.path.exists(os.path.join(csv_file_path, control_filename)):
         return None
-
 
     f = open(os.path.join(csv_file_path, control_filename), "r")
     header = f.readline()
@@ -142,9 +136,7 @@ def get_latest_checkpoint_drive(control_filename):
     if len(data_matrix.shape) == 1:
         data_matrix = np.expand_dims(data_matrix, axis=0)
 
-
     return float(data_matrix[-1][header.index('step')])
-
 
 
 def get_latest_checkpoint(filename):
@@ -158,9 +150,7 @@ def get_latest_checkpoint(filename):
         raise ValueError("The process name is not producing checkpoints")
 
 
-
 def get_status(exp_batch, experiment, process_name):
-
     """
 
     Args:
@@ -183,7 +173,6 @@ def get_status(exp_batch, experiment, process_name):
         * Finished ( Summarize)
 
     """
-
 
     # Configuration file path
     config_file_path = os.path.join('configs', exp_batch, experiment + '.yaml')
@@ -238,8 +227,4 @@ def get_status(exp_batch, experiment, process_name):
     if 'Error' in data[-1]:
         return ['Error', ' ']
 
-
     raise ValueError(" No valid status found")
-
-
-

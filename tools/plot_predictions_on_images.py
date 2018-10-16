@@ -179,7 +179,7 @@ if __name__ == "__main__":
                 action = Control()
                 angle = data['targets'][i + j][26]
 
-                #########Augmentation!!!!
+                # Augmentation!!!!
                 # time_use =  1.0
                 # car_lenght = 6.0
                 # targets[count][i] -=min(4*(math.atan((angle*car_lenght)/(time_use*float_data[speed_pos,i]+0.05)))/3.1415,0.2)
@@ -197,12 +197,12 @@ if __name__ == "__main__":
                     angle = math.radians(math.fabs(angle))
                     action.steer -= min(
                         extra_factor * (
-                        math.atan((angle * car_lenght) / (time_use * speed + 0.05))) / 3.1415, 0.6)
+                            math.atan((angle * car_lenght) / (time_use * speed + 0.05))) / 3.1415, 0.6)
                 else:
                     angle = math.radians(math.fabs(angle))
                     action.steer += min(
                         extra_factor * (
-                        math.atan((angle * car_lenght) / (time_use * speed + 0.05))) / 3.1415, 0.6)
+                            math.atan((angle * car_lenght) / (time_use * speed + 0.05))) / 3.1415, 0.6)
 
                     # print 'Angle : ',angle,'Steer : ',action.steer
 
@@ -231,19 +231,14 @@ if __name__ == "__main__":
 
             speed = data['targets'][i + 2][speed_position]
 
-
             steer_pred1_vec.append(steer_pred1_order[1] * 1.22)
             steer_pred2_vec.append(steer_pred2_order[1] * 1.22)
             steer_gt_vec.append(steer_gt_order[1] * 1.22)
-
-
 
             #    print actions[j].steer
 
             screen.plot3camrcnoise(images[1], steer_pred1_order[1], steer_pred2_order[1],
                                    steer_gt_order[1], [0, 0])
-
-
 
             #figure_plot(steer_pred1_vec, steer_pred2_vec, steer_gt_vec, count)
             count += 1

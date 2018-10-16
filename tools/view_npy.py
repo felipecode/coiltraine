@@ -6,15 +6,12 @@ import os
 from shutil import copyfile
 
 
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='NPY viewer')
     # parser.add_argument('model', type=str, help='Path to model definition json. Model weights should be on the same path.')
     parser.add_argument('-f', '--file', default="")
 
     test_images_write_path = 'tools/_test_images_'
-
 
     args = parser.parse_args()
     preload_name = args.file
@@ -23,7 +20,6 @@ if __name__ == "__main__":
 
     if not os.path.exists(test_images_write_path + preload_name):
         os.mkdir(test_images_write_path + preload_name)
-
 
     for i in range(len(measurements)):
 
@@ -34,4 +30,3 @@ if __name__ == "__main__":
         copyfile(img_path,
                  os.path.join(test_images_write_path + preload_name, str(i) + '.png'))
         print (' imager ', i)
-

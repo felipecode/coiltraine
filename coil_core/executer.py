@@ -67,7 +67,6 @@ def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, params):
 
     #suppress_output = True, no_screen = False, docker = False
 
-
     # OBS the host is allocated always as the localhost.
 
     params.update({'host': "127.0.0.1"})
@@ -153,7 +152,7 @@ def folder_execute(params=None):
                     and (train_status == 'Iterating' or train_status == 'Loading' or
                          train_status == 'Finished'):
                 free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
-                                        free_gpus, allocation_parameters['validation_cost'])
+                    free_gpus, allocation_parameters['validation_cost'])
                 execute_validation(gpu_number, process_specs['folder'], process_specs['experiment'],
                                    process_specs['dataset'])
                 process_specs.update({'gpu': gpu_number})
@@ -164,16 +163,11 @@ def folder_execute(params=None):
                     and (train_status == 'Iterating' or train_status == 'Loading' or
                          train_status == 'Finished'):
                 free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
-                                            free_gpus, allocation_parameters['drive_cost'])
+                    free_gpus, allocation_parameters['drive_cost'])
                 execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
                               process_specs['environment'], params['driving_parameters'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
-
-
-
-
-
 
         tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
                                             executing_processes, tasks_queue,

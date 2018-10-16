@@ -26,7 +26,6 @@ class CoILICRA(nn.Module):
         # TODO: Make configurable function on the config files by reading other dictionary
         number_first_layer_channels = 0
 
-
         for _, sizes in g_conf.SENSORS.items():
             number_first_layer_channels += sizes[0] * g_conf.NUMBER_FRAMES_FUSION
 
@@ -35,20 +34,18 @@ class CoILICRA(nn.Module):
         sensor_input_shape = [number_first_layer_channels, sensor_input_shape[1],
                               sensor_input_shape[2]]
 
-
-
         # For this case we check if the perception layer is of the type "conv"
         if 'conv' in params['perception']:
 
             perception_convs = Conv(params={'channels': [number_first_layer_channels] +
-                                                          params['perception']['conv']['channels'],
+                                            params['perception']['conv']['channels'],
                                             'kernels': params['perception']['conv']['kernels'],
                                             'strides': params['perception']['conv']['strides'],
                                             'dropouts': params['perception']['conv']['dropouts'],
                                             'end_layer': True})
 
             perception_fc = FC(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
-                                                  + params['perception']['fc']['neurons'],
+                                       + params['perception']['fc']['neurons'],
                                        'dropouts': params['perception']['fc']['dropouts'],
                                        'end_layer': False})
 
@@ -56,19 +53,17 @@ class CoILICRA(nn.Module):
 
             number_output_neurons = params['perception']['fc']['neurons'][-1]
 
-
         elif 'res' in params['perception']:  # pre defined residual networks
             resnet_module = importlib.import_module('network.models.building_blocks.resnet')
             #+ params['perception']['res']['name']
             #fromlist = ['resnet']
             # TODO: Check network drawing
             resnet_module = getattr(resnet_module, params['perception']['res']['name'])
-            self.perception  = resnet_module(num_classes=params['perception']['res']['num_classes'])
+            self.perception = resnet_module(num_classes=params['perception']['res']['num_classes'])
 
             number_output_neurons = params['perception']['res']['num_classes']
 
-
-            #elif 'res_attention' in params['perception']:  # pre defined residual networks
+            # elif 'res_attention' in params['perception']:  # pre defined residual networks
             #    resnet_module = importlib.import_module('network.models.building_blocks.resnet')
             #    # + params['perception']['res']['name']
             #    # fromlist = ['resnet']
@@ -82,51 +77,40 @@ class CoILICRA(nn.Module):
 
             raise ValueError("invalid convolution layer type")
 
-
-
-
-
-
-
-
-
         # WILL NOT WORK FOR SMALL AND DEEP LAYERS
         # TODO: eliminate this hardcoded middle layer, make a conv simulation to get the fc out size
         self.measurements = FC(params={'neurons': [len(g_conf.INPUTS)] +
-                                                   params['measurements']['fc']['neurons'],
+                                       params['measurements']['fc']['neurons'],
                                        'dropouts': params['measurements']['fc']['dropouts'],
                                        'end_layer': False})
 
-
-
         self.join = Join(
             params={'after_process':
-                         FC(params={'neurons':
-                                        [params['measurements']['fc']['neurons'][-1] +
-                                         number_output_neurons] +
-                                        params['join']['fc']['neurons'],
-                                     'dropouts': params['join']['fc']['dropouts'],
-                                     'end_layer': False}),
-                     'mode': 'cat'
+                    FC(params={'neurons':
+                               [params['measurements']['fc']['neurons'][-1] +
+                                number_output_neurons] +
+                               params['join']['fc']['neurons'],
+                               'dropouts': params['join']['fc']['dropouts'],
+                               'end_layer': False}),
+                    'mode': 'cat'
                     }
-         )
+        )
 
         self.speed_branch = FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
-                                                  params['speed_branch']['fc']['neurons'] + [1],
+                                       params['speed_branch']['fc']['neurons'] + [1],
                                        'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
                                        'end_layer': True})
-
 
         # Create the fc vector separatedely
         branch_fc_vector = []
         for i in range(params['branches']['number_of_branches']):
             branch_fc_vector.append(FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
-                                                         params['branches']['fc']['neurons'] +
-                                                         [len(g_conf.TARGETS)],
+                                               params['branches']['fc']['neurons'] +
+                                               [len(g_conf.TARGETS)],
                                                'dropouts': params['branches']['fc']['dropouts'] + [0.0],
                                                'end_layer': True}))
 
-        self.branches = Branching(branch_fc_vector) #  Here we set branching automatically
+        self.branches = Branching(branch_fc_vector)  # Here we set branching automatically
 
         if 'conv' in params['perception']:
             for m in self.modules():
@@ -139,12 +123,7 @@ class CoILICRA(nn.Module):
                     nn.init.xavier_uniform_(m.weight)
                     nn.init.constant_(m.bias, 0.1)
 
-
-
-
     def forward(self, x, a):
-
-
         """ ###### APPLY THE PERCEPTION MODULE """
         x, inter = self.perception(x)
         self.intermediate_layers = inter
@@ -182,13 +161,9 @@ class CoILICRA(nn.Module):
         # TODO: take four branches, this is hardcoded
         output_vec = torch.stack(self.forward(x, a)[0:4])
 
-
         return self.extract_branch(output_vec, branch_number)
 
-
-
     def extract_branch(self, output_vec, branch_number):
-
 
         branch_number = command_number_to_index(branch_number)
 
@@ -204,7 +179,6 @@ class CoILICRA(nn.Module):
         # for i in range(len(branch_number)):
         #    branch_output_vector.append(output_vec[branch_number[i]][i])
 
-
         return output_vec[branch_number[0], branch_number[1], :]
 
     def load_network(self, checkpoint):
@@ -218,8 +192,6 @@ class CoILICRA(nn.Module):
 
         """
         coil_logger.add_message('Loading', {
-                    "Model": {"Loaded checkpoint: " + str(checkpoint) }
+            "Model": {"Loaded checkpoint: " + str(checkpoint)}
 
-                })
-
-
+        })

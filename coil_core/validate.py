@@ -19,7 +19,6 @@ from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_c
 from torchvision import transforms
 
 
-
 def write_waypoints_output(iteration, output):
 
     for i in range(g_conf.BATCH_SIZE):
@@ -31,15 +30,15 @@ def write_waypoints_output(iteration, output):
             steer = max(steer, -1)
 
         coil_logger.write_on_csv(iteration, [steer,
-                                            output[i][1],
-                                            output[i][2]])
+                                             output[i][1],
+                                             output[i][2]])
 
 
 def write_regular_output(iteration, output):
     for i in range(len(output)):
         coil_logger.write_on_csv(iteration, [output[i][0],
-                                            output[i][1],
-                                            output[i][2]])
+                                             output[i][1],
+                                             output[i][2]])
 
 
 # The main function maybe we could call it with a default name
@@ -59,14 +58,14 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         if suppress_output:
             sys.stdout = open(os.path.join('_output_logs',
-                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+                                           g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
 
         if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
             # TODO: print some cool summary or not ?
             return
 
-        #Define the dataset. This structure is has the __get_item__ redefined in a way
-        #that you can access the HDFILES positions from the root directory as a in a vector.
+        # Define the dataset. This structure is has the __get_item__ redefined in a way
+        # that you can access the HDFILES positions from the root directory as a in a vector.
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name)
 
         augmenter = Augmenter(None)
@@ -84,12 +83,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                                                   num_workers=g_conf.NUMBER_OF_LOADING_WORKERS,
                                                   pin_memory=True)
 
-
         # TODO: here there is clearly a posibility to make a cool "conditioning" system.
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
-
-
-
 
         latest = get_latest_evaluated_checkpoint()
         if latest is None:  # When nothing was tested, get latest returns none, we fix that.
@@ -102,7 +97,6 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         best_loss_iter = 0
         best_error_iter = 0
 
-
         # TODO: refactor on the getting on the checkpoint organization needed
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
@@ -110,8 +104,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
                 latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
 
-                checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
-                                        , 'checkpoints', str(latest) + '.pth'))
+                checkpoint = torch.load(os.path.join(
+                    '_logs', exp_batch, exp_alias, 'checkpoints', str(latest) + '.pth'))
                 checkpoint_iteration = checkpoint['iteration']
                 print ("Validation loaded ", checkpoint_iteration)
 
@@ -123,18 +117,11 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                 iteration_on_checkpoint = 0
                 for data in data_loader:
 
-
                     controls = data['directions']
-
-
 
                     output = model.forward_branch(torch.squeeze(data['rgb']).cuda(),
                                                   dataset.extract_inputs(),
                                                   controls)
-
-
-
-
 
                     # TODO: this is hardcoded, eliminate the hardcodeness
                     if 'waypoint1_angle' in g_conf.TARGETS:
@@ -142,42 +129,36 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     else:
                         write_regular_output(checkpoint_iteration, output)
 
-
-
-
                     # TODO: Change this a functional standard using the loss functions.
 
-                    loss = torch.mean((output - dataset.extract_targets(float_data).cuda())**2).data.tolist()
-                    mean_error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
+                    loss = torch.mean(
+                        (output - dataset.extract_targets(float_data).cuda())**2).data.tolist()
+                    mean_error = torch.mean(
+                        torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
                     #print ("Loss", loss)
                     #print ("output", output[0])
                     accumulated_error += mean_error
                     accumulated_loss += loss
                     error = torch.abs(output - dataset.extract_targets(float_data).cuda())
 
-
                     # Log a random position
                     position = random.randint(0, len(float_data) - 1)
                     #print (output[position].data.tolist())
                     coil_logger.add_message('Iterating',
-                         {'Checkpoint': latest,
-                          'Iteration': (str(iteration_on_checkpoint*120)+'/'+str(len(dataset))),
-                          'MeanError': mean_error,
-                          'Loss': loss,
-                          'Output': output[position].data.tolist(),
-                          'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist(),
-                          'Error': error[position].data.tolist(),
-                          'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()},
-                          latest)
+                                            {'Checkpoint': latest,
+                                             'Iteration': (str(iteration_on_checkpoint*120)+'/'+str(len(dataset))),
+                                                'MeanError': mean_error,
+                                                'Loss': loss,
+                                                'Output': output[position].data.tolist(),
+                                                'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist(),
+                                                'Error': error[position].data.tolist(),
+                                                'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()},
+                                            latest)
                     iteration_on_checkpoint += 1
 
                 checkpoint_average_loss = accumulated_loss/(len(data_loader))
 
                 checkpoint_average_error = accumulated_error/(len(data_loader))
-
-
-
-
 
                 coil_logger.add_scalar('Loss', checkpoint_average_loss, latest, True)
                 coil_logger.add_scalar('Error', checkpoint_average_error, latest, True)
@@ -192,17 +173,17 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
                 coil_logger.add_message('Iterating',
 
-                     {'Summary':
-                         {
-                          'Error': checkpoint_average_error,
-                          'Loss': checkpoint_average_loss,
-                          'BestError': best_error,
-                          'BestLoss': best_loss,
-                          'BestLossCheckpoint': best_loss_iter,
-                          'BestErrorCheckpoint': best_error_iter
-                         },
+                                        {'Summary':
+                                         {
+                                             'Error': checkpoint_average_error,
+                                             'Loss': checkpoint_average_loss,
+                                             'BestError': best_error,
+                                             'BestLoss': best_loss,
+                                             'BestLossCheckpoint': best_loss_iter,
+                                             'BestErrorCheckpoint': best_error_iter
+                                         },
 
-                     'Checkpoint': latest},
+                                            'Checkpoint': latest},
                                         latest)
 
             else:
@@ -215,7 +196,6 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         coil_logger.add_message('Finished', {})
 
-
         # TODO: DO ALL THE AMAZING LOGGING HERE, as a way to very the status in paralell.
         # THIS SHOULD BE AN INTERELY PARALLEL PROCESS
 
@@ -226,5 +206,3 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         traceback.print_exc()
 
         coil_logger.add_message('Error', {'Message': 'Something Happened'})
-
-

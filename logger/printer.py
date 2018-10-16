@@ -21,6 +21,7 @@ DARK_BLUE = '\033[94m'
 BLUE = '\033[94m'
 END = '\033[0m'
 
+
 def format_name(experiment_name):
 
     # We start by spliting it by parts
@@ -40,10 +41,6 @@ def format_name(experiment_name):
     return format_string
 
 
-
-
-
-
 def print_train_summary(summary):
 
     if summary == '':
@@ -53,21 +50,18 @@ def print_train_summary(summary):
     print ('            Images/s: ', BOLD + str(summary['Images/s']) + END)
     print ('            Loss: ', UNDERLINE + str(summary['Loss']) + END)
     print ('            Best Loss: ', LIGHT_GREEN + UNDERLINE + str(summary['BestLoss']) + END)
-    print ('            Best Loss Iteration: ', BLUE + UNDERLINE + str(summary['BestLossIteration']) + END)
+    print ('            Best Loss Iteration: ', BLUE +
+           UNDERLINE + str(summary['BestLossIteration']) + END)
     #print ('            Best Error: ',UNDERLINE + str(summary['BestError']) + END)
     print ('            Outputs: ', UNDERLINE + str(summary['Output']) + END)
     print ('            Ground Truth: ', UNDERLINE + str(summary['GroundTruth']) + END)
     print ('            Error: ', UNDERLINE + str(summary['Error']) + END)
 
 
-
 def print_validation_summary(current, latest, verbose):
 
     if current == '':
         return
-
-
-
 
     print ('        CHECKPOINT: ', DARK_BLUE + str(current['Checkpoint']) + END)
 
@@ -86,19 +80,18 @@ def print_validation_summary(current, latest, verbose):
     print ('        LATEST: ')
     print ('            Loss: ', UNDERLINE + str(latest['Loss']) + END)
     print ('            Best Loss: ', LIGHT_GREEN + UNDERLINE + str(latest['BestLoss']) + END)
-    print ('            Best Loss Checkpoint: ', BLUE + UNDERLINE + str(latest['BestLossCheckpoint']) + END)
+    print ('            Best Loss Checkpoint: ', BLUE +
+           UNDERLINE + str(latest['BestLossCheckpoint']) + END)
     print ('            Error: ', UNDERLINE + str(latest['Error']) + END)
     print ('            Best Error: ', LIGHT_GREEN + UNDERLINE + str(latest['BestError']) + END)
-    print ('            Best Error Checkpoint: ', BLUE + UNDERLINE + str(latest['BestErrorCheckpoint']) + END)
+    print ('            Best Error Checkpoint: ', BLUE +
+           UNDERLINE + str(latest['BestErrorCheckpoint']) + END)
 
 
 @static_vars(previous_checkpoint=g_conf.TEST_SCHEDULE[0],
              previous_checkpoint_number=None,
              previous_checkpoint_time=0)
 def print_drive_summary(path, csv_filename, checkpoint, verbose):
-
-
-
 
     print ('        CHECKPOINT: ', DARK_BLUE + str(checkpoint) + END)
 
@@ -107,8 +100,9 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
     if os.path.exists(os.path.join(path, 'summary.csv')):
         print ('        CURRENT: ')
         print ('            Episode: ', BLUE + str(get_episode_number(path)) + END, ' Time: ',
-               time.time() - print_drive_summary.previous_checkpoint_time )
-        print ('            Completed: ', GREEN + UNDERLINE + str(get_number_episodes_completed(path)) + END)
+               time.time() - print_drive_summary.previous_checkpoint_time)
+        print ('            Completed: ', GREEN + UNDERLINE +
+               str(get_number_episodes_completed(path)) + END)
 
     if print_drive_summary.previous_checkpoint != checkpoint:
         print_drive_summary.previous_checkpoint = checkpoint
@@ -138,7 +132,6 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
     """
 
 
-
 def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environments, verbose=False):
 
     # TODO: if train is not running the user should be warned
@@ -151,20 +144,16 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
     for val in validation_datasets:
         process_names.append('validation' + '_' + val)
 
-
     for drive in drive_environments:
         process_names.append('drive' + '_' + drive)
-
-
-
 
     experiments_list = os.listdir(os.path.join('configs', exp_batch))
 
     experiments_list = [experiment.split('.')[-2] for experiment in experiments_list]
 
     names_list = get_names(exp_batch)
-    sorted_keys = sorted(range(len(names_list)), key=lambda k: names_list[experiments_list[k]+'.yaml'])
-
+    sorted_keys = sorted(range(len(names_list)),
+                         key=lambda k: names_list[experiments_list[k]+'.yaml'])
 
     print (experiments_list)
 
@@ -180,7 +169,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
         merge_with_yaml(os.path.join('configs', exp_batch, experiment + '.yaml'))
 
-        print (BOLD +  experiment +' : ' + generated_name + END)
+        print (BOLD + experiment + ' : ' + generated_name + END)
 
         for process in process_names:
             try:
@@ -208,7 +197,6 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
             elif status == 'Error':
 
                 print('        STATUS: ', RED + status + END)
-
 
             if status == 'Iterating':
                 if 'train' in process:
@@ -238,30 +226,21 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                     """
 
                     path = exp_batch + '_' + experiment + '_' + str(checkpoint) \
-                           + '_' + process.split('_')[0] + '_' + control_filename \
-                           + '_' + process.split('_')[1] + '_' + process.split('_')[2]
-
-
+                        + '_' + process.split('_')[0] + '_' + control_filename \
+                        + '_' + process.split('_')[1] + '_' + process.split('_')[2]
 
                     print_drive_summary(get_latest_path(path), None, checkpoint, verbose)
 
 
-
 def print_folder_process_names(exp_batch):
-
 
     experiments_list = os.listdir(os.path.join('configs', exp_batch))
     sort_nicely(experiments_list)
 
-
-    for experiment in  experiments_list:
+    for experiment in experiments_list:
         if '.yaml' in experiment:
             g_conf.immutable(False)
 
             merge_with_yaml(os.path.join('configs', exp_batch, experiment))
 
-
             print (experiment.split('.')[-2] + ': ' + g_conf.EXPERIMENT_GENERATED_NAME)
-
-
-

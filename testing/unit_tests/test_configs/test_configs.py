@@ -6,16 +6,14 @@ from input import CoILDataset, CoILSampler
 from torchvision import transforms
 import torch
 
+
 class testConfigs(unittest.TestCase):
 
     def test_config_integrity(self):
 
-
         pass
 
-
     def test_merge_yaml_line_globaldict(self):
-
 
         g_conf.NAME = 'experiment_1'
         merge_with_yaml('configs/eccv/experiment_1.yaml')
@@ -34,18 +32,9 @@ class testConfigs(unittest.TestCase):
         # The data loader is the multi threaded module from pytorch that release a number of
         # workers to get all the data.
         # TODO: batch size an number of workers go to some configuration file
-        data_loader = torch.utils.data.DataLoader(dataset , batch_size=120,
+        data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
                                                   shuffle=False, num_workers=12, pin_memory=True)
         # By instanciating the augmenter we get a callable that augment images and transform them
         for data in data_loader:
 
-
-            a,b =data
-
-
-
-
-
-
-
-
+            a, b = data

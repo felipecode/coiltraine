@@ -20,12 +20,12 @@ from carla.planner import map
 from PIL import Image
 import numpy as np
 
+
 def plot_test_image(image, name):
 
     image_to_plot = Image.fromarray(image.astype("uint8"))
 
     image_to_plot.save(name)
-
 
 
 def sldist(c1, c2): return math.sqrt((c2[0] - c1[0]) ** 2 + (c2[1] - c1[1]) ** 2)
@@ -39,10 +39,10 @@ def circle(map_image, position, colour=[255, 0, 0, 255], radius=6):
     ddf_y = -2 * radius
     x = 0
     y = radius
-    plot_point(map_image,x0, y0 + radius, colour)
-    plot_point(map_image,x0, y0 - radius, colour)
-    plot_point(map_image,x0 + radius, y0, colour)
-    plot_point(map_image,x0 - radius, y0, colour)
+    plot_point(map_image, x0, y0 + radius, colour)
+    plot_point(map_image, x0, y0 - radius, colour)
+    plot_point(map_image, x0 + radius, y0, colour)
+    plot_point(map_image, x0 - radius, y0, colour)
 
     while x < y:
         if f >= 0:
@@ -52,30 +52,26 @@ def circle(map_image, position, colour=[255, 0, 0, 255], radius=6):
         x += 1
         ddf_x += 2
         f += ddf_x
-        plot_point(map_image,x0 + x, y0 + y, colour)
-        plot_point(map_image,x0 - x, y0 + y, colour)
-        plot_point(map_image,x0 + x, y0 - y, colour)
-        plot_point(map_image,x0 - x, y0 - y, colour)
-        plot_point(map_image,x0 + y, y0 + x, colour)
-        plot_point(map_image,x0 - y, y0 + x, colour)
-        plot_point(map_image,x0 + y, y0 - x, colour)
-        plot_point(map_image,x0 - y, y0 - x, colour)
-
-
+        plot_point(map_image, x0 + x, y0 + y, colour)
+        plot_point(map_image, x0 - x, y0 + y, colour)
+        plot_point(map_image, x0 + x, y0 - y, colour)
+        plot_point(map_image, x0 - x, y0 - y, colour)
+        plot_point(map_image, x0 + y, y0 + x, colour)
+        plot_point(map_image, x0 - y, y0 + x, colour)
+        plot_point(map_image, x0 + y, y0 - x, colour)
+        plot_point(map_image, x0 - y, y0 - x, colour)
 
 
 def filled_circle(map_image, position, colour=[255, 0, 0, 255], radius=6):
 
     for i in range(0, radius):
-        circle(map_image, position,colour=colour, radius=i)
-
+        circle(map_image, position, colour=colour, radius=i)
 
 
 def plot_point(map_image, x, y, colour):
 
     if (0 < x < map_image.shape[1]) and (0 < x < map_image.shape[0]):
         map_image[x, y] = colour
-
 
 
 def plot_on_map(map_image, position, color, size):
@@ -92,10 +88,7 @@ def plot_on_map(map_image, position, color, size):
         map_image[int(position[1]) - i, int(position[0]) + i] = color
 
 
-
-
 def split_episodes(meas_file):
-
     """
 
     Args:
@@ -115,13 +108,12 @@ def split_episodes(meas_file):
 
     print (header_details)
 
-
     details_matrix = np.loadtxt(open(meas_file, "rb"), delimiter=",", skiprows=1)
 
     #
     #print (details_matrix)
     previous_pos = [details_matrix[0, header_details.index('pos_')],
-                 details_matrix[0, header_details.index('pos_y')]]
+                    details_matrix[0, header_details.index('pos_y')]]
 
     #
 
@@ -148,7 +140,6 @@ def split_episodes(meas_file):
             episode_positions_matrix.append(positions_vector)
             positions_vector = []
 
-
         travel_this_episode += sldist(point, previous_pos)
         previous_pos = point
 
@@ -170,14 +161,10 @@ def get_start_end_points(summary):
     # TODO: implement
 
 
-
-
-
 def plot_episodes_tracks(exp_batch, experiment, checkpoint, city_name, exp_suite, meas_file):
 
     image_location = map.__file__[:-7]
     carla_map = map.CarlaMap(city_name, 0.164, 50)
-
 
     episodes_positions, travelled_distances = split_episodes(meas_file)
 
@@ -214,13 +201,10 @@ def plot_episodes_tracks(exp_batch, experiment, checkpoint, city_name, exp_suite
 
             plot_on_map(map_image, carla_map.convert_to_pixel(point), color_palate_inst, 8)
 
-
         count += 1
 
         map_image = rescale(map_image.astype('float'), 1.0 / 4.0)
         plot_test_image(map_image, os.path.join(paths_dir, str(checkpoint), str(count) + '.png'))
-
-
 
 
 def plot_episodes_tracks_sameimage(exp_batch, experiment, checkpoint,
@@ -228,7 +212,6 @@ def plot_episodes_tracks_sameimage(exp_batch, experiment, checkpoint,
 
     image_location = map.__file__[:-7]
     carla_map = map.CarlaMap(city_name, 0.164, 50)
-
 
     episodes_positions, travelled_distances = split_episodes(meas_file)
 
@@ -242,9 +225,7 @@ def plot_episodes_tracks_sameimage(exp_batch, experiment, checkpoint,
     if not os.path.exists(os.path.join(paths_dir, str(checkpoint))):
         os.mkdir(os.path.join(paths_dir, str(checkpoint)))
 
-
-
-    #for j in range(0, 25 - len(color_palete)):
+    # for j in range(0, 25 - len(color_palete)):
 
     # For each position vec in all episodes
     count = 0  # To count the number
@@ -271,20 +252,14 @@ def plot_episodes_tracks_sameimage(exp_batch, experiment, checkpoint,
 
             filled_circle(map_image, carla_map.convert_to_pixel(point), color_palate_inst, 8)
 
-
         count += 1
-
-
 
     plot_test_image(map_image, os.path.join(paths_dir, str(checkpoint), 'episodes.png'))
 
 
-
-
 if __name__ == '__main__':
 
-
-    episode_list = [4,5,6,7]
+    episode_list = [4, 5, 6, 7]
 
     # 4,1,5, 23
 
@@ -299,15 +274,14 @@ if __name__ == '__main__':
     ]
 
     plot_episodes_tracks_sameimage('eccv_debug',
-                         'experiment_24',
-                         '200000',
-                         city_name,
-                         'ECCVGeneralizationSuite',
-                         '_benchmarks_results/eccv_debug_experiment_24_200000_drive_control_output_auto_ECCVGeneralizationSuite_Town02/measurements.csv',
-                         color_palete,
-                         episode_list
-                         )
-
+                                   'experiment_24',
+                                   '200000',
+                                   city_name,
+                                   'ECCVGeneralizationSuite',
+                                   '_benchmarks_results/eccv_debug_experiment_24_200000_drive_control_output_auto_ECCVGeneralizationSuite_Town02/measurements.csv',
+                                   color_palete,
+                                   episode_list
+                                   )
 
     color_palete = [
         [255, 0, 0],
@@ -317,11 +291,11 @@ if __name__ == '__main__':
     ]
 
     plot_episodes_tracks_sameimage('eccv_debug',
-                         'experiment_64',
-                         '200000',
-                         city_name,
-                         'ECCVGeneralizationSuite',
-                         '_benchmarks_results/eccv_debug_experiment_64_200000_drive_control_output_auto_ECCVGeneralizationSuite_Town02/measurements.csv',
-                         color_palete,
-                         episode_list
-                         )
+                                   'experiment_64',
+                                   '200000',
+                                   city_name,
+                                   'ECCVGeneralizationSuite',
+                                   '_benchmarks_results/eccv_debug_experiment_64_200000_drive_control_output_auto_ECCVGeneralizationSuite_Town02/measurements.csv',
+                                   color_palete,
+                                   episode_list
+                                   )

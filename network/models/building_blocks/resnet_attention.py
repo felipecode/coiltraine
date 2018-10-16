@@ -146,7 +146,6 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-
         """ Put also the activation as the real one."""
         print (x.shape)
         x = self.conv1(x)
@@ -157,7 +156,7 @@ class ResNet(nn.Module):
         x = self.maxpool(x)
         print (x.shape)
         """ RETURN ALSO THE AVERAGE POOLING OF THE NETWORKS TO A CERTAIN SIZE """
-        x= self.layer1(x)
+        x = self.layer1(x)
         attention_0 = self.attention_0(x)
         print (x.shape)
         print ("attention ", attention_0.shape)
@@ -165,7 +164,7 @@ class ResNet(nn.Module):
         attention_1 = self.attention_1(x)
         print (x.shape)
         print("attention ", attention_1.shape)
-        x= self.layer3(x)
+        x = self.layer3(x)
         attention_2 = self.attention_2(x)
         print (x.shape)
         print("attention ", attention_2.shape)
@@ -184,8 +183,6 @@ class ResNet(nn.Module):
         attention = [attention_0, attention_1, attention_2]
 
         return x, attention
-
-
 
 
 def resnet18(pretrained=False, **kwargs):

@@ -70,6 +70,7 @@ def filelogger(logname, recordfields=[], filename='json.log', level=INFO, writin
     handler = FileHandler(filename, writing_level)
     return logger(logname, handler, recordfields, level)
 
+
 def closeFileLogger(name):
     log = getLogger(name)
     x = _handlers.copy()
@@ -77,8 +78,6 @@ def closeFileLogger(name):
         log.removeHandler(i)
         i.flush()
         i.close()
-
-
 
 
 def streamlogger(logname, recordfields=[], outputstream=None, level=INFO):
@@ -109,7 +108,8 @@ def readJSONlog(logfile, filterfunction=(lambda x: True), customjson=None):
     for x in logfile:
         # if the record in the logfile returns true from the filter function convert it to JSON and add it the records to return
         rec = loads(x[:-1], object_hook=customjson)
-        if filterfunction(rec): json_records.append(rec)
+        if filterfunction(rec):
+            json_records.append(rec)
     return json_records
 
 

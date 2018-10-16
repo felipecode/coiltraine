@@ -1,16 +1,16 @@
 import collections
 
+
 def get_dropout_sum(model_configuration):
     return (sum(model_configuration['branches']['fc']['dropouts']) +
             sum(model_configuration['speed_branch']['fc']['dropouts']) +
-            sum(model_configuration['measurements']['fc']['dropouts'])+
-            sum(model_configuration['join']['fc']['dropouts'])+
+            sum(model_configuration['measurements']['fc']['dropouts']) +
+            sum(model_configuration['join']['fc']['dropouts']) +
             sum(model_configuration['perception']['fc']['dropouts']))
 
 
 # TODO: THIS FUNCTION IS REPEATED FROM MAIN
 def parse_split_configuration(configuration):
-
     """
     Turns the configuration line of sliptting into a name and a set of params.
 
@@ -26,9 +26,8 @@ def parse_split_configuration(configuration):
             name += '_'
             name += key
 
-
-
     return name, conf_dict
+
 
 def generate_name(g_conf):
     # TODO: Make a cool name generator, maybe in another class
@@ -54,17 +53,16 @@ def generate_name(g_conf):
 
     """
 
-
-
     final_name_string = ""
     # Addind dataset
     final_name_string += g_conf.TRAIN_DATASET_NAME
     # Model type
     final_name_string += '_' + g_conf.MODEL_TYPE
     # Model Size
-    #TODO: for now is just saying the number of convs, add a layer counting
+    # TODO: for now is just saying the number of convs, add a layer counting
     if 'conv' in g_conf.MODEL_CONFIGURATION['perception']:
-        final_name_string += '_' + str(len(g_conf.MODEL_CONFIGURATION['perception']['conv']['kernels'])) +'conv'
+        final_name_string += '_' + \
+            str(len(g_conf.MODEL_CONFIGURATION['perception']['conv']['kernels'])) + 'conv'
     else:  # FOR NOW IT IS A RES MODEL
         final_name_string += '_' + str(g_conf.MODEL_CONFIGURATION['perception']['res']['name'])
 
@@ -84,7 +82,6 @@ def generate_name(g_conf):
                 final_name_string += '_lowdropout'
             else:
                 final_name_string += '_none'
-
 
     # Temporal
 
@@ -115,7 +112,6 @@ def generate_name(g_conf):
     else:
         final_name_string += '_random'
 
-
     # The type of loss function
 
     final_name_string += '_' + g_conf.LOSS_FUNCTION
@@ -133,9 +129,7 @@ def generate_name(g_conf):
     name_splitter, _ = parse_split_configuration(g_conf.SPLIT)
     final_name_string += '_' + name_splitter
 
-
     final_name_string += '_' + str(g_conf.NUMBER_OF_HOURS) + 'hours'
-
 
     if g_conf.USE_FULL_ORACLE:
         return 'ORACLE'

@@ -5,19 +5,15 @@ import resource
 
 from coil_core import execute_train, execute_validation, execute_drive, folder_execute
 from utils.general import create_log_folder, create_exp_path, erase_logs, fix_driving_environments,\
-                          erase_wrong_plotting_summaries, erase_validations
+    erase_wrong_plotting_summaries, erase_validations
 
 from visualization import plot_scatter
 
 # You could send the module to be executed and they could have the same interface.
 
 
-
-
-
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description=__doc__)
-
 
     argparser.add_argument(
         '--single-process',
@@ -112,8 +108,6 @@ if __name__ == '__main__':
     )
     args = argparser.parse_args()
 
-
-
     for gpu in args.gpus:
         try:
             int(gpu)
@@ -122,7 +116,6 @@ if __name__ == '__main__':
 
     if args.folder is None:
         raise ValueError(" You should set a folder name where the experiments are placed")
-
 
     # We increase the number of files available.
     resource.setrlimit(
@@ -135,9 +128,9 @@ if __name__ == '__main__':
 
     if args.driving_environments is not None:
         for de in list(args.driving_environments):
-            if len(de.split('_'))  < 2:
-                raise ValueError("Invalid format for the driving envinronments should be Suite_Town")
-
+            if len(de.split('_')) < 2:
+                raise ValueError(
+                    "Invalid format for the driving envinronments should be Suite_Town")
 
     create_log_folder(args.folder)
     erase_logs(args.folder)
@@ -145,7 +138,6 @@ if __name__ == '__main__':
         erase_wrong_plotting_summaries(args.folder, list(args.validation_datasets))
     if args.restart_validations:
         erase_validations(args.folder, list(args.validation_datasets))
-
 
     # THe definition of parameters for driving
     drive_params = {
@@ -173,13 +165,13 @@ if __name__ == '__main__':
 
             drive_params['suppress_output'] = False
             #driving_environments = fix_driving_environments(list(args.driving_environments))
-            execute_drive("0", args.folder, args.exp, list(args.driving_environments)[0], drive_params)
+            execute_drive("0", args.folder, args.exp, list(
+                args.driving_environments)[0], drive_params)
 
             # list(args.driving_environments)[0], suppress_output=False,
-                          #no_screen=args.no_screen, docker=args.docker)
+            # no_screen=args.no_screen, docker=args.docker)
         else:
             raise Exception("Invalid name for single process, chose from (train, validation, test)")
-
 
     else:
 

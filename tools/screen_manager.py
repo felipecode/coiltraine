@@ -40,18 +40,17 @@ tform3_img = trans.ProjectiveTransform()
 tform3_img.estimate(np.array(rdst), np.array(rsrc))
 
 
-def draw_vbar_on(img,bar_intensity,x_pos,color=(0,0,255)):
+def draw_vbar_on(img, bar_intensity, x_pos, color=(0, 0, 255)):
 
+    bar_size = int(img.shape[1]/6 * bar_intensity)
+    initial_y_pos = img.shape[0] - img.shape[0]/6
+    #print bar_intensity
 
-  bar_size = int(img.shape[1]/6 * bar_intensity)
-  initial_y_pos = img.shape[0] - img.shape[0]/6
-  #print bar_intensity
-
-  for i in range(bar_size):
-    if bar_intensity > 0.0:
-      y = initial_y_pos - i
-      for j in range(20):
-        img[y , x_pos +j] = color
+    for i in range(bar_size):
+        if bar_intensity > 0.0:
+            y = initial_y_pos - i
+            for j in range(20):
+                img[y, x_pos + j] = color
 
 
 def generate_ncolors(num_colors):
@@ -148,8 +147,8 @@ class ScreenManager(object):
         self._speed_limit = 50.0
         if load_steer:
             self._wheel = cv2.imread('./drive_interfaces/wheel.png')  # ,cv2.IMREAD_UNCHANGED)
-            self._wheel = cv2.resize(self._wheel, (int(0.08 * self._wheel.shape[0]), int(0.08 * self._wheel.shape[1])))
-
+            self._wheel = cv2.resize(
+                self._wheel, (int(0.08 * self._wheel.shape[0]), int(0.08 * self._wheel.shape[1])))
 
     # If we were to load the steering wheel load it
 
@@ -184,7 +183,7 @@ class ScreenManager(object):
 
         position = (position[0] * self._scale, position[1] * self._scale)
 
-        final_position = (position[0] + self._resolution[0] * (self._scale * (screen_position[0])), \
+        final_position = (position[0] + self._resolution[0] * (self._scale * (screen_position[0])),
                           position[1] + (self._resolution[1] * (self._scale * (screen_position[1]))))
 
         content_to_write = myfont.render(content, 1, color)
@@ -201,7 +200,7 @@ class ScreenManager(object):
 
         # print array.shape, self._resolution
 
-        final_position = (position[0] + self._resolution[0] * (scale * (screen_position[0])), \
+        final_position = (position[0] + self._resolution[0] * (scale * (screen_position[0])),
                           position[1] + (self._resolution[1] * (scale * (screen_position[1]))))
 
         # pygame.surfarray.array_colorkey(self._camera_surfaces[screen_number])
@@ -218,12 +217,14 @@ class ScreenManager(object):
 
         cols, rows, c = self._wheel.shape
         M = cv2.getRotationMatrix2D((cols / 2, rows / 2), -90 * steer, 1)
-        rot_wheel = cv2.warpAffine(self._wheel, M, (cols, rows), borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0))
+        rot_wheel = cv2.warpAffine(self._wheel, M, (cols, rows),
+                                   borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0))
         # scale = 0.5
         position = (self._resolution[0] / 2 - cols / 2, int(self._resolution[1] / 1.5) - rows / 2)
         # print position
 
-        wheel_surface = pygame.surface.Surface((rot_wheel.shape[1], rot_wheel.shape[0]), 0, 24).convert()
+        wheel_surface = pygame.surface.Surface(
+            (rot_wheel.shape[1], rot_wheel.shape[0]), 0, 24).convert()
         # print array.shape, self._resolution
 
         # final_position = (position[0] + self._resolution[0]*(scale*(screen_number%3)),\
@@ -257,13 +258,10 @@ class ScreenManager(object):
 
         self.set_array(sensor_data, screen_position)
 
-
         pygame.display.flip()
 
-
-
-    def plot3camrcnoise(self, sensor_data, \
-                        steer, noise, difference, \
+    def plot3camrcnoise(self, sensor_data,
+                        steer, noise, difference,
                         screen_number=0):
 
         # Define our fonts
@@ -275,8 +273,6 @@ class ScreenManager(object):
         draw_path_on(sensor_data, 20, -noise * 20.0, (0, 255, 0))
 
         draw_path_on(sensor_data, 20, -difference * 20.0, (0, 0, 255))
-
-
 
         #pygame.image.save(self._screen, "footage_offline/imgcamera" + str(self._render_iter) +".png")
 

@@ -15,20 +15,20 @@ processing_params = {'Success rate':   {'metric': 'control_success_rate', 'filte
                      'Steering MSE': {'metric': 'steering_avg_mse', 'filter': data_filter,
                                       'params': {}},
                      'Classification error @ 0.001': {'metric': 'steering_classification_error',
-                                                 'filter': data_filter,
-                                                 'params': {'threshold': 0.001}},
+                                                      'filter': data_filter,
+                                                      'params': {'threshold': 0.001}},
                      'Classification error @ 0.002': {'metric': 'steering_classification_error',
-                                                 'filter': data_filter,
-                                                 'params': {'threshold': 0.002}},
+                                                      'filter': data_filter,
+                                                      'params': {'threshold': 0.002}},
                      'Classification error @ 0.005': {'metric': 'steering_classification_error',
-                                                 'filter': data_filter,
-                                                 'params': {'threshold': 0.005}},
+                                                      'filter': data_filter,
+                                                      'params': {'threshold': 0.005}},
                      'Classification error @ 0.01': {'metric': 'steering_classification_error',
-                                                'filter': data_filter,
-                                                'params': {'threshold': 0.01}},
+                                                     'filter': data_filter,
+                                                     'params': {'threshold': 0.01}},
                      'Classification error @ 0.03': {'metric': 'steering_classification_error',
-                                                'filter': data_filter,
-                                                'params': {'threshold': 0.03}},
+                                                     'filter': data_filter,
+                                                     'params': {'threshold': 0.03}},
                      # 'Steering absolute error gt > 0.001': {'metric': 'steering_error_filter_gt',
                      #                                        'filter': data_filter, 'params': {
                      #         'gt_condition': (lambda x: abs(x) > 0.001)}},
@@ -52,73 +52,73 @@ processing_params = {'Success rate':   {'metric': 'control_success_rate', 'filte
                      #        'gt_condition': (lambda x: abs(x) > 0.001)}},
 
                      'Steering MSE, GT > 0.001': {'metric': 'steering_avg_mse_filter_gt',
-                                                           'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.001)}},
+                                                  'filter': data_filter, 'params': {
+                                                      'gt_condition': (lambda x: abs(x) > 0.001)}},
                      'Steering MSE, GT > 0.01': {'metric': 'steering_avg_mse_filter_gt',
                                                            'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.01)}},
+                                                               'gt_condition': (lambda x: abs(x) > 0.01)}},
                      'Steering MSE, GT > 0.03': {'metric': 'steering_avg_mse_filter_gt',
                                                            'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.03)}},
+                                                               'gt_condition': (lambda x: abs(x) > 0.03)}},
                      'Steering MSE, GT > 0.05': {'metric': 'steering_avg_mse_filter_gt',
                                                            'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.05)}},
+                                                               'gt_condition': (lambda x: abs(x) > 0.05)}},
                      'Steering MSE, GT > 0.1': {'metric': 'steering_avg_mse_filter_gt',
                                                           'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.1)}},
+                                                              'gt_condition': (lambda x: abs(x) > 0.1)}},
                      'Steering MSE, GT > 0.2': {'metric': 'steering_avg_mse_filter_gt',
                                                           'filter': data_filter, 'params': {
-                             'gt_condition': (lambda x: abs(x) > 0.2)}},
+                                                              'gt_condition': (lambda x: abs(x) > 0.2)}},
 
                      'Speed-weighted error': {'metric': 'displacement', 'filter': data_filter,
-                                      'params': {'aggregate': {'type': 'mean'}}},
+                                              'params': {'aggregate': {'type': 'mean'}}},
                      'Speed-weighted error 70th percentile': {'metric': 'displacement',
-                                                      'filter': data_filter, 'params': {
-                             'aggregate': {'type': 'percentile', 'percentile': 70}}},
+                                                              'filter': data_filter, 'params': {
+                                                                  'aggregate': {'type': 'percentile', 'percentile': 70}}},
                      'Speed-weighted error 90th percentile': {'metric': 'displacement',
-                                                      'filter': data_filter, 'params': {
-                             'aggregate': {'type': 'percentile', 'percentile': 90}}},
+                                                              'filter': data_filter, 'params': {
+                                                                  'aggregate': {'type': 'percentile', 'percentile': 90}}},
                      'Thresholded relative error @ 0.05': {'metric': 'relative_error_smoothed',
-                                                         'filter': data_filter,
-                                                         'params': {'steer_smooth': 1e-5,
-                                                                    'aggregate': {'type': 'count',
-                                                                                  'condition': (
-                                                                                  lambda
-                                                                                      x: x > 0.05)}}},
+                                                           'filter': data_filter,
+                                                           'params': {'steer_smooth': 1e-5,
+                                                                      'aggregate': {'type': 'count',
+                                                                                    'condition': (
+                                                                                        lambda
+                                                                                        x: x > 0.05)}}},
                      'Thresholded relative error @ 0.05 (Felipe)': {'metric': 'count_errors_weighted',
-                                                         'filter': data_filter,
-                                                         'params': {'coeff': 0.05}},
+                                                                    'filter': data_filter,
+                                                                    'params': {'coeff': 0.05}},
                      'Thresholded relative error @ 0.03': {'metric': 'relative_error_smoothed',
-                                                         'filter': data_filter,
-                                                         'params': {'steer_smooth': 1e-5,
-                                                                    'aggregate': {'type': 'count',
-                                                                                  'condition': (
-                                                                                  lambda
-                                                                                      x: x > 0.03)}}},
+                                                           'filter': data_filter,
+                                                           'params': {'steer_smooth': 1e-5,
+                                                                      'aggregate': {'type': 'count',
+                                                                                    'condition': (
+                                                                                        lambda
+                                                                                        x: x > 0.03)}}},
                      'Thresholded relative error @ 0.01': {'metric': 'relative_error_smoothed',
-                                                         'filter': data_filter,
-                                                         'params': {'steer_smooth': 1e-5,
-                                                                    'aggregate': {'type': 'count',
-                                                                                  'condition': (
-                                                                                  lambda
-                                                                                      x: x > 0.01)}}},
+                                                           'filter': data_filter,
+                                                           'params': {'steer_smooth': 1e-5,
+                                                                      'aggregate': {'type': 'count',
+                                                                                    'condition': (
+                                                                                        lambda
+                                                                                        x: x > 0.01)}}},
                      'Thresholded relative error @ 0.1': {'metric': 'relative_error_smoothed',
-                                                        'filter': data_filter,
-                                                        'params': {'steer_smooth': 1e-5,
-                                                                   'aggregate': {'type': 'count',
-                                                                                 'condition': (
-                                                                                 lambda
-                                                                                     x: x > 0.1)}}},
+                                                          'filter': data_filter,
+                                                          'params': {'steer_smooth': 1e-5,
+                                                                     'aggregate': {'type': 'count',
+                                                                                   'condition': (
+                                                                                       lambda
+                                                                                       x: x > 0.1)}}},
                      'Cumulative error, 16 steps': {'metric': 'cumulative_displacement',
-                                                          'filter': data_filter,
-                                                          'params': {'window': 16, 'timestep': 0.1,
-                                                                     'aggregate': {
-                                                                         'type': 'mean'}}},
+                                                    'filter': data_filter,
+                                                    'params': {'window': 16, 'timestep': 0.1,
+                                                               'aggregate': {
+                                                                   'type': 'mean'}}},
                      'Cumulative error, 64 steps': {'metric': 'cumulative_displacement',
-                                                          'filter': data_filter,
-                                                          'params': {'window': 16, 'timestep': 0.1,
-                                                                     'aggregate': {
-                                                                         'type': 'mean'}}},
+                                                    'filter': data_filter,
+                                                    'params': {'window': 16, 'timestep': 0.1,
+                                                               'aggregate': {
+                                                                   'type': 'mean'}}},
                      'step': {'metric': 'step', 'filter': {}, 'params': {}},
                      'town_id': {'metric': 'id', 'filter': {}, 'params': {}},
                      'exp': {'metric': 'experiment', 'filter': {}, 'params': {}}
@@ -231,81 +231,81 @@ plot_params['ctrl_vs_cum_disp16'] = {'print': True,
                                      }
 
 plot_params['ctrl_vs_steer_mse_gt_0001'] = {'print': True,
-                                   'x': {'data': 'Steering MSE, GT > 0.001', 'log': True},
-                                   'y': {'data': 'Success rate', 'log': False},
-                                   'size': {'data': 'step'},
-                                   'color': {'data': 'town_id'}
-                                   }
+                                            'x': {'data': 'Steering MSE, GT > 0.001', 'log': True},
+                                            'y': {'data': 'Success rate', 'log': False},
+                                            'size': {'data': 'step'},
+                                            'color': {'data': 'town_id'}
+                                            }
 
 plot_params['ctrl_vs_steer_mse_gt_001'] = {'print': True,
-                                   'x': {'data': 'Steering MSE, GT > 0.01', 'log': True},
-                                   'y': {'data': 'Success rate', 'log': False},
-                                   'size': {'data': 'step'},
-                                   'color': {'data': 'town_id'}
-                                   }
+                                           'x': {'data': 'Steering MSE, GT > 0.01', 'log': True},
+                                           'y': {'data': 'Success rate', 'log': False},
+                                           'size': {'data': 'step'},
+                                           'color': {'data': 'town_id'}
+                                           }
 
 plot_params['ctrl_vs_steer_mse_gt_003'] = {'print': True,
-                                   'x': {'data': 'Steering MSE, GT > 0.03', 'log': True},
-                                   'y': {'data': 'Success rate', 'log': False},
-                                   'size': {'data': 'step'},
-                                   'color': {'data': 'town_id'}
-                                   }
+                                           'x': {'data': 'Steering MSE, GT > 0.03', 'log': True},
+                                           'y': {'data': 'Success rate', 'log': False},
+                                           'size': {'data': 'step'},
+                                           'color': {'data': 'town_id'}
+                                           }
 
 plot_params['ctrl_vs_steer_mse_gt_005'] = {'print': True,
-                                   'x': {'data': 'Steering MSE, GT > 0.05', 'log': True},
-                                   'y': {'data': 'Success rate', 'log': False},
-                                   'size': {'data': 'step'},
-                                   'color': {'data': 'town_id'}
-                                   }
+                                           'x': {'data': 'Steering MSE, GT > 0.05', 'log': True},
+                                           'y': {'data': 'Success rate', 'log': False},
+                                           'size': {'data': 'step'},
+                                           'color': {'data': 'town_id'}
+                                           }
 
 plot_params['ctrl_vs_steer_mse_gt_01'] = {'print': True,
-                                   'x': {'data': 'Steering MSE, GT > 0.1', 'log': True},
-                                   'y': {'data': 'Success rate', 'log': False},
-                                   'size': {'data': 'step'},
-                                   'color': {'data': 'town_id'}
-                                   }
+                                          'x': {'data': 'Steering MSE, GT > 0.1', 'log': True},
+                                          'y': {'data': 'Success rate', 'log': False},
+                                          'size': {'data': 'step'},
+                                          'color': {'data': 'town_id'}
+                                          }
 
 plot_params['ctrl_vs_steer_mse_gt_02'] = {'print': True,
-                                   'x': {'data': 'Steering MSE, GT > 0.2', 'log': True},
-                                   'y': {'data': 'Success rate', 'log': False},
-                                   'size': {'data': 'step'},
-                                   'color': {'data': 'town_id'}
-                                   }
+                                          'x': {'data': 'Steering MSE, GT > 0.2', 'log': True},
+                                          'y': {'data': 'Success rate', 'log': False},
+                                          'size': {'data': 'step'},
+                                          'color': {'data': 'town_id'}
+                                          }
 
 plot_params['ctrl_vs_classif_error_0001'] = {'print': True,
-                                   'x': {'data': 'Classification error @ 0.001', 'log': True},
-                                   'y': {'data': 'Success rate', 'log': False},
-                                   'size': {'data': 'step'},
-                                   'color': {'data': 'town_id'}
-                                   }
+                                             'x': {'data': 'Classification error @ 0.001', 'log': True},
+                                             'y': {'data': 'Success rate', 'log': False},
+                                             'size': {'data': 'step'},
+                                             'color': {'data': 'town_id'}
+                                             }
 
 plot_params['ctrl_vs_classif_error_0002'] = {'print': True,
-                                   'x': {'data': 'Classification error @ 0.002', 'log': True},
-                                   'y': {'data': 'Success rate', 'log': False},
-                                   'size': {'data': 'step'},
-                                   'color': {'data': 'town_id'}
-                                   }
+                                             'x': {'data': 'Classification error @ 0.002', 'log': True},
+                                             'y': {'data': 'Success rate', 'log': False},
+                                             'size': {'data': 'step'},
+                                             'color': {'data': 'town_id'}
+                                             }
 
 plot_params['ctrl_vs_classif_error_0005'] = {'print': True,
-                                   'x': {'data': 'Classification error @ 0.005', 'log': True},
-                                   'y': {'data': 'Success rate', 'log': False},
-                                   'size': {'data': 'step'},
-                                   'color': {'data': 'town_id'}
-                                   }
+                                             'x': {'data': 'Classification error @ 0.005', 'log': True},
+                                             'y': {'data': 'Success rate', 'log': False},
+                                             'size': {'data': 'step'},
+                                             'color': {'data': 'town_id'}
+                                             }
 
 plot_params['ctrl_vs_classif_error_001'] = {'print': True,
-                                   'x': {'data': 'Classification error @ 0.01', 'log': True},
-                                   'y': {'data': 'Success rate', 'log': False},
-                                   'size': {'data': 'step'},
-                                   'color': {'data': 'town_id'}
-                                   }
+                                            'x': {'data': 'Classification error @ 0.01', 'log': True},
+                                            'y': {'data': 'Success rate', 'log': False},
+                                            'size': {'data': 'step'},
+                                            'color': {'data': 'town_id'}
+                                            }
 
 plot_params['ctrl_vs_classif_error_003'] = {'print': True,
-                                   'x': {'data': 'Classification error @ 0.03', 'log': True},
-                                   'y': {'data': 'Success rate', 'log': False},
-                                   'size': {'data': 'step'},
-                                   'color': {'data': 'town_id'}
-                                   }
+                                            'x': {'data': 'Classification error @ 0.03', 'log': True},
+                                            'y': {'data': 'Success rate', 'log': False},
+                                            'size': {'data': 'step'},
+                                            'color': {'data': 'town_id'}
+                                            }
 
 for key in plot_params:
     plot_params[key]['plot_best_n_percent'] = @BEST_N_PERCENT@

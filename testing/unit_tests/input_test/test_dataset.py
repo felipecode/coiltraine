@@ -21,7 +21,7 @@ import reference
 from coil_core.train import select_balancing_strategy
 
 
-#TODO: verify images, there should be something for that !!
+# TODO: verify images, there should be something for that !!
 
 
 class testCILDataset(unittest.TestCase):
@@ -30,7 +30,6 @@ class testCILDataset(unittest.TestCase):
         super(testCILDataset, self).__init__(*args, **kwargs)
         self.root_test_dir = 'testing/unit_tests/data'
         self.test_images_write_path = 'testing/unit_tests/_test_images_'
-
 
     def test_pre_load_augmentation(self):
         return
@@ -46,7 +45,6 @@ class testCILDataset(unittest.TestCase):
 
         keys = range(0, len(dataset.sensor_data_names))
 
-
         # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
         #                                          shuffle=True, num_workers=12, pin_memory=True)
         # capture_time = time.time()
@@ -59,9 +57,6 @@ class testCILDataset(unittest.TestCase):
         max_steer = 0
         for data in data_loader:
 
-
-
-
             # Test steerings after augmentation
 
             #print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
@@ -70,8 +65,7 @@ class testCILDataset(unittest.TestCase):
 
             print ("brake ", data['brake'].data, " throttle", data['throttle'])
 
-
-            self.assertLess(data['speed_module'],1)
+            self.assertLess(data['speed_module'], 1)
 
             count += 1
 
@@ -92,7 +86,6 @@ class testCILDataset(unittest.TestCase):
 
         keys = range(0, len(dataset.sensor_data_names))
 
-
         # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
         #                                          shuffle=True, num_workers=12, pin_memory=True)
         # capture_time = time.time()
@@ -104,9 +97,10 @@ class testCILDataset(unittest.TestCase):
         count = 0
         for data in data_loader:
 
-
-            image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
-            image_to_save.save(os.path.join(self.test_images_write_path + 'weather_aug', str(count)+'l.png'))
+            image_to_save = transforms.ToPILImage()(
+                (data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+            image_to_save.save(os.path.join(self.test_images_write_path +
+                                            'weather_aug', str(count)+'l.png'))
             # Test steerings after augmentation
 
             #print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
@@ -131,8 +125,6 @@ class testCILDataset(unittest.TestCase):
         augmenter = Augmenter(None)
         dataset = CoILDataset(full_dataset, transform=augmenter,
                               preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
-
-
 
         # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
         #                                          shuffle=True, num_workers=12, pin_memory=True)
@@ -173,8 +165,6 @@ class testCILDataset(unittest.TestCase):
         dataset = CoILDataset(full_dataset, transform=augmenter,
                               preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
 
-
-
         # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
         #                                          shuffle=True, num_workers=12, pin_memory=True)
         # capture_time = time.time()
@@ -187,8 +177,6 @@ class testCILDataset(unittest.TestCase):
             print (data['speed_module'])
             for i in range(120):
                 if data['angle'][i][0] == -30:
-
-
 
                     self.assertEqual(data['traffic_lights'][i][0], 1)
 
@@ -212,15 +200,12 @@ class testCILDataset(unittest.TestCase):
         g_conf.NUMBER_OF_HOURS = 50
         g_conf.DATA_USED = 'all'
 
-
         #g_conf.SPLIT = [['pedestrian', []], ['vehicle', []], ['traffic_lights', []], ['weights', [0.25, 0.25, 0.25, 0.25, 0.0]]]
         g_conf.SPLIT = [['pedestrian', []], ['vehicle', []], ['traffic_lights', []],
                         ['weights', [0.0, 0.0, 0.0, 0.0, 1.0]]]
         augmenter = input.Augmenter(None)
         dataset = input.CoILDataset(full_dataset, transform=augmenter,
-                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
-
-
+                                    preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
 
         # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
         #                                          shuffle=True, num_workers=12, pin_memory=True)
@@ -231,18 +216,17 @@ class testCILDataset(unittest.TestCase):
         count = 0
         for data in data_loader:
 
-
-            image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+            image_to_save = transforms.ToPILImage()(
+                (data['rgb'][0].cpu()*255).type(torch.ByteTensor))
             b, g, r = image_to_save.split()
             image_to_save = Image.merge("RGB", (r, g, b))
 
-            image_to_save.save(os.path.join(self.test_images_write_path + 'central', str(count)+'l.png'))
+            image_to_save.save(os.path.join(
+                self.test_images_write_path + 'central', str(count)+'l.png'))
             # Test steerings after augmentation
             #print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
             #print ("directions", data['directions'], " speed_module", data['speed_module'])
             count += 1
-
-
 
     def test_add_remove_on_preload(self):
         return
@@ -258,7 +242,7 @@ class testCILDataset(unittest.TestCase):
         g_conf.NUMBER_OF_HOURS = 50
         g_conf.DATA_USED = 'central'
 
-        g_conf.REMOVE = [['angle', -30],['traffic_lights', 1]]
+        g_conf.REMOVE = [['angle', -30], ['traffic_lights', 1]]
 
         augmenter = Augmenter(None)
         dataset = CoILDataset(full_dataset, transform=augmenter,
@@ -278,10 +262,7 @@ class testCILDataset(unittest.TestCase):
             for i in range(120):
                 if data['angle'][i][0] == -30:
 
-
-
                     self.assertEqual(data['traffic_lights'][i][0], 1)
-
 
             """
             print (count)
@@ -315,7 +296,6 @@ class testCILDataset(unittest.TestCase):
         g_conf.NUMBER_OF_ITERATIONS = 2000
         g_conf.NUMBER_OF_HOURS = 1
         g_conf.DATA_USED = 'all'
-
 
         augmenter = Augmenter(None)
         dataset = CoILDataset(full_dataset, transform=augmenter,
@@ -378,15 +358,15 @@ class testCILDataset(unittest.TestCase):
 
         augmenter = input.Augmenter(None)
         dataset = input.CoILDataset(full_dataset_images, transform=augmenter,
-                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+                                    preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
 
         # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
         #                                          shuffle=True, num_workers=12, pin_memory=True)
         # capture_time = time.time()
 
         data_loader_images = iter(torch.utils.data.DataLoader(dataset,
-                                                       num_workers=0,
-                                                       pin_memory=True))
+                                                              num_workers=0,
+                                                              pin_memory=True))
 
         #data_loader_images = select_balancing_strategy(dataset, 0, 12)
         print('len ', len(data_loader_images))
@@ -394,8 +374,8 @@ class testCILDataset(unittest.TestCase):
         count = 0
         throttle_vec = []
 
-
-        full_dataset_hdf5 = os.path.join('/media/eder/Seagate Expansion Drive/data/CVPR1Noise/SeqTrain')
+        full_dataset_hdf5 = os.path.join(
+            '/media/eder/Seagate Expansion Drive/data/CVPR1Noise/SeqTrain')
 
         dataset = reference.CoILDataset(full_dataset_hdf5, transform=augmenter)
         # capture_time = time.time()
@@ -405,8 +385,8 @@ class testCILDataset(unittest.TestCase):
         # The data loader is the multi threaded module from pytorch that release a number of
         # workers to get all the data.
         data_loader_hdf5 = iter(torch.utils.data.DataLoader(dataset,
-                                                       num_workers=0,
-                                                       pin_memory=True))
+                                                            num_workers=0,
+                                                            pin_memory=True))
 
         max_steer = 0
         count = 0
@@ -419,7 +399,6 @@ class testCILDataset(unittest.TestCase):
 
             print ('hdf5 ', h_labels[0][2].data, ' ', h_labels[0][26], ' ', h_labels[0][20],
                    'images ', i_data['brake'].data, ' ', i_data['angle'], ' ', i_data['game_time'])
-
 
             """
             for i in range(120):
@@ -446,7 +425,7 @@ class testCILDataset(unittest.TestCase):
             """
         #x = range(len(throttle_vec))
         #plt.plot(x, throttle_vec)
-        #plt.show()
+        # plt.show()
         # Test steerings after augmentation
         # print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
         # print ("directions", data['directions'], " speed_module", data['speed_module'])
@@ -485,7 +464,6 @@ class testCILDataset(unittest.TestCase):
         count = 0
         throttle_vec = []
 
-
         max_steer = 0
         count = 0
         throttle_vec = []
@@ -494,10 +472,7 @@ class testCILDataset(unittest.TestCase):
             i_data = next(data_loader_images)
 
             print('images ', i_data['speed_module'].data*12.0, ' ', i_data['angle'], ' ', i_data['game_time'],
-                  'images_speed ', i_data['speed_module'].data * 3.6 *12.0, ' ', i_data['angle'], ' ', i_data['game_time'])
-
-
-
+                  'images_speed ', i_data['speed_module'].data * 3.6 * 12.0, ' ', i_data['angle'], ' ', i_data['game_time'])
 
     def test_old_data(self):
         return
@@ -512,7 +487,6 @@ class testCILDataset(unittest.TestCase):
         g_conf.NUMBER_OF_ITERATIONS = 200000
         g_conf.NUMBER_OF_HOURS = 240
         g_conf.DATA_USED = 'all'
-
 
         augmenter = Augmenter(None)
         dataset = CoILDataset(full_dataset, transform=augmenter,
@@ -558,11 +532,10 @@ class testCILDataset(unittest.TestCase):
             """
         #x = range(len(throttle_vec))
         #plt.plot(x, throttle_vec)
-        #plt.show()
+        # plt.show()
         # Test steerings after augmentation
         # print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
         # print ("directions", data['directions'], " speed_module", data['speed_module'])
-
 
     def test_add_augmentation(self):
         return
@@ -610,23 +583,22 @@ class testCILDataset(unittest.TestCase):
                 continue
 
             for i in range(120):
-                image_to_save = transforms.ToPILImage()((data['rgb'][i].cpu()*255).type(torch.ByteTensor))
+                image_to_save = transforms.ToPILImage()(
+                    (data['rgb'][i].cpu()*255).type(torch.ByteTensor))
 
                 b, g, r = image_to_save.split()
                 image_to_save = Image.merge("RGB", (r, g, b))
 
-                image_to_save.save(os.path.join(self.test_images_write_path + 'augmentation', str(count) + '_' + str(i) + '.png'))
+                image_to_save.save(os.path.join(self.test_images_write_path +
+                                                'augmentation', str(count) + '_' + str(i) + '.png'))
             # Test steerings after augmentation
             # print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
             # print ("directions", data['directions'], " speed_module", data['speed_module'])
-
-
 
     def test_steering_augmentation(self):
         return
         if not os.path.exists(self.test_images_write_path + 'normal_steer'):
             os.mkdir(self.test_images_write_path + 'normal_steer')
-
 
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CARLA100_2')
         # This depends on the number of fused frames. A image could have
@@ -637,14 +609,12 @@ class testCILDataset(unittest.TestCase):
 
         keys = range(0, len(dataset.sensor_data_names))
 
-
         # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
         #                                          shuffle=True, num_workers=12, pin_memory=True)
         # capture_time = time.time()
         data_loader = torch.utils.data.DataLoader(dataset,
                                                   shuffle=False, num_workers=12,
                                                   pin_memory=True)
-
 
         count = 0
         print('len ', len(data_loader))
@@ -656,7 +626,6 @@ class testCILDataset(unittest.TestCase):
             print ('steer', labels[0][0])
             print ('speed', labels[0][np.where(dataset.meta_data[:, 0] == b'speed_module')])
             print ('angle', labels[0][np.where(dataset.meta_data[:, 0] == b'angle')])
-
 
             count += 1
         print("MAX STEER ", max_steer)

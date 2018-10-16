@@ -4,7 +4,6 @@ from imgaug import augmenters as iaa
 
 def medium(image_iteration):
 
-
     iteration = image_iteration/(120*1.5)
     frequency_factor = 0.05 + float(iteration)/1000000.0
     color_factor = float(iteration)/1000000.0
@@ -20,22 +19,21 @@ def medium(image_iteration):
     contrast_factor_pos = 1 + (0.5*iteration/500000.0)
     contrast_factor_neg = 1 - (0.5 * iteration / 500000.0)
 
-
     #print 'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,\
     #    multiply_factor_pos,multiply_factor_neg,contrast_factor_pos,contrast_factor_neg
-
 
     augmenter = iaa.Sequential([
 
         iaa.Sometimes(frequency_factor, iaa.GaussianBlur((0, blur_factor))),
         # blur images with a sigma between 0 and 1.5
-        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0,dropout_factor ),
+        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, dropout_factor),
                                                                   per_channel=color_factor)),
         # add gaussian noise to images
         iaa.Sometimes(frequency_factor, iaa.CoarseDropout((0.0, dropout_factor), size_percent=(
             0.08, 0.2), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
-        iaa.Sometimes(frequency_factor, iaa.Dropout((0.0, dropout_factor), per_channel=color_factor)),
+        iaa.Sometimes(frequency_factor, iaa.Dropout(
+            (0.0, dropout_factor), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
         iaa.Sometimes(frequency_factor,
                       iaa.Add((-add_factor, add_factor), per_channel=color_factor)),
@@ -44,7 +42,7 @@ def medium(image_iteration):
                       iaa.Multiply((multiply_factor_neg, multiply_factor_pos), per_channel=color_factor)),
         # change brightness of images (X-Y% of original value)
         iaa.Sometimes(frequency_factor, iaa.ContrastNormalization((contrast_factor_neg, contrast_factor_pos),
-                                                                       per_channel=color_factor)),
+                                                                  per_channel=color_factor)),
         # improve or worsen the contrast
         iaa.Sometimes(frequency_factor, iaa.Grayscale((0.0, 1))),  # put grayscale
 
@@ -72,22 +70,21 @@ def soft(image_iteration):
     contrast_factor_pos = 1 + (0.5*iteration/800000.0)
     contrast_factor_neg = 1 - (0.5 * iteration / 800000.0)
 
-
-    #print ('iteration',iteration,'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,
+    # print ('iteration',iteration,'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,
     #    multiply_factor_pos,multiply_factor_neg,contrast_factor_pos,contrast_factor_neg)
-
 
     augmenter = iaa.Sequential([
 
         iaa.Sometimes(frequency_factor, iaa.GaussianBlur((0, blur_factor))),
         # blur images with a sigma between 0 and 1.5
-        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0,dropout_factor ),
+        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, dropout_factor),
                                                                   per_channel=color_factor)),
         # add gaussian noise to images
         iaa.Sometimes(frequency_factor, iaa.CoarseDropout((0.0, dropout_factor), size_percent=(
             0.08, 0.2), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
-        iaa.Sometimes(frequency_factor, iaa.Dropout((0.0, dropout_factor), per_channel=color_factor)),
+        iaa.Sometimes(frequency_factor, iaa.Dropout(
+            (0.0, dropout_factor), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
         iaa.Sometimes(frequency_factor,
                       iaa.Add((-add_factor, add_factor), per_channel=color_factor)),
@@ -96,7 +93,7 @@ def soft(image_iteration):
                       iaa.Multiply((multiply_factor_neg, multiply_factor_pos), per_channel=color_factor)),
         # change brightness of images (X-Y% of original value)
         iaa.Sometimes(frequency_factor, iaa.ContrastNormalization((contrast_factor_neg, contrast_factor_pos),
-                                                                       per_channel=color_factor)),
+                                                                  per_channel=color_factor)),
         # improve or worsen the contrast
         iaa.Sometimes(frequency_factor, iaa.Grayscale((0.0, 1))),  # put grayscale
 
@@ -124,22 +121,21 @@ def high(image_iteration):
     contrast_factor_pos = 1 + (0.5*iteration/350000.0)
     contrast_factor_neg = 1 - (0.5 * iteration / 400000.0)
 
-
-    #print ('iteration',iteration,'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,
+    # print ('iteration',iteration,'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,
     #    multiply_factor_pos,multiply_factor_neg,contrast_factor_pos,contrast_factor_neg)
-
 
     augmenter = iaa.Sequential([
 
         iaa.Sometimes(frequency_factor, iaa.GaussianBlur((0, blur_factor))),
         # blur images with a sigma between 0 and 1.5
-        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0,dropout_factor ),
+        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, dropout_factor),
                                                                   per_channel=color_factor)),
         # add gaussian noise to images
         iaa.Sometimes(frequency_factor, iaa.CoarseDropout((0.0, dropout_factor), size_percent=(
             0.08, 0.2), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
-        iaa.Sometimes(frequency_factor, iaa.Dropout((0.0, dropout_factor), per_channel=color_factor)),
+        iaa.Sometimes(frequency_factor, iaa.Dropout(
+            (0.0, dropout_factor), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
         iaa.Sometimes(frequency_factor,
                       iaa.Add((-add_factor, add_factor), per_channel=color_factor)),
@@ -148,7 +144,7 @@ def high(image_iteration):
                       iaa.Multiply((multiply_factor_neg, multiply_factor_pos), per_channel=color_factor)),
         # change brightness of images (X-Y% of original value)
         iaa.Sometimes(frequency_factor, iaa.ContrastNormalization((contrast_factor_neg, contrast_factor_pos),
-                                                                       per_channel=color_factor)),
+                                                                  per_channel=color_factor)),
         # improve or worsen the contrast
         iaa.Sometimes(frequency_factor, iaa.Grayscale((0.0, 1))),  # put grayscale
 
@@ -158,8 +154,8 @@ def high(image_iteration):
 
     return augmenter
 
-def medium_harder(image_iteration):
 
+def medium_harder(image_iteration):
 
     iteration = image_iteration / 120
     frequency_factor = 0.05 + float(iteration)/1000000.0
@@ -176,22 +172,21 @@ def medium_harder(image_iteration):
     contrast_factor_pos = 1 + (0.5*iteration/500000.0)
     contrast_factor_neg = 1 - (0.5 * iteration / 500000.0)
 
-
     #print 'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,\
     #    multiply_factor_pos,multiply_factor_neg,contrast_factor_pos,contrast_factor_neg
-
 
     augmenter = iaa.Sequential([
 
         iaa.Sometimes(frequency_factor, iaa.GaussianBlur((0, blur_factor))),
         # blur images with a sigma between 0 and 1.5
-        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0,dropout_factor ),
+        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, dropout_factor),
                                                                   per_channel=color_factor)),
         # add gaussian noise to images
         iaa.Sometimes(frequency_factor, iaa.CoarseDropout((0.0, dropout_factor), size_percent=(
             0.08, 0.2), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
-        iaa.Sometimes(frequency_factor, iaa.Dropout((0.0, dropout_factor), per_channel=color_factor)),
+        iaa.Sometimes(frequency_factor, iaa.Dropout(
+            (0.0, dropout_factor), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
         iaa.Sometimes(frequency_factor,
                       iaa.Add((-add_factor, add_factor), per_channel=color_factor)),
@@ -200,7 +195,7 @@ def medium_harder(image_iteration):
                       iaa.Multiply((multiply_factor_neg, multiply_factor_pos), per_channel=color_factor)),
         # change brightness of images (X-Y% of original value)
         iaa.Sometimes(frequency_factor, iaa.ContrastNormalization((contrast_factor_neg, contrast_factor_pos),
-                                                                       per_channel=color_factor)),
+                                                                  per_channel=color_factor)),
         # improve or worsen the contrast
         iaa.Sometimes(frequency_factor, iaa.Grayscale((0.0, 1))),  # put grayscale
 
@@ -210,8 +205,8 @@ def medium_harder(image_iteration):
 
     return augmenter
 
-def hard_harder(image_iteration):
 
+def hard_harder(image_iteration):
 
     iteration = image_iteration / 120
     frequency_factor = min(0.05 + float(iteration)/200000.0, 1.0)
@@ -228,22 +223,21 @@ def hard_harder(image_iteration):
     contrast_factor_pos = 1 + (0.5*iteration/500000.0)
     contrast_factor_neg = 1 - (0.5 * iteration / 500000.0)
 
-
     #print 'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,\
     #    multiply_factor_pos,multiply_factor_neg,contrast_factor_pos,contrast_factor_neg
-
 
     augmenter = iaa.Sequential([
 
         iaa.Sometimes(frequency_factor, iaa.GaussianBlur((0, blur_factor))),
         # blur images with a sigma between 0 and 1.5
-        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0,dropout_factor ),
+        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, dropout_factor),
                                                                   per_channel=color_factor)),
         # add gaussian noise to images
         iaa.Sometimes(frequency_factor, iaa.CoarseDropout((0.0, dropout_factor), size_percent=(
             0.08, 0.2), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
-        iaa.Sometimes(frequency_factor, iaa.Dropout((0.0, dropout_factor), per_channel=color_factor)),
+        iaa.Sometimes(frequency_factor, iaa.Dropout(
+            (0.0, dropout_factor), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
         iaa.Sometimes(frequency_factor,
                       iaa.Add((-add_factor, add_factor), per_channel=color_factor)),
@@ -252,7 +246,7 @@ def hard_harder(image_iteration):
                       iaa.Multiply((multiply_factor_neg, multiply_factor_pos), per_channel=color_factor)),
         # change brightness of images (X-Y% of original value)
         iaa.Sometimes(frequency_factor, iaa.ContrastNormalization((contrast_factor_neg, contrast_factor_pos),
-                                                                       per_channel=color_factor)),
+                                                                  per_channel=color_factor)),
         # improve or worsen the contrast
         iaa.Sometimes(frequency_factor, iaa.Grayscale((0.0, 1))),  # put grayscale
 
@@ -280,22 +274,21 @@ def soft_harder(image_iteration):
     contrast_factor_pos = 1 + (0.5*iteration/800000.0)
     contrast_factor_neg = 1 - (0.5 * iteration / 800000.0)
 
-
-    #print ('iteration',iteration,'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,
+    # print ('iteration',iteration,'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,
     #    multiply_factor_pos,multiply_factor_neg,contrast_factor_pos,contrast_factor_neg)
-
 
     augmenter = iaa.Sequential([
 
         iaa.Sometimes(frequency_factor, iaa.GaussianBlur((0, blur_factor))),
         # blur images with a sigma between 0 and 1.5
-        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0,dropout_factor ),
+        iaa.Sometimes(frequency_factor, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, dropout_factor),
                                                                   per_channel=color_factor)),
         # add gaussian noise to images
         iaa.Sometimes(frequency_factor, iaa.CoarseDropout((0.0, dropout_factor), size_percent=(
             0.08, 0.2), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
-        iaa.Sometimes(frequency_factor, iaa.Dropout((0.0, dropout_factor), per_channel=color_factor)),
+        iaa.Sometimes(frequency_factor, iaa.Dropout(
+            (0.0, dropout_factor), per_channel=color_factor)),
         # randomly remove up to X% of the pixels
         iaa.Sometimes(frequency_factor,
                       iaa.Add((-add_factor, add_factor), per_channel=color_factor)),
@@ -304,7 +297,7 @@ def soft_harder(image_iteration):
                       iaa.Multiply((multiply_factor_neg, multiply_factor_pos), per_channel=color_factor)),
         # change brightness of images (X-Y% of original value)
         iaa.Sometimes(frequency_factor, iaa.ContrastNormalization((contrast_factor_neg, contrast_factor_pos),
-                                                                       per_channel=color_factor)),
+                                                                  per_channel=color_factor)),
         # improve or worsen the contrast
         iaa.Sometimes(frequency_factor, iaa.Grayscale((0.0, 1))),  # put grayscale
 
@@ -313,4 +306,3 @@ def soft_harder(image_iteration):
     )
 
     return augmenter
-

@@ -31,12 +31,11 @@ class testValidation(unittest.TestCase):
 
     # self.test_images_write_path = 'testing/unit_tests/_test_images_'
 
-
     def test_core_validation(self):
 
         dataset_name = 'DataVerySmall'
 
-        exp_batch  = 'eccv_debug'
+        exp_batch = 'eccv_debug'
         exp_alias = 'experiment_1'
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name)
 
@@ -61,11 +60,8 @@ class testValidation(unittest.TestCase):
                                                   num_workers=0,
                                                   pin_memory=True)
 
-
         # TODO: here there is clearly a posibility to make a cool "conditioning" system.
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
-
-
 
         model.cuda()
 
@@ -75,13 +71,11 @@ class testValidation(unittest.TestCase):
         best_loss_iter = 0
         best_error_iter = 0
 
-
         checkpoint_avg_loss_vec = []
 
-
         for latest in [2000]:
-            checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
-                                    , 'checkpoints', str(latest) + '.pth'))
+            checkpoint = torch.load(os.path.join(
+                '_logs', exp_batch, exp_alias, 'checkpoints', str(latest) + '.pth'))
             checkpoint_iteration = checkpoint['iteration']
             print ("Validation loaded ", checkpoint_iteration)
 
@@ -101,17 +95,17 @@ class testValidation(unittest.TestCase):
                                               float_data[:, speed_position, :].cuda(),
                                               float_data[:, control_position, :].cuda())
 
-
                 # TODO: Change this a functional standard using the loss functions.
 
-                loss = torch.mean((output - dataset.extract_targets(float_data).cuda())**2).data.tolist()
-                mean_error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
+                loss = torch.mean(
+                    (output - dataset.extract_targets(float_data).cuda())**2).data.tolist()
+                mean_error = torch.mean(
+                    torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
                 #print ("Loss", loss)
                 print ("output", output[:, 0])
                 print ("ground_truth", float_data[:, 0])
                 accumulated_error += mean_error
                 accumulated_loss += loss
-
 
                 # Log a random position
 
@@ -121,12 +115,11 @@ class testValidation(unittest.TestCase):
 
             checkpoint_avg_loss_vec.append(checkpoint_average_loss)
 
-
         count = 0
         for latest in [2000]:
 
-            checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
-                                                 , 'checkpoints', str(latest) + '.pth'))
+            checkpoint = torch.load(os.path.join(
+                '_logs', exp_batch, exp_alias, 'checkpoints', str(latest) + '.pth'))
             checkpoint_iteration = checkpoint['iteration']
             print ("Validation loaded ", checkpoint_iteration)
 
@@ -140,7 +133,6 @@ class testValidation(unittest.TestCase):
                 input_data, float_data = data
                 control_position = np.where(dataset.meta_data[:, 0] == b'control')[0][0]
                 speed_position = np.where(dataset.meta_data[:, 0] == b'speed_module')[0][0]
-
 
                 output = model.forward_branch(torch.squeeze(input_data['rgb']).cuda(),
                                               float_data[:, speed_position, :].cuda(),
@@ -169,11 +161,6 @@ class testValidation(unittest.TestCase):
             print ("Val2 ", checkpoint_average_loss)
 
             #self.assertEqual(checkpoint_avg_loss_vec[count], checkpoint_average_loss)
-            #self.assertAlmostEqual(checkpoint_avg_loss_vec[count], checkpoint_average_loss,
+            # self.assertAlmostEqual(checkpoint_avg_loss_vec[count], checkpoint_average_loss,
             #                       3)
             count += 1
-
-
-
-
-

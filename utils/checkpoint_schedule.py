@@ -25,7 +25,6 @@ def is_open(file_name):
     raise NameError
 
 
-
 def maximun_checkpoint_reach(iteration, checkpoint_schedule):
 
     if iteration >= max(checkpoint_schedule):
@@ -46,6 +45,7 @@ def is_ready_to_save(iteration):
     else:
         return False
 
+
 def get_latest_saved_checkpoint():
     """
         Returns the , latest checkpoint number that was saved
@@ -61,8 +61,9 @@ def get_latest_saved_checkpoint():
 
 
 """ FUNCTIONS FOR GETTING THE CHECKPOINTS"""
-def get_latest_evaluated_checkpoint(filename):
 
+
+def get_latest_evaluated_checkpoint(filename):
     """
         Get the latest checkpoint that was validated or tested.
     Args:
@@ -70,7 +71,8 @@ def get_latest_evaluated_checkpoint(filename):
 
     return monitorer.get_latest_checkpoint(filename)
 
-def is_next_checkpoint_ready( checkpoint_schedule, control_filename):
+
+def is_next_checkpoint_ready(checkpoint_schedule, control_filename):
 
     # IT needs
 
@@ -86,14 +88,14 @@ def is_next_checkpoint_ready( checkpoint_schedule, control_filename):
 
     # Check if the file is in the checkpoints list.
     if os.path.exists(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
-                                            g_conf.EXPERIMENT_NAME, 'checkpoints')):
+                                   g_conf.EXPERIMENT_NAME, 'checkpoints')):
 
         # test if the file exist:
         if str(next_check) + '.pth' in os.listdir(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
                                                                g_conf.EXPERIMENT_NAME, 'checkpoints')):
             # now check if someone is writing to it, if it is the case return false
             return not is_open(os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
-                               g_conf.EXPERIMENT_NAME, 'checkpoints', str(next_check) + '.pth'))
+                                            g_conf.EXPERIMENT_NAME, 'checkpoints', str(next_check) + '.pth'))
 
         else:
             return False
@@ -107,13 +109,10 @@ def get_next_checkpoint(checkpoint_schedule, filename):
     if ltst_check is None:
         return checkpoint_schedule[0]
 
-
-
     if checkpoint_schedule.index(ltst_check) + 1 == len(checkpoint_schedule):
         raise RuntimeError("Not able to get next checkpoint, maximum checkpoint is reach")
 
     return checkpoint_schedule[checkpoint_schedule.index(ltst_check) + 1]
-
 
 
 #
@@ -154,6 +153,5 @@ def get_next_checkpoint(checkpoint_schedule, filename):
 
 
 def is_iteration_for_saving():
-
 
     return True

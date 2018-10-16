@@ -17,7 +17,6 @@ class FC(nn.Module):
         #  OBS, only constant = 0.1 initialization of bias
         super(FC, self).__init__()
 
-
         """" ---------------------- FC ----------------------- """
         if params is None:
             raise ValueError("Creating a NULL fully connected block")
@@ -31,11 +30,9 @@ class FC(nn.Module):
         if len(params['dropouts']) != len(params['neurons'])-1:
             raise ValueError("Dropouts should be from the len of kernels minus 1")
 
-
         self.layers = []
 
-
-        for i in range(0, len(params['neurons']) -1):
+        for i in range(0, len(params['neurons']) - 1):
 
             fc = nn.Linear(params['neurons'][i], params['neurons'][i+1])
             dropout = nn.Dropout2d(p=params['dropouts'][i])
@@ -46,12 +43,7 @@ class FC(nn.Module):
             else:
                 self.layers.append(nn.Sequential(*[fc, dropout, relu]))
 
-
         self.layers = nn.Sequential(*self.layers)
-
-
-
-
 
     # TODO: iteration control should go inside the logger, somehow
 
@@ -60,5 +52,3 @@ class FC(nn.Module):
         # TODO: TRACK NANS OUTPUTS
 
         return self.layers(x)
-
-

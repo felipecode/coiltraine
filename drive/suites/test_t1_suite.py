@@ -81,5 +81,4 @@ class TestT1(ExperimentSuite):
                 )
                 experiments_vector.append(experiment)
 
-
         return experiments_vector

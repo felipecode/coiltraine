@@ -33,7 +33,6 @@ class testMasking(unittest.TestCase):
         self.root_test_dir = 'testing/unit_tests/data'
         self.test_images_write_path = 'testing/unit_tests/_test_images_'
 
-
     def test_masking(self):
 
         if not os.path.exists(self.test_images_write_path + 'central'):
@@ -47,19 +46,13 @@ class testMasking(unittest.TestCase):
         g_conf.NUMBER_OF_HOURS = 50
         g_conf.DATA_USED = 'all'
 
-
-
-
         augmenter = input.Augmenter(None)
         dataset = input.CoILDataset(full_dataset, transform=augmenter,
-                              preload_name=str(g_conf.NUMBER_OF_HOURS) +
-                                           'hours_' + g_conf.TRAIN_DATASET_NAME)
-
-
+                                    preload_name=str(g_conf.NUMBER_OF_HOURS) +
+                                    'hours_' + g_conf.TRAIN_DATASET_NAME)
 
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         model.cuda()
-
 
         # data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
         #                                          shuffle=True, num_workers=12, pin_memory=True)
@@ -70,9 +63,8 @@ class testMasking(unittest.TestCase):
         count = 0
         for data in data_loader:
 
-
             _ = model(torch.squeeze(data['rgb'].cuda()),
-                             dataset.extract_inputs(data).cuda())
+                      dataset.extract_inputs(data).cuda())
 
             inter_layers = [model.intermediate_layers[ula] for ula in g_conf.USED_LAYERS_ATT]
             # here we call a function to get the wanted attention leyer
@@ -84,7 +76,6 @@ class testMasking(unittest.TestCase):
                 # Down sample does not exist. But maybe upsample does the same.
                 labels_reshaped = F.downsample(data['labels'], size_new=(il.shape[1], il.shape[2]),
                                                mode='bilinear')
-
 
                 # Try to convert this to a label image.
                 image_to_save = transforms.ToPILImage()(
@@ -108,10 +99,9 @@ class testMasking(unittest.TestCase):
 
                 # Lets get the attention for CAR
 
-                print (" Amount of attention for cars ", sum(att[np.where(labels_reshaped==10)]))
+                print (" Amount of attention for cars ", sum(att[np.where(labels_reshaped == 10)]))
 
                 # Lets get the attention on pedestrian labels
-
 
                 #inter_layers = where(labels_reshaped==4)
 
@@ -119,23 +109,18 @@ class testMasking(unittest.TestCase):
 
                 #inter_layers = where(labels_reshaped==6)
 
-
-
                 # Labels is equal the traffic signs
 
                 #inter_layers = where(labels_reshaped==12)
 
-
-
-            image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
+            image_to_save = transforms.ToPILImage()(
+                (data['rgb'][0].cpu()*255).type(torch.ByteTensor))
             b, g, r = image_to_save.split()
             image_to_save = Image.merge("RGB", (r, g, b))
-            image_to_save.save(os.path.join(self.test_images_write_path + 'central', str(count)+'rgb.png'))
-
-
+            image_to_save.save(os.path.join(self.test_images_write_path +
+                                            'central', str(count)+'rgb.png'))
 
             # Test steerings after augmentation
             #print("steer: ", data['steer'][0], "angle: ", data['angle'][0])
             #print ("directions", data['directions'], " speed_module", data['speed_module'])
             count += 1
-

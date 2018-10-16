@@ -15,7 +15,6 @@ from carla.settings import CarlaSettings
 from carla.driving_benchmark.experiment_suites.experiment_suite import ExperimentSuite
 
 
-
 class EccvGeneralization(ExperimentSuite):
 
     def __init__(self):
@@ -24,22 +23,19 @@ class EccvGeneralization(ExperimentSuite):
     @property
     def train_weathers(self):
         return []
+
     @property
     def test_weathers(self):
         return [14]
 
-
     def _poses(self):
 
-
         return [[[19, 66], [79, 14], [19, 57], [23, 1],
-                [53, 76], [42, 13], [31, 71], [33, 5],
-                [54, 30], [10, 61], [66, 3], [27, 12],
-                [79, 19], [2, 29], [16, 14], [5, 57],
-                [70, 73], [46, 67], [57, 50], [61, 49], [21, 12],
-                [51, 81], [77, 68], [56, 65], [43, 54]]]
-
-
+                 [53, 76], [42, 13], [31, 71], [33, 5],
+                 [54, 30], [10, 61], [66, 3], [27, 12],
+                 [79, 19], [2, 29], [16, 14], [5, 57],
+                 [70, 73], [46, 67], [57, 50], [61, 49], [21, 12],
+                 [51, 81], [77, 68], [56, 65], [43, 54]]]
 
     def build_experiments(self):
         """
@@ -58,7 +54,6 @@ class EccvGeneralization(ExperimentSuite):
         camera.set_position(2.0, 0.0, 1.4)
         camera.set_rotation(-15.0, 0, 0)
 
-
         poses_tasks = self._poses()
         vehicles_tasks = [15]
         pedestrians_tasks = [50]
@@ -71,7 +66,6 @@ class EccvGeneralization(ExperimentSuite):
                 poses = poses_tasks[iteration]
                 vehicles = vehicles_tasks[iteration]
                 pedestrians = pedestrians_tasks[iteration]
-
 
                 conditions = CarlaSettings()
                 conditions.set(
@@ -94,5 +88,3 @@ class EccvGeneralization(ExperimentSuite):
                 experiments_vector.append(experiment)
 
         return experiments_vector
-
-

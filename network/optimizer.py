@@ -1,4 +1,6 @@
 from configs import g_conf
+
+
 def adjust_learning_rate(optimizer, num_iters):
     """
     Adjusts the learning rate every epoch based on the selected schedule

@@ -27,8 +27,6 @@ class Join(nn.Module):
         self.after_process = params['after_process']
         self.mode = params['mode']
 
-
-
     # TODO: iteration control should go inside the logger, somehow
 
     def forward(self, x, m):
@@ -38,8 +36,6 @@ class Join(nn.Module):
         # TODO: Maybe change the name
 
         # TODO: Control the frequency of postion log
-
-
         """ conv1 + batch normalization + dropout + relu """
         if self.mode == 'cat':
             j = torch.cat((x, m), 1)
@@ -48,9 +44,6 @@ class Join(nn.Module):
             raise ValueError("Mode to join networks not found")
 
         return self.after_process(j)
-
-
-
 
     def load_network(self, checkpoint):
         """
@@ -63,13 +56,8 @@ class Join(nn.Module):
 
         """
         coil_logger.add_message('Loading', {
-                    "Model": {"Loaded checkpoint: " + str(checkpoint) }
+            "Model": {"Loaded checkpoint: " + str(checkpoint)}
 
-                })
-
-
+        })
 
         # TODO: implement
-
-
-

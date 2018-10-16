@@ -22,8 +22,8 @@ from torch.utils.data.sampler import BatchSampler, SubsetRandomSampler
 from torch.utils.data import TensorDataset as dset
 from configs import g_conf
 
-class testInput(unittest.TestCase):
 
+class testInput(unittest.TestCase):
 
     def test_new_sampler(self):
         test_images_write_path = 'testing/unit_tests/_test_images_'
@@ -31,21 +31,16 @@ class testInput(unittest.TestCase):
         if not os.path.exists(test_images_write_path):
             os.mkdir(test_images_write_path)
 
-
-
-
-
         #augmenter = Augmenter(g_conf.AUGMENTATION)
 
         root_path = '/home/felipecodevilla/Datasets/CARLA100'
 
-        dataset = CoILDataset(root_path, transform=None, preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_CARLA100')
+        dataset = CoILDataset(root_path, transform=None, preload_name=str(
+            g_conf.NUMBER_OF_HOURS) + 'hours_CARLA100')
 
         g_conf.SPLIT = [['left', []], ['central', []], ['right', []], ['weights', [0., 0., 1.]]]
 
         data_loader = select_balancing_strategy(dataset, 0)
-
-
 
         count = 0
         capture_time = time.time()
@@ -61,7 +56,7 @@ class testInput(unittest.TestCase):
             print (data['rgb'].shape)
 
             #image_to_save = transforms.ToPILImage()((data['rgb'][0].cpu()*255).type(torch.ByteTensor))
-            #image_to_save.save(os.path.join(test_images_write_path,
+            # image_to_save.save(os.path.join(test_images_write_path,
             #                                str(count)+'c.png'))
             """
             image_to_save = transforms.ToPILImage()((data['rgb'][1].cpu()*255).type(torch.ByteTensor))
@@ -73,11 +68,9 @@ class testInput(unittest.TestCase):
                                             str(count)+'r.png'))
             """
 
-            for i in range( len(data['angle'])):
+            for i in range(len(data['angle'])):
 
                 self.assertEqual(data['angle'][i], 30)
-
-                                            
 
             count += 1
 

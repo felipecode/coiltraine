@@ -23,13 +23,9 @@ tl = ''
 # This next bit is to ensure the script runs unchanged on 2.x and 3.x
 
 
-
-
-
 #logging.info(SM('message 1', set_value={1, 2, 3}, snowman='\u2603'))
 
 def create_log(exp_batch_name, exp_name, process_name, log_frequency=1, image_log_frequency=15):
-
     """
 
     Arguments
@@ -49,7 +45,6 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1, image_lo
     # Hardcoded root path
     root_path = "_logs"
 
-
     dir_name = os.path.join(root_path, exp_batch_name, exp_name)
     full_name = os.path.join(dir_name, process_name)
 
@@ -57,8 +52,6 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1, image_lo
         flog = filelogger(exp_name + '_' + process_name, [], full_name, writing_level='a+')
     else:
         flog = filelogger(exp_name + '_' + process_name, [], full_name, writing_level='w')
-
-
 
     # TODO: This needs to be updated after a while. ???
     g_logger = flog
@@ -68,6 +61,7 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1, image_lo
     LOG_FREQUENCY = log_frequency
     IMAGE_LOG_FREQUENCY = image_log_frequency
     tl = Logger(os.path.join(root_path, exp_batch_name, exp_name, 'tensorboard_logs_'+process_name))
+
 
 def close():
 
@@ -89,7 +83,6 @@ def add_message(phase, message, iteration=None):
 
     """
 
-
     if phase == 'Iterating' and iteration is None:
         raise ValueError(" Iterating messages should have the iteration/checkpoint.")
 
@@ -103,9 +96,6 @@ def add_message(phase, message, iteration=None):
 
     # What if it is an error message ?
     # We can monitor the status based on error message. An error should mean the exp is not working
-
-
-
 
 
 # TODO: the logger should also interface with tensorboard.
@@ -141,15 +131,7 @@ def write_on_csv(checkpoint_name, output):
         f.write("\n")
 
 
-
-
-
-
-
-
-
 def add_scalar(tag, value, iteration=None, force_writing=False):
-
     """
     For raw output  logging on tensorboard.
     If you force writing it always writes regardless of the iteration
@@ -167,41 +149,32 @@ def add_scalar(tag, value, iteration=None, force_writing=False):
         tl.scalar_summary(tag, value, 0)
 
 
-
-
-
-
-
 def add_image(tag, images, iteration=None):
     # Add the image to a log, the monitorer is the module responsible by checking this
     # and eventually put some of the images to tensorboard.
-
 
     # TODO: change to sampling 10 images instead
     if iteration is not None:
         if iteration % IMAGE_LOG_FREQUENCY == 0:
 
-
             print (images.shape)
 
             images = images.view(-1, images.shape[1],
-                                     images.shape[2],
-                                     images.shape[3])[:10].cpu().data.numpy()
+                                 images.shape[2],
+                                 images.shape[3])[:10].cpu().data.numpy()
 
-
-            new_images = [] 
+            new_images = []
             if images.shape[1] == 1:
                 cmap = plt.get_cmap('inferno')
                 for i in range(images.shape[0]):
                     this = cmap(images[i, 0])[:, :, :3]
                     new_images.append(this)
                 images = np.array(new_images).transpose(0, 3, 1, 2)
-                
+
             print ("Converted")
             print (images.shape)
 
             tl.image_summary(tag, images, iteration + 1)
-
 
     else:
 
@@ -209,5 +182,3 @@ def add_image(tag, images, iteration=None):
                              images.shape[2],
                              images.shape[3])[:10].cpu().data.numpy()
         tl.image_summary(tag, images, iteration + 1)
-
-

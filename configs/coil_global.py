@@ -35,7 +35,6 @@ from configs.namer import generate_name
 from logger.coil_logger import create_log, add_message
 
 
-
 # TODO: NAMing conventions ?
 _g_conf = AttributeDict()
 
@@ -71,11 +70,12 @@ _g_conf.AUGMENTATION = None
 #                              ia.GaussianBlur(sigma=(0.0, 3.0)),
 #                              ia.ContrastNormalization((0.5, 1.5))
 #                              ]
-_g_conf.DATA_USED = 'all' #  central, all, sides,
+_g_conf.DATA_USED = 'all'  # central, all, sides,
 _g_conf.USE_NOISE_DATA = True
 _g_conf.TRAIN_DATASET_NAME = '1HoursW1-3-6-8'  # We only set the dataset in configuration for training
 
-_g_conf.LOG_SCALAR_WRITING_FREQUENCY = 2   # TODO NEEDS TO BE TESTED ON THE LOGGING FUNCTION ON  CREATE LOG
+# TODO NEEDS TO BE TESTED ON THE LOGGING FUNCTION ON  CREATE LOG
+_g_conf.LOG_SCALAR_WRITING_FREQUENCY = 2
 _g_conf.LOG_IMAGE_WRITING_FREQUENCY = 1000
 
 _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
@@ -104,7 +104,7 @@ _g_conf.MODEL_CONFIGURATION = {}
 
 _g_conf.LEARNING_RATE_DECAY_INTERVAL = 50000
 _g_conf.LEARNING_RATE_DECAY_LEVEL = 0.5
-#TODO check how to use this part
+# TODO check how to use this part
 
 _g_conf.LEARNING_RATE = 0.0002  # First
 _g_conf.BRANCH_LOSS_WEIGHT = [0.95, 0.95, 0.95, 0.95, 0.05]
@@ -115,7 +115,8 @@ _g_conf.LOSS_FUNCTION = 'L2'
 
 """#### Simulation Related Parameters ####"""
 
-_g_conf.IMAGE_CUT = [115, 510]  # How you should cut the input image that is received from the server
+# How you should cut the input image that is received from the server
+_g_conf.IMAGE_CUT = [115, 510]
 _g_conf.USE_ORACLE = True
 _g_conf.USE_FULL_ORACLE = False
 
@@ -134,10 +135,7 @@ def merge_with_yaml(yaml_filename):
 
         yaml_cfg = AttributeDict(yaml_file)
 
-
-
     _merge_a_into_b(yaml_cfg, _g_conf)
-
 
     path_parts = os.path.split(yaml_filename)
     _g_conf.EXPERIMENT_BATCH_NAME = os.path.split(path_parts[-2])[-1]
@@ -189,7 +187,7 @@ def set_type_of_process(process_type, param=None):
         _g_conf.CITY_NAME = param.split('_')[-1]
         _g_conf.PROCESS_NAME = process_type + '_' + param
 
-    #else:  # FOr the test case we join with the name of the experimental suite.
+    # else:  # FOr the test case we join with the name of the experimental suite.
 
     create_log(_g_conf.EXPERIMENT_BATCH_NAME,
                _g_conf.EXPERIMENT_NAME,
@@ -199,52 +197,37 @@ def set_type_of_process(process_type, param=None):
 
     if process_type == "train":
         if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
-                                            _g_conf.EXPERIMENT_NAME,
-                                            'checkpoints') ):
-                os.mkdir(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
-                                      _g_conf.EXPERIMENT_NAME,
-                                      'checkpoints'))
-
-
-
+                                           _g_conf.EXPERIMENT_NAME,
+                                           'checkpoints')):
+            os.mkdir(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
+                                  _g_conf.EXPERIMENT_NAME,
+                                  'checkpoints'))
 
     if process_type == "validation" or process_type == 'drive':
         if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
                                            _g_conf.EXPERIMENT_NAME,
                                            _g_conf.PROCESS_NAME + '_csv')):
             os.mkdir(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
-                                          _g_conf.EXPERIMENT_NAME,
-                                           _g_conf.PROCESS_NAME + '_csv'))
-
-
+                                  _g_conf.EXPERIMENT_NAME,
+                                  _g_conf.PROCESS_NAME + '_csv'))
 
     # We assure ourselves that the configuration file added does not kill things
     _check_integrity()
 
-
-
     add_message('Loading', {'ProcessName': _g_conf.EXPERIMENT_GENERATED_NAME,
                             'FullConfiguration': generate_param_dict()})
 
-
     _g_conf.immutable(True)
-
-
-
 
 
 def merge_with_parameters():
     pass
 
 
-
 def generate_param_dict():
     # TODO IMPLEMENT ! generate a cool param dictionary USE
     # https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable
     return _g_conf.TRAIN_DATASET_NAME + 'dict'
-
-
-
 
 
 def _merge_a_into_b(a, b, stack=None):
@@ -254,7 +237,6 @@ def _merge_a_into_b(a, b, stack=None):
 
     assert isinstance(a, AttributeDict) or isinstance(a, dict), 'Argument `a` must be an AttrDict'
     assert isinstance(b, AttributeDict) or isinstance(a, dict), 'Argument `b` must be an AttrDict'
-
 
     for k, v_ in a.items():
         full_key = '.'.join(stack) + '.' + k if stack is not None else k
@@ -283,14 +265,12 @@ def _merge_a_into_b(a, b, stack=None):
             b[k] = v
 
 
-
 def _decode_cfg_value(v):
     """Decodes a raw config value (e.g., from a yaml config files or command
     line argument) into a Python object.
     """
     # Configs parsed from raw yaml will contain dictionary keys that need to be
     # converted to AttrDict objects
-
 
     # All remaining processing is only applied to strings
     if not isinstance(v, str):
@@ -346,8 +326,4 @@ def _check_and_coerce_cfg_value_type(value_a, value_b, key, full_key):
     return value_a
 
 
-
-
-
 g_conf = _g_conf
-

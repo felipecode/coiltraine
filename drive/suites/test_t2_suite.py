@@ -15,7 +15,6 @@ from carla.settings import CarlaSettings
 from carla.driving_benchmark.experiment_suites.experiment_suite import ExperimentSuite
 
 
-
 class TestT2(ExperimentSuite):
 
     def __init__(self):
@@ -24,16 +23,14 @@ class TestT2(ExperimentSuite):
     @property
     def train_weathers(self):
         return []
+
     @property
     def test_weathers(self):
         return [14]
 
-
     def _poses(self):
 
         return [[[38, 34], [4, 2]]]
-
-
 
     def build_experiments(self):
         """
@@ -51,7 +48,6 @@ class TestT2(ExperimentSuite):
         camera.set_image_size(800, 600)
         camera.set_position(2.0, 0.0, 1.4)
         camera.set_rotation(-15.0, 0, 0)
-
 
         poses_tasks = self._poses()
         vehicles_tasks = [0, 0, 0, 15]
@@ -87,5 +83,3 @@ class TestT2(ExperimentSuite):
                 experiments_vector.append(experiment)
 
         return experiments_vector
-
-

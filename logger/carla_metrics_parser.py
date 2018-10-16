@@ -3,7 +3,6 @@ import json
 import numpy as np
 
 
-
 # TODO, THIS COULD BE EXPANDED TO GET OTHER TYPES OF METRICS.
 
 def get_averaged_metrics(weathers, path):
@@ -20,17 +19,15 @@ def get_averaged_metrics(weathers, path):
                          4: 'Cloudy After Rain', 14: 'Soft Rain Sunset'}
 
     # First we write the entire dictionary on the benchmark folder.
-    with open(os.path.join('_benchmark_results', path, 'metrics.json')
-            , 'r') as f:
+    with open(os.path.join('_benchmark_results', path, 'metrics.json'), 'r') as f:
         metrics_summary = json.loads(f.read())
 
-
     averaged_metrics = {'episodes_fully_completed': [], 'episodes_completion': [],
-                        'collision_pedestrians':[],
-                        'collision_vehicles':[],
-                        'collision_other':[],
-                        'intersection_offroad':[],
-                        'intersection_otherlane':[] }
+                        'collision_pedestrians': [],
+                        'collision_vehicles': [],
+                        'collision_other': [],
+                        'intersection_offroad': [],
+                        'intersection_otherlane': []}
 
     # Second we plot the metrics that are already ready by averaging
 

@@ -165,10 +165,7 @@ class ResNet(nn.Module):
         x = self.fc(x)
         print (x.shape)
 
-
         return x, [x0, x1, x2, x3, x4]  # output, intermediate
-
-
 
 
 def resnet18(pretrained=False, **kwargs):

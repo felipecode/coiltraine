@@ -33,12 +33,11 @@ class RandomSampler(Sampler):
     def __init__(self, keys, executed_iterations, data_source):
         super().__init__(data_source)
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
-                                     executed_iterations + g_conf.BATCH_SIZE
+            executed_iterations + g_conf.BATCH_SIZE
         self.keys = keys
 
     def __iter__(self):
         return iter([random.choice(self.keys) for _ in range(self.iterations_to_execute)])
-
 
     def __len__(self):
         return self.iterations_to_execute
@@ -62,12 +61,10 @@ class SubsetSampler(Sampler):
         return len(self.indices)
 
 
-
 class PreSplittedSampler(Sampler):
     """ Sample on a list of keys that was previously splitted
 
     """
-
 
     def __init__(self, keys, executed_iterations, data_source, weights=None):
 
@@ -78,10 +75,8 @@ class PreSplittedSampler(Sampler):
         else:
             self.weights = np.asarray(weights)
 
-
-
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
-                                     executed_iterations + g_conf.BATCH_SIZE
+            executed_iterations + g_conf.BATCH_SIZE
         self.replacement = True
 
     def __iter__(self):
@@ -98,7 +93,6 @@ class PreSplittedSampler(Sampler):
         """
         rank_keys = get_rank(self.keys)
         print ("got rank", rank_keys)
-
 
         # First we check how many subdivisions there are
         weights = torch.from_numpy(self.weights)
@@ -118,12 +112,10 @@ class PreSplittedSampler(Sampler):
             idy = torch.multinomial(weights, self.iterations_to_execute, True)
             idy = idy.tolist()
 
-
-            return iter([random.choice(self.keys[i][j]) for i, j in zip(idx,idy)])
+            return iter([random.choice(self.keys[i][j]) for i, j in zip(idx, idy)])
 
         else:
             raise ValueError("Keys have invalid rank")
-
 
     def __len__(self):
         return self.iterations_to_execute
@@ -135,23 +127,22 @@ class LogitSplittedSampler(Sampler):
 
     """
 
-
     def __init__(self, keys, executed_iterations, data_source, weights=None):
-
 
         super().__init__(data_source)
         self.keys = keys
         if weights is None:
-            self.weights = torch.tensor([1.0/float(len(self.keys))]*len(self.keys), dtype=torch.double)
+            self.weights = torch.tensor([1.0/float(len(self.keys))] *
+                                        len(self.keys), dtype=torch.double)
         else:
             self.weights = torch.from_numpy(weights)
         self.weights = Variable(self.weights, requires_grad=True)
 
         assert len(self.weights) == len(self.keys), "Number of weights and keys should be the same"
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
-                                     executed_iterations + g_conf.BATCH_SIZE
+            executed_iterations + g_conf.BATCH_SIZE
         self.replacement = True
-        self.optim = optim.Adam([self.weights,], lr=0.01)
+        self.optim = optim.Adam([self.weights, ], lr=0.01)
 
     def __iter__(self):
         """
@@ -177,7 +168,8 @@ class LogitSplittedSampler(Sampler):
         self.optim.step()
         if perturb:
             N = len(self.weights)
-            self.weights = self.weights + torch.normal(torch.zeros(N), perturb * torch.ones(N)).double()
+            self.weights = self.weights + \
+                torch.normal(torch.zeros(N), perturb * torch.ones(N)).double()
 
     def __len__(self):
         return self.iterations_to_execute
@@ -227,8 +219,7 @@ class BatchSequenceSampler(object):
         if len(batch) > 0 and not self.drop_last:
             yield batch
 
-
-        #if len(batch) > 0 and not self.drop_last:
+        # if len(batch) > 0 and not self.drop_last:
         #    yield batch
 
     def __len__(self):

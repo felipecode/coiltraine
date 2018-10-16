@@ -21,6 +21,7 @@ from torch.utils.data.sampler import BatchSampler, SubsetRandomSampler
 from torch.utils.data import TensorDataset as dset
 from configs import g_conf
 
+
 class testSampler(unittest.TestCase):
 
     def test_regular_sampler(self):
@@ -48,9 +49,7 @@ class testSampler(unittest.TestCase):
 
         print (np.unique(labels))
 
-
         print ('position of camera', np.where(dataset.meta_data[:, 0] == b'camera'))
-
 
         camera_names = dataset.measurements[np.where(dataset.meta_data[:, 0] == b'camera'), :][0][0]
         print (" Camera names ")
@@ -58,13 +57,8 @@ class testSampler(unittest.TestCase):
 
         keys = range(0, len(steerings) - g_conf.NUMBER_IMAGES_SEQUENCE)
 
-
         splitted_steer_labels = splitter.control_steer_split(dataset.measurements,
                                                              dataset.meta_data, keys)
-
-
-
-
 
         # one_camera_data = splitter.label_split(camera_names, keys, [[0]])
         #
@@ -83,13 +77,10 @@ class testSampler(unittest.TestCase):
         #weights = [1.0/len(g_conf.STEERING_DIVISION)]*len(g_conf.STEERING_DIVISION)
 
         sampler = BatchSequenceSampler(splitted_steer_labels, 0, 120, g_conf.NUMBER_IMAGES_SEQUENCE,
-                                      g_conf.SEQUENCE_STRIDE, False)
-
-
-
+                                       g_conf.SEQUENCE_STRIDE, False)
 
         big_steer_vec = []
-        count =0
+        count = 0
 
         print ("len keys", len(keys))
 
@@ -97,7 +88,7 @@ class testSampler(unittest.TestCase):
                                                   batch_sampler=sampler,
                                                   num_workers=0,
                                                   pin_memory=True)
-        dist_calc =  [0] * (len(keys)+1)
+        dist_calc = [0] * (len(keys)+1)
 
         print (len(dist_calc))
 
@@ -105,17 +96,14 @@ class testSampler(unittest.TestCase):
 
             sensor, float_data = data
 
-            print (sorted(float_data[:,0]))
-
+            print (sorted(float_data[:, 0]))
 
             count += 1
 
         print (dist_calc)
-        #plt.hist(dist_calc,1400)
+        # plt.hist(dist_calc,1400)
 
-        #plt.show()
-
-
+        # plt.show()
 
     def test_inverse_sampler(self):
 
@@ -130,7 +118,8 @@ class testSampler(unittest.TestCase):
 
         dataset = CoILDataset(root_path, transform=None, preload_name='10hours_CARLA100')
 
-        g_conf.SPLIT = [['pedestrian', []], ['vehicle', []], ['traffic_lights_move', []], ['weights', 'inverse']]
+        g_conf.SPLIT = [['pedestrian', []], ['vehicle', []], [
+            'traffic_lights_move', []], ['weights', 'inverse']]
 
         data_loader = select_balancing_strategy(dataset, 0)
 
@@ -151,12 +140,13 @@ class testSampler(unittest.TestCase):
             # image_to_save.save(os.path.join(test_images_write_path,
             #                                str(count)+'c.png'))
 
-            image_to_save = transforms.ToPILImage()((data['rgb'][1].cpu()*255).type(torch.ByteTensor))
+            image_to_save = transforms.ToPILImage()(
+                (data['rgb'][1].cpu()*255).type(torch.ByteTensor))
             image_to_save.save(os.path.join(test_images_write_path,
                                             str(count)+'l.png'))
 
             #image_to_save = transforms.ToPILImage()((data['rgb'][2].cpu()*255).type(torch.ByteTensor))
-            #image_to_save.save(os.path.join(test_images_write_path,
+            # image_to_save.save(os.path.join(test_images_write_path,
             #                                str(count)+'r.png'))
 
-            count +=1
+            count += 1
