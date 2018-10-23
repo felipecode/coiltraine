@@ -8,7 +8,7 @@ learning networks, toguether with the CARLA simulator.
 #### General System view
 
 The system has a few modules:
-
+[![COIL Diagram](docs/img/CoIL.png?raw=true )]()
 
 #### Getting started
 
