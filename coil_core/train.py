@@ -280,8 +280,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             capture_time = time.time()
             controls = data['directions']
 
-
-
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
             model.zero_grad()
@@ -291,16 +289,21 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             # Make use of attention more general.
 
 
-
             #TODO: This requires some cleaning, there is two selection points for the loss
             if 'attention' in g_conf.LOSS_FUNCTION or 'regularization' in g_conf.LOSS_FUNCTION:
                 inter_layers = [model.intermediate_layers[ula] for ula in g_conf.USED_LAYERS_ATT]
-                loss, loss_L1, loss_L2 = criterion(branches, dataset.extract_targets(data).cuda(),
-                                 controls.cuda(), dataset.extract_inputs(data).cuda(),
-                                 branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
-                                 variable_weights=g_conf.VARIABLE_WEIGHT,
-                                 inter_layers=inter_layers,
-                                 intention_factors=dataset.extract_intentions(data).cuda())
+                # Build the loss function parameters
+                loss_function_params = {
+                    'branches': branches,
+                    'targets': dataset.extract_targets(data).cuda(),
+                    'controls': controls.cuda(),
+                    'inputs': dataset.extract_inputs(data).cuda(),
+                    'branch_weights': g_conf.BRANCH_LOSS_WEIGHT,
+                    'variable_weights': g_conf.VARIABLE_WEIGHT,
+                    'inter_layers': inter_layers,
+                    'intention_factors': dataset.extract_intentions(data).cuda()
+                }
+                loss, loss_L1, loss_L2 = criterion(loss_function_params)
 
                 # my weight decay
                 if g_conf.WEIGHT_DECAY != 0:
@@ -309,7 +312,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                         if w.requires_grad:
                             wdecay = torch.add(torch.sum(w**2), wdecay)
                     loss = torch.add(loss, g_conf.WEIGHT_DECAY * wdecay)
-
 
                 coil_logger.add_scalar('L1', loss_L1.data, iteration)
                 coil_logger.add_scalar('L2', loss_L2.data, iteration)
