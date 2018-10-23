@@ -5,62 +5,38 @@ This code can be used to easily train and manage the trainings of imitation
 learning networks, toguether with the CARLA simulator.
 
 
-
-####Getting started
-
-
-##### RequiredPackages
-
-Imgaug
-h5py
-pytorch 0.4
-
-
 #### General System view
 
-The system has a few modules
+The system has a few modules:
+
 
 #### Getting started
 
 
-Train/Validation mode:
+Assuming you collected and post-processed the data at 
+
+~/CARLA/CARLA100 ---
+    --/episode_00001
+    --/episode_00002
+    …
+
 
 The first thing you need to do is define the datasets folder.
-This is the folder that contains your training and validation datasets.
+This is the folder that contains your training and validation datasets
 
-    export COIL_DATASET_PATH=<path to the datasetfolders>
+    export COIL_DATASET_PATH=<Path to where your dataset folders are>
+ 
+Experiments are defined in config files inside CoIL/configs. You can run all the experiments in a folder using:
 
+    python3 run_CoIL.py --folder <my_folder> --gpus 0 1 -de <DrivingEnvironmentClass_Town0X> 
 
-The training dataset must be set on the experiment file directly. 
-Since training is strictly associated with the experiment.
-The validation datasets are passed as parameter.
-There are two modes of running.
+Where DrivingEnvironmentClass is one of the classes defined in the modules at CoIL/drive/suites. Those driving environments define the start and end positions for driving, the number of cars, people, etc. That information will define the Benchmark to test the model driving in CARLA in parallel to training. Town0X is either Town01 or Town02. 
+Note that the training dataset must be set on the experiment file directly. Since training is strictly associated with the experiment. The validation datasets are passed as parameter. There are two modes of running.
 
-Running a simple process:
-This mode is for basically just running a single process that can be
-a training/ validation or drive proccess.
+To run a single experiment, we use the flag single-process train and the experiment name. A full example to train a ResNet_34 with attention losses is shown below:
 
-Running a folder
-
-    python3 --folder <folder_name>  --gpus < list of gpus > -vd < list of validation datasets >
-     -de < List of driving environments >
+    python3 run_CoIL.py --folder attention_tests --gpus 0 1 2 3 4 5 6 7 -de ExredTraining_Town01 --single-process train -e resnet_attention --docker
 
 
-Drive Mode:
-
-For driving and testing in CARLA the path to the CARLA
-folder must be specified.
-
-    export CARLA_PATH=<pathtocarla/CARLA/
-    
-
-Running plot:
-
-To run the plotting run
-
-    python3 run_plotting.py --folder eccv_debug -p plotting_all_cameras
-    
-Where the "folder" is the folder of the experiments. "-p" is the plotting configuration file
-that is localized at the visulization/plotting_params    
 
 
