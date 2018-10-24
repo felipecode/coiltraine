@@ -20,30 +20,42 @@ def branched_loss(loss_function, params):
     Args
         loss_function: The loss functional that is actually computing the loss
         params: all the parameters, including
+                branches: The tensor containing all the branches branches output from the network
+                targets: The ground truth targets that the network should produce
+                controls: the controls used for each point
+                branches weights: the weigths that each branch will have on the loss function
+                speed_gt: the ground truth speed for these data points
+                variable_weights: The weights for each of the variables used
+
+                For other losses it could contain more parameters
+
     Returns
-        The computed loss function, but also a dictnary with plotable variables for tb
+        The computed loss function, but also a dictionary with plotable variables for tensorboard
     """
 
-    controls_mask = LF.compute_branches_masks(params['controls'])
+    controls_mask = LF.compute_branches_masks(params['controls'],
+                                              params['branches'][0].shape[1])
     # Update the dictionary to add also the controls mask.
     params.update({'controls_mask': controls_mask})
 
     # calculate loss for each branch with specific activation
-    loss_branches_vec = loss_function(params)
+    loss_branches_vec, plotable_params = loss_function(params)
 
     # Apply the variable weights
     # This is applied to all branches except the last one, that is the speed branch...
-    for i in range(len(loss_branches_vec)-1):
-        loss_branches_vec = loss_branches_vec[i][:, 0] * params['variable_weights']['Steer'] \
-                            + loss_branches_vec[i][:, 1] * params['variable_weights']['Gas'] \
-                            + loss_branches_vec[i][:, 2] * params['variable_weights']['Brake']
+    # TODO This is hardcoded to  have 4 branches not using speed.
+    for i in range(4):
+        print ("SHAIPES")
+        print (loss_branches_vec[i].shape)
+        print (loss_branches_vec[i])
+        print (params['variable_weights'])
+        loss_branches_vec[i] = loss_branches_vec[i][:, 0] * params['variable_weights']['Steer'] \
+                               + loss_branches_vec[i][:, 1] * params['variable_weights']['Gas'] \
+                               + loss_branches_vec[i][:, 2] * params['variable_weights']['Brake']
 
     # add all branches losses together
     loss_value = sum(loss_branches_vec)
-
-    return torch.sum(loss_value) / (loss_value.shape[0]), {}
-
-
+    return torch.sum(loss_value) / (loss_value.shape[0]), plotable_params
 
 
 def Loss(loss_name):

@@ -1,19 +1,17 @@
+from torch.nn import functional as F
 import torch
+
 
 def normalize(x, dim):
     x_normed = x / x.max(dim, keepdim=True)[0]
     return x_normed
 
-# TODO: needs some severe refactor to avoid hardcoding and repetition
 
-def compute_attention_map_L2(il):
-
+def compute_attention_map_l2(il):
     """
     THis compute the attention map that is actually viewable for L2
-    :param il:
-    :return:
-    """
 
+    """
     L2 = torch.pow(il, 2)
     L2 = L2.mean(1)  # channel pooling
     max_value, _ = torch.max(L2.view(L2.shape[0], -1), 1, keepdim=True)
@@ -23,11 +21,11 @@ def compute_attention_map_L2(il):
 
     return L2
 
-def compute_attention_map_L1(il):
+
+def compute_attention_map_l1(il):
     """
     THis compute the attention map that is actually viewable for L1
-    :param il:
-    :return:
+
     """
 
     L1 = il.mean(1)
@@ -39,6 +37,7 @@ def compute_attention_map_L1(il):
     print (L1)
 
     return L1
+
 
 def compute_attention_loss(inter_layers, variable_weights, intention_factors):
 
@@ -55,13 +54,15 @@ def compute_attention_loss(inter_layers, variable_weights, intention_factors):
     count = 0
     for il in inter_layers:
         """ We compute the square ( L2) for each of the maps and them take the mean"""
-        L2 = compute_attention_map_L2(il)
-        L2 = F.avg_pool2d(L2, variable_weights['AVGP_Kernel_Size'], padding=int(variable_weights['AVGP_Kernel_Size']/2))
+        L2 = compute_attention_map_l2(il)
+        L2 = F.avg_pool2d(L2, variable_weights['AVGP_Kernel_Size'],
+                          padding=int(variable_weights['AVGP_Kernel_Size']/2))
         L2 = L2.mean(1).mean(1)
 
         """ We compute the square (L1) for each of the maps and them take the mean"""
-        L1 = compute_attention_map_L1(il)
-        L1 = F.avg_pool2d(L1, variable_weights['AVGP_Kernel_Size'],  padding=int(variable_weights['AVGP_Kernel_Size']/2))
+        L1 = compute_attention_map_l1(il)
+        L1 = F.avg_pool2d(L1, variable_weights['AVGP_Kernel_Size'],
+                          padding=int(variable_weights['AVGP_Kernel_Size']/2))
         L1 = L1.mean(1).mean(1)
 
         #print (" atention ", count)
@@ -75,18 +76,18 @@ def compute_attention_loss(inter_layers, variable_weights, intention_factors):
 
         print (" Partial Loss ", loss)
 
-
     return loss, L1, L2
 
 
 
-
-def compute_branches_masks(controls):
+def compute_branches_masks(controls, number_targets):
     """
         Args
             controls
             the control values that have the following structure
             command flags: 2 - follow lane; 3 - turn left; 4 - turn right; 5 - go straight
+            size of targets:
+            How many targets is produced by the network so we can produce the masks properly
         Returns
             a mask to have the loss function applied
             only on over the correct branch.
@@ -98,22 +99,22 @@ def compute_branches_masks(controls):
     # when command = 2, branch 1 (follow lane) is activated
     controls_b1 = (controls == 2)
     controls_b1 = torch.tensor(controls_b1, dtype=torch.float32).cuda()
-    controls_b1 = torch.cat([controls_b1] * len(g_conf.TARGETS), 1)
+    controls_b1 = torch.cat([controls_b1] * number_targets, 1)
     controls_masks.append(controls_b1)
     # when command = 3, branch 2 (turn left) is activated
     controls_b2 = (controls == 3)
     controls_b2 = torch.tensor(controls_b2, dtype=torch.float32).cuda()
-    controls_b2 = torch.cat([controls_b2] * len(g_conf.TARGETS), 1)
+    controls_b2 = torch.cat([controls_b2] * number_targets, 1)
     controls_masks.append(controls_b2)
     # when command = 4, branch 3 (turn right) is activated
     controls_b3 = (controls == 4)
     controls_b3 = torch.tensor(controls_b3, dtype=torch.float32).cuda()
-    controls_b3 = torch.cat([controls_b3] * len(g_conf.TARGETS), 1)
+    controls_b3 = torch.cat([controls_b3] * number_targets, 1)
     controls_masks.append(controls_b3)
     # when command = 5, branch 4 (go strange) is activated
     controls_b4 = (controls == 5)
     controls_b4 = torch.tensor(controls_b4, dtype=torch.float32).cuda()
-    controls_b4 = torch.cat([controls_b4] * len(g_conf.TARGETS), 1)
+    controls_b4 = torch.cat([controls_b4] * number_targets, 1)
     controls_masks.append(controls_b4)
 
 
@@ -143,9 +144,10 @@ def l2_loss(params):
                                  * params['branch_weights'][i])
     """ The last branch is a speed branch"""
     # TODO: Activate or deactivate speed branch loss
-    loss_branches_vec.append(torch.abs(params['branches'][-1] - params['inputs']) ** 2
+    loss_branches_vec.append((params['branches'][-1] - params['inputs']) ** 2
                              * params['branch_weights'][-1])
     return loss_branches_vec, {}
+
 
 def l1_loss(params):
     """
@@ -171,9 +173,10 @@ def l1_loss(params):
                                  * params['branch_weights'][i])
     """ The last branch is a speed branch"""
     # TODO: Activate or deactivate speed branch loss
-    loss_branches_vec.append(torch.abs(params['branches'][-1] - params['inputs']) ** 2
+    loss_branches_vec.append(torch.abs(params['branches'][-1] - params['inputs'])
                              * params['branch_weights'][-1])
     return loss_branches_vec, {}
+
 
 def l1_attention_loss(params):
     """
@@ -185,6 +188,8 @@ def l1_attention_loss(params):
                 controls_mask: the masked already expliciting the branches tha are going to be used
                 branches weights: the weigths that each branch will have on the loss function
                 speed_gt: the ground truth speed for these data points
+                inter_layers: The intermediate layers used to compute the attention
+                intention_factors: The factors used to compute to weight the attention used.
 
 
         Returns
@@ -200,11 +205,15 @@ def l1_attention_loss(params):
     if 'intention_factors' not in params:
         raise ValueError(" Missing Intention Factors (intention_factors) Parameters ")
 
-
     """ It is a vec for each branch"""
     loss_branches_vec = []
+
     # TODO This is hardcoded but all our cases rigth now uses four branches
     for i in range(len(params['branches']) -1):
+        print (" ATT SHAPIES")
+        print ((torch.abs((params['branches'][i] - params['targets'])
+                                           * params['controls_mask'][i])
+                                 * params['branch_weights'][i]).shape)
         loss_branches_vec.append(torch.abs((params['branches'][i] - params['targets'])
                                            * params['controls_mask'][i])
                                  * params['branch_weights'][i])
@@ -214,9 +223,13 @@ def l1_attention_loss(params):
                                               params['variable_weights'],
                                               params['intention_factors'])
     loss_branches_vec.append(att_loss)
+
+    # We pre process the plotable params to make them plotable
+    l1 = torch.sum(l1) / (l1.shape[0])
+    l2 = torch.sum(l2) / (l2.shape[0])
     plotable_params = {'L1': l1, 'L2': l2}
 
     # TODO: Activate or deactivate speed branch loss
-    loss_branches_vec.append(torch.abs(params['branches'][-1] - params['inputs']) ** 2
+    loss_branches_vec.append(torch.abs(params['branches'][-1] - params['inputs'])
                              * params['branch_weights'][-1])
     return loss_branches_vec, plotable_params

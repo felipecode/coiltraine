@@ -9,6 +9,7 @@ import numpy as np
 from .json_formatter import filelogger, closeFileLogger
 from .tensorboard_logger import Logger
 
+from utils.general import plot_test_image
 
 g_logger = filelogger('None')
 
@@ -188,7 +189,6 @@ def add_image(tag, images, iteration=None):
                                      images.shape[2],
                                      images.shape[3])[:10].cpu().data.numpy()
 
-
             new_images = [] 
             if images.shape[1] == 1:
                 cmap = plt.get_cmap('inferno')
@@ -196,11 +196,20 @@ def add_image(tag, images, iteration=None):
                     this = cmap(images[i, 0])[:, :, :3]
                     new_images.append(this)
                 images = np.array(new_images).transpose(0, 3, 1, 2)
-                
+
+            np.set_printoptions(threshold=np.nan)
+            #print (images.shape)
+            #print (images[0]*255)
+            #plot_test_image((images[0]*255).astype(np.uint8), 'test.png')
+
             print ("Converted")
             print (images.shape)
 
+
             tl.image_summary(tag, images, iteration + 1)
+
+            #exit(1)
+            #exit(1)
 
 
     else:

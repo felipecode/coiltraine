@@ -16,14 +16,14 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 # TODO: maybe add aditional tasks ( NO dynamic obstacles for instace !)
 
-class ExredTraining(ExperimentSuite):
+class ExredmoreTraining(ExperimentSuite):
 
     def __init__(self):
-        super(ExredTraining, self).__init__('Town01')
+        super(ExredmoreTraining, self).__init__('Town01')
 
     @property
     def train_weathers(self):
-        return [1]
+        return [1, 8]
 
     @property
     def test_weathers(self):
@@ -39,7 +39,13 @@ class ExredTraining(ExperimentSuite):
                     [96, 26], [34, 67], [28, 1], [140, 134], [105, 9],
                     [148, 129], [65, 18], [21, 16], [147, 97], [42, 51],
                     [30, 41], [18, 107], [69, 45], [102, 95], [18, 145],
-                    [111, 64], [79, 45], [84, 69], [73, 31], [37, 81]]
+                    [111, 64], [79, 45], [84, 69], [73, 31], [37, 81],
+                    [35, 57], [42, 116], [75, 47], [132, 143], [145, 8],
+                    [43, 107], [61, 111], [137, 105], [24, 72], [0, 77],
+                    [17, 80], [12, 32], [3, 64], [146, 32], [33, 40],
+                    [71, 127], [21, 116], [51, 49], [35, 110], [91, 85],
+                    [93, 114], [7, 30], [133, 110], [43, 60], [98, 11],
+                    ]
 
         return [_poses_navigation(),
                 _poses_navigation()

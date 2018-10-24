@@ -13,7 +13,7 @@ import collections
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss, adjust_learning_rate
-from network.loss import compute_attention_map_L2, compute_attention_map_L1
+from network.loss_functional import compute_attention_map_l2, compute_attention_map_l1
 from input import CoILDataset, PreSplittedSampler, splitter, Augmenter, RandomSampler
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
@@ -303,7 +303,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                     'inter_layers': inter_layers,
                     'intention_factors': dataset.extract_intentions(data).cuda()
                 }
-                loss, loss_L1, loss_L2 = criterion(loss_function_params)
+                loss, platable_params = criterion(loss_function_params)
 
                 # my weight decay
                 if g_conf.WEIGHT_DECAY != 0:
@@ -313,18 +313,27 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                             wdecay = torch.add(torch.sum(w**2), wdecay)
                     loss = torch.add(loss, g_conf.WEIGHT_DECAY * wdecay)
 
-                coil_logger.add_scalar('L1', loss_L1.data, iteration)
-                coil_logger.add_scalar('L2', loss_L2.data, iteration)
+                coil_logger.add_scalar('L1', platable_params['L1'].data, iteration)
+                coil_logger.add_scalar('L2', platable_params['L2'].data, iteration)
 
                 count = 0
                 for il in inter_layers:
                     coil_logger.add_image('Attention L1 ' + str(g_conf.USED_LAYERS_ATT[count]),
-                                          compute_attention_map_L1(il).unsqueeze(1), iteration)
+                                          compute_attention_map_l1(il).unsqueeze(1), iteration)
                     coil_logger.add_image('Attention L2 ' + str(g_conf.USED_LAYERS_ATT[count]),
-                                          compute_attention_map_L2(il).unsqueeze(1), iteration)
+                                          compute_attention_map_l2(il).unsqueeze(1), iteration)
                     count += 1
 
             else:
+                loss_function_params = {
+                    'branches': branches,
+                    'targets': dataset.extract_targets(data).cuda(),
+                    'controls': controls.cuda(),
+                    'inputs': dataset.extract_inputs(data).cuda(),
+                    'branch_weights': g_conf.BRANCH_LOSS_WEIGHT,
+                    'variable_weights': g_conf.VARIABLE_WEIGHT
+                }
+
                 loss = criterion(branches, dataset.extract_targets(data).cuda(),
                                  controls.cuda(), dataset.extract_inputs(data).cuda(),
                                  branch_weights=g_conf.BRANCH_LOSS_WEIGHT,

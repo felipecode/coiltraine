@@ -329,7 +329,7 @@ class CoILDataset(Dataset):
 
                 # We do measurements for the left side camera
                 # #TOdo the angle does not need to be hardcoded
-                # We convert the speed to KM/h for the augmentaiton
+                # We convert the speed to KM/h for the augmentation
 
                 # We extract the interesting subset from the measurement dict
 

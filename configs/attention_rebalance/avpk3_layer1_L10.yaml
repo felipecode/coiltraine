@@ -79,7 +79,7 @@ VARIABLE_WEIGHT:
   Gas: 0.45
   Brake: 0.05
   L1: 0.0
-  L2: 1.0
+  L2: 0.1
   AVGP_Kernel_Size: 3  # The kernel size used for average pooling.
 
 #### Simulation Related Parameters ####
