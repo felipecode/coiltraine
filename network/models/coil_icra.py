@@ -50,7 +50,7 @@ class CoILICRA(nn.Module):
                                             'end_layer': True})
 
             perception_fc = FC(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
-                                                  + params['perception']['fc']['neurons'],
+                                                   + params['perception']['fc']['neurons'],
                                        'dropouts': params['perception']['fc']['dropouts'],
                                        'end_layer': False})
 

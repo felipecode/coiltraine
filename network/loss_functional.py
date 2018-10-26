@@ -233,3 +233,59 @@ def l1_attention_loss(params):
     loss_branches_vec.append(torch.abs(params['branches'][-1] - params['inputs'])
                              * params['branch_weights'][-1])
     return loss_branches_vec, plotable_params
+
+def l1_ground_truth_attention_loss(params):
+    """
+        Functional LOSS L1 attention
+        Args
+            params dictionary that should include:
+                branches: The tensor containing all the branches branches output from the network
+                targets: The ground truth targets that the network should produce
+                controls_mask: the masked already expliciting the branches tha are going to be used
+                branches weights: the weigths that each branch will have on the loss function
+                speed_gt: the ground truth speed for these data points
+                inter_layers: The intermediate layers used to compute the attention
+                intention_factors: The factors used to compute to weight the attention used.
+
+
+        Returns
+            A vector with the loss function
+            a dictionary with all the intermediary values that are plotable, for this case the
+            L1 And L2 computed attention
+
+    """
+    if 'inter_layers' not in params:
+        raise ValueError(" Missing Intermediate layer (inter_layers) Parameters ")
+    if 'variable_weights' not in params:
+        raise ValueError(" Missing Variable Weights (variable_weights) Parameters ")
+    if 'intention_factors' not in params:
+        raise ValueError(" Missing Intention Factors (intention_factors) Parameters ")
+
+    """ It is a vec for each branch"""
+    loss_branches_vec = []
+
+    # TODO This is hardcoded but all our cases rigth now uses four branches
+    for i in range(len(params['branches']) -1):
+
+        print ((torch.abs((params['branches'][i] - params['targets'])
+                                           * params['controls_mask'][i])
+                                 * params['branch_weights'][i]).shape)
+        loss_branches_vec.append(torch.abs((params['branches'][i] - params['targets'])
+                                           * params['controls_mask'][i])
+                                 * params['branch_weights'][i])
+    """ The last branch is a speed branch"""
+
+    att_loss, l1, l2 = compute_attention_loss(params['inter_layers'],
+                                              params['variable_weights'],
+                                              params['intention_factors'])
+    loss_branches_vec.append(att_loss)
+
+    # We pre process the plotable params to make them plotable
+    l1 = torch.sum(l1) / (l1.shape[0])
+    l2 = torch.sum(l2) / (l2.shape[0])
+    plotable_params = {'L1': l1, 'L2': l2}
+
+    # TODO: Activate or deactivate speed branch loss
+    loss_branches_vec.append(torch.abs(params['branches'][-1] - params['inputs'])
+                             * params['branch_weights'][-1])
+    return loss_branches_vec, plotable_params

@@ -61,4 +61,3 @@ class FC(nn.Module):
 
         return self.layers(x)
 
-

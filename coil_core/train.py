@@ -248,9 +248,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         dataset = CoILDataset(full_dataset, transform=augmenter,
                               preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
 
-
         data_loader = select_balancing_strategy(dataset, iteration, number_of_workers)
-
 
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         model.cuda()
@@ -305,14 +303,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                 }
                 loss, platable_params = criterion(loss_function_params)
 
-                # my weight decay
-                if g_conf.WEIGHT_DECAY != 0:
-                    wdecay = 0
-                    for w in model.parameters():
-                        if w.requires_grad:
-                            wdecay = torch.add(torch.sum(w**2), wdecay)
-                    loss = torch.add(loss, g_conf.WEIGHT_DECAY * wdecay)
-
                 coil_logger.add_scalar('L1', platable_params['L1'].data, iteration)
                 coil_logger.add_scalar('L2', platable_params['L2'].data, iteration)
 
@@ -334,12 +324,15 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                     'variable_weights': g_conf.VARIABLE_WEIGHT
                 }
 
-                loss = criterion(branches, dataset.extract_targets(data).cuda(),
-                                 controls.cuda(), dataset.extract_inputs(data).cuda(),
-                                 branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
-                                 variable_weights=g_conf.VARIABLE_WEIGHT)
+                loss, _ = criterion(loss_function_params)
 
-
+            # my weight decay
+            if g_conf.WEIGHT_DECAY != 0:
+                wdecay = 0
+                for w in model.parameters():
+                    if w.requires_grad:
+                        wdecay = torch.add(torch.sum(w**2), wdecay)
+                loss = torch.add(loss, g_conf.WEIGHT_DECAY * wdecay)
 
 
             # TODO: All these logging things could go out to clean up the main
@@ -353,20 +346,12 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             output = model.extract_branch(torch.stack(branches[0:4]), controls)
             error = torch.abs(output - dataset.extract_targets(data).cuda())
 
-
-
-
             # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
             print (" The produced loss")
 
             coil_logger.add_scalar('Loss', loss.data, iteration)
             print ("RGB")
             coil_logger.add_image('Image', torch.squeeze(data['rgb']), iteration)
-
-
-
-
-
 
             loss.backward()
             optimizer.step()

@@ -136,7 +136,33 @@ class CoILDataset(Dataset):
             #else:
             #    boost = 1
             boost = 1
-            img = self.transform(self.batch_read_number * boost, img)
+            if g_conf.GATED_AUGMENTATION is None:
+                img = self.transform(self.batch_read_number * boost, img)
+            else:
+                # The
+                intention = min(self.measurements[index]['pedestrian'],
+                                self.measurements[index]['traffic_lights'],
+                                self.measurements[index]['vehicle'])
+
+                if g_conf.GATED_AUGMENTATION == 'easy':
+                    if intention == 1:
+                        boost = intention
+                        img = self.transform(self.batch_read_number * boost, img)
+                    else:
+                        img = img.transpose(2, 0, 1)
+
+                elif g_conf.GATED_AUGMENTATION == 'hard':
+                    if intention != 1:
+                        boost = 1 - intention
+                        img = self.transform(self.batch_read_number * boost, img)
+                    else:
+                        img = img.transpose(2, 0, 1)
+
+                else:
+                    raise ValueError(" Not valid Gated Augmentation")
+
+
+
 
         else:
             img = img.transpose(2, 0, 1)

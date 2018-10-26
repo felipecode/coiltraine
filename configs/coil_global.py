@@ -65,6 +65,7 @@ _g_conf.REMOVE = None
 #                             ]
 
 _g_conf.AUGMENTATION = None
+_g_conf.GATED_AUGMENTATION = None
 
 
 #_g_conf.AUGMENTATION_SUITE_CPU = [ ia.Add((0, 0)), ia.Dropout(0, 0),
@@ -76,7 +77,7 @@ _g_conf.USE_NOISE_DATA = True
 _g_conf.TRAIN_DATASET_NAME = '1HoursW1-3-6-8'  # We only set the dataset in configuration for training
 
 _g_conf.LOG_SCALAR_WRITING_FREQUENCY = 2   # TODO NEEDS TO BE TESTED ON THE LOGGING FUNCTION ON  CREATE LOG
-_g_conf.LOG_IMAGE_WRITING_FREQUENCY = 1
+_g_conf.LOG_IMAGE_WRITING_FREQUENCY = 10
 
 _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
 _g_conf.EXPERIMENT_NAME = "default"
