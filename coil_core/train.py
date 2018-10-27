@@ -256,8 +256,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         if checkpoint_file is not None:
             model.load_state_dict(checkpoint['state_dict'])
 
-        print(model)
-
         criterion = Loss(g_conf.LOSS_FUNCTION)
 
         optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
@@ -315,6 +313,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                     count += 1
 
             else:
+                print (" CLASSICAL LOSS")
                 loss_function_params = {
                     'branches': branches,
                     'targets': dataset.extract_targets(data).cuda(),
@@ -327,7 +326,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                 loss, _ = criterion(loss_function_params)
 
             # my weight decay
+
             if g_conf.WEIGHT_DECAY != 0:
+                print (" WEIGHT DECAYING  ")
                 wdecay = 0
                 for w in model.parameters():
                     if w.requires_grad:
@@ -350,13 +351,11 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             print (" The produced loss")
 
             coil_logger.add_scalar('Loss', loss.data, iteration)
-            print ("RGB")
             coil_logger.add_image('Image', torch.squeeze(data['rgb']), iteration)
 
             loss.backward()
             optimizer.step()
 
-            print ("Inference + opt + TIME ", time.time() - capture_time)
             accumulated_time += time.time() - capture_time
             capture_time = time.time()
 

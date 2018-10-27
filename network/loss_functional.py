@@ -31,10 +31,8 @@ def compute_attention_map_l1(il):
     L1 = il.mean(1)
     l1_max_value, _ = torch.max(L1.view(L1.shape[0], -1), 1, keepdim=True)
     l1_max_value = l1_max_value.view(-1, 1, 1)
-    print (" max L1 ", l1_max_value.mean())
     L1 = torch.div(L1, l1_max_value)
-    print ("L1 Image")
-    print (L1)
+
 
     return L1
 
@@ -42,14 +40,11 @@ def compute_attention_map_l1(il):
 def compute_attention_loss(inter_layers, variable_weights, intention_factors):
 
     """ Take the batch size from the number of channels on the attention maps"""
-    print (inter_layers[0].shape)
-    print (intention_factors.shape)
+
     loss = torch.zeros([intention_factors.shape[0]], dtype=torch.float32).cuda()
 
     intention, _ = torch.min(intention_factors, 1)
     intention = (1. > intention).float()
-    print (loss.shape)
-    print (intention.shape)
 
     count = 0
     for il in inter_layers:
@@ -210,10 +205,6 @@ def l1_attention_loss(params):
 
     # TODO This is hardcoded but all our cases rigth now uses four branches
     for i in range(len(params['branches']) -1):
-        print (" ATT SHAPIES")
-        print ((torch.abs((params['branches'][i] - params['targets'])
-                                           * params['controls_mask'][i])
-                                 * params['branch_weights'][i]).shape)
         loss_branches_vec.append(torch.abs((params['branches'][i] - params['targets'])
                                            * params['controls_mask'][i])
                                  * params['branch_weights'][i])
