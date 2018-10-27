@@ -64,7 +64,7 @@ class Conv(nn.Module):
 
     # TODO: iteration control should go inside the logger, somehow
 
-    def forward(self, x):
+    def forward(self, x, *args):
         # get only the speeds from measurement labels
 
         # TODO: TRACK NANS OUTPUTS

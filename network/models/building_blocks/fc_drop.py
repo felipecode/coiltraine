@@ -1,4 +1,3 @@
-
 from logger import coil_logger
 import torch.nn as nn
 import torch.nn.init as init
@@ -8,15 +7,8 @@ import torch.nn.functional as F
 
 class FC(nn.Module):
 
-    def __init__(self, params=None, module_name='Default'
-                 ):
-
-        #         input_size=, kernel_sizes= [512, 128,128], end_module=False):
-        # TODO: Make an auto naming function for this.
-        #  OBS, only xavier init is available
-        #  OBS, only constant = 0.1 initialization of bias
+    def __init__(self, params=None, module_name='Default'):
         super(FC, self).__init__()
-
 
         """" ---------------------- FC ----------------------- """
         if params is None:
@@ -32,32 +24,37 @@ class FC(nn.Module):
             raise ValueError("Dropouts should be from the len of kernels minus 1")
 
 
+        self.params = params
         self.layers = []
 
 
         for i in range(0, len(params['neurons']) -1):
 
             fc = nn.Linear(params['neurons'][i], params['neurons'][i+1])
-            dropout = nn.Dropout2d(p=params['dropouts'][i])
             relu = nn.ReLU(inplace=True)
 
             if i == len(params['neurons'])-2 and params['end_layer']:
-                self.layers.append(nn.Sequential(*[fc, dropout]))
+                self.layers.append(nn.Sequential(*[fc, ]))
             else:
-                self.layers.append(nn.Sequential(*[fc, dropout, relu]))
-
-
-        self.layers = nn.Sequential(*self.layers)
-
-
-
-
+                self.layers.append(nn.Sequential(*[fc, relu]))
 
     # TODO: iteration control should go inside the logger, somehow
 
-    def forward(self, x, *args):
+    def forward(self, x, intentions=None):
+        # intentions define if max dropout is to be applied
         # get only the speeds from measurement labels
         # TODO: TRACK NANS OUTPUTS
+        for L, drop in zip(self.layers, self.params['dropouts']):
+            x = L(x)
+            if self.training:  # apply dropout
+                if intentions is None:
+                    intentions = torch.ones(x.shape[0], dtype=torch.float32)
+                keepprob = 1. - drop
+                d = (intentions * keepprob).view_as(-1, 1)
+                d = d.view_as.expand_as(x)
+                mask = torch.bernoulli(d)
+                x = x * mask
+                x = x / d
 
-        return self.layers(x)
+        return x
 

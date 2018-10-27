@@ -25,7 +25,7 @@ class Branching(nn.Module):
 
     # TODO: iteration control should go inside the logger, somehow
 
-    def forward(self, x):
+    def forward(self, x, *args):
         # get only the speeds from measurement labels
 
 
@@ -34,7 +34,7 @@ class Branching(nn.Module):
 
         branches_outputs = []
         for branch in self.branched_modules:
-            branches_outputs.append(branch(x))
+            branches_outputs.append(branch(x, *args))
 
         return branches_outputs
 
