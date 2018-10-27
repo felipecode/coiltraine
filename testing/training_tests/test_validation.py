@@ -36,7 +36,7 @@ class testValidation(unittest.TestCase):
 
         dataset_name = 'DataVerySmall'
 
-        exp_batch  = 'eccv_debug'
+        exp_batch = 'eccv_debug'
         exp_alias = 'experiment_1'
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name)
 
