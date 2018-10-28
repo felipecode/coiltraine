@@ -2,13 +2,13 @@ from logger import coil_logger
 import torch.nn as nn
 import torch.nn.init as init
 import torch
-import torch.nn.functional as F
+import numpy as np
 
 
-class FC(nn.Module):
+class FCD(nn.Module):
 
     def __init__(self, params=None, module_name='Default'):
-        super(FC, self).__init__()
+        super(FCD, self).__init__()
 
         """" ---------------------- FC ----------------------- """
         if params is None:
@@ -23,13 +23,10 @@ class FC(nn.Module):
         if len(params['dropouts']) != len(params['neurons'])-1:
             raise ValueError("Dropouts should be from the len of kernels minus 1")
 
-
         self.params = params
         self.layers = []
 
-
         for i in range(0, len(params['neurons']) -1):
-
             fc = nn.Linear(params['neurons'][i], params['neurons'][i+1])
             relu = nn.ReLU(inplace=True)
 
@@ -37,6 +34,9 @@ class FC(nn.Module):
                 self.layers.append(nn.Sequential(*[fc, ]))
             else:
                 self.layers.append(nn.Sequential(*[fc, relu]))
+
+        self.layers = nn.ModuleList(self.layers)
+
 
     # TODO: iteration control should go inside the logger, somehow
 
@@ -48,13 +48,21 @@ class FC(nn.Module):
             x = L(x)
             if self.training:  # apply dropout
                 if intentions is None:
-                    intentions = torch.ones(x.shape[0], dtype=torch.float32)
+                    tensor_intentions = torch.ones(x.shape[0], dtype=torch.float32).cuda()
+                else:
+                    tensor_intentions, _ = torch.min(intentions, 1)
                 keepprob = 1. - drop
-                d = (intentions * keepprob).view_as(-1, 1)
-                d = d.view_as.expand_as(x)
+                print (keepprob)
+                print (tensor_intentions * keepprob)
+                d = (tensor_intentions * keepprob)
+                print(d.shape)
+                d = torch.unsqueeze(d, 1)
+                print(d.shape)
                 mask = torch.bernoulli(d)
+                print (" MASK ", mask)
                 x = x * mask
                 x = x / d
+
 
         return x
 

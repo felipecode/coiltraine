@@ -183,7 +183,7 @@ class CoILDataset(Dataset):
 
     def is_measurement_partof_experiment(self, measurement_data):
 
-        # If the measument data is not removable is because it is part of this experiment dataa
+        # If the measurement data is not removable is because it is part of this experiment dataa
         return not self._check_remove_function(measurement_data, self._remove_params)
 
 
