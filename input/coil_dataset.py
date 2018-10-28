@@ -511,9 +511,6 @@ class CoILDataset(Dataset):
         return torch.cat(inputs_vec, 1)
 
 
-
-
-
 if __name__ == "__main__":
     dataset = NewDataset(root_dir='')
     print(len(dataset))

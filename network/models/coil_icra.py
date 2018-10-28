@@ -8,7 +8,7 @@ from utils.general import command_number_to_index
 
 from .building_blocks import Conv
 from .building_blocks import Branching
-from .building_blocks import FC
+from .building_blocks import FC, FCD
 from .building_blocks import Join
 
 
@@ -49,10 +49,10 @@ class CoILICRA(nn.Module):
                                             'dropouts': params['perception']['conv']['dropouts'],
                                             'end_layer': True})
 
-            perception_fc = FC(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
-                                                   + params['perception']['fc']['neurons'],
-                                       'dropouts': params['perception']['fc']['dropouts'],
-                                       'end_layer': False})
+            perception_fc = FCD(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
+                                                    + params['perception']['fc']['neurons'],
+                                        'dropouts': params['perception']['fc']['dropouts'],
+                                        'end_layer': False})
 
             self.perception = nn.Sequential(*[perception_convs, perception_fc])
 
@@ -94,7 +94,7 @@ class CoILICRA(nn.Module):
 
         # WILL NOT WORK FOR SMALL AND DEEP LAYERS
         # TODO: eliminate this hardcoded middle layer, make a conv simulation to get the fc out size
-        self.measurements = FC(params={'neurons': [len(g_conf.INPUTS)] +
+        self.measurements = FCD(params={'neurons': [len(g_conf.INPUTS)] +
                                                    params['measurements']['fc']['neurons'],
                                        'dropouts': params['measurements']['fc']['dropouts'],
                                        'end_layer': False})
@@ -103,7 +103,7 @@ class CoILICRA(nn.Module):
 
         self.join = Join(
             params={'after_process':
-                         FC(params={'neurons':
+                         FCD(params={'neurons':
                                         [params['measurements']['fc']['neurons'][-1] +
                                          number_output_neurons] +
                                         params['join']['fc']['neurons'],
@@ -113,7 +113,7 @@ class CoILICRA(nn.Module):
                     }
          )
 
-        self.speed_branch = FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
+        self.speed_branch = FCD(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                   params['speed_branch']['fc']['neurons'] + [1],
                                        'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
                                        'end_layer': True})
@@ -122,7 +122,7 @@ class CoILICRA(nn.Module):
         # Create the fc vector separatedely
         branch_fc_vector = []
         for i in range(params['branches']['number_of_branches']):
-            branch_fc_vector.append(FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
+            branch_fc_vector.append(FCD(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                          params['branches']['fc']['neurons'] +
                                                          [len(g_conf.TARGETS)],
                                                'dropouts': params['branches']['fc']['dropouts'] + [0.0],
@@ -144,16 +144,16 @@ class CoILICRA(nn.Module):
 
 
 
-    def forward(self, x, a):
+    def forward(self, x, a, intentions=None):
 
 
         """ ###### APPLY THE PERCEPTION MODULE """
-        x, inter = self.perception(x)
+        x, inter = self.perception(x, intentions)
         self.intermediate_layers = inter
 
         """ ###### APPLY THE MEASUREMENT MODUES """
 
-        m = self.measurements(a)
+        m = self.measurements(a, intentions)
 
         """ Join measurements and perception"""
         j = self.join(x, m)

@@ -145,7 +145,7 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def forward(self, x):
+    def forward(self, x, *args):
 
         """ Put also the activation as the real one."""
         print (x.shape)
