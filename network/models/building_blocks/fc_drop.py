@@ -55,6 +55,7 @@ class FCD(nn.Module):
                 print (keepprob)
                 print (tensor_intentions * keepprob)
                 d = (tensor_intentions * keepprob)
+                d = torch.clip(d, 0.1, 1)
                 print(d.shape)
                 d = torch.unsqueeze(d, 1)
                 print(d.shape)
