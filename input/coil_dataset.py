@@ -154,7 +154,7 @@ class CoILDataset(Dataset):
                 elif g_conf.GATED_AUGMENTATION == 'hard':
                     if intention_value != 1:
                         boost = 1 - intention_value
-                        img = self.transform(self.batch_read_number * boost*1000, img)
+                        img = self.transform(self.batch_read_number * boost, img)
                     else:
                         img = img.transpose(2, 0, 1)
 
