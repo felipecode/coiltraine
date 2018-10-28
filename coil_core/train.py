@@ -13,7 +13,8 @@ import collections
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss, adjust_learning_rate
-from network.loss_functional import compute_attention_map_l2, compute_attention_map_l1
+from network.loss_functional import compute_attention_map_l2, compute_attention_map_l1, weight_decay_l1, \
+weight_decay_l2
 from input import CoILDataset, PreSplittedSampler, splitter, Augmenter, RandomSampler
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
@@ -280,8 +281,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             model.zero_grad()
             branches = model(torch.squeeze(data['rgb'].cuda()),
-                             dataset.extract_inputs(data).cuda(),
-                             dataset.extract_intentions(data).cuda())
+                             dataset.extract_inputs(data).cuda())
 
             # Make use of attention more general.
 
@@ -328,13 +328,31 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             # my weight decay
 
-            if g_conf.WEIGHT_DECAY != 0:
-                print (" WEIGHT DECAYING  ")
-                wdecay = 0
-                for w in model.parameters():
-                    if w.requires_grad:
-                        wdecay = torch.add(torch.sum(w**2), wdecay)
-                loss = torch.add(loss, g_conf.WEIGHT_DECAY * wdecay)
+            if g_conf.WEIGHT_DECAY == 'L1':
+                loss = weight_decay_l1(loss, model, None,
+                                       g_conf.WEIGHT_DECAY_ALPHA,
+                                       None)
+            elif g_conf.WEIGHT_DECAY == 'L2':
+                loss = weight_decay_l2(loss, model, None,
+                                       g_conf.WEIGHT_DECAY_ALPHA,
+                                       None)
+            elif g_conf.WEIGHT_DECAY == 'L1_easy':
+                loss = weight_decay_l1(loss, model, dataset.extract_intentions(data).cuda(),
+                                       g_conf.WEIGHT_DECAY_ALPHA,
+                                       'easy')
+            elif g_conf.WEIGHT_DECAY == 'L2_easy':
+                loss = weight_decay_l2(loss, model, dataset.extract_intentions(data).cuda(),
+                                       g_conf.WEIGHT_DECAY_ALPHA,
+                                       'easy')
+            elif g_conf.WEIGHT_DECAY == 'L1_hard':
+                loss = weight_decay_l1(loss, model, dataset.extract_intentions(data).cuda(),
+                                       g_conf.WEIGHT_DECAY_ALPHA,
+                                       'hard')
+            elif g_conf.WEIGHT_DECAY == 'L2_hard':
+                loss = weight_decay_l2(loss, model, dataset.extract_intentions(data).cuda(),
+                                       g_conf.WEIGHT_DECAY_ALPHA,
+                                       'hard')
+
 
 
             # TODO: All these logging things could go out to clean up the main

@@ -49,7 +49,7 @@ class CoILICRA(nn.Module):
                                             'dropouts': params['perception']['conv']['dropouts'],
                                             'end_layer': True})
 
-            perception_fc = FCD(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
+            perception_fc = FC(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
                                                     + params['perception']['fc']['neurons'],
                                         'dropouts': params['perception']['fc']['dropouts'],
                                         'end_layer': False})
@@ -94,7 +94,7 @@ class CoILICRA(nn.Module):
 
         # WILL NOT WORK FOR SMALL AND DEEP LAYERS
         # TODO: eliminate this hardcoded middle layer, make a conv simulation to get the fc out size
-        self.measurements = FCD(params={'neurons': [len(g_conf.INPUTS)] +
+        self.measurements = FC(params={'neurons': [len(g_conf.INPUTS)] +
                                                    params['measurements']['fc']['neurons'],
                                        'dropouts': params['measurements']['fc']['dropouts'],
                                        'end_layer': False})
@@ -103,7 +103,7 @@ class CoILICRA(nn.Module):
 
         self.join = Join(
             params={'after_process':
-                         FCD(params={'neurons':
+                         FC(params={'neurons':
                                         [params['measurements']['fc']['neurons'][-1] +
                                          number_output_neurons] +
                                         params['join']['fc']['neurons'],
@@ -113,7 +113,7 @@ class CoILICRA(nn.Module):
                     }
          )
 
-        self.speed_branch = FCD(params={'neurons': [params['join']['fc']['neurons'][-1]] +
+        self.speed_branch = FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                   params['speed_branch']['fc']['neurons'] + [1],
                                        'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
                                        'end_layer': True})
@@ -122,7 +122,7 @@ class CoILICRA(nn.Module):
         # Create the fc vector separatedely
         branch_fc_vector = []
         for i in range(params['branches']['number_of_branches']):
-            branch_fc_vector.append(FCD(params={'neurons': [params['join']['fc']['neurons'][-1]] +
+            branch_fc_vector.append(FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                          params['branches']['fc']['neurons'] +
                                                          [len(g_conf.TARGETS)],
                                                'dropouts': params['branches']['fc']['dropouts'] + [0.0],

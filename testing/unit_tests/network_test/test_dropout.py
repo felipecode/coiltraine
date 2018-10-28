@@ -111,8 +111,8 @@ class testDropout(unittest.TestCase):
         print (self._x)
 
         # Test for some gated augmentation
-        result = model(self._x, self._intentions)
-        #result = model(self._x)
+        #result = model(self._x, self._intentions)
+        result = model(self._x)
 
         print (" RESULT ")
 

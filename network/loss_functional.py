@@ -73,7 +73,48 @@ def compute_attention_loss(inter_layers, variable_weights, intention_factors):
 
     return loss, L1, L2
 
+def weight_decay_l1(loss, model, intention_factors, alpha, gating):
 
+    wdecay = 0
+    for w in model.parameters():
+        if w.requires_grad:
+            wdecay = torch.add(torch.sum(w), wdecay)
+
+    if intention_factors is not None:
+
+        intention, _ = torch.min(intention_factors, 1)
+        intention = (1. > intention).float()
+        if gating == 'hard':
+            # Multiply by a factor proportional to the size of the number of non 1
+            wdecay = wdecay * intention.shape[0]/torch.sum(intention)
+
+        elif gating == 'easy':
+            wdecay = wdecay * torch.sum(intention)/intention.shape[0]
+
+    loss = torch.add(loss, alpha * wdecay)
+    return loss
+
+
+def weight_decay_l2(loss, model, intention_factors, alpha, gating):
+
+    wdecay = 0
+    for w in model.parameters():
+        if w.requires_grad:
+            wdecay = torch.add(torch.sum(w**2), wdecay)
+
+    if intention_factors is not None:
+
+        intention, _ = torch.min(intention_factors, 1)
+        intention = (1. > intention).float()
+        if gating == 'hard':
+            # Multiply by a factor proportional to the size of the number of non 1
+            wdecay = wdecay * intention.shape[0]/torch.sum(intention)
+
+        elif gating == 'easy':
+            wdecay = wdecay * torch.sum(intention)/intention.shape[0]
+
+    loss = torch.add(loss, alpha * wdecay)
+    return loss
 
 def compute_branches_masks(controls, number_targets):
     """

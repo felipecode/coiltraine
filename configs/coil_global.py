@@ -77,7 +77,7 @@ _g_conf.USE_NOISE_DATA = True
 _g_conf.TRAIN_DATASET_NAME = '1HoursW1-3-6-8'  # We only set the dataset in configuration for training
 
 _g_conf.LOG_SCALAR_WRITING_FREQUENCY = 2   # TODO NEEDS TO BE TESTED ON THE LOGGING FUNCTION ON  CREATE LOG
-_g_conf.LOG_IMAGE_WRITING_FREQUENCY = 10
+_g_conf.LOG_IMAGE_WRITING_FREQUENCY = 1000
 
 _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
 _g_conf.EXPERIMENT_NAME = "default"
@@ -107,12 +107,12 @@ _g_conf.LEARNING_RATE_DECAY_INTERVAL = 50000
 _g_conf.LEARNING_RATE_DECAY_LEVEL = 0.5
 #TODO check how to use this part
 
-_g_conf.WEIGHT_DECAY = 0.0
+_g_conf.WEIGHT_DECAY = None
+_g_conf.WEIGHT_DECAY_ALPHA = 0.0005
 _g_conf.LEARNING_RATE = 0.0002  # First
 _g_conf.BRANCH_LOSS_WEIGHT = [0.95, 0.95, 0.95, 0.95, 0.05]
 _g_conf.VARIABLE_WEIGHT = {'Steer': 0.5, 'Gas': 0.45, 'Brake': 0.05}
 _g_conf.USED_LAYERS_ATT = []
-
 _g_conf.LOSS_FUNCTION = 'L2'
 
 """#### Simulation Related Parameters ####"""

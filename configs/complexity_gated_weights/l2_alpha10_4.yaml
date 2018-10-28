@@ -21,8 +21,7 @@ SEQUENCE_STRIDE: 1
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 12.0
 TRAIN_DATASET_NAME: 'CARLA100'
-AUGMENTATION: 'medium'
-GATED_AUGMENTATION: 'hard'
+AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
 NUMBER_OF_HOURS: 50
@@ -81,6 +80,8 @@ VARIABLE_WEIGHT:
 IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
+WEIGHT_DECAY: 'L2'
+WEIGHT_DECAY_ALPHA: 0.0001
 
 
 

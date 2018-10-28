@@ -140,21 +140,21 @@ class CoILDataset(Dataset):
                 img = self.transform(self.batch_read_number * boost, img)
             else:
                 # The
-                intention = min(self.measurements[index]['pedestrian'],
-                                self.measurements[index]['traffic_lights'],
-                                self.measurements[index]['vehicle'])
+                intention_value = 1.0
+                for intention in g_conf.INTENTIONS:
+                    intention_value = min(intention_value, self.measurements[index][intention])
 
                 if g_conf.GATED_AUGMENTATION == 'easy':
-                    if intention == 1:
-                        boost = intention
+                    if intention_value == 1:
+                        boost = intention_value
                         img = self.transform(self.batch_read_number * boost, img)
                     else:
                         img = img.transpose(2, 0, 1)
 
                 elif g_conf.GATED_AUGMENTATION == 'hard':
-                    if intention != 1:
-                        boost = 1 - intention
-                        img = self.transform(self.batch_read_number * boost, img)
+                    if intention_value != 1:
+                        boost = 1 - intention_value
+                        img = self.transform(self.batch_read_number * boost*1000, img)
                     else:
                         img = img.transpose(2, 0, 1)
 
