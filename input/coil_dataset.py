@@ -160,10 +160,6 @@ class CoILDataset(Dataset):
 
                 else:
                     raise ValueError(" Not valid Gated Augmentation")
-
-
-
-
         else:
             img = img.transpose(2, 0, 1)
 

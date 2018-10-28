@@ -149,9 +149,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
         experiment_suite_module = getattr(experiment_suite_module, exp_set_name)
 
-
-
-
         experiment_set = experiment_suite_module()
 
         set_type_of_process('drive', drive_conditions)

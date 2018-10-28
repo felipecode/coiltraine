@@ -32,7 +32,9 @@ class ExredmoreNewWeatherTown(ExperimentSuite):
     @property
     def collision_as_failure(self):
         return True
-
+    @property
+    def traffic_light_as_failure(self):
+        return True
 
     def _poses(self):
 
