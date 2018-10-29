@@ -78,7 +78,7 @@ def weight_decay_l1(loss, model, intention_factors, alpha, gating):
     wdecay = 0
     for w in model.parameters():
         if w.requires_grad:
-            wdecay = torch.add(torch.sum(w), wdecay)
+            wdecay = torch.add(torch.sum(torch.abs(w)), wdecay)
 
     if intention_factors is not None:
 
