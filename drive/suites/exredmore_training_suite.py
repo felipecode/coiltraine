@@ -23,7 +23,7 @@ class ExredmoreTraining(ExperimentSuite):
 
     @property
     def train_weathers(self):
-        return [1, 8]
+        return [1]
 
     @property
     def test_weathers(self):
