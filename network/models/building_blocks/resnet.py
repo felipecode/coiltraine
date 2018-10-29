@@ -94,34 +94,40 @@ class Bottleneck(nn.Module):
         return out
 
 
+
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, num_classes=1000):
-        self.inplanes = 64
+    def __init__(self, params):
+        if params is None:
+            raise ValueError("Creating a NULL fully connected block")
+        if 'channels' not in params:
+            raise ValueError(" Missing the channel sizes parameter ")
+        if 'block' not in params:
+            raise ValueError(" Missing the strides parameter ")
+        if 'dropouts' not in params:
+            raise ValueError(" Missing the dropouts parameter ")
+        if 'end_layer' not in params:
+            raise ValueError(" Missing the end module parameter ")
+
+        self.inplanes = params['channels'][0]
+
         super(ResNet, self).__init__()
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
-                               bias=False)
-        self.bn1 = nn.BatchNorm2d(64)
-        self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, 64, layers[0])
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
-        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
-        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        self.avgpool = nn.AvgPool2d(2, stride=0)
 
-        # TODO: THis is a super hardcoding ..., in order to fit my image size on resnet
-        if block.__name__ == 'Bottleneck':
-            self.fc = nn.Linear(6144, num_classes)
-        else:
-            self.fc = nn.Linear(1536, num_classes)
+        self.layers = []
+        for i in range(len(params['layers'])):
 
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
-            elif isinstance(m, nn.BatchNorm2d):
-                nn.init.constant_(m.weight, 1)
-                nn.init.constant_(m.bias, 0)
+            layer = params['layers'][i]
+            channels = params['channels'][i]
+            stride = params['strides'][i]
+            self.layers.append(self._make_layer(params['block'], channels, layer, stride=stride))
+
+        if params['end_layer']:
+            self.avgpool = nn.AvgPool2d(2, stride=0)
+
+            # TODO: THis is a super hardcoding ..., in order to fit my image size on resnet
+            # TODO: eliminate this hard coding !!!
+            # TODO: JUST USE THE CONV CODE HERE
+
 
     def _make_layer(self, block, planes, blocks, stride=1):
         downsample = None
@@ -131,7 +137,6 @@ class ResNet(nn.Module):
                           kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(planes * block.expansion),
             )
-
         layers = []
         layers.append(block(self.inplanes, planes, stride, downsample))
         self.inplanes = planes * block.expansion
@@ -141,6 +146,8 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x, *args):
+
+        # TODO: just forward all layers
         print (x.shape)
         x = self.conv1(x)
         print (x.shape)
@@ -167,6 +174,17 @@ class ResNet(nn.Module):
 
 
         return x, [x0, x1, x2, x3, x4]  # output, intermediate
+
+    def get_conv_output(self, shape):
+        """
+           By inputing the shape of the input, simulate what is the ouputsize.
+        """
+
+        bs = 1
+        input = torch.autograd.Variable(torch.rand(bs, *shape))
+        output_feat = self.forward(input)
+        n_size = output_feat.data.view(bs, -1).size(1)
+        return n_size
 
 
 

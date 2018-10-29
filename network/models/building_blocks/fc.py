@@ -34,9 +34,7 @@ class FC(nn.Module):
 
         self.layers = []
 
-
         for i in range(0, len(params['neurons']) -1):
-
             fc = nn.Linear(params['neurons'][i], params['neurons'][i+1])
             dropout = nn.Dropout2d(p=params['dropouts'][i])
             relu = nn.ReLU(inplace=True)
