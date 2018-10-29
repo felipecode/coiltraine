@@ -98,7 +98,7 @@ class testDropout(unittest.TestCase):
         gated_augmentation = True
 
 
-        params = {"dropouts": [0.5],
+        params = {"dropouts": [0.0],
                   "neurons": [128, 128],
                   'end_layer': True
                   }
@@ -111,8 +111,8 @@ class testDropout(unittest.TestCase):
         print (self._x)
 
         # Test for some gated augmentation
-        #result = model(self._x, self._intentions)
-        result = model(self._x)
+        result = model(self._x, self._intentions)
+        #result = model(self._x)
 
         print (" RESULT ")
 

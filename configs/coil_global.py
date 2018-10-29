@@ -94,6 +94,7 @@ _g_conf.SPEED_FACTOR = 12.0
 _g_conf.AUGMENT_LATERAL_STEERINGS = 6
 _g_conf.NUMBER_OF_HOURS = 1
 _g_conf.WEATHERS = [1, 3, 6, 8]
+_g_conf.GATED_DROPOUT = None
 
 
 """#### Network Related Parameters ####"""

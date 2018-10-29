@@ -280,8 +280,17 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
 
             model.zero_grad()
-            branches = model(torch.squeeze(data['rgb'].cuda()),
-                             dataset.extract_inputs(data).cuda())
+            if g_conf.GATED_DROPOUT == 'hard':
+                branches = model(torch.squeeze(data['rgb'].cuda()),
+                                 dataset.extract_inputs(data).cuda(),
+                                 dataset.extract_intentions(data).cuda())
+            elif g_conf.GATED_DROPOUT == 'easy':
+                branches = model(torch.squeeze(data['rgb'].cuda()),
+                                 dataset.extract_inputs(data).cuda(),
+                                 1 - dataset.extract_intentions(data).cuda())
+            else:
+                branches = model(torch.squeeze(data['rgb'].cuda()),
+                                 dataset.extract_inputs(data).cuda())
 
             # Make use of attention more general.
 
