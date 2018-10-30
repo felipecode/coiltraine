@@ -197,24 +197,25 @@ class CoILSoftCGating(nn.Module):
 
         return perception_layers
 
-    def forward(self, x, a, intentions):
+    def forward(self, x, a, intentions=None):
 
         """ ###### APPLY THE PERCEPTION MODULES """
         x = self.low_perception(x)
 
         ## We get the complexity indicator by using the intentions ##
+        if intentions is not None:
+            complexity_indicator = self.make_complexity_indicator(intentions)
 
-        complexity_indicator = self.make_complexity_indicator(intentions)
-        print ('complex indicator')
-        print (complexity_indicator.shape)
-        print ('x shape')
-        print (x.shape)
-        complexity_indicator = \
-            torch.unsqueeze(torch.unsqueeze(torch.unsqueeze(complexity_indicator, 1), 1), 1)
+            complexity_indicator = \
+                torch.unsqueeze(torch.unsqueeze(torch.unsqueeze(complexity_indicator, 1), 1), 1)
 
-        x_complex = self.mid_complex_perception(x * (1 - complexity_indicator))
+            x_complex = self.mid_complex_perception(x * (1 - complexity_indicator))
 
-        x_easy = self.mid_easy_perception(x * complexity_indicator)
+            x_easy = self.mid_easy_perception(x * complexity_indicator)
+        else:
+            x_complex = self.mid_complex_perception(x)
+
+            x_easy = self.mid_easy_perception(x)
 
         easy_complex = self.join_perceptions(x_complex, x_easy)
 
