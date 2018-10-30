@@ -78,7 +78,7 @@ class CoILICRA(nn.Module):
                                             'channels': params['perception']['res']['channels'],
                                             'layers': params['perception']['res']['layers'],
                                             'strides': params['perception']['res']['strides'],
-                                            'end_layer': True}))
+                                            'end_layer': True}, inplanes=64))
         if 'fc' in params['perception']:
             perception_layers.append(FC(params={'neurons': [get_layer_sequence_size(
                                         sensor_input_shape, perception_layers)]
