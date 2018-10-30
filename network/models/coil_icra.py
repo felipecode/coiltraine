@@ -6,7 +6,7 @@ import importlib
 from configs import g_conf
 from utils.general import command_number_to_index
 
-from .building_blocks import Conv
+from .building_blocks import Conv, Residuals
 from .building_blocks import Branching
 from .building_blocks import FC, FCD
 from .building_blocks import Join
@@ -15,12 +15,31 @@ from .building_blocks import Join
 # TODO: REFACTOR
 # TODO: it is interesting the posibility to loop over many models.
 # TODO: Having multiple experiments, over the same alias.
+
+def get_layer_sequence_size(initial_shape, network_sequence):
+    """
+    Function to get the output size from a series of convolutions with and without residuals
+    :param initial_shape:
+    :param network_sequence:
+    :return: the final shape
+    """
+
+    iterating_shape = initial_shape
+    print(iterating_shape)
+    for network in network_sequence:
+
+        iterating_shape = network.get_conv_output(iterating_shape)
+        print('iter ', iterating_shape)
+
+    return iterating_shape
+
+
 class CoILICRA(nn.Module):
 
     def __init__(self, params):
         # TODO: Improve the model autonaming function
 
-        self.intermediate_layerss = None
+        self.intermediate_layers = None
         super(CoILICRA, self).__init__()
 
         # TODO: Make configurable function on the config files by reading other dictionary
@@ -37,63 +56,44 @@ class CoILICRA(nn.Module):
         sensor_input_shape = [number_first_layer_channels, sensor_input_shape[1],
                               sensor_input_shape[2]]
 
+        # ==============================================================================
+        # -- Perception Layers -----------------------------------------------------------
+        # ==============================================================================
+        perception_layers = []
 
-
-        # For this case we check if the perception layer is of the type "conv"
+        # For this case we check if the perception layer has a initial convolution
         if 'conv' in params['perception']:
-
-            perception_convs = Conv(params={'channels': [number_first_layer_channels] +
+            perception_layers.append(Conv(params={'channels': [number_first_layer_channels] +
                                                           params['perception']['conv']['channels'],
                                             'kernels': params['perception']['conv']['kernels'],
                                             'strides': params['perception']['conv']['strides'],
+                                            'padding': params['perception']['conv']['padding'],
+                                               'bias': params['perception']['conv']['bias'],
                                             'dropouts': params['perception']['conv']['dropouts'],
-                                            'end_layer': True})
+                                            'end_layer': False}))
 
-            perception_fc = FC(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
-                                                    + params['perception']['fc']['neurons'],
+        if 'res' in params['perception']:
+            perception_layers.append(Residuals(params={
+                                            'block_type': params['perception']['res']['block_type'],
+                                            'channels': params['perception']['res']['channels'],
+                                            'layers': params['perception']['res']['layers'],
+                                            'strides': params['perception']['res']['strides'],
+                                            'end_layer': True}))
+        if 'fc' in params['perception']:
+            perception_layers.append(FC(params={'neurons': [get_layer_sequence_size(
+                                        sensor_input_shape, perception_layers)]
+                                        + params['perception']['fc']['neurons'],
                                         'dropouts': params['perception']['fc']['dropouts'],
-                                        'end_layer': False})
-
-            self.perception = nn.Sequential(*[perception_convs, perception_fc])
-
-            number_output_neurons = params['perception']['fc']['neurons'][-1]
+                                        'end_layer': False}))
 
 
-        elif 'res' in params['perception']:  # pre defined residual networks
-            resnet_module = importlib.import_module('network.models.building_blocks.resnet')
-            #+ params['perception']['res']['name']
-            #fromlist = ['resnet']
-            # TODO: Check network drawing
-            resnet_module = getattr(resnet_module, params['perception']['res']['name'])
-            self.perception  = resnet_module(num_classes=params['perception']['res']['num_classes'])
+        print (perception_layers)
+        self.perception = nn.Sequential(*perception_layers)
 
-            number_output_neurons = params['perception']['res']['num_classes']
-
-
-            #elif 'res_attention' in params['perception']:  # pre defined residual networks
-            #    resnet_module = importlib.import_module('network.models.building_blocks.resnet')
-            #    # + params['perception']['res']['name']
-            #    # fromlist = ['resnet']
-            #    # TODO: Check network drawing
-            #    resnet_module = getattr(resnet_module, params['perception']['res']['name'])
-            #    self.perception= resnet_module(num_classes=params['perception']['res']['num_classes'])#
-            #
-            #     number_output_neurons = params['perception']['res']['num_classes']
-
-        else:
-
-            raise ValueError("invalid convolution layer type")
-
-
-
-
-
-
-
+        number_output_neurons = params['perception']['fc']['neurons'][-1]
 
 
         # WILL NOT WORK FOR SMALL AND DEEP LAYERS
-        # TODO: eliminate this hardcoded middle layer, make a conv simulation to get the fc out size
         self.measurements = FC(params={'neurons': [len(g_conf.INPUTS)] +
                                                    params['measurements']['fc']['neurons'],
                                        'dropouts': params['measurements']['fc']['dropouts'],
@@ -130,17 +130,14 @@ class CoILICRA(nn.Module):
 
         self.branches = Branching(branch_fc_vector) #  Here we set branching automatically
 
-        if 'conv' in params['perception']:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-                    nn.init.xavier_uniform_(m.weight)
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
                     nn.init.constant_(m.bias, 0.1)
-        else:
-            for m in self.modules():
-                if isinstance(m, nn.Linear):
-                    nn.init.xavier_uniform_(m.weight)
-                    nn.init.constant_(m.bias, 0.1)
-
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
 
 
 
@@ -148,12 +145,12 @@ class CoILICRA(nn.Module):
 
 
         """ ###### APPLY THE PERCEPTION MODULE """
-        x, inter = self.perception(x, intentions)
-        self.intermediate_layers = inter
+        x = self.perception(x)
+        #self.intermediate_layers = inter
 
         """ ###### APPLY THE MEASUREMENT MODUES """
 
-        m = self.measurements(a, intentions)
+        m = self.measurements(a)
 
         """ Join measurements and perception"""
         j = self.join(x, m)

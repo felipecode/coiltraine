@@ -6,21 +6,34 @@ import importlib
 from configs import g_conf
 from utils.general import command_number_to_index
 
-from .building_blocks import Conv
+from .building_blocks import Conv, Residuals
 from .building_blocks import Branching
 from .building_blocks import FC, FCD
 from .building_blocks import Join
 
+# TODO: REFACTOR
 
+def get_layer_sequence_size(initial_shape, network_sequence):
+    """
+    Function to get the output size from a series of convolutions with and without residuals
+    """
+
+    iterating_shape = initial_shape
+    print(iterating_shape)
+    for network in network_sequence:
+
+        iterating_shape = network.get_conv_output(iterating_shape)
+        print('iter ', iterating_shape)
+
+    return iterating_shape
 # TODO: REFACTOR
 # TODO: it is interesting the posibility to loop over many models.
 # TODO: Having multiple experiments, over the same alias.
 class CoILSoftCGating(nn.Module):
+       # TODO: Improve the model autonaming function
 
     def __init__(self, params):
-        # TODO: Improve the model autonaming function
-
-        self.intermediate_layerss = None
+        self.intermediate_layers = None
         super(CoILSoftCGating, self).__init__()
 
         # TODO: Make configurable function on the config files by reading other dictionary
@@ -37,32 +50,68 @@ class CoILSoftCGating(nn.Module):
         sensor_input_shape = [number_first_layer_channels, sensor_input_shape[1],
                               sensor_input_shape[2]]
 
+        # ==============================================================================
+        # -- Perception Layers -----------------------------------------------------------
+        # ==============================================================================
+
+        # For this case we check if the perception layer has a initial convolution
+
+        self.low_perception = self.build_perception(params['low_perception'],
+                                                    sensor_input_shape,
+                                                    False)
+        low_perception_o_shape = get_layer_sequence_size(sensor_input_shape, self.low_perception)
+        self.low_perception = nn.Sequential(*self.low_perception)
+        print ('low perception', low_perception_o_shape)
+
+        ### Declare for the branched perception part used for complex cases ###
+        self.mid_complex_perception = self.build_perception(params['mid_complex_perception'],
+                                                            low_perception_o_shape,
+                                                            False)
+        mid_complex_perception_o_shape = get_layer_sequence_size(low_perception_o_shape,
+                                                                 self.mid_complex_perception)
+        print('mid complex perception', mid_complex_perception_o_shape)
+        self.mid_complex_perception = nn.Sequential(*self.mid_complex_perception)
+
+        ### Declare for the branched perception part used for complex cases ###
+        self.mid_easy_perception = self.build_perception(params['mid_easy_perception'],
+                                                         low_perception_o_shape,
+                                                         False)
+        mid_easy_perception_o_shape = get_layer_sequence_size(low_perception_o_shape,
+                                                              self.mid_easy_perception)
+        print('mid easy perception', mid_easy_perception_o_shape)
+
+        self.mid_easy_perception = nn.Sequential(*self.mid_easy_perception)
+
+        self.join_perceptions = Join(
+            params={'after_process': None,
+                    'mode': 'cat'
+                    }
+        )
+        # TODO: we assume both parts output same shape
+        high_perception_start_shape = torch.Size([
+                mid_easy_perception_o_shape[0] + mid_complex_perception_o_shape[0],
+                                      mid_easy_perception_o_shape[1],
+                                      mid_easy_perception_o_shape[2]])
 
 
-        # For this case we check if the perception layer is of the type "conv"
-        resnet_module = importlib.import_module('network.models.building_blocks.resnet')
+        print ('high perception', high_perception_start_shape)
 
-        resnet_module = getattr(resnet_module, params['perception']['res']['name'])
+        self.high_perception = self.build_perception(params['high_perception'],
+                                                     high_perception_start_shape,
+                                                     True)
 
-        params['perception']['res'][]
+        self.high_perception = nn.Sequential(*self.high_perception)
 
-        self.perception = resnet_module(num_classes=params['perception']['res']['num_classes'])
-
-        number_output_neurons = params['perception']['res']['num_classes']
-
-        # THERE IS THIS TRICKY MAX POOL
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        # ==============================================================================
+        # -- Measurement Layers -----------------------------------------------------------
+        # ==============================================================================
 
 
 
-
-
-
-
+        number_output_neurons = params['high_perception']['fc']['neurons'][-1]
 
 
         # WILL NOT WORK FOR SMALL AND DEEP LAYERS
-        # TODO: eliminate this hardcoded middle layer, make a conv simulation to get the fc out size
         self.measurements = FC(params={'neurons': [len(g_conf.INPUTS)] +
                                                    params['measurements']['fc']['neurons'],
                                        'dropouts': params['measurements']['fc']['dropouts'],
@@ -99,28 +148,79 @@ class CoILSoftCGating(nn.Module):
 
         self.branches = Branching(branch_fc_vector) #  Here we set branching automatically
 
-        if 'conv' in params['perception']:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-                    nn.init.xavier_uniform_(m.weight)
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
                     nn.init.constant_(m.bias, 0.1)
-        else:
-            for m in self.modules():
-                if isinstance(m, nn.Linear):
-                    nn.init.xavier_uniform_(m.weight)
-                    nn.init.constant_(m.bias, 0.1)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
 
 
+    def build_perception(self, params, sensor_input_shape, end_layer):
+        perception_layers = []
+        if 'conv' in params:
+            perception_layers.append(Conv(params={'channels': [sensor_input_shape[0]] +
+                                                              params['conv'][
+                                                                  'channels'],
+                                                  'kernels': params['conv'][
+                                                      'kernels'],
+                                                  'strides': params['conv'][
+                                                      'strides'],
+                                                  'padding': params['conv'][
+                                                      'padding'],
+                                                  'bias': params['conv']['bias'],
+                                                  'dropouts': params['conv'][
+                                                      'dropouts'],
+                                                  'end_layer': False}))
 
+        if 'res' in params:
+            if len(perception_layers) > 0:
+                inplanes = get_layer_sequence_size(sensor_input_shape, perception_layers)[0]
+            else:
+                inplanes = sensor_input_shape[0]
 
-    def forward(self, x, a, intentions=None):
+            perception_layers.append(Residuals(params={
+                'block_type': params['res']['block_type'],
+                'channels': params['res']['channels'],
+                'layers': params['res']['layers'],
+                'strides': params['res']['strides'],
+                'end_layer': end_layer},
+                inplanes=inplanes))
+        if 'fc' in params:
+            perception_layers.append(FC(params={'neurons': [get_layer_sequence_size(
+                sensor_input_shape, perception_layers)]
+                                                           + params['fc']['neurons'],
+                                                'dropouts': params['fc']['dropouts'],
+                                                'end_layer': False}))
 
+        return perception_layers
 
-        """ ###### APPLY THE PERCEPTION MODULE """
-        x, inter = self.perception(x, intentions)
-        self.intermediate_layers = inter
+    def forward(self, x, a, intentions):
 
-        """ ###### APPLY THE MEASUREMENT MODUES """
+        """ ###### APPLY THE PERCEPTION MODULES """
+        x = self.low_perception(x)
+
+        ## We get the complexity indicator by using the intentions ##
+
+        complexity_indicator = self.make_complexity_indicator(intentions)
+        print ('complex indicator')
+        print (complexity_indicator.shape)
+        print ('x shape')
+        print (x.shape)
+        complexity_indicator = \
+            torch.unsqueeze(torch.unsqueeze(torch.unsqueeze(complexity_indicator, 1), 1), 1)
+
+        x_complex = self.mid_complex_perception(x * (1 - complexity_indicator))
+
+        x_easy = self.mid_easy_perception(x * complexity_indicator)
+
+        easy_complex = self.join_perceptions(x_complex, x_easy)
+
+        x = self.high_perception(easy_complex)
+
+        """ ###### APPLY THE MEASUREMENT MODULES """
 
         m = self.measurements(a, intentions)
 
@@ -155,6 +255,11 @@ class CoILSoftCGating(nn.Module):
 
         return self.extract_branch(output_vec, branch_number), self.forward(x, a)[-1]
 
+
+    def make_complexity_indicator(self, intention_factors):
+
+        intention, _ = torch.min(intention_factors, 1)
+        return intention
 
 
     def extract_branch(self, output_vec, branch_number):

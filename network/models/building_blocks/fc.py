@@ -48,14 +48,13 @@ class FC(nn.Module):
         self.layers = nn.Sequential(*self.layers)
 
 
-
-
-
     # TODO: iteration control should go inside the logger, somehow
 
     def forward(self, x, *args):
         # get only the speeds from measurement labels
-        # TODO: TRACK NANS OUTPUTS
+        print (x.shape)
+        x = self.layers(x)
+        print (x.shape)
 
-        return self.layers(x)
+        return x
 

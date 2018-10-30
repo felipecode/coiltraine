@@ -3,3 +3,4 @@ from .conv import Conv
 from .fc import FC
 from .fc_drop import FCD
 from .join import Join
+from .resnet import Residuals

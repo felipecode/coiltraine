@@ -95,23 +95,23 @@ class Bottleneck(nn.Module):
 
 
 
-class ResNet(nn.Module):
+class Residuals(nn.Module):
 
-    def __init__(self, params):
+    def __init__(self, params, inplanes):
         if params is None:
-            raise ValueError("Creating a NULL fully connected block")
+            raise ValueError(" Error, None parameter for residual construction")
+        if 'layers' not in params:
+            raise ValueError(" Missing the channel sizes parameter ")
         if 'channels' not in params:
             raise ValueError(" Missing the channel sizes parameter ")
-        if 'block' not in params:
-            raise ValueError(" Missing the strides parameter ")
-        if 'dropouts' not in params:
-            raise ValueError(" Missing the dropouts parameter ")
+        if 'block_type' not in params:
+            raise ValueError(" Missing the block parameter ")
         if 'end_layer' not in params:
             raise ValueError(" Missing the end module parameter ")
 
-        self.inplanes = params['channels'][0]
+        self.inplanes = inplanes
 
-        super(ResNet, self).__init__()
+        super(Residuals, self).__init__()
 
         self.layers = []
         for i in range(len(params['layers'])):
@@ -119,15 +119,15 @@ class ResNet(nn.Module):
             layer = params['layers'][i]
             channels = params['channels'][i]
             stride = params['strides'][i]
-            self.layers.append(self._make_layer(params['block'], channels, layer, stride=stride))
+            self.layers.append(self._make_layer(eval(params['block_type']), channels, layer,
+                                                stride=stride))
 
+        self.end_layer = params['end_layer']
         if params['end_layer']:
             self.avgpool = nn.AvgPool2d(2, stride=0)
-
-            # TODO: THis is a super hardcoding ..., in order to fit my image size on resnet
-            # TODO: eliminate this hard coding !!!
-            # TODO: JUST USE THE CONV CODE HERE
-
+            self.layers = nn.Sequential(*(self.layers + [self.avgpool]))
+        else:
+            self.layers = nn.Sequential(*self.layers)
 
     def _make_layer(self, block, planes, blocks, stride=1):
         downsample = None
@@ -146,47 +146,39 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x, *args):
+        print(x.shape)
+        x = self.layers(x)
+        print(x.shape)
 
-        # TODO: just forward all layers
-        print (x.shape)
-        x = self.conv1(x)
-        print (x.shape)
-        x = self.bn1(x)
-        x = self.relu(x)
-        print (x.shape)
-        x0 = self.maxpool(x)
-        print (x0.shape)
-        x1 = self.layer1(x0)
-        print (x1.shape)
-        x2 = self.layer2(x1)
-        print (x2.shape)
-        x3 = self.layer3(x2)
-        print (x3.shape)
-        x4 = self.layer4(x3)
-        print (x4.shape)
+        if self.end_layer:
+            x = x.view(-1, self.num_flat_features(x))
 
-        x = self.avgpool(x4)
-        print (x.shape)
-        x = x.view(x.size(0), -1)
-        print (x.shape)
-        x = self.fc(x)
-        print (x.shape)
+        return x
 
 
-        return x, [x0, x1, x2, x3, x4]  # output, intermediate
 
     def get_conv_output(self, shape):
         """
            By inputing the shape of the input, simulate what is the ouputsize.
         """
-
         bs = 1
+        print ('input shape', shape)
         input = torch.autograd.Variable(torch.rand(bs, *shape))
-        output_feat = self.forward(input)
-        n_size = output_feat.data.view(bs, -1).size(1)
-        return n_size
+        output_feat = self.forward((input))
 
+        if self.end_layer:
 
+            return output_feat.data.view(bs, -1).size(1)
+
+        else:
+            return output_feat.data.shape[1:]
+
+    def num_flat_features(self, x):
+        size = x.size()[1:]  # all dimensions except the batch dimension
+        num_features = 1
+        for s in size:
+            num_features *= s
+        return num_features
 
 
 def resnet18(pretrained=False, **kwargs):

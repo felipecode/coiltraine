@@ -22,6 +22,10 @@ class Conv(nn.Module):
             raise ValueError(" Missing the kernel sizes parameter ")
         if 'strides' not in params:
             raise ValueError(" Missing the strides parameter ")
+        if 'padding' not in params:
+            raise ValueError(" Missing the padding parameter ")
+        if 'bias' not in params:
+            raise ValueError(" Missing the bias parameter ")
         if 'dropouts' not in params:
             raise ValueError(" Missing the dropouts parameter ")
         if 'end_layer' not in params:
@@ -33,20 +37,27 @@ class Conv(nn.Module):
         """" ------------------ IMAGE MODULE ---------------- """
         # Conv2d(input channel, output channel, kernel size, stride), Xavier initialization and 0.1 bias initialization
 
+        self.end_layer = params['end_layer']
         self.layers = []
 
         # TODO: need to log the loaded networks
-
+        print (params)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         for i in range(0, len(params['channels'])-1):
             conv = nn.Conv2d(in_channels=params['channels'][i], out_channels=params['channels'][i+1],
-                             kernel_size=params['kernels'][i], stride=params['strides'][i])
+                             kernel_size=params['kernels'][i], stride=params['strides'][i],
+                             padding=params['padding'][i], bias=params['bias'][i])
             bn = nn.BatchNorm2d(params['channels'][i+1])
             dropout = nn.Dropout2d(p=params['dropouts'][i])
             relu = nn.ReLU(inplace=True)
             layer = nn.Sequential(*[conv, bn, dropout, relu])
             self.layers.append(layer)
+        if not self.end_layer:
+            self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+            self.layers = nn.Sequential(*(self.layers + [self.maxpool]))
+        else:
+            self.layers = nn.Sequential(*self.layers)
 
-        self.layers = nn.Sequential(*self.layers)
         self.module_name = module_name
 
 
@@ -56,17 +67,16 @@ class Conv(nn.Module):
     def forward(self, x, *args):
         # get only the speeds from measurement labels
 
-        # TODO: TRACK NANS OUTPUTS
-        # TODO: Maybe change the name
-        # TODO: Maybe add internal logs !
-
         """ conv1 + batch normalization + dropout + relu """
+        print (x.shape)
         x = self.layers(x)
+        print (x.shape)
 
-        x = x.view(-1, self.num_flat_features(x))
+        if self.end_layer:
+            x = x.view(-1, self.num_flat_features(x))
 
 
-        return x, None  # output, intermediate
+        return x  # output, intermediate
 
 
     def num_flat_features(self, x):
@@ -81,10 +91,10 @@ class Conv(nn.Module):
         """
            By inputing the shape of the input, simulate what is the ouputsize.
         """
-
         bs = 1
         input = torch.autograd.Variable(torch.rand(bs, *shape))
-        output_feat = self.forward(input)
-        n_size = output_feat.data.view(bs, -1).size(1)
-        return n_size
+        output_feat = self.forward((input))
+        #n_size = output_feat.data.view(bs, -1).size(1)
+
+        return output_feat.data.shape[1:]
 

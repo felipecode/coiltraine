@@ -3,7 +3,7 @@
 
 """
 
-from .models import CoILICRA
+from .models import CoILICRA, CoILSoftCGating
 
 
 def CoILModel(architecture_name, architecture_configuration):
@@ -17,7 +17,9 @@ def CoILModel(architecture_name, architecture_configuration):
     if architecture_name == 'coil-icra':
 
         return CoILICRA(architecture_configuration)
+    elif architecture_name == 'coil-soft-c-gating':
 
+        return CoILSoftCGating(architecture_configuration)
     else:
 
         raise ValueError(" Not found architecture name")

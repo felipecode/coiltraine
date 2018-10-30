@@ -40,14 +40,15 @@ class Join(nn.Module):
         # TODO: Control the frequency of postion log
 
 
-        """ conv1 + batch normalization + dropout + relu """
         if self.mode == 'cat':
             j = torch.cat((x, m), 1)
 
         else:
             raise ValueError("Mode to join networks not found")
-
-        return self.after_process(j)
+        if self.after_process is None:
+            return j
+        else:
+            return self.after_process(j)
 
 
 
