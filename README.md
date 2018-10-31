@@ -10,6 +10,14 @@ learning networks, toguether with the CARLA simulator.
 The system has a few modules:
 [![COIL Diagram](docs/img/CoIL.png?raw=true )]()
 
+#### Installation
+
+To install the CoIL large scale training framework,we provide a conda environment requirements file.
+Basically just do:
+
+    conda env create -f requirements.yml
+
+
 #### Getting started
 
 
