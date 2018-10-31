@@ -80,6 +80,6 @@ IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from
 USE_ORACLE: False
 USE_FULL_ORACLE: False
 
-
+AVOID_STOPPING: True
 
 
