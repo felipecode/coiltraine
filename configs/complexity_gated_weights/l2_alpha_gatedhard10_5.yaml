@@ -80,8 +80,8 @@ VARIABLE_WEIGHT:
 IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
-WEIGHT_DECAY: 'L1_hard'
-WEIGHT_DECAY_ALPHA: 0.0005
+WEIGHT_DECAY: 'L2_hard'
+WEIGHT_DECAY_ALPHA: 0.00001
 
 
 
