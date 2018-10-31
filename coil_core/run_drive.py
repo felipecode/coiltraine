@@ -89,7 +89,7 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
                                    stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
 
         else:
-            os.environ['DISPLAY'] =":5"
+
             sp = subprocess.Popen(['vglrun', '-d', ':7.' + str(gpu),
                                         carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
                                         '/Game/Maps/' + town_name, '-windowed', '-benchmark',

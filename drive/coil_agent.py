@@ -322,9 +322,11 @@ class CoILAgent(Agent):
         """
         if g_conf.AVOID_STOPPING:
             real_speed = speed_gt * 25.0
-
+            print (real_speed)
             real_predicted = speed_pred * 25.0
+            print (real_predicted)
             if real_speed < 2.0 and real_predicted > 3.0:
+                # print ("BOOOOOOOSSSSTTTT !!! ! ! ! ! ! !  !  111  onze !!! ")
                 # If (Car Stooped) and
                 #  ( It should not have stopped, use the speed prediction branch for that)
                 throttle = 1 * (5.6 / 25.0 - speed_gt) + speed_pred
