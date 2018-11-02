@@ -23,7 +23,7 @@ class LongNewWeather(ExperimentSuite):
 
     @property
     def train_weathers(self):
-        return [4, 14]
+        return [10, 14]
 
     @property
     def test_weathers(self):
