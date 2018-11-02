@@ -209,6 +209,11 @@ class CoILSoftCGating(nn.Module):
             complexity_indicator = \
                 torch.unsqueeze(torch.unsqueeze(torch.unsqueeze(complexity_indicator, 1), 1), 1)
 
+
+            print ((1 - complexity_indicator))
+            print (x * (1 - complexity_indicator))
+
+
             x_complex = self.mid_complex_perception(x * (1 - complexity_indicator))
 
             x_easy = self.mid_easy_perception(x * complexity_indicator)

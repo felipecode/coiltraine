@@ -86,12 +86,12 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   speed_branch:
     fc:
       neurons: [256, 256]
-      dropouts: [0.0, 0.5]
+      dropouts: [0.0, 0.0]
   branches:
     number_of_branches: 4
     fc:
       neurons: [256, 256]
-      dropouts: [0.0, 0.5]
+      dropouts: [0.0, 0.0]
 
 
 

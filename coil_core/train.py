@@ -252,6 +252,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         data_loader = select_balancing_strategy(dataset, iteration, number_of_workers)
 
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
+
+        print (model)
         model.cuda()
 
         if checkpoint_file is not None:
