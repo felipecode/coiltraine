@@ -32,6 +32,15 @@ class CorlTraining(ExperimentSuite):
     def collision_as_failure(self):
         return False
 
+
+    def calculate_time_out(self, path_distance):
+        """
+        Function to return the timeout ,in milliseconds,
+        that is calculated based on distance to goal.
+        This is the same timeout as used on the CoRL paper.
+        """
+        return ((path_distance / 1000.0) / 3.0) * 3600.0 + 20.0
+
     def _poses(self):
 
         def _poses_straight():
