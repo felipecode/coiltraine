@@ -53,7 +53,7 @@ def export_csv(exp_batch, variables_to_export):
                         f.write("\n")
 
 
-def export_csv_separate(exp_batch, variables_to_export, task_list):
+def export_csv_separate(exp_batch, variables_to_export, task_list, position =None):
     # TODO: add parameter for auto versus auto.
 
     root_path = '_logs'
@@ -100,7 +100,10 @@ def export_csv_separate(exp_batch, variables_to_export, task_list):
                             continue
                         print (control_csv)
 
-                        position_of_max_success = np.argmax(control_csv['episodes_fully_completed'])
+                        if position is None:
+                            position_of_max_success = np.argmax(control_csv['episodes_fully_completed'])
+                        else:
+                            position_of_max_success = control_csv['episodes_fully_completed'][position]
                         print (dicts_to_write)
 
 

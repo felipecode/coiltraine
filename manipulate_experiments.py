@@ -39,6 +39,13 @@ if __name__ == '__main__':
         dest='erase_experiments',
         type=str
     )
+    argparser.add_argument(
+        '-p'
+        '--position',
+        dest='position',
+        type=int
+
+    )
 
     args = argparser.parse_args()
 
@@ -60,7 +67,7 @@ if __name__ == '__main__':
 
         # TODO: for now it basically will just export the best
         export_csv_separate(args.folder, variables_to_export,
-                            ['empty', 'cluttered'])
+                            ['empty', 'cluttered'], position=args.position)
 
     if args.erase_experiments:
         pass
