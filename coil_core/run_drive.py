@@ -82,7 +82,6 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
 
         carla_path = os.environ['CARLA_PATH']
         if not no_screen:
-            os.environ['SDL_HINT_CUDA_DEVICE'] = str(gpu)
             sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
                                     '-windowed',
                                    '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
@@ -182,9 +181,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             # The used tasks are hardcoded, this need to be improved
             file_base = os.path.join('_logs', exp_batch, exp_alias,
                          g_conf.PROCESS_NAME + '_csv', control_filename)
-            #write_header_control_summary(file_base, 'empty')
 
-            #write_header_control_summary(file_base, 'normal')
             print (g_conf.PROCESS_NAME)
             print (file_base)
 
@@ -192,6 +189,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                 write_header_control_summary(file_base, task_list[i])
 
 
+        port = 2006
 
         # Write the header of the summary file used conclusion
         # While the checkpoint is not there
@@ -203,8 +201,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                 if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE, control_filename + '_' + task_list[0]):
 
 
-                    carla_process, port, out = start_carla_simulator(gpu, town_name,
-                                                                     params['no_screen'], params['docker'])
+                    #carla_process, port, out = start_carla_simulator(gpu, town_name,
+                    #                                                 params['no_screen'], params['docker'])
+
 
                     latest = get_next_checkpoint(g_conf.TEST_SCHEDULE, control_filename + '_' + task_list[0])
                     checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
@@ -215,7 +214,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
 
                     coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
-
+                    print (" STARING BENHC")
                     run_driving_benchmark(coil_agent, experiment_set, town_name,
                                           exp_batch + '_' + exp_alias + '_' + str(latest)
                                           + '_drive_' + control_filename
@@ -248,15 +247,16 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                     for i in range(len(task_list)):
                         #write_data_point_control_summary(file_base, 'empty', averaged_dict, latest, 0)
                         #write_data_point_control_summary(file_base, 'normal', averaged_dict, latest, 1)
-                        write_data_point_control_summary(file_base, task_list[i], averaged_dict, latest, i)
+                        write_data_point_control_summary(file_base, task_list[i],
+                                                         averaged_dict, latest, i)
 
                     #plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
                     #                     )
                     print (averaged_dict)
 
 
-                    carla_process.kill()
-                    subprocess.call(['docker', 'stop', out[:-1]])
+                    #carla_process.kill()
+                    #subprocess.call(['docker', 'stop', out[:-1]])
 
                 else:
                     time.sleep(0.1)

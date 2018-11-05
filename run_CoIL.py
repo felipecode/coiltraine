@@ -62,8 +62,8 @@ if __name__ == '__main__':
     argparser.add_argument(
         '-v', '--verbose',
         action='store_true',
-        dest='debug',
-        help='print debug information')
+        dest='verbose',
+        help='print verbose information')
 
     argparser.add_argument(
         '-ns', '--no-screen',
@@ -123,6 +123,12 @@ if __name__ == '__main__':
     if args.folder is None:
         raise ValueError(" You should set a folder name where the experiments are placed")
 
+    if args.verbose:
+        log_level = logging.INFO
+    else:
+        log_level = logging.WARNING
+
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
     # We increase the number of files available.
     resource.setrlimit(

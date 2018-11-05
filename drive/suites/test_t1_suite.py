@@ -31,7 +31,7 @@ class TestT1(ExperimentSuite):
 
     def _poses(self):
 
-        return [[[36, 40], [39, 35]]]
+        return [[[105, 29], [27, 130]]]
 
     def build_experiments(self):
         """
@@ -49,9 +49,10 @@ class TestT1(ExperimentSuite):
         camera.set_rotation(-15.0, 0, 0)
 
         poses_tasks = self._poses()
-        vehicles_tasks = [0, 0, 0, 15]
-        pedestrians_tasks = [0, 0, 0, 50]
+        vehicles_tasks = [0]
+        pedestrians_tasks = [0]
 
+        task_names = ['empty']
         experiments_vector = []
 
         for weather in self.weathers:
@@ -77,6 +78,7 @@ class TestT1(ExperimentSuite):
                     Conditions=conditions,
                     Poses=poses,
                     Task=iteration,
+                    TaskName=task_names[iteration],
                     Repetitions=1
                 )
                 experiments_vector.append(experiment)

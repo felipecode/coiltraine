@@ -53,7 +53,16 @@ def export_csv(exp_batch, variables_to_export):
                         f.write("\n")
 
 
-def export_csv_separate(exp_batch, variables_to_export, task_list):
+def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_number = None):
+
+    """
+
+    :param exp_batch:
+    :param variables_to_export:
+    :param task_list:
+    :param checkpoint_number: the number of the checkpoint to be used as reference.
+    :return:
+    """
     # TODO: add parameter for auto versus auto.
 
     root_path = '_logs'
@@ -99,8 +108,11 @@ def export_csv_separate(exp_batch, variables_to_export, task_list):
                         if control_csv is None:
                             continue
                         print (control_csv)
-
-                        position_of_max_success = np.argmax(control_csv['episodes_fully_completed'])
+                        if checkpoint_number is None:
+                            position_of_max_success = np.argmax(control_csv['episodes_fully_completed'])
+                        else:
+                            position_of_max_success = control_csv['episodes_fully_completed']\
+                                                        [checkpoint_number]
                         print (dicts_to_write)
 
 
