@@ -113,6 +113,7 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
                         else:
                             position_of_max_success = control_csv['episodes_fully_completed']\
                                                         [checkpoint_number]
+
                         print (dicts_to_write)
 
 

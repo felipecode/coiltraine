@@ -39,6 +39,13 @@ if __name__ == '__main__':
         dest='erase_experiments',
         type=str
     )
+    argparser.add_argument(
+        '-p'
+        '--position',
+        dest='position',
+        type=int
+
+    )
 
     args = argparser.parse_args()
 
@@ -55,12 +62,13 @@ if __name__ == '__main__':
 
 
     if args.export_results:
-        variables_to_export = ['episodes_fully_completed', 'end_pedestrian_collision', 'end_vehicle_collision',
+        variables_to_export = ['episodes_fully_completed', 'end_pedestrian_collision',
+                               'end_vehicle_collision',
                              'end_other_collision', 'driven_kilometers']
-
+        tasks = ['straight', 'oneturn', 'navigation', 'nav dynamic']
         # TODO: for now it basically will just export the best
-        export_csv_separate(args.folder, variables_to_export,
-                            ['empty', 'normal', 'cluttered'])
+        export_csv_separate(args.folder, variables_to_export,tasks, position=args.position)
+
 
     if args.erase_experiments:
         pass
