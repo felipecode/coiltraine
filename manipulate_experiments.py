@@ -64,10 +64,10 @@ if __name__ == '__main__':
     if args.export_results:
         variables_to_export = ['episodes_fully_completed', 'end_pedestrian_collision', 'end_vehicle_collision',
                              'end_other_collision', 'driven_kilometers']
-
+        tasks = ['straight', 'oneturn', 'navigation', 'nav dynamic']
         # TODO: for now it basically will just export the best
         export_csv_separate(args.folder, variables_to_export,
-                            ['empty', 'cluttered'], position=args.position)
+                            tasks, position=args.position)
 
     if args.erase_experiments:
         pass
