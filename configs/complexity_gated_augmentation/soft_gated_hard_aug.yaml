@@ -28,7 +28,7 @@ USE_NOISE_DATA: True
 NUMBER_OF_HOURS: 50
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [100000, 300000, 500000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [100000, 300000]  # The frequency the model is actually tested.
 
 #### Network Related Parameters ####
 
@@ -77,7 +77,7 @@ VARIABLE_WEIGHT:
 IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
-AVOID_STOPPING: True
+
 
 
 
