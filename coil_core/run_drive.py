@@ -189,7 +189,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                 write_header_control_summary(file_base, task_list[i])
 
 
-        port = 2006
 
         # Write the header of the summary file used conclusion
         # While the checkpoint is not there
@@ -201,8 +200,8 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                 if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE, control_filename + '_' + task_list[0]):
 
 
-                    #carla_process, port, out = start_carla_simulator(gpu, town_name,
-                    #                                                 params['no_screen'], params['docker'])
+                    carla_process, port, out = start_carla_simulator(gpu, town_name,
+                                                                     params['no_screen'], params['docker'])
 
 
                     latest = get_next_checkpoint(g_conf.TEST_SCHEDULE, control_filename + '_' + task_list[0])
@@ -255,8 +254,8 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                     print (averaged_dict)
 
 
-                    #carla_process.kill()
-                    #subprocess.call(['docker', 'stop', out[:-1]])
+                    carla_process.kill()
+                    subprocess.call(['docker', 'stop', out[:-1]])
 
                 else:
                     time.sleep(0.1)
