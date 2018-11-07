@@ -76,8 +76,7 @@ class Conv(nn.Module):
 
         x = x.view(-1, self.num_flat_features(x))
 
-
-        return x, None  # output, intermediate
+        return x
 
 
     def num_flat_features(self, x):
@@ -95,7 +94,7 @@ class Conv(nn.Module):
 
         bs = 1
         input = torch.autograd.Variable(torch.rand(bs, *shape))
-        output_feat, _ = self.forward(input)
+        output_feat = self.forward(input)
         n_size = output_feat.data.view(bs, -1).size(1)
         return n_size
 

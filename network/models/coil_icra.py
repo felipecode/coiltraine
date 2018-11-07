@@ -143,8 +143,7 @@ class CoILICRA(nn.Module):
 
 
         """ ###### APPLY THE PERCEPTION MODULE """
-        x, inter = self.perception(x)
-        self.intermediate_layers = inter
+        x = self.perception(x)
 
         """ ###### APPLY THE MEASUREMENT MODUES """
 
