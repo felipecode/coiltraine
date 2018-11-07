@@ -97,7 +97,7 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
                 dicts_to_write = {}
                 for task in task_list:
                     dicts_to_write.update({task: {}})
-
+                print (log)
                 for task in task_list:
                     if 'drive' in log and '_csv' in log:
                         csv_file_path = os.path.join(root_path, exp_batch, exp, log, 'control_output_' + task + '.csv')
