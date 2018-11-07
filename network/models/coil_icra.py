@@ -87,11 +87,6 @@ class CoILICRA(nn.Module):
 
 
 
-
-
-
-
-
         # WILL NOT WORK FOR SMALL AND DEEP LAYERS
         # TODO: eliminate this hardcoded middle layer, make a conv simulation to get the fc out size
         self.measurements = FC(params={'neurons': [len(g_conf.INPUTS)] +
@@ -148,12 +143,12 @@ class CoILICRA(nn.Module):
 
 
         """ ###### APPLY THE PERCEPTION MODULE """
-        x, inter = self.perception(x, intentions)
+        x, inter = self.perception(x)
         self.intermediate_layers = inter
 
         """ ###### APPLY THE MEASUREMENT MODUES """
 
-        m = self.measurements(a, intentions)
+        m = self.measurements(a)
 
         """ Join measurements and perception"""
         j = self.join(x, m)
