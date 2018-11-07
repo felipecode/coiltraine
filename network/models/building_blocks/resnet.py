@@ -140,30 +140,31 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def forward(self, x, *args):
-        #print (x.shape)
+    def forward(self, x):
+        print (x.shape)
         x = self.conv1(x)
-        #print (x.shape)
+        print (x.shape)
         x = self.bn1(x)
         x = self.relu(x)
-        #print (x.shape)
-        x0 = self.maxpool(x)
-        #print (x0.shape)
-        x1 = self.layer1(x0)
-        #print (x1.shape)
-        x2 = self.layer2(x1)
-        #print (x2.shape)
-        x3 = self.layer3(x2)
-        #print (x3.shape)
-        x4 = self.layer4(x3)
-        #print (x4.shape)
+        print (x.shape)
+        x = self.maxpool(x)
+        print (x.shape)
 
-        x = self.avgpool(x4)
-        #print (x.shape)
+        x = self.layer1(x)
+        print (x.shape)
+        x = self.layer2(x)
+        print (x.shape)
+        x = self.layer3(x)
+        print (x.shape)
+        x = self.layer4(x)
+        print (x.shape)
+
+        x = self.avgpool(x)
+        print (x.shape)
         x = x.view(x.size(0), -1)
-        #print (x.shape)
+        print (x.shape)
         x = self.fc(x)
-        #print (x.shape)
+        print (x.shape)
 
 
         return x
