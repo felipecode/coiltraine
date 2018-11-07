@@ -123,12 +123,12 @@ if __name__ == '__main__':
     if args.folder is None:
         raise ValueError(" You should set a folder name where the experiments are placed")
 
-    if args.verbose:
-        log_level = logging.INFO
-    else:
-        log_level = logging.WARNING
+    #if args.verbose:
+    #    log_level = logging.INFO
+    #else:
+    #    log_level = logging.WARNING
 
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
+    #logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
     # We increase the number of files available.
     resource.setrlimit(
