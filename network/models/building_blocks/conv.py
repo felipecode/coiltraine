@@ -95,7 +95,7 @@ class Conv(nn.Module):
 
         bs = 1
         input = torch.autograd.Variable(torch.rand(bs, *shape))
-        output_feat = self.forward(input)
+        output_feat, _ = self.forward(input)
         n_size = output_feat.data.view(bs, -1).size(1)
         return n_size
 

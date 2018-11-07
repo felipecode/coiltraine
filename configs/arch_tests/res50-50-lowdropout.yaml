@@ -38,7 +38,7 @@ MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
     res:
-      name: 'resnet34'
+      name: 'resnet50'
       num_classes: 512
 
   measurements:
