@@ -20,7 +20,7 @@ class CoILICRA(nn.Module):
     def __init__(self, params):
         # TODO: Improve the model autonaming function
 
-        self.intermediate_layerss = None
+        self.intermediate_layers = None
         super(CoILICRA, self).__init__()
 
         # TODO: Make configurable function on the config files by reading other dictionary
@@ -37,7 +37,7 @@ class CoILICRA(nn.Module):
         sensor_input_shape = [number_first_layer_channels, sensor_input_shape[1],
                               sensor_input_shape[2]]
 
-
+        self._params= params
 
         # For this case we check if the perception layer is of the type "conv"
         if 'conv' in params['perception']:
@@ -141,24 +141,47 @@ class CoILICRA(nn.Module):
 
     def forward(self, x, a, intentions=None):
 
+        # TODO: THISIS A PRE DEADLINE HACKKK REMOVEE.
 
-        """ ###### APPLY THE PERCEPTION MODULE """
-        x, inter = self.perception(x)
-        self.intermediate_layers = inter
+        if 'res' in self._params['perception']:
+            """ ###### APPLY THE PERCEPTION MODULE """
+            x, inter = self.perception(x)
+            self.intermediate_layers = inter
 
-        """ ###### APPLY THE MEASUREMENT MODUES """
+            """ ###### APPLY THE MEASUREMENT MODUES """
 
-        m = self.measurements(a)
+            m = self.measurements(a)
 
-        """ Join measurements and perception"""
-        j = self.join(x, m)
+            """ Join measurements and perception"""
+            j = self.join(x, m)
 
-        branch_outputs = self.branches(j)
+            branch_outputs = self.branches(j)
 
-        speed_branch_output = self.speed_branch(x)
+            speed_branch_output = self.speed_branch(x)
 
-        # We concatenate speed with the rest.
-        return branch_outputs + [speed_branch_output]
+            # We concatenate speed with the rest.
+            return branch_outputs + [speed_branch_output]
+
+        else:
+
+            """ ###### APPLY THE PERCEPTION MODULE """
+            x = self.perception(x)
+            # self.intermediate_layers = inter
+
+            """ ###### APPLY THE MEASUREMENT MODUES """
+
+            m = self.measurements(a)
+
+            """ Join measurements and perception"""
+            j = self.join(x, m)
+
+            branch_outputs = self.branches(j)
+
+            speed_branch_output = self.speed_branch(x)
+
+            # We concatenate speed with the rest.
+
+            return branch_outputs + [speed_branch_output]
 
     def forward_branch(self, x, a, branch_number):
         """
