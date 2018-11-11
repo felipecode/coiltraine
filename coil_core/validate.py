@@ -37,7 +37,6 @@ def write_waypoints_output(iteration, output):
 
 def write_regular_output(iteration, output):
 
-    print ("OUTIPUTI", output)
     for i in range(len(output)):
         coil_logger.write_on_csv(iteration, [output[i][0],
                                             output[i][1],
@@ -61,7 +60,12 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         if suppress_output:
             sys.stdout = open(os.path.join('_output_logs',
-                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+                               exp_alias + '_' + g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
+            sys.stderr = open(os.path.join('_output_logs',
+                              exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
+
 
         if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
             # TODO: print some cool summary or not ?
