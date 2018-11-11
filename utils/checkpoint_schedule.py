@@ -61,7 +61,7 @@ def get_latest_saved_checkpoint():
 
 
 """ FUNCTIONS FOR GETTING THE CHECKPOINTS"""
-def get_latest_evaluated_checkpoint(filename):
+def get_latest_evaluated_checkpoint(filename=None):
 
     """
         Get the latest checkpoint that was validated or tested.
@@ -70,7 +70,7 @@ def get_latest_evaluated_checkpoint(filename):
 
     return monitorer.get_latest_checkpoint(filename)
 
-def is_next_checkpoint_ready( checkpoint_schedule, control_filename):
+def is_next_checkpoint_ready( checkpoint_schedule, control_filename=None):
 
     # IT needs
 
@@ -102,7 +102,7 @@ def is_next_checkpoint_ready( checkpoint_schedule, control_filename):
         return False
 
 
-def get_next_checkpoint(checkpoint_schedule, filename):
+def get_next_checkpoint(checkpoint_schedule, filename=None):
     ltst_check = get_latest_evaluated_checkpoint(filename)
     if ltst_check is None:
         return checkpoint_schedule[0]

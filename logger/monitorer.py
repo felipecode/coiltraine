@@ -147,7 +147,7 @@ def get_latest_checkpoint_drive(control_filename):
 
 
 
-def get_latest_checkpoint(filename):
+def get_latest_checkpoint(filename=None):
 
     print (" PROCCESS NAME    ", g_conf.PROCESS_NAME)
     if 'validation' in g_conf.PROCESS_NAME:

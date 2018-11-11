@@ -36,6 +36,8 @@ def write_waypoints_output(iteration, output):
 
 
 def write_regular_output(iteration, output):
+
+    print ("OUTIPUTI", output)
     for i in range(len(output)):
         coil_logger.write_on_csv(iteration, [output[i][0],
                                             output[i][1],
@@ -70,8 +72,9 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name)
 
         augmenter = Augmenter(None)
-
-        dataset = CoILDataset(full_dataset, transform=augmenter)
+        print (" FULL DATA ", full_dataset)
+        dataset = CoILDataset(full_dataset, transform=augmenter,
+                              preload_name='100hours_' + dataset_name)
 
         # Creates the sampler, this part is responsible for managing the keys. It divides
         # all keys depending on the measurements and produces a set of keys for each bach.
@@ -96,7 +99,6 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
             latest = 0
         model.cuda()
 
-        print (dataset.meta_data)
         best_loss = 1000
         best_error = 1000
         best_loss_iter = 0
@@ -128,36 +130,32 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
 
 
-                    output = model.forward_branch(torch.squeeze(data['rgb']).cuda(),
-                                                  dataset.extract_inputs(),
-                                                  controls)
+                    output, speed_output = model.forward_branch(torch.squeeze(data['rgb']).cuda(),
+                                                  dataset.extract_inputs(data).cuda(),
+                                                  controls.cuda())
 
 
 
 
 
-                    # TODO: this is hardcoded, eliminate the hardcodeness
-                    if 'waypoint1_angle' in g_conf.TARGETS:
-                        write_waypoints_output(checkpoint_iteration, output)
-                    else:
-                        write_regular_output(checkpoint_iteration, output)
+                    write_regular_output(checkpoint_iteration, output)
 
 
 
 
                     # TODO: Change this a functional standard using the loss functions.
 
-                    loss = torch.mean((output - dataset.extract_targets(float_data).cuda())**2).data.tolist()
-                    mean_error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
+                    loss = torch.mean((output - dataset.extract_targets(data).cuda())**2).data.tolist()
+                    mean_error = torch.mean(torch.abs(output - dataset.extract_targets(data).cuda())).data.tolist()
                     #print ("Loss", loss)
                     #print ("output", output[0])
                     accumulated_error += mean_error
                     accumulated_loss += loss
-                    error = torch.abs(output - dataset.extract_targets(float_data).cuda())
+                    error = torch.abs(output - dataset.extract_targets(data).cuda())
 
 
                     # Log a random position
-                    position = random.randint(0, len(float_data) - 1)
+                    position = random.randint(0, len(data) - 1)
                     #print (output[position].data.tolist())
                     coil_logger.add_message('Iterating',
                          {'Checkpoint': latest,
@@ -165,9 +163,9 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                           'MeanError': mean_error,
                           'Loss': loss,
                           'Output': output[position].data.tolist(),
-                          'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist(),
+                          'GroundTruth': dataset.extract_targets(data)[position].data.tolist(),
                           'Error': error[position].data.tolist(),
-                          'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()},
+                          'Inputs': dataset.extract_inputs(data)[position].data.tolist()},
                           latest)
                     iteration_on_checkpoint += 1
 
