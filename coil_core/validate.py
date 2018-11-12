@@ -77,7 +77,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         #that you can access the HDFILES positions from the root directory as a in a vector.
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name)
 
-        augmenter = Augmenter(None)
+        augmenter = None
         print (" FULL DATA ", full_dataset)
         dataset = CoILDataset(full_dataset, transform=augmenter,
                               preload_name='100hours_' + dataset_name)
