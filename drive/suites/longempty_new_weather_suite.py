@@ -16,10 +16,10 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 # TODO: maybe add aditional tasks ( NO dynamic obstacles for instace !)
 
-class LongNewWeather(ExperimentSuite):
+class LongNewWeatherEmpty(ExperimentSuite):
 
     def __init__(self):
-        super(LongNewWeather, self).__init__('Town01')
+        super(LongNewWeatherEmpty, self).__init__('Town01')
 
     @property
     def train_weathers(self):
@@ -49,9 +49,7 @@ class LongNewWeather(ExperimentSuite):
                  [30, 41], [81, 89], [69, 45], [102, 95], [18, 145],
                  [111, 64], [79, 45], [84, 69], [73, 31], [37, 81]]
 
-        return [_poses_navigation(),
-                _poses_navigation(),
-                _poses_navigation()
+        return [_poses_navigation()
                 ]
 
     def build_experiments(self):
@@ -70,9 +68,9 @@ class LongNewWeather(ExperimentSuite):
         camera.set_rotation(-15.0, 0, 0)
 
         poses_tasks = self._poses()
-        vehicles_tasks = [0, 20, 100]
-        pedestrians_tasks = [0, 50, 250]
-        task_names = ['empty', 'normal', 'cluttered']
+        vehicles_tasks = [0]
+        pedestrians_tasks = [0]
+        task_names = ['empty']
 
         experiments_vector = []
 

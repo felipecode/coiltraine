@@ -101,6 +101,7 @@ _g_conf.WEATHERS = [1, 3, 6, 8]
 _g_conf.INPUT_SENSORS = ['rgb']
 _g_conf.MODEL_TYPE = 'coil_icra'
 _g_conf.MODEL_CONFIGURATION = {}
+_g_conf.PRE_TRAINED = False
 
 
 _g_conf.LEARNING_RATE_DECAY_INTERVAL = 50000

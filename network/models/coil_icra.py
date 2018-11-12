@@ -65,7 +65,8 @@ class CoILICRA(nn.Module):
             #fromlist = ['resnet']
             # TODO: Check network drawing
             resnet_module = getattr(resnet_module, params['perception']['res']['name'])
-            self.perception  = resnet_module(num_classes=params['perception']['res']['num_classes'])
+            self.perception  = resnet_module(pretrained=g_conf.PRE_TRAINED,
+                                             num_classes=params['perception']['res']['num_classes'])
 
             number_output_neurons = params['perception']['res']['num_classes']
 

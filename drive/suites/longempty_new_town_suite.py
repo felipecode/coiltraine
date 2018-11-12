@@ -16,10 +16,10 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 
 
-class LongNewTown(ExperimentSuite):
+class LongNewTownEmpty(ExperimentSuite):
 
     def __init__(self):
-        super(LongNewTown, self).__init__('Town02')
+        super(LongNewTownEmpty, self).__init__('Town02')
 
     @property
     def train_weathers(self):
@@ -51,9 +51,7 @@ class LongNewTown(ExperimentSuite):
                     [70, 73], [46, 67], [34, 77], [61, 49], [21, 12]]
 
 
-        return [_poses_navigation(),
-                _poses_navigation(),
-                _poses_navigation()]
+        return [_poses_navigation()]
 
 
 
@@ -76,10 +74,10 @@ class LongNewTown(ExperimentSuite):
 
 
         poses_tasks = self._poses()
-        vehicles_tasks = [0, 15, 70]
-        pedestrians_tasks = [0, 50, 150]
+        vehicles_tasks = [0]
+        pedestrians_tasks = [0]
 
-        task_names = ['empty', 'normal', 'cluttered']
+        task_names = ['empty']
 
         experiments_vector = []
 

@@ -75,6 +75,7 @@ class PreSplittedSampler(Sampler):
         else:
             self.weights = np.asarray(weights)
 
+        torch.manual_seed(42)
 
 
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
@@ -93,6 +94,8 @@ class PreSplittedSampler(Sampler):
             Iterator to get ids for the dataset
 
         """
+
+        random.seed(42)
         rank_keys = get_rank(self.keys)
         print ("got rank", rank_keys)
 
