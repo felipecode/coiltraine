@@ -53,6 +53,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         # At this point the log file with the correct naming is created.
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
+
+        g_conf.NUMBER_OF_HOURS = 100
         set_type_of_process('validation', dataset_name)
 
         if not os.path.exists('_output_logs'):
@@ -140,11 +142,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
 
 
-
-
                     write_regular_output(checkpoint_iteration, output)
-
-
 
 
                     # TODO: Change this a functional standard using the loss functions.
