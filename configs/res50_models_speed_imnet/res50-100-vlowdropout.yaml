@@ -60,7 +60,7 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       dropouts: [0.0, 0.2]
 
 
-
+PRE_TRAINED: True
 LEARNING_RATE: 0.0002  # First
 LEARNING_RATE_DECAY_INTERVAL: 75000
 LEARNING_RATE_DECAY_LEVEL: 0.5
