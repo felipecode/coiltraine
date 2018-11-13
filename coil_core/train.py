@@ -206,7 +206,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         g_conf.VARIABLE_WEIGHT = {}
         print("BEFOE MERGET variable ", g_conf.VARIABLE_WEIGHT, 'conf targets',
               g_conf.TARGETS)
-        seed_everything()
+
         # At this point the log file with the correct naming is created.
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
         set_type_of_process('train')
@@ -233,6 +233,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             print(values)
         #exit(1)
 
+        seed_everything(g_conf.MAGICAL_SEED)
         checkpoint_file = get_latest_saved_checkpoint()
         print ( " LOADING  ", checkpoint_file)
         if checkpoint_file is not None:

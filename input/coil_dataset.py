@@ -399,7 +399,7 @@ class CoILDataset(Dataset):
 
 
     def augment_directions(self, directions):
-        random.seed(42)
+
         if directions == 2.0:
             if random.randint(0, 100) < 20:
                 directions = random.choice([3.0, 4.0, 5.0])
