@@ -61,7 +61,7 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
 
 MAGICAL_SEED: 755234851
 
-PRE_TRAINED: True
+PRE_TRAINED: False
 
 
 LEARNING_RATE: 0.0002  # First
