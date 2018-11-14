@@ -11,7 +11,7 @@ MEASUREMENTS:
   targets: (31)
 
 BATCH_SIZE: 120
-NUMBER_ITERATIONS: 300000
+NUMBER_ITERATIONS: 100000
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
 NUMBER_FRAMES_FUSION: 1
@@ -26,7 +26,7 @@ USE_NOISE_DATA: True
 NUMBER_OF_HOURS: 100
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [100000, 300000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: [100000]  # The frequency the model is actually tested.
 
 
 
