@@ -60,6 +60,7 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       dropouts: [0.0, 0.5]
 
 PRE_TRAINED: True
+MAGICAL_SEED: 123
 
 LEARNING_RATE: 0.0002  # First
 LEARNING_RATE_DECAY_INTERVAL: 75000
@@ -79,5 +80,5 @@ VARIABLE_WEIGHT:
 IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
-
+AVOID_STOPPING: True
 

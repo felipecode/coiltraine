@@ -60,11 +60,11 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       dropouts: [0.0, 0.2]
 
 
-MAGICAL_SEED: 241543903
+MAGICAL_SEED: 123
 
 PRE_TRAINED: False
 LEARNING_RATE: 0.0002  # First
-LEARNING_RATE_DECAY_INTERVAL: 75000
+LEARNING_RATE_DECAY_INTERVAL: 50000
 LEARNING_RATE_DECAY_LEVEL: 0.5
 
 #TODO check how to use this part
