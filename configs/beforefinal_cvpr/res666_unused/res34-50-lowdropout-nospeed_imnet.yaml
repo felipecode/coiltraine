@@ -38,7 +38,7 @@ MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
     res:
-      name: 'resnet50'
+      name: 'resnet34'
       num_classes: 512
 
   measurements:
@@ -52,23 +52,22 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   speed_branch:
     fc:
       neurons: [256, 256]
-      dropouts: [0.0, 0.5]
+      dropouts: [0.0, 0.2]
   branches:
     number_of_branches: 4
     fc:
       neurons: [256, 256]
-      dropouts: [0.0, 0.5]
+      dropouts: [0.0, 0.2]
 
-
+PRE_TRAINED: True
 MAGICAL_SEED: 666
 
-PRE_TRAINED: False
 LEARNING_RATE: 0.0002  # First
 LEARNING_RATE_DECAY_INTERVAL: 75000
 LEARNING_RATE_DECAY_LEVEL: 0.5
 
 #TODO check how to use this part
-BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05]
+BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0]
 LOSS_FUNCTION: 'L1'
 
 VARIABLE_WEIGHT:
@@ -81,6 +80,4 @@ VARIABLE_WEIGHT:
 IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
-AVOID_STOPPING: True
-
 
