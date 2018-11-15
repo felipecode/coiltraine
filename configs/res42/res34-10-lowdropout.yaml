@@ -59,7 +59,9 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       neurons: [256, 256]
       dropouts: [0.0, 0.5]
 
-PRE_TRAINED: True
+PRE_TRAINED: False
+
+MAGICAL_SEED: 42
 
 LEARNING_RATE: 0.0002  # First
 LEARNING_RATE_DECAY_INTERVAL: 75000
