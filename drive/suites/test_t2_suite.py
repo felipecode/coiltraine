@@ -26,19 +26,25 @@ class TestT2(ExperimentSuite):
         return []
     @property
     def test_weathers(self):
-        return [4, 14]
+        return [14]
 
 
     def _poses(self):
 
         return [[[19, 66], [79, 14], [19, 57], [23, 1],
-                    [53, 76], [42, 13], [31, 71], [33, 5],
-                    [54, 30], [10, 61], [66, 3], [27, 12],
-                    [79, 19], [2, 29], [16, 14], [5, 57],
-                    [70, 73], [46, 67], [57, 50], [61, 49], [21, 12],
-                    [51, 81], [77, 68], [56, 65], [43, 54]]]
+                [53, 76], [42, 13], [31, 71], [33, 5],
+                [54, 30], [10, 61], [66, 3], [27, 12],
+                [79, 19], [2, 29], [16, 14], [5, 57],
+                [70, 73], [46, 67], [57, 50], [61, 49], [21, 12],
+                [51, 81], [77, 68], [56, 65], [43, 54]]]
 
-
+    def calculate_time_out(self, path_distance):
+        """
+        Function to return the timeout ,in milliseconds,
+        that is calculated based on distance to goal.
+        This is the same timeout as used on the CoRL paper.
+        """
+        return ((path_distance / 1000.0) / 3.0) * 3600.0 + 20.0
 
     def build_experiments(self):
         """
@@ -59,8 +65,8 @@ class TestT2(ExperimentSuite):
 
 
         poses_tasks = self._poses()
-        vehicles_tasks = [0, 0, 0, 15]
-        pedestrians_tasks = [0, 0, 0, 50]
+        vehicles_tasks = [15]
+        pedestrians_tasks = [50]
 
         experiments_vector = []
 
@@ -82,6 +88,7 @@ class TestT2(ExperimentSuite):
 
                 conditions.add_sensor(camera)
 
+                conditions.set(DisableTwoWheeledVehicles=True)
                 experiment = Experiment()
                 experiment.set(
                     Conditions=conditions,

@@ -29,9 +29,25 @@ class TestT1(ExperimentSuite):
     def test_weathers(self):
         return []
 
+    @property
+    def collision_as_failure(self):
+        return True
+
     def _poses(self):
 
-        return [[[105, 29], [27, 130]]]
+        return  [[[105, 29], [27, 130], [102, 87], [132, 27], [25, 44],
+                 [4, 64], [34, 67], [54, 30], [140, 134], [105, 9],
+                 [148, 129], [65, 18], [21, 16], [147, 97], [134, 49],
+                 [30, 41], [81, 89], [69, 45], [102, 95], [18, 145],
+                 [111, 64], [79, 45], [84, 69], [73, 31], [37, 81]]]
+
+    def calculate_time_out(self, path_distance):
+        """
+        Function to return the timeout ,in milliseconds,
+        that is calculated based on distance to goal.
+        This is the same timeout as used on the CoRL paper.
+        """
+        return ((path_distance / 1000.0) / 3.0) * 3600.0 + 20.0
 
     def build_experiments(self):
         """
@@ -49,8 +65,8 @@ class TestT1(ExperimentSuite):
         camera.set_rotation(-15.0, 0, 0)
 
         poses_tasks = self._poses()
-        vehicles_tasks = [0]
-        pedestrians_tasks = [0]
+        vehicles_tasks = [100]
+        pedestrians_tasks = [250]
 
         task_names = ['empty']
         experiments_vector = []
@@ -73,6 +89,7 @@ class TestT1(ExperimentSuite):
 
                 conditions.add_sensor(camera)
 
+                conditions.set(DisableTwoWheeledVehicles=True)
                 experiment = Experiment()
                 experiment.set(
                     Conditions=conditions,
