@@ -128,6 +128,14 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
         print("Running ", __file__, " On GPU ", gpu, "of experiment name ", exp_alias)
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
+        if params['suppress_output']:
+            sys.stdout = open(os.path.join('_output_logs',
+                               exp_alias + '_' + drive_conditions + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
+            sys.stderr = open(os.path.join('_output_logs',
+                              exp_alias + '_err_' + drive_conditions + '_' + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
+
 
         if not os.path.exists('_output_logs'):
             os.mkdir('_output_logs')
@@ -135,7 +143,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
 
 
-        print ("drive cond", drive_conditions)
         exp_set_name, town_name = drive_conditions.split('_')
 
         if g_conf.USE_ORACLE:
@@ -154,13 +161,8 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
         set_type_of_process('drive', drive_conditions)
 
 
-        if params['suppress_output']:
-            sys.stdout = open(os.path.join('_output_logs',
-                               exp_alias + '_' + g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
-                              "a", buffering=1)
-            sys.stderr = open(os.path.join('_output_logs',
-                              exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
-                              "a", buffering=1)
+
+
 
 
 
