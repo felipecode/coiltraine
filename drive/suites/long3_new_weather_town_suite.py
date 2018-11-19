@@ -16,10 +16,10 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 
 
-class LongNewWeatherTown(ExperimentSuite):
+class Long3NewWeatherTown(ExperimentSuite):
 
     def __init__(self):
-        super(LongNewWeatherTown, self).__init__('Town02')
+        super(Long3NewWeatherTown, self).__init__('Town02')
 
     @property
     def train_weathers(self):
@@ -109,7 +109,7 @@ class LongNewWeatherTown(ExperimentSuite):
                     Poses=poses,
                     Task=iteration,
                     TaskName=task_names[iteration],
-                    Repetitions=1
+                    Repetitions=3
                 )
                 experiments_vector.append(experiment)
 

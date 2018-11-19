@@ -14,12 +14,11 @@ from carla.settings import CarlaSettings
 from carla.driving_benchmark.experiment_suites.experiment_suite import ExperimentSuite
 
 
-# TODO: maybe add aditional tasks ( NO dynamic obstacles for instace !)
 
-class LongNewWeather(ExperimentSuite):
+class Long3NewWeather(ExperimentSuite):
 
     def __init__(self):
-        super(LongNewWeather, self).__init__('Town01')
+        super(Long3NewWeather, self).__init__('Town01')
 
     @property
     def train_weathers(self):
@@ -102,7 +101,7 @@ class LongNewWeather(ExperimentSuite):
                     Poses=poses,
                     Task=iteration,
                     TaskName=task_names[iteration],
-                    Repetitions=1
+                    Repetitions=3
                 )
                 experiments_vector.append(experiment)
 
