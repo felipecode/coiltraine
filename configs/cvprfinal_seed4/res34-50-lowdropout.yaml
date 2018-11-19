@@ -1,4 +1,4 @@
-
+# GET ON 31
 #### General Configuration Parameters ####
 SAVE_SCHEDULE: range(0,1000001, 20000)
 
@@ -29,25 +29,22 @@ NUMBER_OF_HOURS: 50
 TEST_SCHEDULE: [100000]  # The frequency the model is actually tested.
 
 
+
 #### Network Related Parameters ####
+
 
 
 MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
-    conv:
-      channels: [32, 32, 64, 64, 128, 128, 256, 256]
-      kernels: [5, 3, 3, 3, 3, 3, 3, 3]
-      strides: [2, 1, 2, 1, 2, 1, 1, 1]
-      dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    fc:
-      neurons: [512, 512]
-      dropouts: [0.0, 0.5]
+    res:
+      name: 'resnet34'
+      num_classes: 512
 
   measurements:
     fc:
       neurons: [128, 128]
-      dropouts: [0.0, 0.5]
+      dropouts: [0.0, 0.0]
   join:
     fc:
       neurons: [512]
@@ -55,15 +52,15 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   speed_branch:
     fc:
       neurons: [256, 256]
-      dropouts: [0.5, 0.5]
+      dropouts: [0.0, 0.5]
   branches:
     number_of_branches: 4
     fc:
       neurons: [256, 256]
-      dropouts: [0.5, 0.5]
+      dropouts: [0.0, 0.5]
 
-
-MAGICAL_SEED: 666
+PRE_TRAINED: False
+MAGICAL_SEED: 69176754
 
 LEARNING_RATE: 0.0002  # First
 LEARNING_RATE_DECAY_INTERVAL: 50000
@@ -84,6 +81,3 @@ IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from
 USE_ORACLE: False
 USE_FULL_ORACLE: False
 AVOID_STOPPING: True
-
-
-

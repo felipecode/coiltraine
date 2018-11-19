@@ -279,16 +279,6 @@ def _merge_a_into_b(a, b, stack=None):
         v = _check_and_coerce_cfg_value_type(v, b[k], k, full_key)
         print (" V ", v)
 
-        # Recursively merge dicts
-        # CHANGE THIS TO JUST A REPLACEMENT OF THE DICT
-
-        # if isinstance(v, dict):
-        #     try:
-        #         stack_push = [k] if stack is None else stack + [k]
-        #        _merge_a_into_b(v, b[k], stack=stack_push)
-        #    except BaseException:
-        #        raise
-        #else:
         b[k] = v
 
 
