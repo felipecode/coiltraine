@@ -259,6 +259,7 @@ def _merge_a_into_b(a, b, stack=None):
 
     assert isinstance(a, AttributeDict) or isinstance(a, dict), 'Argument `a` must be an AttrDict'
     assert isinstance(b, AttributeDict) or isinstance(a, dict), 'Argument `b` must be an AttrDict'
+    print (" MERGING ",a, "INTO ", b)
 
 
     for k, v_ in a.items():
@@ -275,6 +276,7 @@ def _merge_a_into_b(a, b, stack=None):
         v = _decode_cfg_value(v)
 
         v = _check_and_coerce_cfg_value_type(v, b[k], k, full_key)
+        print (v)
 
         # Recursively merge dicts
 
