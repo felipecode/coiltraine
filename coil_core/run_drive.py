@@ -69,8 +69,9 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
 
         (out, err) = sp.communicate()
 
+        #'docker run --rm -d -p 2000-2002:2000-2002 --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=1
+        #carlasim/carla:0.8.2 /bin/bash CarlaUE4.sh '/Game/Maps/Town01 -windowed -benchmark -fps=10 -world-port=2000
 
-        
 
         #print (['docker', 'run', '--rm', '-p '+str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
         #                      '--runtime=nvidia', '-e  NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
@@ -155,7 +156,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
         if params['suppress_output']:
             sys.stdout = open(os.path.join('_output_logs',
-                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                               exp_alias + '_' + g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
             sys.stderr = open(os.path.join('_output_logs',
                               exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
@@ -172,7 +173,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
         task_list = unique([experiment.task_name for experiment in experiment_list ])
         # Now actually run the driving_benchmark
 
-        print (" CARLA IS OPEN")
         latest = get_latest_evaluated_checkpoint(control_filename + '_' + task_list[0])
 
 
@@ -182,8 +182,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             file_base = os.path.join('_logs', exp_batch, exp_alias,
                          g_conf.PROCESS_NAME + '_csv', control_filename)
 
-            print (g_conf.PROCESS_NAME)
-            print (file_base)
 
             for i in range(len(task_list)):
                 write_header_control_summary(file_base, task_list[i])
@@ -202,11 +200,17 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
                     carla_process, port, out = start_carla_simulator(gpu, town_name,
                                                                      params['no_screen'], params['docker'])
-
+                    print ("information ")
+                    print(exp_batch, exp_alias)
+                    for keys, values in g_conf.items():
+                        print(keys)
+                        print(values)
+                    #exit(1)
 
                     latest = get_next_checkpoint(g_conf.TEST_SCHEDULE, control_filename + '_' + task_list[0])
                     checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                                          , 'checkpoints', str(latest) + '.pth'))
+
 
 
                     coil_agent = CoILAgent(checkpoint, town_name, params['record_collisions'])
