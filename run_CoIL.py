@@ -195,7 +195,7 @@ if __name__ == '__main__':
         # Maybe the latest voltas will be underused
         # OBS: This usage is also based on my tensorflow experiences, maybe pytorch allows more.
         allocation_parameters = {'gpu_value': args.gpu_value,
-                                 'train_cost': 2,
+                                 'train_cost': 4,
                                  'validation_cost': 1.5,
                                  'drive_cost': 1.5}
         # TODO: temporary function until carla map change feature is fixed.
