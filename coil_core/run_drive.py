@@ -237,7 +237,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                         benchmark_dict = json.loads(f.read())
 
                     print (" number of episodes ", len(experiment_set.build_experiments()))
-                    averaged_dict = compute_average_std_separatetasks([benchmark_dict],
+                    averaged_dict, std_dict = compute_average_std_separatetasks([benchmark_dict],
                                                         experiment_set.weathers,
                                                         len(experiment_set.build_experiments()))
 
@@ -249,11 +249,13 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                     print ("TASK LIST ")
                     print (task_list)
 
+                    print(std_dict)
+
                     for i in range(len(task_list)):
                         #write_data_point_control_summary(file_base, 'empty', averaged_dict, latest, 0)
                         #write_data_point_control_summary(file_base, 'normal', averaged_dict, latest, 1)
                         write_data_point_control_summary(file_base, task_list[i],
-                                                         averaged_dict, latest, i)
+                                                         averaged_dict, latest, i, std_dict=std_dict)
 
                     #plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
                     #                     )

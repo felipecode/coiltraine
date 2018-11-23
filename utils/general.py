@@ -468,7 +468,7 @@ def write_header_control_summary(path, task):
 
 
 
-def write_data_point_control_summary(path, task, averaged_dict, step, pos):
+def write_data_point_control_summary(path, task, averaged_dict, step, pos, std_dict):
 
     filename = os.path.join(path + '_' + task + '.csv')
 
@@ -479,20 +479,38 @@ def write_data_point_control_summary(path, task, averaged_dict, step, pos):
 
     csv_outfile = open(filename, 'a')
 
-    csv_outfile.write("%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n"
-                      % (step,
-                         averaged_dict['episodes_completion'][pos][0],
-                         averaged_dict['intersection_offroad'][pos][0],
-                         averaged_dict['collision_pedestrians'][pos][0],
-                         averaged_dict['collision_vehicles'][pos][0],
-                         averaged_dict['episodes_fully_completed'][pos][0],
-                         averaged_dict['driven_kilometers'][pos],
-                         averaged_dict['end_pedestrian_collision'][pos][0],
-                         averaged_dict['end_vehicle_collision'][pos][0],
-                         averaged_dict['end_other_collision'][pos][0],
-                         averaged_dict['intersection_otherlane'][pos][0],
-                         averaged_dict['percentage_green_lights'][pos][0],
-                         averaged_dict['percentage_off_road'][pos][0]))
+    if std_dict is not None:
+        csv_outfile.write("%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n"
+                          % (step,
+                             averaged_dict['episodes_completion'][pos][0],
+                             averaged_dict['intersection_offroad'][pos][0],
+                             averaged_dict['collision_pedestrians'][pos][0],
+                             averaged_dict['collision_vehicles'][pos][0],
+                             averaged_dict['episodes_fully_completed'][pos][0],
+                             std_dict['episodes_completion'][pos][0],
+                             averaged_dict['driven_kilometers'][pos],
+                             averaged_dict['end_pedestrian_collision'][pos][0],
+                             averaged_dict['end_vehicle_collision'][pos][0],
+                             averaged_dict['end_other_collision'][pos][0],
+                             averaged_dict['intersection_otherlane'][pos][0],
+                             averaged_dict['percentage_green_lights'][pos][0],
+                             averaged_dict['percentage_off_road'][pos][0]))
+    else:
+
+        csv_outfile.write("%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n"
+                          % (step,
+                             averaged_dict['episodes_completion'][pos][0],
+                             averaged_dict['intersection_offroad'][pos][0],
+                             averaged_dict['collision_pedestrians'][pos][0],
+                             averaged_dict['collision_vehicles'][pos][0],
+                             averaged_dict['episodes_fully_completed'][pos][0],
+                             averaged_dict['driven_kilometers'][pos],
+                             averaged_dict['end_pedestrian_collision'][pos][0],
+                             averaged_dict['end_vehicle_collision'][pos][0],
+                             averaged_dict['end_other_collision'][pos][0],
+                             averaged_dict['intersection_otherlane'][pos][0],
+                             averaged_dict['percentage_green_lights'][pos][0],
+                             averaged_dict['percentage_off_road'][pos][0]))
 
     csv_outfile.close()
 
@@ -500,7 +518,7 @@ def write_data_point_control_summary(path, task, averaged_dict, step, pos):
 
 #TODO REFACTOR THIS TWO EPISODES INTO MANY FUNCTIONS
 
-def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1):
+def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, number_of_reps=3):
     """
     There are two types of outputs, these come packed in a dictionary
 
@@ -548,9 +566,11 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1):
 
     # The average results between the dictionaries.
     average_results_matrix = {}
+    std_results_matrix = {}
 
     for metric_name in (metrics_to_average + infraction_metrics + metrics_to_sum):
         average_results_matrix.update({metric_name: np.zeros((number_of_tasks, len(dic_list)))})
+        std_results_matrix.update({metric_name: np.zeros((number_of_tasks, len(dic_list)))})
 
     count_dic_pos = 0
     for metrics_summary in dic_list:
@@ -559,7 +579,7 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1):
 
             values = metrics_summary[metric]
 
-            metric_sum_values = np.zeros(number_of_experiments)
+            metric_sum_values = np.zeros(number_of_experiments,number_of_reps)
             for weather, tasks in values.items():
                 if float(weather) in set(weathers):
                     count = 0
@@ -568,13 +588,25 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1):
                         if len(t) == 0:
                             print('    Metric Not Computed')
                         else:
-                            metric_sum_values[count] += (float(sum(t)))
+                            for r in range(number_of_reps):
+                                metric_sum_values[count][r] += (float(sum(t[r:-1:number_of_reps])))
 
                         count += 1
 
             for i in range(len(metric_sum_values)):
-                average_results_matrix[metric][i][count_dic_pos] = metric_sum_values[i]/\
-                                                               (number_of_episodes*len(weathers))
+                average_results_matrix[metric][i][count_dic_pos] = 0
+                # We take the average of each rep and them average again
+                for r in range(number_of_reps):
+                    average_results_matrix[metric][i][count_dic_pos] += metric_sum_values[i][r]/\
+                                                               (number_of_episodes*len(weathers))/\
+                                                                number_of_reps
+                std_results_matrix[metric][i][count_dic_pos] = 0
+                for r in range(number_of_reps):
+                    std_results_matrix[metric][i][count_dic_pos] += \
+                        (average_results_matrix[metric][i][count_dic_pos]-
+                            metric_sum_values[i][r]/ (number_of_episodes*len(weathers))) \
+                        / number_of_reps
+
 
         # For the metrics we sum over all the weathers here, this is to better subdivide the driving envs
         # The infraction metrics are divided by the number of kilometers in the end
@@ -651,4 +683,4 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1):
     print(average_results_matrix)
 
 
-    return average_results_matrix
+    return average_results_matrix, std_results_matrix
