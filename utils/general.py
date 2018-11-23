@@ -518,7 +518,7 @@ def write_data_point_control_summary(path, task, averaged_dict, step, pos, std_d
 
 #TODO REFACTOR THIS TWO EPISODES INTO MANY FUNCTIONS
 
-def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, number_of_reps=3):
+def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, number_of_reps=1):
     """
     There are two types of outputs, these come packed in a dictionary
 
@@ -579,7 +579,7 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
 
             values = metrics_summary[metric]
 
-            metric_sum_values = np.zeros(number_of_experiments,number_of_reps)
+            metric_sum_values = np.zeros((number_of_experiments, number_of_reps))
             for weather, tasks in values.items():
                 if float(weather) in set(weathers):
                     count = 0
