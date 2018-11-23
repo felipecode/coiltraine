@@ -239,7 +239,8 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                     print (" number of episodes ", len(experiment_set.build_experiments()))
                     averaged_dict, std_dict = compute_average_std_separatetasks([benchmark_dict],
                                                         experiment_set.weathers,
-                                                        len(experiment_set.build_experiments()))
+                                                        len(experiment_set.build_experiments()),
+                                                        number_of_reps=experiment_set.build_experiments()[0].repetitions)
 
                     file_base = os.path.join('_logs', exp_batch, exp_alias,
                                              g_conf.PROCESS_NAME + '_csv', control_filename)
