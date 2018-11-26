@@ -64,8 +64,7 @@ class CorlTraining(ExperimentSuite):
                     [30, 41], [18, 107], [69, 45], [102, 95], [18, 145],
                     [111, 64], [79, 45], [84, 69], [73, 31], [37, 81]]
 
-        return [_poses_straight(),
-                _poses_one_curve(),
+        return [
                 _poses_navigation(),
                 _poses_navigation()]
 
@@ -85,10 +84,10 @@ class CorlTraining(ExperimentSuite):
         camera.set_rotation(-15.0, 0, 0)
 
         poses_tasks = self._poses()
-        vehicles_tasks = [0, 0, 0, 20]
-        pedestrians_tasks = [0, 0, 0, 50]
+        vehicles_tasks = [0, 20]
+        pedestrians_tasks = [0, 50]
 
-        task_names = ['straight', 'one_curve', 'navigation', 'navigation_dyn']
+        task_names = ['navigation', 'navigation_dyn']
 
         experiments_vector = []
 
@@ -118,7 +117,7 @@ class CorlTraining(ExperimentSuite):
                     Poses=poses,
                     Task=iteration,
                     TaskName=task_names[iteration],
-                    Repetitions=1
+                    Repetitions=3
                 )
                 experiments_vector.append(experiment)
 

@@ -65,8 +65,7 @@ class CorlNewWeatherTown(ExperimentSuite):
                     [70, 73], [46, 67], [57, 50], [61, 49], [21, 12],
                     [51, 81], [77, 68], [56, 65], [43, 54]]
 
-        return [_poses_straight(),
-                _poses_one_curve(),
+        return [
                 _poses_navigation(),
                 _poses_navigation()]
 
@@ -86,10 +85,10 @@ class CorlNewWeatherTown(ExperimentSuite):
         camera.set_rotation(-15.0, 0, 0)
 
         poses_tasks = self._poses()
-        vehicles_tasks = [0, 0, 0, 15]
-        pedestrians_tasks = [0, 0, 0, 50]
+        vehicles_tasks = [0, 15]
+        pedestrians_tasks = [0, 50]
 
-        task_names = ['straight', 'one_curve', 'navigation', 'navigation_dyn']
+        task_names = ['navigation', 'navigation_dyn']
 
         experiments_vector = []
 
@@ -119,7 +118,7 @@ class CorlNewWeatherTown(ExperimentSuite):
                     Poses=poses,
                     Task=iteration,
                     TaskName=task_names[iteration],
-                    Repetitions=1
+                    Repetitions=3
                 )
                 experiments_vector.append(experiment)
 
