@@ -1,5 +1,6 @@
 import re
 import os
+import math
 import smtplib
 import numpy as np
 
@@ -599,8 +600,10 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
                             print('    Metric Not Computed')
                         else:
                             for r in range(number_of_reps):
+                                print ("Rep ", r)
                                 metric_sum_values[count][r] += (float(sum(t[r:-1:number_of_reps])))
-
+                                print ("episodes ", range(r, len(t), number_of_reps))
+                                print (metric_sum_values[count][r])
                         count += 1
 
             for i in range(len(metric_sum_values)):
@@ -613,7 +616,7 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
                 std_results_matrix[metric][i][count_dic_pos] = 0
                 for r in range(number_of_reps):
                     std_results_matrix[metric][i][count_dic_pos] += \
-                        (average_results_matrix[metric][i][count_dic_pos]-
+                        math.fabs(average_results_matrix[metric][i][count_dic_pos]-
                             metric_sum_values[i][r]/ (number_of_episodes*len(weathers))) \
                         / number_of_reps
 
