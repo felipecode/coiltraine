@@ -16,10 +16,10 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 # TODO: maybe add aditional tasks ( NO dynamic obstacles for instace !)
 
-class CorlNewWeather(ExperimentSuite):
+class CorlnavNewWeather(ExperimentSuite):
 
     def __init__(self):
-        super(CorlNewWeather, self).__init__('Town01')
+        super(CorlnavNewWeather, self).__init__('Town01')
 
     @property
     def train_weathers(self):
