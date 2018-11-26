@@ -587,14 +587,18 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
     for metrics_summary in dic_list:
 
         for metric in metrics_to_average:
-
+            print ("METRIC ", metric)
             values = metrics_summary[metric]
 
             metric_sum_values = np.zeros((number_of_experiments, number_of_reps))
             for weather, tasks in values.items():
+
+                print (tasks)
                 if float(weather) in set(weathers):
+                    print("W", weather)
                     count = 0
                     for t in tasks:
+                        print (t)
                         # if isinstance(t, np.ndarray) or isinstance(t, list):
                         if len(t) == 0:
                             print('    Metric Not Computed')
