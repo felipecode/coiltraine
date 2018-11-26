@@ -74,7 +74,6 @@ class Long3NewTown(ExperimentSuite):
         camera.set_position(2.0, 0.0, 1.4)
         camera.set_rotation(-15.0, 0, 0)
 
-
         poses_tasks = self._poses()
         vehicles_tasks = [0, 15, 70]
         pedestrians_tasks = [0, 50, 150]

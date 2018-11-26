@@ -8,30 +8,29 @@
 
 from __future__ import print_function
 
-
 from carla.driving_benchmark.experiment import Experiment
 from carla.sensor import Camera
 from carla.settings import CarlaSettings
 from carla.driving_benchmark.experiment_suites.experiment_suite import ExperimentSuite
 
 
+# TODO: maybe add aditional tasks ( NO dynamic obstacles for instace !)
 
-class TestT2(ExperimentSuite):
+class CorlTraining(ExperimentSuite):
 
     def __init__(self):
-        super(TestT2, self).__init__('Town02')
+        super(CorlTraining, self).__init__('Town01')
 
     @property
     def train_weathers(self):
-        return []
+        return [1, 3, 6, 8]
 
     @property
     def test_weathers(self):
-        return [ 14]
-
+        return []
     @property
     def collision_as_failure(self):
-        return True
+        return False
 
 
     def calculate_time_out(self, path_distance):
@@ -40,29 +39,40 @@ class TestT2(ExperimentSuite):
         that is calculated based on distance to goal.
         This is the same timeout as used on the CoRL paper.
         """
-        return ((path_distance / 1000.0) / 5.0) * 3600.0 + 20.0
+        return ((path_distance / 1000.0) / 5.0) * 3600.0 + 10.0
 
     def _poses(self):
 
-        def _poses_navigation():
-            return [[19, 66], [79, 14], [19, 57], [39, 53], [60, 26],
-             [53, 76], [42, 13], [31, 71], [59, 35], [47, 16],
-             [10, 61], [66, 3], [20, 79], [14, 56], [26, 69],
-             [79, 19], [2, 29], [16, 14], [5, 57], [77, 68],
-             [70, 73], [46, 67], [34, 77], [61, 49], [21, 12]]
+        def _poses_straight():
+            return [[36, 40], [39, 35], [110, 114], [7, 3], [0, 4],
+                    [68, 50], [61, 59], [47, 64], [147, 90], [33, 87],
+                    [26, 19], [80, 76], [45, 49], [55, 44], [29, 107],
+                    [95, 104], [84, 34], [53, 67], [22, 17], [91, 148],
+                    [20, 107], [78, 70], [95, 102], [68, 44], [45, 69]]
 
-        return [_poses_navigation(),
+        def _poses_one_curve():
+            return [[138, 17], [47, 16], [26, 9], [42, 49], [140, 124],
+                    [85, 98], [65, 133], [137, 51], [76, 66], [46, 39],
+                    [40, 60], [0, 29], [4, 129], [121, 140], [2, 129],
+                    [78, 44], [68, 85], [41, 102], [95, 70], [68, 129],
+                    [84, 69], [47, 79], [110, 15], [130, 17], [0, 17]]
+
+        def _poses_navigation():
+            return [[105, 29], [27, 130], [102, 87], [132, 27], [24, 44],
+                    [96, 26], [34, 67], [28, 1], [140, 134], [105, 9],
+                    [148, 129], [65, 18], [21, 16], [147, 97], [42, 51],
+                    [30, 41], [18, 107], [69, 45], [102, 95], [18, 145],
+                    [111, 64], [79, 45], [84, 69], [73, 31], [37, 81]]
+
+        return [_poses_straight(),
+                _poses_one_curve(),
                 _poses_navigation(),
                 _poses_navigation()]
-
-
 
     def build_experiments(self):
         """
         Creates the whole set of experiment objects,
         The experiments created depend on the selected Town.
-
-
         """
 
         # We set the camera
@@ -74,12 +84,11 @@ class TestT2(ExperimentSuite):
         camera.set_position(2.0, 0.0, 1.4)
         camera.set_rotation(-15.0, 0, 0)
 
-
         poses_tasks = self._poses()
-        vehicles_tasks = [15, 15, 70]
-        pedestrians_tasks = [50, 50, 150]
+        vehicles_tasks = [0, 0, 0, 20]
+        pedestrians_tasks = [0, 0, 0, 50]
 
-        task_names = ['empty', 'normal', 'cluttered']
+        task_names = ['straight', 'one_curve', 'navigation', 'navigation_dyn']
 
         experiments_vector = []
 
@@ -114,6 +123,3 @@ class TestT2(ExperimentSuite):
                 experiments_vector.append(experiment)
 
         return experiments_vector
-
-
-
