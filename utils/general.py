@@ -450,7 +450,7 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
 
 
     return average_results_matrix
-def write_header_control_summary(path, task):
+def write_header_control_summary(path, task, write_std=False):
 
     filename = os.path.join(path + '_' + task + '.csv')
 
@@ -458,12 +458,22 @@ def write_header_control_summary(path, task):
 
     csv_outfile = open(filename, 'w')
 
-    csv_outfile.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
-                      % ('step', 'episodes_completion', 'intersection_offroad',
-                          'collision_pedestrians', 'collision_vehicles', 'episodes_fully_completed',
-                         'driven_kilometers', 'end_pedestrian_collision',
-                         'end_vehicle_collision',  'end_other_collision', 'intersection_otherlane',
-                         'percentage_green_lights', 'percentage_off_road'))
+    if write_std:
+        csv_outfile.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
+                          % ('step', 'episodes_completion', 'intersection_offroad',
+                              'collision_pedestrians', 'collision_vehicles', 'episodes_fully_completed',
+                             'std_success',
+                             'driven_kilometers', 'end_pedestrian_collision',
+                             'end_vehicle_collision',  'end_other_collision', 'intersection_otherlane',
+                             'percentage_green_lights', 'percentage_off_road'))
+    else:
+
+        csv_outfile.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
+                          % ('step', 'episodes_completion', 'intersection_offroad',
+                              'collision_pedestrians', 'collision_vehicles', 'episodes_fully_completed',
+                             'driven_kilometers', 'end_pedestrian_collision',
+                             'end_vehicle_collision',  'end_other_collision', 'intersection_otherlane',
+                             'percentage_green_lights', 'percentage_off_road'))
     csv_outfile.close()
 
 

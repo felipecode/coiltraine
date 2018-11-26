@@ -184,12 +184,14 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             file_base = os.path.join('_logs', exp_batch, exp_alias,
                          g_conf.PROCESS_NAME + '_csv', control_filename)
 
+            # Test if the episodes have repetitions, if so we plot std deviation
+            repetitions = experiment_set.build_experiments()[0].repetitions > 1
 
             for i in range(len(task_list)):
-                write_header_control_summary(file_base, task_list[i])
+                write_header_control_summary(file_base, task_list[i],
+                                             write_std=repetitions)
 
-
-
+        #port =2000
         # Write the header of the summary file used conclusion
         # While the checkpoint is not there
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
