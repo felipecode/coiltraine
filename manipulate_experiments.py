@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
 
     if args.export_results:
-        variables_to_export = ['episodes_fully_completed', 'end_pedestrian_collision',
+        variables_to_export = ['episodes_fully_completed', 'std_success', 'end_pedestrian_collision',
                                'end_vehicle_collision',
                              'end_other_collision', 'driven_kilometers',
                                'percentage_green_lights', 'percentage_off_road']
