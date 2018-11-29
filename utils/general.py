@@ -621,7 +621,8 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
                 for r in range(number_of_reps):
                     std_results_matrix[metric][i][count_dic_pos] += \
                         math.fabs(average_results_matrix[metric][i][count_dic_pos]-
-                            metric_sum_values[i][r]/ (number_of_episodes*len(weathers)))
+                            metric_sum_values[i][r]/ ((number_of_episodes/number_of_reps)*
+                                                      len(weathers)))/number_of_reps
 
 
 
