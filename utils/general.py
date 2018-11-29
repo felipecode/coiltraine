@@ -615,14 +615,14 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
                 # We take the average of each rep and them average again
                 for r in range(number_of_reps):
                     average_results_matrix[metric][i][count_dic_pos] += metric_sum_values[i][r]/\
-                                                               (number_of_episodes*len(weathers))/\
-                                                                number_of_reps
+                                                               (number_of_episodes*len(weathers))
+
                 std_results_matrix[metric][i][count_dic_pos] = 0
                 for r in range(number_of_reps):
                     std_results_matrix[metric][i][count_dic_pos] += \
                         math.fabs(average_results_matrix[metric][i][count_dic_pos]-
-                            metric_sum_values[i][r]/ (number_of_episodes*len(weathers))) \
-                        / number_of_reps
+                            metric_sum_values[i][r]/ (number_of_episodes*len(weathers)))
+
 
 
         # For the metrics we sum over all the weathers here, this is to better subdivide the driving envs
