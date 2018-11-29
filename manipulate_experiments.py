@@ -65,10 +65,10 @@ if __name__ == '__main__':
         variables_to_export = ['episodes_fully_completed', 'std_success', 'end_pedestrian_collision',
                                'end_vehicle_collision',
                              'end_other_collision', 'driven_kilometers',
-                               'percentage_green_lights', 'percentage_off_road']
+                               'percentage_green_lights', 'percentage_off_roa']
         tasks = ['empty', 'normal', 'cluttered']
         # TODO: for now it basically will just export the best
-        export_csv_separate(args.folder, variables_to_export,tasks, checkpoint_number=args.position)
+        export_csv_separate(args.folder, variables_to_export, tasks, checkpoint_number=args.position)
 
 
     if args.erase_experiments:
