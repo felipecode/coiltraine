@@ -97,6 +97,11 @@ class PreSplittedSampler(Sampler):
             Iterator to get ids for the dataset
 
         """
+        if g_conf.SAMPLING_SEED is not None:
+            random.seed(g_conf.SAMPLING_SEED)
+            torch.manual_seed(g_conf.SAMPLING_SEED)
+            torch.cuda.manual_seed_all(g_conf.SAMPLING_SEED)
+            np.random.seed(g_conf.SAMPLING_SEED)
 
         rank_keys = get_rank(self.keys)
 
