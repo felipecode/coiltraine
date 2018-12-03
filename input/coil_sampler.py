@@ -36,7 +36,21 @@ class RandomSampler(Sampler):
                                      executed_iterations + g_conf.BATCH_SIZE
         self.keys = keys
 
+        if g_conf.SAMPLING_SEED is not None:
+            random.seed(g_conf.SAMPLING_SEED)
+            torch.manual_seed(g_conf.SAMPLING_SEED)
+            torch.cuda.manual_seed_all(g_conf.SAMPLING_SEED)
+            np.random.seed(g_conf.SAMPLING_SEED)
+            os.environ['PYTHONHASHSEED'] = str(g_conf.SAMPLING_SEED)
+
     def __iter__(self):
+
+        if g_conf.SAMPLING_SEED is not None:
+            random.seed(g_conf.SAMPLING_SEED)
+            torch.manual_seed(g_conf.SAMPLING_SEED)
+            torch.cuda.manual_seed_all(g_conf.SAMPLING_SEED)
+            np.random.seed(g_conf.SAMPLING_SEED)
+            os.environ['PYTHONHASHSEED'] = str(g_conf.SAMPLING_SEED)
         return iter([random.choice(self.keys) for _ in range(self.iterations_to_execute)])
 
 
