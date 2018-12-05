@@ -135,54 +135,45 @@ def get_inverse_freq_weights(keys, dataset_size):
 # TODO: for now is not posible to maybe balance just labels or just steering. Is either all or nothing
 def select_balancing_strategy(dataset, iteration, number_of_workers):
 
-
-
     # Creates the sampler, this part is responsible for managing the keys. It divides
     # all keys depending on the measurements and produces a set of keys for each bach.
-
-    #keys = select_data(dataset.measurements)   I WILL TEST SELECTING DATA ON OTHER PART
     keys = range(0, len(dataset) - g_conf.NUMBER_IMAGES_SEQUENCE)
-    print (" ALL THE KEYS ")
-    print (len(keys))
-
+    print(" ALL THE KEYS ")
+    print(len(keys))
     # In the case we are using the balancing
-    print(" Split is ", g_conf.SPLIT)
-
+    print("Split is ", g_conf.SPLIT)
     if g_conf.SPLIT is not None and g_conf.SPLIT is not "None":
         name, params = parse_split_configuration(g_conf.SPLIT)
         splitter_function = getattr(splitter, name)
 
-        print (" Function to split", name)
-        print (" params ", params)
-        print (" Weights ", params['weights'])
+        print("Function to split", name)
+        print("params ", params)
+        print("Weights ", params['weights'])
         keys_splitted = splitter_function(dataset.measurements, params)
-        print (keys_splitted)
+        print(keys_splitted)
 
         for i in range(len(keys_splitted)):
 
             keys_splitted[i] = np.array(list(set(keys_splitted[i]).intersection(set(keys))))
 
-        print (keys_splitted)
-        print (" number of kleys",len(keys_splitted))
+        print(keys_splitted)
+        print("number of kleys ", len(keys_splitted))
 
         if params['weights'] == 'inverse':
             weights = get_inverse_freq_weights(keys_splitted, len(dataset.measurements) - g_conf.NUMBER_IMAGES_SEQUENCE)
         else:
             weights = params['weights']
 
-        print ( " final weights ")
-        print ( weights )
+        print(" final weights ")
+        print(weights)
         sampler = PreSplittedSampler(keys_splitted, iteration * g_conf.BATCH_SIZE, weights)
     else:
 
-        print (" Random Splitter ")
-
-        #print(keys)
+        print(" Random Splitter ")
         sampler = RandomSampler(keys, iteration * g_conf.BATCH_SIZE)
 
 
-    print ( "Getting dataloader")
-
+    print("Getting dataloader")
     # The data loader is the multi threaded module from pytorch that release a number of
     # workers to get all the data.
     data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
@@ -222,20 +213,23 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         # Put the output to a separate file
         if suppress_output:
             sys.stdout = open(os.path.join('_output_logs', exp_alias + '_' +
-                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a",
+                              buffering=1)
             sys.stderr = open(os.path.join('_output_logs',
-                              exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              exp_alias + '_err_' + g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
-        print (exp_batch, exp_alias)
+        print("Loaded Information")
+        print(exp_batch, exp_alias)
         for keys, values in g_conf.items():
             print(keys)
             print(values)
-        #exit(1)
 
         seed_everything(g_conf.MAGICAL_SEED)
+        print("Reseting seed to ", g_conf.MAGICAL_SEED)
+
         checkpoint_file = get_latest_saved_checkpoint()
-        print ( " LOADING  ", checkpoint_file)
+        print("LOADING  ", checkpoint_file)
         if checkpoint_file is not None:
             checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias,
                                      'checkpoints', str(get_latest_saved_checkpoint())))
@@ -253,42 +247,40 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         # that you can access the HD_FILES positions from the root directory as a in a vector.
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
 
-        # augmenter_cpu = iag.AugmenterCPU(g_conf.AUGMENTATION_SUITE_CPU)
-
-        # By instanciating the augmenter we get a callable that augment images and transform them
+        # By instantiating the augmenter we get a callable that augment images and transform them
         # into tensors.
         augmenter = Augmenter(g_conf.AUGMENTATION)
 
         dataset = CoILDataset(full_dataset, transform=augmenter,
-                              preload_name=str(g_conf.NUMBER_OF_HOURS) + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+                              preload_name=str(g_conf.NUMBER_OF_HOURS)
+                                               + 'hours_' + g_conf.TRAIN_DATASET_NAME)
 
         data_loader = select_balancing_strategy(dataset, iteration, number_of_workers)
 
         seed_everything(g_conf.MAGICAL_SEED)
+        print (" Reseting seed to ", g_conf.MAGICAL_SEED)
 
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         model.cuda()
 
         if checkpoint_file is not None:
+            print("LOAD A STATE DICT ")
             model.load_state_dict(checkpoint['state_dict'])
 
         criterion = Loss(g_conf.LOSS_FUNCTION)
 
         optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
 
-
         if checkpoint_file is not None:
             accumulated_time = checkpoint['total_time']
         else:
             accumulated_time = 0  # We accumulate iteration time and keep the average speed
 
-
         #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
         capture_time = time.time()
         for data in data_loader:
-            print ("READ TIME ", time.time() - capture_time)
+            print("READ TIME ", time.time() - capture_time)
             # get the control commands from float_data, size = [120,1]
-
             capture_time = time.time()
             controls = data['directions']
 
@@ -299,8 +291,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                              dataset.extract_inputs(data).cuda())
 
             # Make use of attention more general.
-
-
             #TODO: This requires some cleaning, there is two selection points for the loss
             if 'attention' in g_conf.LOSS_FUNCTION or 'regularization' in g_conf.LOSS_FUNCTION:
                 inter_layers = [model.intermediate_layers[ula] for ula in g_conf.USED_LAYERS_ATT]
@@ -316,7 +306,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                     'intention_factors': dataset.extract_intentions(data).cuda()
                 }
                 loss, platable_params = criterion(loss_function_params)
-
                 coil_logger.add_scalar('L1', platable_params['L1'].data, iteration)
                 coil_logger.add_scalar('L2', platable_params['L2'].data, iteration)
 
@@ -342,7 +331,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                 loss, _ = criterion(loss_function_params)
 
             # my weight decay
-
             if g_conf.WEIGHT_DECAY == 'L1':
                 loss = weight_decay_l1(loss, model, None,
                                        g_conf.WEIGHT_DECAY_ALPHA,
@@ -382,8 +370,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             error = torch.abs(output - dataset.extract_targets(data).cuda())
 
             # TODO: For now we are computing the error for just the correct branch, it could be multi- branch,
-            print (" The produced loss")
-
+            print(" The produced loss")
             coil_logger.add_scalar('Loss', loss.data, iteration)
             coil_logger.add_image('Image', torch.squeeze(data['rgb']), iteration)
 
@@ -411,15 +398,16 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
 
             # TODO: save also the optimizer state dictionary
-            if is_ready_to_save(iteration):
 
+            if is_ready_to_save(iteration):
+                print("Is Going To save ", iteration)
+                print(model.state_dict())
                 state = {
                     'iteration': iteration,
                     'state_dict': model.state_dict(),
                     'best_loss': best_loss,
                     'total_time': accumulated_time,
                     'best_loss_iter': best_loss_iter
-
                 }
                 # TODO : maybe already summarize the best model ???
                 torch.save(state, os.path.join('_logs', exp_batch, exp_alias
@@ -438,12 +426,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
         coil_logger.add_message('Finished', {})
 
-
-
-
     except KeyboardInterrupt:
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
-
     except:
         traceback.print_exc()
         coil_logger.add_message('Error', {'Message': 'Something Happened'})

@@ -43,10 +43,11 @@ class RandomSampler(Sampler):
             np.random.seed(g_conf.SAMPLING_SEED)
             os.environ['PYTHONHASHSEED'] = str(g_conf.SAMPLING_SEED)
 
+        print("Setting a sampling seed", g_conf.SAMPLING_SEED)
+
     def __iter__(self):
 
         return iter([random.choice(self.keys) for _ in range(self.iterations_to_execute)])
-
 
     def __len__(self):
         return self.iterations_to_execute

@@ -133,6 +133,12 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             os.mkdir('_output_logs')
 
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
+        print("Merged with YAML")
+        print("Information ")
+        print(exp_batch, exp_alias)
+        for keys, values in g_conf.items():
+            print(keys)
+            print(values)
 
         exp_set_name, town_name = drive_conditions.split('_')
 
@@ -148,17 +154,21 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
         experiment_suite_module = getattr(experiment_suite_module, exp_set_name)
 
         experiment_set = experiment_suite_module()
+        print("experiment_set ", experiment_set)
 
         set_type_of_process('drive', drive_conditions)
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 
         experiment_list = experiment_set.build_experiments()
+        print ("Experiment List", experiment_list)
         # Get all the uniquely named tasks
         task_list = unique([experiment.task_name for experiment in experiment_list])
         # Now actually run the driving_benchmark
+        print("Task List", task_list)
 
         latest = get_latest_evaluated_checkpoint(control_filename + '_' + task_list[0])
+        print("Latest Evaluated benchmark ", latest)
 
         if latest is None:  # When nothing was tested, get latest returns none, we fix that.
             latest = 0
@@ -173,7 +183,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                 write_header_control_summary(file_base, task_list[i],
                                              write_std=repetitions)
 
-        # port =2000
         # Write the header of the summary file used conclusion
         # While the checkpoint is not there
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
@@ -187,22 +196,16 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                     carla_process, port, out = start_carla_simulator(gpu, town_name,
                                                                      params['no_screen'],
                                                                      params['docker'])
-                    print("information ")
-                    print(exp_batch, exp_alias)
-                    for keys, values in g_conf.items():
-                        print(keys)
-                        print(values)
-                    # exit(1)
 
                     latest = get_next_checkpoint(g_conf.TEST_SCHEDULE,
                                                  control_filename + '_' + task_list[0])
                     checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                                          , 'checkpoints', str(latest) + '.pth'))
-
+                    print ("Loading the checkpoint ", latest)
                     coil_agent = CoILAgent(checkpoint, town_name, params['record_collisions'])
 
                     coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
-                    print(" STARING BENHC")
+                    print("STARING BENCHMARK")
                     run_driving_benchmark(coil_agent, experiment_set, town_name,
                                           exp_batch + '_' + exp_alias + '_' + str(latest)
                                           + '_drive_' + control_filename
@@ -235,18 +238,12 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
                     print("TASK LIST ")
                     print(task_list)
-
                     print(std_dict)
 
                     for i in range(len(task_list)):
-                        # write_data_point_control_summary(file_base, 'empty', averaged_dict, latest, 0)
-                        # write_data_point_control_summary(file_base, 'normal', averaged_dict, latest, 1)
                         write_data_point_control_summary(file_base, task_list[i],
                                                          averaged_dict, latest, i,
                                                          std_dict=std_dict)
-
-                    # plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
-                    #                     )
                     print(averaged_dict)
 
                     carla_process.kill()
