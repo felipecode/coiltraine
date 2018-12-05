@@ -32,10 +32,10 @@ class RandomSampler(Sampler):
     """
 
     def __init__(self, keys, executed_iterations):
-        self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
-                                     executed_iterations + g_conf.BATCH_SIZE
-        self.keys = keys
+        self.iterations_to_execute = (g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE) -\
+                                     executed_iterations
 
+        self.keys = keys
         if g_conf.SAMPLING_SEED is not None:
             random.seed(g_conf.SAMPLING_SEED)
             torch.manual_seed(g_conf.SAMPLING_SEED)

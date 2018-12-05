@@ -171,6 +171,7 @@ def select_balancing_strategy(dataset, iteration, number_of_workers):
 
         print(" Random Splitter ")
         sampler = RandomSampler(keys, iteration * g_conf.BATCH_SIZE)
+        print ("LEN of the sampler", len(sampler))
 
 
     print("Getting dataloader")
@@ -263,13 +264,12 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         model.cuda()
 
+        criterion = Loss(g_conf.LOSS_FUNCTION)
+        optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
         if checkpoint_file is not None:
             print("LOAD A STATE DICT ")
             model.load_state_dict(checkpoint['state_dict'])
-
-        criterion = Loss(g_conf.LOSS_FUNCTION)
-
-        optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
+            optimizer.load_state_dict(checkpoint['optimizer'])
 
         if checkpoint_file is not None:
             accumulated_time = checkpoint['total_time']
@@ -279,6 +279,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
         capture_time = time.time()
         for data in data_loader:
+            # Try to adjust the iteration.
+            if iteration % 1000 == 0:
+                adjust_learning_rate(optimizer, iteration)
             print("READ TIME ", time.time() - capture_time)
             # get the control commands from float_data, size = [120,1]
             capture_time = time.time()
@@ -401,12 +404,12 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             if is_ready_to_save(iteration):
                 print("Is Going To save ", iteration)
-                print(model.state_dict())
                 state = {
                     'iteration': iteration,
                     'state_dict': model.state_dict(),
                     'best_loss': best_loss,
                     'total_time': accumulated_time,
+                    'optimizer': optimizer.state_dict(),
                     'best_loss_iter': best_loss_iter
                 }
                 # TODO : maybe already summarize the best model ???
@@ -416,8 +419,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             iteration += 1
             print (iteration)
 
-            if iteration % 1000 == 0:
-                adjust_learning_rate(optimizer, iteration)
 
             del data
 
