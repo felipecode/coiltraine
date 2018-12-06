@@ -279,6 +279,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
         capture_time = time.time()
         for data in data_loader:
+
+            iteration += 1
+            print (iteration)
             # Try to adjust the iteration.
             if iteration % 1000 == 0:
                 adjust_learning_rate(optimizer, iteration)
@@ -416,8 +419,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                 torch.save(state, os.path.join('_logs', exp_batch, exp_alias
                                                , 'checkpoints', str(iteration) + '.pth'))
 
-            iteration += 1
-            print (iteration)
 
 
             del data

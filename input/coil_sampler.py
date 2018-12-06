@@ -32,8 +32,11 @@ class RandomSampler(Sampler):
     """
 
     def __init__(self, keys, executed_iterations):
-        self.iterations_to_execute = (g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE) -\
-                                     executed_iterations
+        self.iterations_to_execute = ((g_conf.NUMBER_ITERATIONS) * g_conf.BATCH_SIZE) -\
+                                     (executed_iterations)
+
+        print ("Total iterations ", (g_conf.NUMBER_ITERATIONS) * g_conf.BATCH_SIZE)
+        print ("Executed Iterations ", executed_iterations)
 
         self.keys = keys
         if g_conf.SAMPLING_SEED is not None:
