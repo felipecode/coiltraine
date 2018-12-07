@@ -1,8 +1,10 @@
 from configs import g_conf
 from logger import coil_logger
 import numpy as np
+from utils.general import softmax
+import collections
 
-
+from input import PreSplittedSampler, splitter, RandomSampler
 
 def order_sequence(steerings, keys_sequence):
     sequence_average = []
@@ -16,7 +18,6 @@ def order_sequence(steerings, keys_sequence):
         sequence_average.append(sum(sampled_sequence) / len(sampled_sequence))
 
     # sequence_average =  get_average_over_interval_stride(steerings_train,sequence_size,stride_size)
-
     return [i[0] for i in sorted(enumerate(sequence_average), key=lambda x: x[1])], sequence_average
 
 
@@ -24,13 +25,9 @@ def partition_keys_by_percentiles(steerings, keys, percentiles):
     iter_index = 0
     quad_pos = 0
     splited_keys = []
-    # print 'len steerings'
-    # print len(steerings
     quad_vec = [percentiles[0]]
     for i in range(1, len(percentiles)):
         quad_vec.append(quad_vec[-1] + percentiles[i])
-
-    #print(quad_vec)
 
     for i in range(0, len(steerings)):
 
@@ -46,7 +43,6 @@ def partition_keys_by_percentiles(steerings, keys, percentiles):
             # The number of keys for this split
             # print ([steerings[i], len(splited_keys)])
             coil_logger.add_message('Loading', {'SplitPoints': [steerings[i], len(splited_keys)]})
-
 
     return splited_keys
 
@@ -101,7 +97,8 @@ def select_data_sequence(control, selected_data):
     return del_pos
 
 
-""" Split the outputs keys with respect to the labels. The selected labels represents how it is going to be split """
+""" Split the outputs keys with respect to the labels. 
+The selected labels represents how it is going to be split """
 
 
 def label_split(labels, keys, selected_data):
@@ -126,8 +123,6 @@ def label_split(labels, keys, selected_data):
             raise ValueError(" Invalid type for scalar label selection")
 
         selected_data_vec = [[1]] + int(100/selected_data -1) * [[0]]
-
-    print (selected_data_vec)
 
     for j in range(len(selected_data_vec)):
 
@@ -177,46 +172,18 @@ def float_split(output_to_split, keys, percentiles):
 # READABILITY IS HORRIBLE
 
 
-
 def remove_angle_traffic_lights(data, positions_dict):
     # will return all the keys that does not contain the expression.
 
     return (data['angle'] == positions_dict['angle'] and data['traffic_lights']!=positions_dict['traffic_lights'])
 
 
-
-
 def remove_angle(data, positions_dict):
     # This will remove a list of angles that you dont want
     # Usually used to get just the central camera
 
-
     return data['angle'] == positions_dict['angle']
 
-    #data = convert_measurements(data)
-    #keys = np.where(np.logical_and(data['angle'] != positions_dict['angle'][0],
-    #                               data['angle'] != positions_dict['angle'][1]
-    #                               )
-    #                )[0]
-
-    #return keys
-
-
-
-def remove_all(data, positions_dict):
-    # This will remove a list of angles that you dont want
-    # Usually used to get just the central camera
-
-    #data = convert_measurements(data)
-    return
-    keys = np.where(np.logical_and(np.logical_and(data['pedestrian'] == 1,
-                                                  data['traffic_lights'] == 1,
-                                                  ),
-                                   data['vehicle'] == 1
-                                   )
-                    )[0]
-
-    return keys
 
 def remove_traffic_lights(data, positions_dict):
     # This will remove a list of angles that you dont want
@@ -374,55 +341,63 @@ def get_boost_pedestrian_vehicle_traffic_lights(data, key, positions_dict):
 
 
 
+def parse_split_configuration(configuration):
+    """
+    Turns the configuration line of splitting into a name and a set of params.
+    """
+    if configuration is None:
+        return "None", None
+    conf_dict = collections.OrderedDict(configuration)
 
-def full_split(dataset):
-    
-    S = np.zeros(len(dataset.measurements))
-    T = np.zeros(len(dataset.measurements))
-    B = np.zeros(len(dataset.measurements))
-    V = np.zeros(len(dataset.measurements))
-    C = np.zeros(len(dataset.measurements))
+    name = 'split'
+    for key in conf_dict.keys():
+        if key != 'weights' and key != 'boost':
+            name += '_'
+            name += key
 
-    for i, M in tqdm(enumerate(dataset.measurements)):
-        S[i] = M['steer']
-        T[i] = M['throttle']
-        B[i] = M['brake']
-        V[i] = M['speed_module']
-        C[i] = M['directions']
-    
-    control = [[0, 2, 5], [3], [4]]
-    steering = [-1.1, -0.9, -0.8, -0.6, 0, 0.6, 0.8, 0.9, 1.1]
-    throttle = [0., 0.1, 0.3, 0.5, 1.1]
-    brake = [0., 0.1, 0.3, 0.5, 1.1]
-    speed = [-1., 2., 4., 6., 8., 11.]
-    keys = list()
-    
-    counter = 0
-    for c in range(3):  # control
-        for s in range(len(steering)-1):  # steer
-            for t in range(len(throttle)-1): # throttle
-                for b in range(len(brake)-1): # brake
-                    for v in range(len(speed)-1): # speed
-                        true_c = [False, ] * C.shape[0]
-                        for vals in control[c]:
-                            true_c = np.logical_or(true_c, C==vals)
-                        # true_c = [m in control[c] for m in M[D[b'control']]]
-                        true_s = np.logical_and(S>=steering[s], S<steering[s+1])
-                        true_t = np.logical_and(T>=throttle[t], T<throttle[t+1])
-                        true_b = np.logical_and(B>=brake[b], B<brake[b+1])
-                        true_v = np.logical_and(V>=speed[v], V<speed[v+1])
-                        k1 = np.logical_and(true_c, true_s)
-                        k2 = np.logical_and(true_t, true_b)
-                        k3 = np.logical_and(k1, k2)
-                        k = np.logical_and(k3, true_v)
-                        k = np.where(k)[0]
-                        counter += 1
-                 
-                        print(counter, end="\r")
+    return name, conf_dict
 
-                        if len(k) > 0:
-                            this_d = {'keys': k, 'control': c, 'steer': s, 'throttle': t, 'brake': b, 'speed': v}
-                            keys.append(this_d)
-    
-    print('\nNumber key splits: {}'.format(len(keys)))
-    return keys
+
+def get_inverse_freq_weights(keys, dataset_size):
+
+    invers_freq_weights = []
+    print (" frequency")
+    for key_vec in keys:
+        print ((len(key_vec)/dataset_size))
+        invers_freq_weights.append((len(key_vec)/dataset_size))
+
+    return softmax(np.array(invers_freq_weights))
+
+
+# TODO: for now is not possible to maybe balance just labels or just steering.
+# TODO: Is either all or nothing
+def select_balancing_strategy(dataset, iteration, number_of_workers):
+
+    # Creates the sampler, this part is responsible for managing the keys. It divides
+    # all keys depending on the measurements and produces a set of keys for each bach.
+
+    keys = range(0, len(dataset) - g_conf.NUMBER_IMAGES_SEQUENCE)
+
+    # In the case we are using the balancing
+    if g_conf.SPLIT is not None and g_conf.SPLIT is not "None":
+        name, params = parse_split_configuration(g_conf.SPLIT)
+        splitter_function = getattr(splitter, name)
+        keys_splitted = splitter_function(dataset.measurements, params)
+
+        for i in range(len(keys_splitted)):
+            keys_splitted[i] = np.array(list(set(keys_splitted[i]).intersection(set(keys))))
+        if params['weights'] == 'inverse':
+            weights = get_inverse_freq_weights(keys_splitted, len(dataset.measurements) - g_conf.NUMBER_IMAGES_SEQUENCE)
+        else:
+            weights = params['weights']
+        sampler = PreSplittedSampler(keys_splitted, iteration * g_conf.BATCH_SIZE, weights)
+    else:
+        sampler = RandomSampler(keys, iteration * g_conf.BATCH_SIZE)
+
+    # The data loader is the multi threaded module from pytorch that release a number of
+    # workers to get all the data.
+    data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
+                                              sampler=sampler,
+                                              num_workers=number_of_workers,
+                                              pin_memory=True)
+    return data_loader

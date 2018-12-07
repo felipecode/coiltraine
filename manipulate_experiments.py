@@ -44,19 +44,15 @@ if __name__ == '__main__':
 
     # Obs this is like a fixed parameter, how much a validation and a train and drives ocupies
 
-
     if args.export_status:
         validation_datasets = get_validation_datasets(args.folder)
         drive_environments = get_driving_environments(args.folder)
         export_status(args.folder, validation_datasets, drive_environments)
 
-
-
-
-
     if args.export_results:
-        variables_to_export = ['episodes_fully_completed', 'end_pedestrian_collision', 'end_vehicle_collision',
-                             'end_other_collision', 'driven_kilometers']
+        variables_to_export = ['episodes_fully_completed', 'end_pedestrian_collision',
+                               'end_vehicle_collision',
+                               'end_other_collision', 'driven_kilometers']
 
         # TODO: for now it basically will just export the best
         export_csv_separate(args.folder, variables_to_export,

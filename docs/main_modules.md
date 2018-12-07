@@ -1,19 +1,15 @@
 
-Interface Modules
------------------
+Main Modules
+============
 
-The interface modules are responsible interfacing with the CIL modules.
-the module also provides the following capabilities:
+There are three kinds of process that are executed on
+COiLTRAiNE.
 
-* Execute train for an entire folder
-* Execute train for a set of gpus
-* It interfaces with the test module and assures everything went well.
-* It initializes things such as logger creates the necessary thing
+### Train
 
+Runs a training for process based on a configuration file.
 
-
-* It considers both direct executing and executing from some scheduling software.
-* It has persistent execution.
+### Validation
 
 
-There are two options 
+### Drive

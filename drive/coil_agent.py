@@ -180,7 +180,7 @@ class CoILAgent(Agent):
                                self._collision_pedestrians_thresh, self._collision_other_thresh)\
                 and self._collision_time == -1:
             # This use of col time helps it to make sure that you dont overlap collisions
-            #print (" COLLLLIDED")
+
             self._collision_time = game_timestamp/100.0
 
 

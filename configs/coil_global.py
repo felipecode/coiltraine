@@ -1,22 +1,3 @@
-
-
-"""Detectron config system.
-
-This file specifies default config options for Detectron. You should not
-change values in this file. Instead, you should write a config file (in yaml)
-and use merge_cfg_from_file(yaml_file) to load it and override the default
-options.
-
-Most tools in the tools directory take a --cfg option to specify an override
-file and an optional list of override (key, value) pairs:
- - See tools/{train,test}_net.py for example code that uses merge_cfg_from_file
- - See configs/*/*.yaml for example config files
-
-Detectron supports a lot of different model types, each of which has a lot of
-different options. The result is a HUGE set of configuration options.
-"""
-
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -27,9 +8,7 @@ from utils import AttributeDict
 import copy
 import numpy as np
 import os
-import os.path as osp
 import yaml
-
 
 from configs.namer import generate_name
 from logger.coil_logger import create_log, add_message
@@ -59,18 +38,9 @@ _g_conf.BATCH_SIZE = 120
 _g_conf.SPLIT = None
 _g_conf.REMOVE = None
 
-#_g_conf.AUGMENTATION_SUITE = [iag.ToGPU()]#, iag.Add((0, 0)), iag.Dropout(0, 0), iag.Multiply((1, 1.04)),
-#                             #iag.GaussianBlur(sigma=(0.0, 3.0)),
-#                             iag.ContrastNormalization((0.5, 1.5))
-#                             ]
-
 _g_conf.AUGMENTATION = None
 
 
-#_g_conf.AUGMENTATION_SUITE_CPU = [ ia.Add((0, 0)), ia.Dropout(0, 0),
-#                              ia.GaussianBlur(sigma=(0.0, 3.0)),
-#                              ia.ContrastNormalization((0.5, 1.5))
-#                              ]
 _g_conf.DATA_USED = 'all' #  central, all, sides,
 _g_conf.USE_NOISE_DATA = True
 _g_conf.TRAIN_DATASET_NAME = '1HoursW1-3-6-8'  # We only set the dataset in configuration for training
@@ -81,6 +51,7 @@ _g_conf.LOG_IMAGE_WRITING_FREQUENCY = 1000
 _g_conf.EXPERIMENT_BATCH_NAME = "eccv"
 _g_conf.EXPERIMENT_NAME = "default"
 _g_conf.EXPERIMENT_GENERATED_NAME = None
+
 # TODO: not necessarily the configuration need to know about this
 _g_conf.PROCESS_NAME = "None"
 _g_conf.NUMBER_ITERATIONS = 20000
@@ -120,11 +91,6 @@ _g_conf.USE_ORACLE = True
 _g_conf.USE_FULL_ORACLE = False
 
 
-def _check_integrity():
-
-    pass
-
-
 def merge_with_yaml(yaml_filename):
     """Load a yaml config file and merge it into the global config object"""
     global _g_conf
@@ -135,9 +101,7 @@ def merge_with_yaml(yaml_filename):
         yaml_cfg = AttributeDict(yaml_file)
 
 
-
     _merge_a_into_b(yaml_cfg, _g_conf)
-
 
     path_parts = os.path.split(yaml_filename)
     _g_conf.EXPERIMENT_BATCH_NAME = os.path.split(path_parts[-2])[-1]
@@ -146,8 +110,6 @@ def merge_with_yaml(yaml_filename):
 
 
 def get_names(folder):
-    #
-
     alias_in_folder = os.listdir(os.path.join('configs', folder))
 
     experiments_in_folder = {}
@@ -205,9 +167,6 @@ def set_type_of_process(process_type, param=None):
                                       _g_conf.EXPERIMENT_NAME,
                                       'checkpoints'))
 
-
-
-
     if process_type == "validation" or process_type == 'drive':
         if not os.path.exists(os.path.join('_logs', _g_conf.EXPERIMENT_BATCH_NAME,
                                            _g_conf.EXPERIMENT_NAME,
@@ -217,34 +176,12 @@ def set_type_of_process(process_type, param=None):
                                            _g_conf.PROCESS_NAME + '_csv'))
 
 
-
-    # We assure ourselves that the configuration file added does not kill things
-    _check_integrity()
-
-
+    # TODO: check if there is some integrity.
 
     add_message('Loading', {'ProcessName': _g_conf.EXPERIMENT_GENERATED_NAME,
-                            'FullConfiguration': generate_param_dict()})
-
+                            'FullConfiguration': _g_conf.TRAIN_DATASET_NAME + 'dict'})
 
     _g_conf.immutable(True)
-
-
-
-
-
-def merge_with_parameters():
-    pass
-
-
-
-def generate_param_dict():
-    # TODO IMPLEMENT ! generate a cool param dictionary USE
-    # https://stackoverflow.com/questions/3768895/how-to-make-a-class-json-serializable
-    return _g_conf.TRAIN_DATASET_NAME + 'dict'
-
-
-
 
 
 def _merge_a_into_b(a, b, stack=None):
@@ -254,7 +191,6 @@ def _merge_a_into_b(a, b, stack=None):
 
     assert isinstance(a, AttributeDict) or isinstance(a, dict), 'Argument `a` must be an AttrDict'
     assert isinstance(b, AttributeDict) or isinstance(a, dict), 'Argument `b` must be an AttrDict'
-
 
     for k, v_ in a.items():
         full_key = '.'.join(stack) + '.' + k if stack is not None else k
@@ -281,7 +217,6 @@ def _merge_a_into_b(a, b, stack=None):
                 raise
         else:
             b[k] = v
-
 
 
 def _decode_cfg_value(v):
@@ -344,10 +279,6 @@ def _check_and_coerce_cfg_value_type(value_a, value_b, key, full_key):
             'key: {}'.format(type_b, type_a, value_b, value_a, full_key)
         )
     return value_a
-
-
-
-
 
 g_conf = _g_conf
 

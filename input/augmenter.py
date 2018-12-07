@@ -1,14 +1,14 @@
 import numpy as np
 import input.scheduler
 
+
 class Augmenter(object):
     """
     This class serve as a wrapper to apply augmentations from IMGAUG in CPU mode in
-    the same way augmentations are applyed when using the transform library from pytorch
+    the same way augmentations are applied when using the transform library from pytorch
 
     """
     # Here besides just applying the list, the class should also apply the scheduling
-
 
     def __init__(self, scheduler_strategy):
         if scheduler_strategy is not None and scheduler_strategy != 'None':

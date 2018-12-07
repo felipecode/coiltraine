@@ -12,38 +12,8 @@ processing_params = {'Success rate':   {'metric': 'control_success_rate', 'filte
                      'Km per infraction': {'metric': 'km_per_infraction', 'filter': {}, 'params': {}},
                      'Steering absolute error': {'metric': 'steering_error', 'filter': data_filter,
                                                  'params': {}},
-                     # 'Steering absolute error gt > 0.001': {'metric': 'steering_error_filter_gt',
-                     #                                        'filter': data_filter, 'params': {
-                     #         'gt_condition': (lambda x: abs(x) > 0.001)}},
-                     # 'Steering absolute error gt > 0.01': {'metric': 'steering_error_filter_gt',
-                     #                                       'filter': data_filter, 'params': {
-                     #         'gt_condition': (lambda x: abs(x) > 0.01)}},
-                     # 'Steering absolute error gt > 0.03': {'metric': 'steering_error_filter_gt',
-                     #                                       'filter': data_filter, 'params': {
-                     #         'gt_condition': (lambda x: abs(x) > 0.03)}},
-                     # 'Steering absolute error gt > 0.05': {'metric': 'steering_error_filter_gt',
-                     #                                       'filter': data_filter, 'params': {
-                     #         'gt_condition': (lambda x: abs(x) > 0.05)}},
-                     # 'Steering absolute error gt > 0.1': {'metric': 'steering_error_filter_gt',
-                     #                                      'filter': data_filter, 'params': {
-                     #         'gt_condition': (lambda x: abs(x) > 0.1)}},
-                     # 'Steering absolute error gt > 0.2': {'metric': 'steering_error_filter_gt',
-                     #                                      'filter': data_filter, 'params': {
-                     #         'gt_condition': (lambda x: abs(x) > 0.2)}},
                      'Steering MSE': {'metric': 'steering_avg_mse', 'filter': data_filter,
                                       'params': {}},
-                     # 'Steering accuracy 0.002': {'metric': 'steering_accuracy',
-                     #                             'filter': data_filter,
-                     #                             'params': {'threshold': 0.002}},
-                     # 'Steering accuracy 0.005': {'metric': 'steering_accuracy',
-                     #                             'filter': data_filter,
-                     #                             'params': {'threshold': 0.005}},
-                     # 'Steering accuracy 0.01': {'metric': 'steering_accuracy',
-                     #                            'filter': data_filter,
-                     #                            'params': {'threshold': 0.01}},
-                     # 'Steering accuracy 0.03': {'metric': 'steering_accuracy',
-                     #                            'filter': data_filter,
-                     #                            'params': {'threshold': 0.03}},
                      'Steering absolute error gt > 0.001': {'metric': 'steering_error_filter_gt',
                                                             'filter': data_filter, 'params': {
                              'gt_condition': (lambda x: abs(x) > 0.001)}},

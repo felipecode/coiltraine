@@ -1,9 +1,23 @@
+# Configuration
 
 
-The configuration module contains a more central global module
-with all the defaul configurations.
-The user could define an YAML file externally or send this
-file as parameter.
+The COiLTRAiNE framework works with a central global module
+with all the default configurations. The configurations
+set data related things (Dataset, input format), network
+architecture, training hyperparameters and others.
 
-After that the dictionary global is merged with the YAML
-before that, the YAML integrity is tested.
+When executing any process, it first merges the YAML file
+with the central global module.
+
+
+
+### The configuration file
+
+The configuration file is defined as YAML files.
+We list some example configuration and what attributes
+it can receive:
+
+
+A fully commented configuration file can be found at
+[configs/sample/resnet34.yaml](configs/sample/resnet34.yaml)
+

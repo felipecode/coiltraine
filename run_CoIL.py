@@ -1,23 +1,13 @@
 import argparse
-import logging
-import resource
-
 
 from coil_core import execute_train, execute_validation, execute_drive, folder_execute
-from utils.general import create_log_folder, create_exp_path, erase_logs, fix_driving_environments,\
+from utils.general import create_log_folder, create_exp_path, erase_logs,\
                           erase_wrong_plotting_summaries, erase_validations
-
-from visualization import plot_scatter
 
 # You could send the module to be executed and they could have the same interface.
 
-
-
-
-
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description=__doc__)
-
 
     argparser.add_argument(
         '--single-process',
@@ -77,7 +67,6 @@ if __name__ == '__main__':
         dest='erase_bad_validations',
         help='Set to carla to run offscreen'
     )
-    # TODO: add the posibility to delete a subset
     argparser.add_argument(
         '-rv', '--restart-validations',
         action='store_true',
@@ -89,7 +78,7 @@ if __name__ == '__main__':
         '--gpu-value',
         dest='gpu_value',
         type=float,
-        default=4.0
+        default=3.5
     )
     argparser.add_argument(
         '-nw',
@@ -112,33 +101,24 @@ if __name__ == '__main__':
     )
     args = argparser.parse_args()
 
-
-
+    # Check if the vector of GPUS passed are valid.
     for gpu in args.gpus:
         try:
             int(gpu)
         except:
             raise ValueError(" Gpu is not a valid int number")
 
+    # Check if the mandatory folder argument is passed
     if args.folder is None:
         raise ValueError(" You should set a folder name where the experiments are placed")
 
-
-    # We increase the number of files available.
-    resource.setrlimit(
-        resource.RLIMIT_CORE,
-        (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
-
-    # Obs this is like a fixed parameter, how much a validation and a train and drives ocupies
-
     # Check if the driving parameters are passed in a correct way
-
     if args.driving_environments is not None:
         for de in list(args.driving_environments):
             if len(de.split('_'))  < 2:
                 raise ValueError("Invalid format for the driving envinronments should be Suite_Town")
 
-
+    # This is the folder creation of the
     create_log_folder(args.folder)
     erase_logs(args.folder)
     if args.erase_bad_validations:
@@ -146,16 +126,18 @@ if __name__ == '__main__':
     if args.restart_validations:
         erase_validations(args.folder, list(args.validation_datasets))
 
-
-    # THe definition of parameters for driving
+    # The definition of parameters for driving
     drive_params = {
         "suppress_output": True,
         "no_screen": args.no_screen,
         "docker": args.docker,
         "record_collisions": args.record_collisions
     }
-
+    # There are two modes of execution
     if args.single_process is not None:
+        ####
+        # MODE 1: Single Process. Just execute a single experiment alias.
+        ####
 
         if args.exp is None:
             raise ValueError(" You should set the exp alias when using single process")
@@ -163,37 +145,32 @@ if __name__ == '__main__':
         create_exp_path(args.folder, args.exp)
 
         if args.single_process == 'train':
-            # TODO make without position, increases the legibility.
-            execute_train("0", args.folder, args.exp, False, args.number_of_workers)
+            execute_train(gpu="0", exp_batch=args.folder, exp_alias=args.exp,
+                          suppress_output=False, number_of_workers= args.number_of_workers)
 
         elif args.single_process == 'validation':
-            execute_validation("0", args.folder, args.exp, args.validation_datasets[0], False)
+            execute_validation(gpu="0", exp_batch=args.folder, exp_alias=args.exp,
+                               dataset=args.validation_datasets[0], suppress_output=False)
 
         elif args.single_process == 'drive':
-
             drive_params['suppress_output'] = False
-            #driving_environments = fix_driving_environments(list(args.driving_environments))
             execute_drive("0", args.folder, args.exp, list(args.driving_environments)[0], drive_params)
 
-            # list(args.driving_environments)[0], suppress_output=False,
-                          #no_screen=args.no_screen, docker=args.docker)
         else:
             raise Exception("Invalid name for single process, chose from (train, validation, test)")
 
-
     else:
-
-        # TODO: of course this change from gpu to gpu , but for now we just assume at least a K40
-
-        # Maybe the latest voltas will be underused
-        # OBS: This usage is also based on my tensorflow experiences, maybe pytorch allows more.
+        ####
+        # MODE 2: Folder execution. Execute train/validation/drive for all experiments on
+        #         a certain training folder
+        ####
+        # We set by default that each gpu has a value of 3.5, allowing a training and
+        # a driving/validation
         allocation_parameters = {'gpu_value': args.gpu_value,
                                  'train_cost': 2,
                                  'validation_cost': 1.5,
                                  'drive_cost': 1.5}
-        # TODO: temporary function until carla map change feature is fixed.
 
-        #driving_environments = fix_driving_environments(list(args.driving_environments))
         params = {
             'folder': args.folder,
             'gpus': list(args.gpus),
@@ -207,5 +184,4 @@ if __name__ == '__main__':
         }
 
         folder_execute(params)
-
-        plot_scatter()
+        print("SUCCESSFULLY RAN ALL EXPERIMENTS")

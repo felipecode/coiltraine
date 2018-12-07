@@ -1,9 +1,7 @@
-import imgaug as ia
 from imgaug import augmenters as iaa
 
 
 def medium(image_iteration):
-
 
     iteration = image_iteration/(120*1.5)
     frequency_factor = 0.05 + float(iteration)/1000000.0
@@ -279,11 +277,6 @@ def soft_harder(image_iteration):
 
     contrast_factor_pos = 1 + (0.5*iteration/800000.0)
     contrast_factor_neg = 1 - (0.5 * iteration / 800000.0)
-
-
-    #print ('iteration',iteration,'Augment Status ',frequency_factor,color_factor,dropout_factor,blur_factor,add_factor,
-    #    multiply_factor_pos,multiply_factor_neg,contrast_factor_pos,contrast_factor_neg)
-
 
     augmenter = iaa.Sequential([
 

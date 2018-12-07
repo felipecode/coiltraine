@@ -19,7 +19,6 @@ from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_c
 from torchvision import transforms
 
 
-
 def write_waypoints_output(iteration, output):
 
     for i in range(g_conf.BATCH_SIZE):
@@ -131,8 +130,6 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     output = model.forward_branch(torch.squeeze(data['rgb']).cuda(),
                                                   dataset.extract_inputs(),
                                                   controls)
-
-
 
 
 
