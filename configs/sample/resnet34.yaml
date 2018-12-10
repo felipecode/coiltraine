@@ -1,4 +1,3 @@
-# GET ON 31
 #### General Configuration Parameters ####
 SAVE_SCHEDULE: range(0,1000001, 20000)
 

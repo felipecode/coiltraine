@@ -1,3 +1,7 @@
+Network Configurations
+======================
+
+
 For he networks we have a concept of model type.
 Inside a model type there is a certain training strategy related to it.
 

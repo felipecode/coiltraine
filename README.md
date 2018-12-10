@@ -4,20 +4,50 @@ COiLTRAiNE: Conditional Imitation Learning Training Framework
 !!! Note: The old imitation learning repo is temporarely inside
 the "old imitation folder"
 
-This code can be used to easily train and manage the trainings of imitation
-learning networks, toguether with the CARLA simulator.
+This repository can be used to easily train and manage the trainings of imitation
+learning networks toguether with the CARLA simulator.
 Objectives:
 
  * To enable the user to perform several trainings with a single command.
  * To automatically test the trained system using CARLA.
- * Allow the user to monitor several trainings and testings on CARLA with a single glance.
+ * Allow the user to monitor several trainings
+   and testings on CARLA with a single glance.
+ * Allows [to perform the testing methodology proposed]()
+ on the paper "On Offline Evaluation of Vision-based Driving Models"
+ * Model ZOO of some published imitation learning approaches. (New
+ pull requests accepted)
 
 
 
-#### General system view
+#### System Overview
 
-The system has a few modules:
-[![COIL Diagram](docs/img/CoIL.png?raw=true )]
+
+![COIL Diagram](docs/img/CoIL.png?raw=true )
+
+The idea of the system is, by using a single command, train several
+experiments with different [network conditions](docs/) and
+[input data configurations](docs/).
+
+
+For a given [experiment configuration file](), the main executer function
+can perform a [training](), measure the [model prediction error]() on some
+dataset and evaluate the model performance on a [driving benchmark]().
+
+The training, prediction error, and driving benchmarks are performed
+simultaneusly on different process. To perform evaluation
+the validation and driving modules wait for the
+training part to produce checkpoints. All of this is controlled
+by the [execution module]().
+
+During the execution, all the information is [logged and
+printed](docs/logger.md) on the screen to summarize the experiment status
+with a single glance.
+
+
+
+
+
+#### Getting started
 
 #### Installation
 
@@ -27,7 +57,8 @@ Basically just do:
     conda env create -f requirements.yml
 
 
-#### Getting started
+
+#### Execution
 
 
 Assuming you collected and post-processed the data at:
@@ -47,13 +78,13 @@ This is the folder that contains your training and validation datasets
     export COIL_DATASET_PATH=<Path to where your dataset folders are>
 
 
-#### Single experiment mode
+##### Single experiment mode
+
 To run a single experiment, we use the flag single-process train
 and the experiment name.
 
 A full example to train a ResNet_34  is shown below. There
-is also further documentation about
-[the types of processes](docs/main_modules.md)
+is also further documentation about ( CIte 3 modules)
 
     python3 run_CoIL.py --single-process train -e resnet34
     --folder sample --gpus 0 1 2
@@ -62,18 +93,26 @@ is also further documentation about
 
 
 
-#### Folder execution mode
+##### Folder execution mode
+
 Experiments are defined in config files inside [CoIL/configs](docs/configuration.md).
 You can run all the experiments in a folder using:
 
-    python3 run_CoIL.py --folder <my_folder> --gpus 0 1 -de <DrivingEnvironmentClass_Town0X> 
+    python3 run_CoIL.py --folder <my_folder> --gpus 0 1 -de <DrivingEnvironmentClass_Town0X> -vd <validation_dataset>
 
 Where the DrivingEnvironmentClass is one of the classes defined in the
 modules at [CoIL/drive/suites](docs/suites.md). Those driving environments
 define the start and end positions for driving, the number of cars, people, etc. That information will define the Benchmark to test the model driving in CARLA in parallel to training. Town0X is either Town01 or Town02.
-Note that the training dataset must be set on the experiment file directly. Since training is strictly associated with the experiment. The validation datasets are passed as parameter. There are two modes of running.
-3  -de ExredTraining_Town01 --single-process train -e resnet_attention --docker
+Note that the training dataset must be set on the experiment file directly,
+ since training is strictly associated with the experiment.
+ The validation datasets are passed as parameter.
+
+ validation datasets ...
 
 
+#### Paper Results reproduction
 
-
+* Conditional Imitiation learning
+* Conditional IMitation learning CARLA paper
+* ECCV
+* On
