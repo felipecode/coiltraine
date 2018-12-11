@@ -113,7 +113,6 @@ def get_names(folder):
     alias_in_folder = os.listdir(os.path.join('configs', folder))
 
     experiments_in_folder = {}
-
     for experiment_alias in alias_in_folder:
 
         g_conf.immutable(False)

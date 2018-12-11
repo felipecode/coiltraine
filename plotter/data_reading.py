@@ -3,17 +3,108 @@ import os
 import math
 import traceback
 import collections
+import h5py
 
 from configs import g_conf
 from utils.general import static_vars
 
 
+def augment_steering(camera_angle, steer, speed):
+    """
+        Apply the steering physical equation to augment for the lateral cameras.
+    Args:
+        camera_angle_batch:
+        steer_batch:
+        speed_batch:
+    Returns:
+        the augmented steering
+    """
 
+    time_use = 1.0
+    car_length = 6.0
+    old_steer = steer
+    pos = camera_angle > 0.0
+    neg = camera_angle <= 0.0
+    # You should use the absolute value of speed
+    speed = math.fabs(speed)
+    rad_camera_angle = math.radians(math.fabs(camera_angle))
+    val = 6 * (
+        math.atan((rad_camera_angle * car_length) / (time_use * speed + 0.05))) / 3.1415
+    steer -= pos * min(val, 0.3)
+    steer += neg * min(val, 0.3)
+
+    steer = min(1.0, max(-1.0, steer))
+
+    # print('Angle', camera_angle, ' Steer ', old_steer, ' speed ', speed, 'new steer', steer)
+    return steer
+
+def generate_csv_ground_truth(validation_dataset_path):
+    # Generate the csv ground truth by reading the measurements files.
+    pass
+"""
+
+def generate_csv_ground_truth(validation_dataset_path):
+
+
+    print ("")
+    path = validation_dataset_path
+    validation_file_list = os.listdir(path)
+    # Start by checking if this dataset contains h5py files
+    if '*.h5' not in validation_file_list:
+        raise ValueError("Validation dataset passed does not contain h5 files. "
+                         "Currently is the only type supported.")
+
+    # Check if writting ground truths csv are necessary.
+    if 'ground_truth.csv' in validation_file_list:
+        write_ground_truth = False
+    else:
+        write_ground_truth = True
+
+    if 'speed_ground_truth.csv' in validation_file_list:
+        write_speed_ground_truth = False
+    else:
+        write_speed_ground_truth = True
+
+    if 'camera_labels.csv' in validation_file_list:
+        write_camera_labels = False
+    else:
+        write_camera_labels = True
+
+    with open(os.path.join(path, 'ground_truth.csv'), 'a+') as gt_file, \
+         open(os.path.join(path, 'speed_ground_truth.csv'), 'a+') as speed_gt_file,\
+         open(os.path.join(path, 'camera_labels.csv'), 'a+') as camera_label_file:
+
+        positions_to_test = range(0, len(
+            [name for name in os.listdir(path) if os.path.isfile(os.path.join(path, name))]) + 1)
+
+        for h_num in positions_to_test:
+
+            print(" SEQUENCE NUMBER ", h_num)
+            try:
+                data = h5py.File(path + 'data_' + str(h_num).zfill(5) + '.h5', "r")
+            except Exception as e:
+                print(e)
+                continue
+
+            for i in range(0, 200):
+
+                steer = data['targets'][i][0]
+                camera_angle = data['targets'][i][26]
+                camera_label = data['targets'][i][25]
+                speed = data['targets'][i][10]
+                steer = augment_steering(camera_angle, steer, speed)
+
+                if write_ground_truth:
+                    gt_file.write(str(steer) +','+str(data['targets'][i][1])"\n")
+
+                if write_speed_ground_truth:
+
+                if write_camera_labels:
+
+"""
 
 
 def read_summary_csv(control_csv_file):
-
-
 
     f = open(control_csv_file, "rU")
     header = f.readline()
@@ -35,13 +126,10 @@ def read_summary_csv(control_csv_file):
         summary_dict.update({header[count]: data_matrix[:, count]})
         count += 1
 
-
-
     return summary_dict
 
 
 def read_summary_tasks_csv(control_csv_file):
-
 
 
     f = open(control_csv_file, "rU")
@@ -125,7 +213,7 @@ def read_control_csv(control_csv_file):
     return control_results_dic, header
 
 
-
+# TODO add csv generation directly here, if it was not generated.
 
 # Add a static variable to avoid re-reading
 @static_vars(previous_ground_truth={})
@@ -134,7 +222,6 @@ def get_ground_truth(dataset_name):
     if dataset_name not in get_ground_truth.previous_ground_truth:
         full_path = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name, 'ground_truth.csv')
         ground_truth = np.loadtxt(full_path, delimiter=",", skiprows=0, usecols=([0]))
-        ground_truth = augment_ground_truth(ground_truth)
         get_ground_truth.previous_ground_truth.update({dataset_name :ground_truth})
 
     return get_ground_truth.previous_ground_truth[dataset_name]
@@ -172,8 +259,6 @@ def _read_step_data(step_path):
 
     val_dataset_name = step_path.split('/')[-2].split('_')[-2]
 
-    print ("val_dataset_name", val_dataset_name)
-
     step_dictionary = {}
 
     # On this step we read all predictions for this benchmark step.
@@ -184,20 +269,13 @@ def _read_step_data(step_path):
 
     step_dictionary.update({'steer_pred': predictions})
 
-
-
     #steer_gt = np.loadtxt(step_path + '_seq_gt_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
     step_dictionary.update({'steer_gt': ground_truth})
 
     #steer_error = np.loadtxt(step_path + '_seq_error_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
     #step_dictionary.update({'steer_error': compute_error(predictions, ground_truth)})
 
-
-
     step_dictionary.update({'speed_input': get_speed_ground_truth(val_dataset_name)})
-
-
-
 
     return step_dictionary
 
@@ -207,23 +285,18 @@ def _read_step_data(step_path):
 
 def _read_control_data(full_path, control_to_use):
 
-
     # The word auto refers to the use of the autopilot
-
     # Try to read the controls
     # Some flags to check the control files found
-
     try:
         control, _ = read_control_csv(os.path.join(full_path, 'control_output' + control_to_use +
                                                    '.csv'))
     except:
         raise ValueError("exception on control_csv reading full_path = %s,  " % full_path)
 
-
     # resend the none to eliminate this dataset
     if control is None:
         return control
-
     return list(control.items())
     # Simple extra counter
 
@@ -233,32 +306,18 @@ def _read_control_data(full_path, control_to_use):
 def _read_data(full_path, benchmarked_steps):
     town_dictionary = {}
 
-    print (benchmarked_steps)
-
     for i in range(len(benchmarked_steps)):
-
-        print (benchmarked_steps[i][0])
         step = int(benchmarked_steps[i][0])
-
-
         step_path = os.path.join(full_path, str(step) + '.csv')
-        print (step_path)
-
         # First we try to add prediction data
         try:
-            # Check for waypoints.
-            print ("step path ", step_path)
             prediction_data = {step: _read_step_data(step_path)}
-
-
             town_dictionary.update(prediction_data)
         except KeyboardInterrupt:
             raise
         except:
             traceback.print_exc()
             return None
-
-
         town_dictionary[step].update({'control': benchmarked_steps[i][1]})
 
     town_dictionary_ordered = collections.OrderedDict(sorted(town_dictionary.items()))

@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from .data_reading import read_control_csv, read_summary_csv
+from visualization.data_reading import read_control_csv, read_summary_csv
 
 from configs.coil_global import get_names, merge_with_yaml, g_conf
 

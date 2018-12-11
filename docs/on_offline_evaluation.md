@@ -1,51 +1,56 @@
 On Offline Evaluation of Vision-based Driving Models
 ====================================================
 
-Make a tutorial that should get again the full plot used
-on ECCV.
 
 The evaluation proposed on the paper comprises
-using a a validation dataset toguether with some benhcmark
+using a a validation dataset toguether with some benchmark on
+CARLA. Considering that the validation
+dataset and the benchmark were computed on a similar
+scenario, we compute the correlation between driving and prediction
+on some dataset.
+
+### Reproducing the results
 
 
-To re run the trainings
 
-Not there are non determins on the training and evaluation, this
-makes that the plots wont be the same
+#### Download the Models
 
+First thing is to download all the 64 trained models.
+For that we provide a script that makes the download and store
+it on the appropriete folder. Run:
 
-To download all the checkpoints run
-
+    python3 tools/get_offline_online_data.py
 
 #### Plotting
 
+To test computing the scatter plots for a single experiment,
+you should run:
 
-To run the plotting
-
-    python3 plotting.
-
-
+    python3 run_plotting.py -p sample_plot -e experiment_64
 
 
+The folder _logs/eccv/plots/sample_plots should show
+the following plot:
+
+[ Figure]
+
+Note, for a single experiment, containing 12 models from
+different checkpoints, the correlation is usually high.
+
+To compute all the plots:
+
+    python3 run_plotting.py -p eccv_online_offline_plots
+
+A loading bar should show up. It takes aproximatelly 4 hours
+to complete the plotting process.
+
+#### Re-Training
+To re run the trainings:
 
 
+Note: there are non determinism on the training and evaluation, the
+plots when retraining all the models will not be the same.
 
-TODO: Maybe make an separate repository just for that.
-
-List of experiments:
-You should send a folder, with a set of experiments that are
-going to be ploted.
-
-Data params
-
-Basically what kind of data is going to be used for plotting.
-you can select the experiments that are going to be plotted.
-
-
-
-
-
-Plotting params
 
 
 

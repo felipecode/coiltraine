@@ -13,6 +13,7 @@ def compute_and_aggregate(metric_func, data, param):
             metric_results.append(aggregate_metric(metric_raw, param['aggregate']))
     return metric_results
 
+
 def aggregate_metric(metric_raw, param):
     if np.isscalar(metric_raw):
         assert not param , 'There should be no aggregate param for metrics which are already scalar'
@@ -42,6 +43,7 @@ def aggregate_metric(metric_raw, param):
             raise Exception('Unknown aggregation type', param['type'])
     return metric_result
 
+
 def compute_id(data, param):
     if data['town'] == 'Town01':
         return [0]*len(data['values'].items())
@@ -49,6 +51,7 @@ def compute_id(data, param):
         return [1]*len(data['values'].items())
     else:
         raise Exception('Unknown town', data['town'])
+
 
 def compute_experiment(data, param):
     return [hash(data['experiment']) % 50] * len(data['values'].items())
@@ -187,43 +190,6 @@ def compute_correlation(data_item, param):
 
     return calc_score(data_item['steer_pred']*np.absolute(data_item['speed_input'])
                       , data_item['steer_gt']*np.absolute(data_item['speed_input']))
-
-
-'''
-def compute_average_displacement(data, param):
-    # We get the list of cameras that were previously computed
-
-    # Remember 0 must be set as central camera
-
-    #print ('list_cameras'+'_' +  data['town'])
-    #print param['list_cameras'+'_' +  data['town']]
-
-    # COULD BE SPEED UP
-    metric_data = []
-
-    np.set_printoptions(threshold=np.nan)
-
-    for step, data_item in data['values'].items():
-
-        #steer_pred = data_item['steer_pred'] - data_item['steer_gt']
-
-        cummulative_displacement_vec = []
-        for i in range(0, len(data_item['steer_pred']) - param['window']):
-
-            #displacement_vec = [steer * math.fabs(speed) * param['timestep']  for steer, speed in zip(steer_error[(i):(i + param['window'])],
-            #                   data_item['speed_input'][(i):(i + param['window'])])]
-            displacement_vec_pred = [math.fabs(steer) * math.fabs(speed) * param['timestep'] for steer, speed in
-                                zip(data_item['steer_pred'][(i):(i + param['window'])], data_item['speed_input'][(i):(i + param['window'])])]
-
-            displacement_vec_gt = [math.fabs(steer) * math.fabs(speed) * param['timestep'] for steer, speed in
-                                zip(data_item['steer_gt'][(i):(i + param['window'])], data_item['speed_input'][(i):(i + param['window'])])]
-
-            cummulative_displacement_vec.append(math.fabs(sum(displacement_vec_pred)-sum(displacement_vec_gt)))
-
-        metric_data.append(math.fabs(sum(cummulative_displacement_vec) / len(cummulative_displacement_vec)))
-
-    return metric_data
-'''
 
 
 

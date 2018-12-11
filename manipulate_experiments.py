@@ -1,14 +1,9 @@
 import argparse
-import logging
-import resource
 
-from logger import printer
-
-from utils.general import create_log_folder, create_exp_path, erase_logs, fix_driving_environments, \
-                            get_validation_datasets, get_driving_environments
+from utils.general import get_validation_datasets, get_driving_environments
 
 
-from visualization.exporter import export_csv, export_status, export_csv_separate
+from utils.exporter import export_status, export_csv_separate
 
 
 
