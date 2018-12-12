@@ -4,7 +4,7 @@ import numpy as np
 from utils.general import softmax
 import collections
 
-from . import PreSplittedSampler, splitter, RandomSampler
+from . import PreSplittedSampler, RandomSampler
 
 def order_sequence(steerings, keys_sequence):
     sequence_average = []
