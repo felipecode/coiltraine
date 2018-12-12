@@ -1,14 +1,6 @@
 import numpy as np
-import shutil
-import copy
-import random
-import gc
-import os
-
-from collections import deque
 import scipy
-import torch
-from PIL import Image
+
 
 try:
     from carla import carla_server_pb2 as carla_protocol
@@ -17,11 +9,8 @@ except ImportError:
         'cannot import "carla_server_pb2.py", run the protobuf compiler to generate this file')
 
 
-import json
-from google.protobuf.json_format import MessageToDict
-from torchvision import transforms
 
-from carla.agent import Agent, CommandFollower
+from ..carla.agent import Agent, CommandFollower
 
 
 # TODO: The network is defined and toguether there is as forward pass operation to be used for testing, depending on the configuration
@@ -30,8 +19,6 @@ from network import CoILModel
 from configs import g_conf
 from logger import coil_logger
 
-
-from utils.general import plot_test_image
 
 
 
@@ -76,131 +63,6 @@ class CoILAgent(Agent):
 
         if g_conf.USE_ORACLE or g_conf.USE_FULL_ORACLE:
             self.control_agent = CommandFollower(town_name)
-
-        self._recording_collisions = record_collisions
-        if self._recording_collisions:
-            # The parameters used for the case we want to detect collisions
-
-            self._collision_other_thresh = 400
-
-            self._collision_vehicles_thresh = 400
-
-            self._collision_pedestrians_thresh = 300
-
-            self._previous_pedestrian_collision = 0
-
-            self._previous_vehicle_collision = 0
-
-            self._previous_other_collision = 0
-
-            self._image_queue = deque([])
-
-            self._measurements_queue = deque([])
-            self._collision_time = -1
-            self._count_collisions = 0
-            self._writting_path_collisions = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
-                                                          g_conf.EXPERIMENT_NAME, g_conf.PROCESS_NAME + '_' +
-                                                          'collisions')
-
-            if not os.path.exists(self._writting_path_collisions):
-                os.mkdir(self._writting_path_collisions)
-
-
-
-
-
-    def _add_image_and_record(self, sensor_data, player_measurements, game_timestamp):
-        # The clip size for recording is 3 seconds before and 2 seconds after.
-
-        before_collision_clip_size = 3
-        after_collision_clip_size = 4
-        clip_size = before_collision_clip_size + after_collision_clip_size # in seconds
-
-        def _add_clip_to_disk(clip, meas_clip, writting_path, collision_number):
-            # Add it to disk
-            # The path for the collision images
-            collision_path = os.path.join(writting_path, 'collision_' + str(collision_number))
-            if not os.path.exists(collision_path):
-                os.mkdir(collision_path)
-
-            count = 0
-            for image in clip:
-                image.save_to_disk(os.path.join(collision_path, 'img_' + str(count) + '.png'))
-
-
-                with open(os.path.join(collision_path, 'measurements' + str(count) + '.json'), 'w') as fo:
-                    json_obj = MessageToDict(meas_clip[count])
-                    fo.write(json.dumps(json_obj, sort_keys=True, indent=4))
-
-                count += 1
-
-
-
-        def _test_for_collision(player_measurements, previous_vehicle_collision,
-                                previous_pedestrian_collision, previous_other_collision,
-                                thresh_vehicle, thresh_pedestrian, thresh_other):
-
-            if (player_measurements.collision_vehicles - previous_vehicle_collision) > thresh_vehicle:
-                return True
-            if (player_measurements.collision_pedestrians - previous_pedestrian_collision) > thresh_pedestrian:
-                return True
-            if (player_measurements.collision_other - previous_other_collision) > thresh_other:
-                return True
-
-            return False
-
-
-
-        #print ("Pedestrian Collision", player_measurements.collision_pedestrians)
-
-        print ("Instant Pedestrian Collision",
-               (player_measurements.collision_pedestrians - self._previous_pedestrian_collision))
-
-
-        #TODO We will hardcode the sensor that is going to be used as RGB to record the collisions
-        if len(self._image_queue) < clip_size*10:
-
-            self._image_queue.append(sensor_data['rgb'])
-            self._measurements_queue.append(player_measurements)
-        else:
-            self._image_queue.popleft()
-            self._measurements_queue.popleft()
-            self._image_queue.append(sensor_data['rgb'])
-            self._measurements_queue.append(player_measurements)
-
-
-        #print ('images on clip', len(self._image_queue))
-
-        # If it collided, prepare to save things. after after_collision_clipe_size seconds
-
-
-        if _test_for_collision(player_measurements, self._previous_vehicle_collision,
-                               self._previous_pedestrian_collision, self._previous_other_collision,
-                               self._collision_vehicles_thresh,
-                               self._collision_pedestrians_thresh, self._collision_other_thresh)\
-                and self._collision_time == -1:
-            # This use of col time helps it to make sure that you dont overlap collisions
-
-            self._collision_time = game_timestamp/100.0
-
-
-
-
-
-        if self._collision_time > 0 and ((game_timestamp/100.0) - self._collision_time) > \
-                                         after_collision_clip_size:
-            # This use of col time helps it to make sure that you dont overlap collisions
-            self._collision_time = -1
-            _add_clip_to_disk(self._image_queue, self._measurements_queue,
-                              self._writting_path_collisions, self._count_collisions)
-            self._count_collisions += 1
-
-        self._previous_pedestrian_collision = player_measurements.collision_pedestrians
-
-        self._previous_vehicle_collision = player_measurements.collision_vehicles
-
-        self._previous_other_collision = player_measurements.collision_other
-
 
 
 

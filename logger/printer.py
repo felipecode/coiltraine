@@ -5,7 +5,7 @@ from .monitorer import get_status, get_episode_number, get_number_episodes_compl
 from configs import g_conf, merge_with_yaml
 from configs.coil_global import get_names
 from utils.general import sort_nicely, get_latest_path, static_vars
-from visualization.data_reading import read_control_csv
+from plotter.data_reading import read_control_csv
 
 """
 COLOR CODINGS
@@ -120,22 +120,6 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
     if checkpoint == g_conf.TEST_SCHEDULE[0]:
         return
 
-    """
-    print_drive_summary.previous_checkpoint = g_conf.TEST_SCHEDULE[g_conf.TEST_SCHEDULE.index(checkpoint)-1]
-    # TODO: we need to get the previous checkpoint
-
-    averaged_metrics, header = read_control_csv(csv_filename)
-
-
-    print ('        SUMMARY: ')
-    print ('            Average Completion: ', LIGHT_GREEN + UNDERLINE +
-           str(averaged_metrics[float(print_drive_summary.previous_checkpoint)]
-               [header.index('episodes_fully_completed')-1]) + END)
-    #print ('            Kilometers Per Infraction: ', GREEN + UNDERLINE +
-    #       str(averaged_metrics[float(print_drive_summary.previous_checkpoint)]
-    #           [header.index('collision_pedestrians')-1]) + END)
-    
-    """
 
 
 
