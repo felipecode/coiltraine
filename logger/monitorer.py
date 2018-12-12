@@ -8,7 +8,7 @@ from utils.general import sort_nicely
 
 
 from .carla_metrics_parser import get_averaged_metrics
-from visualization.data_reading import read_summary_csv
+from plotter.data_reading import read_summary_csv
 
 # Check the log and also put it to tensorboard
 

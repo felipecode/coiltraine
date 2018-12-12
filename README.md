@@ -88,8 +88,7 @@ and the experiment name.
 A full example to train a ResNet_34  is shown below. There
 is also further documentation about ( CIte 3 modules)
 
-    python3 run_CoIL.py --single-process train -e resnet34
-    --folder sample --gpus 0 1 2
+    python3 coiltraine.py --single-process train -e resnet34 --folder sample --gpus 0 1 2
 
 
 
@@ -100,7 +99,7 @@ is also further documentation about ( CIte 3 modules)
 Experiments are defined in config files inside [CoIL/configs](docs/configuration.md).
 You can run all the experiments in a folder using:
 
-    python3 run_CoIL.py --folder <my_folder> --gpus 0 1 -de <DrivingEnvironmentClass_Town0X> -vd <validation_dataset>
+    python3 coiltraine.py --folder <my_folder> --gpus 0 1 -de <DrivingEnvironmentClass_Town0X> -vd <validation_dataset>
 
 Where the DrivingEnvironmentClass is one of the classes defined in the
 modules at [CoIL/drive/suites](docs/suites.md). Those driving environments
