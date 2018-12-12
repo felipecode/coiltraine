@@ -12,7 +12,7 @@ Objectives:
  * To automatically test the trained system using CARLA.
  * Allow the user to monitor several trainings
    and testings on CARLA with a single glance.
- * Allows [to perform the testing methodology proposed]()
+ * Allows [to perform the testing methodology proposed](docs/on_offline_evaluation.md)
  on the paper "On Offline Evaluation of Vision-based Driving Models"
  * Model ZOO of some published imitation learning approaches. (New
  pull requests accepted)
@@ -24,23 +24,25 @@ Objectives:
 
 ![COIL Diagram](docs/img/CoIL.png?raw=true )
 
-The idea of the system is, by using a single command, train several
-experiments with different [network conditions](docs/) and
-[input data configurations](docs/).
+The idea of the system is to, by using a single command, train several
+experiments with different [network conditions](docs/network.md) and
+[input data configurations](docs/input.md).
 
+For a given [experiment configuration file](docs/configuration.md), the main executer function
+can perform a [training](docs/training.md), measure the [model prediction error](docs/main_modules.md) on some
+dataset and evaluate the model performance on a [driving benchmark](docs/main_modules.md).
 
-For a given [experiment configuration file](), the main executer function
-can perform a [training](), measure the [model prediction error]() on some
-dataset and evaluate the model performance on a [driving benchmark]().
 
 The training, prediction error, and driving benchmarks are performed
 simultaneusly on different process. To perform evaluation
 the validation and driving modules wait for the
 training part to produce checkpoints. All of this is controlled
-by the [execution module]().
+by the [execution module](). The user can execute a single configuration
+file but also an entire folder.
 
 During the execution, all the information is [logged and
-printed](docs/logger.md) on the screen to summarize the experiment status
+printed](docs/logger.md) on the screen to summarize the experiment
+ training or evaluation status
 with a single glance.
 
 

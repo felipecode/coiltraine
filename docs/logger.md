@@ -17,6 +17,7 @@ The logger is global and accessible at any moment.
 
 The experiments have a set of status for each part of
 the logging. The general status is the last one that stopped.
+For our system the following message types exist.
 
 * Not Started
 * Loading
@@ -25,11 +26,11 @@ the logging. The general status is the last one that stopped.
 * Finished
 
 
-# Training Messages
+### Training Messages
 
-# Validation Messages
+### Validation Messages
 
-# Driving Messages
+### Driving Messages
 
 
 The folder organization for logging is as following:
@@ -38,23 +39,4 @@ The folder organization for logging is as following:
     * Experiment Folder
         * Experiment Name
             * Logs
-
-
-
-The messages are JSON
-
-For our system the following message types exist.
-
-Loading messages
-
-
-When the agent is testing there are several mesages
-
-1.Control Output
-2.Image Input # TODO: a way to take images inputs very fast
-3.Full measurements
-4.Directions
-5.Activation images.
-
-
 

@@ -60,7 +60,6 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
 
     if docker:
 
-
         sp = subprocess.Popen(['docker', 'run', '--rm', '-d' ,'-p', str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
                               '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlagear',
                                '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
@@ -68,15 +67,6 @@ def start_carla_simulator(gpu, town_name, no_screen, docker):
                               stdout=subprocess.PIPE)
 
         (out, err) = sp.communicate()
-
-
-        
-
-        #print (['docker', 'run', '--rm', '-p '+str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
-        #                      '--runtime=nvidia', '-e  NVIDIA_VISIBLE_DEVICES='+str(gpu), 'carlasim/carla:0.8.4',
-        #                       '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name,'-windowed',
-        #                       '-benchmark', '-fps=10', '-world-port=' + str(port)])
-
 
     else:
 

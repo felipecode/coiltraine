@@ -214,7 +214,10 @@ def plot_scatter(exp_batch, list_of_experiments, data_params,
             # The output is a list of the same size as processing_params.
             metrics_dict = {experiment + ' : ' + list_of_exps_names[experiment+'.yaml']:
                             computed_metrics}
-            all_metrics.update({validation + '_' + drive: metrics_dict})
+            if validation + '_' + drive in all_metrics:
+                all_metrics[validation + '_' + drive].update(metrics_dict)
+            else:
+                all_metrics.update({validation + '_' + drive: metrics_dict})
             print (all_metrics)
 
     # Plot the results

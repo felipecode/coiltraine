@@ -1,5 +1,3 @@
-
-
 #  Generate the plots on the images folder that are going to be linked
 
 import argparse
@@ -28,12 +26,6 @@ if __name__ == '__main__':
         metavar='C',
         default='auto',
         help='IP of the host server (default: localhost)')
-
-    argparser.add_argument('-f',
-        '--folder-name',
-        metavar='F',
-        default='test',
-        help='The name of the output folder')
 
     argparser.add_argument('-p',
         '--params-file',
@@ -78,16 +70,6 @@ if __name__ == '__main__':
     else:
         list_of_experiments = []
 
-    if args.strings_to_contain is not None:
-        final_list_of_experiments = []
-        sub_strings = args.strings_to_contain.split(',')
-        for experiment in list_of_experiments:
-            if all(sub in experiment for sub in sub_strings):
-                final_list_of_experiments.append(experiment)
-    else:
-        final_list_of_experiments = list_of_experiments
-
-
     # Import the parameters of what and how to plot
     sys.path.append('plotter/plotting_params')
     params_module = importlib.import_module(args.params_file)
@@ -95,9 +77,9 @@ if __name__ == '__main__':
     data_params = params_module.data_params
 
     if hasattr(params_module, 'list_of_experiments'):
-        assert (not (final_list_of_experiments and params_module.list_of_experiments)),\
-            'List of experiments should either be given by flags or in the param file, not both'
         final_list_of_experiments = params_module.list_of_experiments
+    else:
+        final_list_of_experiments = list_of_experiments
 
     print('final_list_experiments', final_list_of_experiments)
     print('data params', data_params)
@@ -112,4 +94,4 @@ if __name__ == '__main__':
     # Check if the validation folders already have the
 
     plot_scatter(args.folder, final_list_of_experiments, data_params, params_module.processing_params,
-                 params_module.plot_params, out_folder=args.folder_name)
+                 params_module.plot_params, out_folder=args.params_file)
