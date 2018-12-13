@@ -36,3 +36,6 @@ on the [CARLA data collector module](https://github.com/carla-simulator/data-col
 
 
 
+#### Input sequence
+
+Incomplete
