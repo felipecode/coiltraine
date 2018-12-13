@@ -158,7 +158,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                 # Log a random position
             position = random.randint(0, len(data) - 1)
 
-            controls = data['controls']
             output = model.extract_branch(torch.stack(branches[0:4]), controls)
             error = torch.abs(output - dataset.extract_targets(data).cuda())
 
