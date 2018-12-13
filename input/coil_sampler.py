@@ -37,12 +37,6 @@ class RandomSampler(Sampler):
 
 
         self.keys = keys
-        if g_conf.SAMPLING_SEED is not None:
-            random.seed(g_conf.SAMPLING_SEED)
-            torch.manual_seed(g_conf.SAMPLING_SEED)
-            torch.cuda.manual_seed_all(g_conf.SAMPLING_SEED)
-            np.random.seed(g_conf.SAMPLING_SEED)
-            os.environ['PYTHONHASHSEED'] = str(g_conf.SAMPLING_SEED)
 
         print("Setting a sampling seed", g_conf.SAMPLING_SEED)
 
@@ -86,13 +80,6 @@ class PreSplittedSampler(Sampler):
         else:
             self.weights = np.asarray(weights)
 
-        if g_conf.SAMPLING_SEED is not None:
-            random.seed(g_conf.SAMPLING_SEED)
-            torch.manual_seed(g_conf.SAMPLING_SEED)
-            torch.cuda.manual_seed_all(g_conf.SAMPLING_SEED)
-            np.random.seed(g_conf.SAMPLING_SEED)
-            os.environ['PYTHONHASHSEED'] = str(g_conf.SAMPLING_SEED)
-
 
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
                                      executed_iterations + g_conf.BATCH_SIZE
@@ -110,12 +97,6 @@ class PreSplittedSampler(Sampler):
             Iterator to get ids for the dataset
 
         """
-        if g_conf.SAMPLING_SEED is not None:
-            random.seed(g_conf.SAMPLING_SEED)
-            torch.manual_seed(g_conf.SAMPLING_SEED)
-            torch.cuda.manual_seed_all(g_conf.SAMPLING_SEED)
-            np.random.seed(g_conf.SAMPLING_SEED)
-            os.environ['PYTHONHASHSEED'] = str(g_conf.SAMPLING_SEED)
 
 
         rank_keys = get_rank(self.keys)
@@ -236,12 +217,6 @@ class BatchSequenceSampler(object):
         self.sequence_stride = sequence_stride
 
     def __iter__(self):
-        if g_conf.SAMPLING_SEED is not None:
-            random.seed(g_conf.SAMPLING_SEED)
-            torch.manual_seed(g_conf.SAMPLING_SEED)
-            torch.cuda.manual_seed_all(g_conf.SAMPLING_SEED)
-            np.random.seed(g_conf.SAMPLING_SEED)
-            os.environ['PYTHONHASHSEED'] = str(g_conf.SAMPLING_SEED)
 
         batch = []
         for idx in self.sampler:
