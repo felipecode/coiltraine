@@ -10,23 +10,16 @@ import time
 import subprocess
 import socket
 import json
-import random
 
 import torch
 from contextlib import closing
 
-from carla.tcp import TCPConnectionError
-from carla.driving_benchmark import run_driving_benchmark
+from ..carla.tcp import TCPConnectionError
+from ..carla.driving_benchmark import run_driving_benchmark
 
 from drive import CoILAgent
 from logger import coil_logger
-
-
-from logger import monitorer
-
-
 from configs import g_conf, merge_with_yaml, set_type_of_process
-
 from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkpoint,\
     is_next_checkpoint_ready, get_latest_evaluated_checkpoint
 from utils.general import compute_average_std_separatetasks, get_latest_path, write_header_control_summary,\
