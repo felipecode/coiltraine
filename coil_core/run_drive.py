@@ -14,8 +14,8 @@ import json
 import torch
 from contextlib import closing
 
-from ..carla.tcp import TCPConnectionError
-from ..carla.driving_benchmark import run_driving_benchmark
+from carla.tcp import TCPConnectionError
+from carla.driving_benchmark import run_driving_benchmark
 
 from drive import CoILAgent
 from logger import coil_logger
