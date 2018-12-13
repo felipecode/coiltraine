@@ -170,7 +170,6 @@ class ResNet(nn.Module):
 
 
 
-
 def resnet18(pretrained=False, **kwargs):
     """Constructs a ResNet-18 model.
 
@@ -179,7 +178,15 @@ def resnet18(pretrained=False, **kwargs):
     """
     model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet18']))
+
+        model_dict = model_zoo.load_url(model_urls['resnet18'])
+        print (model_dict.keys())
+        # remove the fc layers
+        del model_dict['fc.weight']
+        del model_dict['fc.bias']
+        state = model.state_dict()
+        state.update(model_dict)
+        model.load_state_dict(state)
     return model
 
 
@@ -191,7 +198,16 @@ def resnet34(pretrained=False, **kwargs):
     """
     model = ResNet(BasicBlock, [3, 4, 6, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet34']))
+
+        model_dict = model_zoo.load_url(model_urls['resnet34'])
+        print (model_dict.keys())
+        # remove the fc layers
+        del model_dict['fc.weight']
+        del model_dict['fc.bias']
+        state = model.state_dict()
+        state.update(model_dict)
+        model.load_state_dict(state)
+
     return model
 
 
@@ -203,8 +219,17 @@ def resnet50(pretrained=False, **kwargs):
     """
     model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
+        model_dict = model_zoo.load_url(model_urls['resnet50'])
+        print (model_dict.keys())
+        # remove the fc layers
+        del model_dict['fc.weight']
+        del model_dict['fc.bias']
+        state = model.state_dict()
+        state.update(model_dict)
+        model.load_state_dict(state)
+
     return model
+
 
 
 def resnet101(pretrained=False, **kwargs):

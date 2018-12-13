@@ -71,6 +71,8 @@ _g_conf.WEATHERS = [1, 3, 6, 8]
 
 _g_conf.MODEL_TYPE = 'coil_icra'
 _g_conf.MODEL_CONFIGURATION = {}
+_g_conf.PRE_TRAINED = False
+_g_conf.MAGICAL_SEED = 42
 
 
 _g_conf.LEARNING_RATE_DECAY_INTERVAL = 50000
@@ -87,8 +89,9 @@ _g_conf.LOSS_FUNCTION = 'L2'
 """#### Simulation Related Parameters ####"""
 
 _g_conf.IMAGE_CUT = [115, 510]  # How you should cut the input image that is received from the server
-_g_conf.USE_ORACLE = True
+_g_conf.USE_ORACLE = False
 _g_conf.USE_FULL_ORACLE = False
+_g_conf.AVOID_STOPPING = False
 
 
 def merge_with_yaml(yaml_filename):

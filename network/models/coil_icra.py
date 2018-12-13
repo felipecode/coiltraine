@@ -59,24 +59,12 @@ class CoILICRA(nn.Module):
 
         elif 'res' in params['perception']:  # pre defined residual networks
             resnet_module = importlib.import_module('network.models.building_blocks.resnet')
-            #+ params['perception']['res']['name']
-            #fromlist = ['resnet']
             # TODO: Check network drawing
             resnet_module = getattr(resnet_module, params['perception']['res']['name'])
-            self.perception  = resnet_module(num_classes=params['perception']['res']['num_classes'])
+            self.perception = resnet_module(pretrained=g_conf.PRE_TRAINED,
+                                             num_classes=params['perception']['res']['num_classes'])
 
             number_output_neurons = params['perception']['res']['num_classes']
-
-
-            #elif 'res_attention' in params['perception']:  # pre defined residual networks
-            #    resnet_module = importlib.import_module('network.models.building_blocks.resnet')
-            #    # + params['perception']['res']['name']
-            #    # fromlist = ['resnet']
-            #    # TODO: Check network drawing
-            #    resnet_module = getattr(resnet_module, params['perception']['res']['name'])
-            #    self.perception= resnet_module(num_classes=params['perception']['res']['num_classes'])#
-            #
-            #     number_output_neurons = params['perception']['res']['num_classes']
 
         else:
 
@@ -84,14 +72,6 @@ class CoILICRA(nn.Module):
 
 
 
-
-
-
-
-
-
-        # WILL NOT WORK FOR SMALL AND DEEP LAYERS
-        # TODO: eliminate this hardcoded middle layer, make a conv simulation to get the fc out size
         self.measurements = FC(params={'neurons': [len(g_conf.INPUTS)] +
                                                    params['measurements']['fc']['neurons'],
                                        'dropouts': params['measurements']['fc']['dropouts'],
