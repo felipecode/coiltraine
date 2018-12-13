@@ -112,11 +112,15 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             model.zero_grad()
             branches = model(torch.squeeze(data['rgb'].cuda()),
                              dataset.extract_inputs(data).cuda())
-
-            loss = criterion(branches, dataset.extract_targets(data).cuda(),
-                             controls.cuda(), dataset.extract_inputs(data).cuda(),
-                             branch_weights=g_conf.BRANCH_LOSS_WEIGHT,
-                             variable_weights=g_conf.VARIABLE_WEIGHT)
+            loss_function_params = {
+                'branches': branches,
+                'targets': dataset.extract_targets(data).cuda(),
+                'controls': controls.cuda(),
+                'inputs': dataset.extract_inputs(data).cuda(),
+                'branch_weights': g_conf.BRANCH_LOSS_WEIGHT,
+                'variable_weights': g_conf.VARIABLE_WEIGHT
+            }
+            loss, _ = criterion(loss_function_params)
             loss.backward()
             optimizer.step()
             """
