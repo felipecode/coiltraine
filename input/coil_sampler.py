@@ -38,8 +38,6 @@ class RandomSampler(Sampler):
 
         self.keys = keys
 
-        print("Setting a sampling seed", g_conf.SAMPLING_SEED)
-
     def __iter__(self):
 
         return iter([random.choice(self.keys) for _ in range(self.iterations_to_execute)])
