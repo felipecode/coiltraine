@@ -1,30 +1,20 @@
 import numpy as np
 import scipy
 
-
+import torch
 try:
     from carla import carla_server_pb2 as carla_protocol
 except ImportError:
     raise RuntimeError(
         'cannot import "carla_server_pb2.py", run the protobuf compiler to generate this file')
 
-
-
-from ..carla.agent import Agent, CommandFollower
-
-
-# TODO: The network is defined and toguether there is as forward pass operation to be used for testing, depending on the configuration
+from carla.agent import Agent, CommandFollower
 
 from network import CoILModel
 from configs import g_conf
 from logger import coil_logger
 
-
-
-
-import torch
-
-
+# Parameters for using semantic segmentation as input.
 number_of_seg_classes = 5
 classes_join = {0: 2, 1: 2, 2: 2, 3: 2, 5: 2, 12: 2, 9: 2, 11: 2, 4: 0, 10: 1, 8: 3, 6: 3, 7: 4}
 
