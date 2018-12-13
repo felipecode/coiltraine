@@ -100,6 +100,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                     Main optimization loop
                 ####################################
             """
+
             iteration += 1
             if iteration % 1000 == 0:
                 adjust_learning_rate(optimizer, iteration)
@@ -155,7 +156,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                 best_loss = loss.data.tolist()
                 best_loss_iter = iteration
 
-                # Log a random position
+            # Log a random position
             position = random.randint(0, len(data) - 1)
 
             output = model.extract_branch(torch.stack(branches[0:4]), controls)
@@ -175,7 +176,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                                      'Inputs': dataset.extract_inputs(data)[
                                          position].data.tolist()},
                                     iteration)
-
+            print("Iteration: %d  Loss: %d" % (iteration, loss.data))
         coil_logger.add_message('Finished', {})
 
     except KeyboardInterrupt:
