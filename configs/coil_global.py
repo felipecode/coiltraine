@@ -208,14 +208,7 @@ def _merge_a_into_b(a, b, stack=None):
 
         # Recursively merge dicts
 
-        if isinstance(v, dict):
-            try:
-                stack_push = [k] if stack is None else stack + [k]
-                _merge_a_into_b(v, b[k], stack=stack_push)
-            except BaseException:
-                raise
-        else:
-            b[k] = v
+        b[k] = v
 
 
 def _decode_cfg_value(v):
