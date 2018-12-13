@@ -1,16 +1,15 @@
-from configs import g_conf
-from logger import coil_logger
 import numpy as np
-from utils.general import softmax
 import collections
 
-from . import PreSplittedSampler, RandomSampler
+from configs import g_conf
+from logger import coil_logger
+from utils.general import softmax
+
+from .coil_sampler import PreSplittedSampler, RandomSampler
+
 
 def order_sequence(steerings, keys_sequence):
     sequence_average = []
-    # print 'keys'
-    #print (" NUMBER OF IMAGES IN A SEQUENCE ", g_conf.NUMBER_IMAGES_SEQUENCE)
-    # print keys_sequence
 
     for i in keys_sequence:
         sampled_sequence = steerings[(i):(i + g_conf.NUMBER_IMAGES_SEQUENCE)]
