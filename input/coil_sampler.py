@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import os
 
 import torch
 
@@ -30,15 +31,24 @@ class RandomSampler(Sampler):
         indices (list): a list of indices
     """
 
-    def __init__(self, keys, executed_iterations, data_source):
-        super().__init__(data_source)
-        self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
-                                     executed_iterations + g_conf.BATCH_SIZE
+    def __init__(self, keys, executed_iterations):
+        self.iterations_to_execute = ((g_conf.NUMBER_ITERATIONS) * g_conf.BATCH_SIZE) -\
+                                     (executed_iterations)
+
+
         self.keys = keys
+        if g_conf.SAMPLING_SEED is not None:
+            random.seed(g_conf.SAMPLING_SEED)
+            torch.manual_seed(g_conf.SAMPLING_SEED)
+            torch.cuda.manual_seed_all(g_conf.SAMPLING_SEED)
+            np.random.seed(g_conf.SAMPLING_SEED)
+            os.environ['PYTHONHASHSEED'] = str(g_conf.SAMPLING_SEED)
+
+        print("Setting a sampling seed", g_conf.SAMPLING_SEED)
 
     def __iter__(self):
-        return iter([random.choice(self.keys) for _ in range(self.iterations_to_execute)])
 
+        return iter([random.choice(self.keys) for _ in range(self.iterations_to_execute)])
 
     def __len__(self):
         return self.iterations_to_execute
@@ -51,8 +61,7 @@ class SubsetSampler(Sampler):
         indices (list): a list of indices
     """
 
-    def __init__(self, indices, data_source):
-        super().__init__(data_source)
+    def __init__(self, indices):
         self.indices = indices
 
     def __iter__(self):
@@ -69,15 +78,20 @@ class PreSplittedSampler(Sampler):
     """
 
 
-    def __init__(self, keys, executed_iterations, data_source, weights=None):
+    def __init__(self, keys, executed_iterations, weights=None):
 
-        super().__init__(data_source)
         self.keys = keys
         if weights is None:
             self.weights = np.asarray([1.0/float(len(self.keys))]*len(self.keys), dtype=np.float)
         else:
             self.weights = np.asarray(weights)
 
+        if g_conf.SAMPLING_SEED is not None:
+            random.seed(g_conf.SAMPLING_SEED)
+            torch.manual_seed(g_conf.SAMPLING_SEED)
+            torch.cuda.manual_seed_all(g_conf.SAMPLING_SEED)
+            np.random.seed(g_conf.SAMPLING_SEED)
+            os.environ['PYTHONHASHSEED'] = str(g_conf.SAMPLING_SEED)
 
 
         self.iterations_to_execute = g_conf.NUMBER_ITERATIONS * g_conf.BATCH_SIZE -\
@@ -96,8 +110,15 @@ class PreSplittedSampler(Sampler):
             Iterator to get ids for the dataset
 
         """
+        if g_conf.SAMPLING_SEED is not None:
+            random.seed(g_conf.SAMPLING_SEED)
+            torch.manual_seed(g_conf.SAMPLING_SEED)
+            torch.cuda.manual_seed_all(g_conf.SAMPLING_SEED)
+            np.random.seed(g_conf.SAMPLING_SEED)
+            os.environ['PYTHONHASHSEED'] = str(g_conf.SAMPLING_SEED)
+
+
         rank_keys = get_rank(self.keys)
-        print ("got rank", rank_keys)
 
 
         # First we check how many subdivisions there are
@@ -136,10 +157,9 @@ class LogitSplittedSampler(Sampler):
     """
 
 
-    def __init__(self, keys, executed_iterations, data_source, weights=None):
+    def __init__(self, keys, executed_iterations, weights=None):
 
 
-        super().__init__(data_source)
         self.keys = keys
         if weights is None:
             self.weights = torch.tensor([1.0/float(len(self.keys))]*len(self.keys), dtype=torch.double)
@@ -216,6 +236,12 @@ class BatchSequenceSampler(object):
         self.sequence_stride = sequence_stride
 
     def __iter__(self):
+        if g_conf.SAMPLING_SEED is not None:
+            random.seed(g_conf.SAMPLING_SEED)
+            torch.manual_seed(g_conf.SAMPLING_SEED)
+            torch.cuda.manual_seed_all(g_conf.SAMPLING_SEED)
+            np.random.seed(g_conf.SAMPLING_SEED)
+            os.environ['PYTHONHASHSEED'] = str(g_conf.SAMPLING_SEED)
 
         batch = []
         for idx in self.sampler:

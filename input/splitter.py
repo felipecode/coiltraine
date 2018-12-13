@@ -1,5 +1,8 @@
+import sys
 import numpy as np
 import collections
+
+import torch
 
 from configs import g_conf
 from logger import coil_logger
@@ -380,13 +383,14 @@ def select_balancing_strategy(dataset, iteration, number_of_workers):
     # In the case we are using the balancing
     if g_conf.SPLIT is not None and g_conf.SPLIT is not "None":
         name, params = parse_split_configuration(g_conf.SPLIT)
-        splitter_function = getattr(splitter, name)
+        splitter_function = getattr(sys.modules[__name__], name)
         keys_splitted = splitter_function(dataset.measurements, params)
 
         for i in range(len(keys_splitted)):
             keys_splitted[i] = np.array(list(set(keys_splitted[i]).intersection(set(keys))))
         if params['weights'] == 'inverse':
-            weights = get_inverse_freq_weights(keys_splitted, len(dataset.measurements) - g_conf.NUMBER_IMAGES_SEQUENCE)
+            weights = get_inverse_freq_weights(keys_splitted, len(dataset.measurements)
+                                               - g_conf.NUMBER_IMAGES_SEQUENCE)
         else:
             weights = params['weights']
         sampler = PreSplittedSampler(keys_splitted, iteration * g_conf.BATCH_SIZE, weights)
