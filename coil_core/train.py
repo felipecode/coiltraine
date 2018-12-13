@@ -176,7 +176,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                                      'Inputs': dataset.extract_inputs(data)[
                                          position].data.tolist()},
                                     iteration)
-            print("Iteration: %d  Loss: %d" % (iteration, loss.data))
+            print("Iteration: %d  Loss: %f" % (iteration, loss.data))
         coil_logger.add_message('Finished', {})
 
     except KeyboardInterrupt:
