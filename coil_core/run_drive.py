@@ -114,9 +114,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                               exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
-
-
-
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 
         experiment_list = experiment_set.build_experiments()

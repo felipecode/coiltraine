@@ -46,7 +46,6 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
     try:
         # We set the visible cuda devices
-
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
 
         # At this point the log file with the correct naming is created.
@@ -58,18 +57,21 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         if suppress_output:
             sys.stdout = open(os.path.join('_output_logs',
-                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+                                           exp_alias + '_' + g_conf.PROCESS_NAME + '_'
+                                           + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
+            sys.stderr = open(os.path.join('_output_logs',
+                              exp_alias + '_err_' + g_conf.PROCESS_NAME + '_'
+                                           + str(os.getpid()) + ".out"),
+                              "a", buffering=1)
 
         if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
-            # TODO: print some cool summary or not ?
             return
 
-        #Define the dataset. This structure is has the __get_item__ redefined in a way
-        #that you can access the HDFILES positions from the root directory as a in a vector.
+        # Define the dataset. This structure is has the __get_item__ redefined in a way
+        # that you can access the HDFILES positions from the root directory as a in a vector.
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name)
-
         augmenter = Augmenter(None)
-
         dataset = CoILDataset(full_dataset, transform=augmenter)
 
         # Creates the sampler, this part is responsible for managing the keys. It divides
@@ -77,32 +79,23 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         # The data loader is the multi threaded module from pytorch that release a number of
         # workers to get all the data.
-        # TODO: batch size an number of workers go to some configuration file
-        data_loader = torch.utils.data.DataLoader(dataset, batch_size=120,
+        data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
                                                   shuffle=False,
                                                   num_workers=g_conf.NUMBER_OF_LOADING_WORKERS,
                                                   pin_memory=True)
 
-
-        # TODO: here there is clearly a posibility to make a cool "conditioning" system.
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
-
-
-
 
         latest = get_latest_evaluated_checkpoint()
         if latest is None:  # When nothing was tested, get latest returns none, we fix that.
             latest = 0
         model.cuda()
 
-        print (dataset.meta_data)
         best_loss = 1000
         best_error = 1000
         best_loss_iter = 0
         best_error_iter = 0
 
-
-        # TODO: refactor on the getting on the checkpoint organization needed
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
 
             if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
@@ -122,60 +115,44 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                 iteration_on_checkpoint = 0
                 for data in data_loader:
 
-
+                    # Compute the forward pass on a batch from  the validation dataset
                     controls = data['directions']
-
-
-
                     output = model.forward_branch(torch.squeeze(data['rgb']).cuda(),
                                                   dataset.extract_inputs(),
                                                   controls)
 
-
-
-                    # TODO: this is hardcoded, eliminate the hardcodeness
+                    # It could be either waypoints
                     if 'waypoint1_angle' in g_conf.TARGETS:
                         write_waypoints_output(checkpoint_iteration, output)
                     else:
                         write_regular_output(checkpoint_iteration, output)
 
-
-
-
                     # TODO: Change this a functional standard using the loss functions.
+                    # LOSS is actually the square error
+                    loss = torch.mean((output - dataset.extract_targets(data).cuda())**2).data.tolist()
+                    mean_error = torch.mean(torch.abs(output - dataset.extract_targets(data).cuda())).data.tolist()
 
-                    loss = torch.mean((output - dataset.extract_targets(float_data).cuda())**2).data.tolist()
-                    mean_error = torch.mean(torch.abs(output - dataset.extract_targets(float_data).cuda())).data.tolist()
-                    #print ("Loss", loss)
-                    #print ("output", output[0])
                     accumulated_error += mean_error
                     accumulated_loss += loss
-                    error = torch.abs(output - dataset.extract_targets(float_data).cuda())
-
+                    error = torch.abs(output - dataset.extract_targets(data).cuda())
 
                     # Log a random position
-                    position = random.randint(0, len(float_data) - 1)
-                    #print (output[position].data.tolist())
+                    position = random.randint(0, g_conf.BATCH_SIZE - 1)
+
                     coil_logger.add_message('Iterating',
                          {'Checkpoint': latest,
                           'Iteration': (str(iteration_on_checkpoint*120)+'/'+str(len(dataset))),
                           'MeanError': mean_error,
                           'Loss': loss,
                           'Output': output[position].data.tolist(),
-                          'GroundTruth': dataset.extract_targets(float_data)[position].data.tolist(),
+                          'GroundTruth': dataset.extract_targets(data)[position].data.tolist(),
                           'Error': error[position].data.tolist(),
-                          'Inputs': dataset.extract_inputs(float_data)[position].data.tolist()},
+                          'Inputs': dataset.extract_inputs(data)[position].data.tolist()},
                           latest)
                     iteration_on_checkpoint += 1
 
                 checkpoint_average_loss = accumulated_loss/(len(data_loader))
-
                 checkpoint_average_error = accumulated_error/(len(data_loader))
-
-
-
-
-
                 coil_logger.add_scalar('Loss', checkpoint_average_loss, latest, True)
                 coil_logger.add_scalar('Error', checkpoint_average_error, latest, True)
 
@@ -188,7 +165,6 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     best_error_iter = latest
 
                 coil_logger.add_message('Iterating',
-
                      {'Summary':
                          {
                           'Error': checkpoint_average_error,
@@ -212,13 +188,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         coil_logger.add_message('Finished', {})
 
-
-        # TODO: DO ALL THE AMAZING LOGGING HERE, as a way to very the status in paralell.
-        # THIS SHOULD BE AN INTERELY PARALLEL PROCESS
-
     except KeyboardInterrupt:
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
-
     except:
         traceback.print_exc()
 

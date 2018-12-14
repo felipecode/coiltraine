@@ -56,7 +56,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         checkpoint_file = get_latest_saved_checkpoint()
         if checkpoint_file is not None:
             checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias,
-                                     'checkpoints', str(get_latest_saved_checkpoint())))
+                                    'checkpoints', str(get_latest_saved_checkpoint())))
             iteration = checkpoint['iteration']
             best_loss = checkpoint['best_loss']
             best_loss_iter = checkpoint['best_loss_iter']
@@ -70,10 +70,10 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         # that you can access the positions from the root directory as a in a vector.
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
 
-        # By instanciating the augmenter we get a callable that augment images and transform them
+        # By instantiating the augmenter we get a callable that augment images and transform them
         # into tensors.
         augmenter = Augmenter(g_conf.AUGMENTATION)
-        # Instanciate the class used to read a dataset. The coil dataset generator
+        # Instantiate the class used to read a dataset. The coil dataset generator
         # can be found
         dataset = CoILDataset(full_dataset, transform=augmenter,
                               preload_name=str(g_conf.NUMBER_OF_HOURS)
