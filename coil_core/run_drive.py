@@ -140,6 +140,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
         """
         #####
         Main Loop , Run a benchmark for each specified checkpoint on the "Test Configuration"
+        #####
         """
 
 
@@ -160,10 +161,10 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                     checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                                          , 'checkpoints', str(latest) + '.pth'))
 
-                    coil_agent = CoILAgent(checkpoint, town_name, params['record_collisions'])
+                    coil_agent = CoILAgent(checkpoint, town_name)
 
                     coil_logger.add_message('Iterating', {"Checkpoint": latest}, latest)
-                    
+
                     """ MAIN PART, RUN THE DRIVING BENCHMARK """
                     run_driving_benchmark(coil_agent, experiment_set, town_name,
                                           exp_batch + '_' + exp_alias + '_' + str(latest)

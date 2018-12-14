@@ -31,18 +31,13 @@ def join_classes(labels_image):
 class CoILAgent(Agent):
 
 
-    def __init__(self, checkpoint, town_name, record_collisions):
+    def __init__(self, checkpoint, town_name):
 
 
         Agent.__init__(self)
 
-
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
         self.model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
-
-
-
-        # TODO: just  trick, remove this leatter then I learn how to suppress stdout
         self.first_iter = True
 
         self.model.load_state_dict(checkpoint['state_dict'])
@@ -55,47 +50,44 @@ class CoILAgent(Agent):
             self.control_agent = CommandFollower(town_name)
 
 
-
-
     def run_step(self, measurements, sensor_data, directions, target):
+        """
+            Run a step on the benchmark simulation
+        Args:
+            measurements: All the float measurements from CARLA ( Just speed is used)
+            sensor_data: All the sensor data used on this benchmark
+            directions: The directions, high level commands
+            target: Final objective.
 
-        # control_agent = self._agent.run_step(measurements, None, target)
+        Returns:
 
+        """
+
+        # Take the forward speed and normalize it for it to go from 0-1
         norm_speed = measurements.player_measurements.forward_speed / g_conf.SPEED_FACTOR
         norm_speed = torch.cuda.FloatTensor([norm_speed]).unsqueeze(0)
-
         directions_tensor = torch.cuda.LongTensor([directions])
-
-        if self._recording_collisions:
-            self._add_image_and_record(sensor_data, measurements.player_measurements,
-                                       measurements.game_timestamp)
-
-
+        # Compute the forward pass processing the sensors got from CARLA.
         model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), norm_speed,
                                                   directions_tensor)
 
-
         if 'brake' in g_conf.TARGETS:
-
             steer, throttle, brake = self._process_model_outputs(model_outputs[0])
         else:
-
             steer, throttle, brake = self._process_model_outputs_no_brake(model_outputs[0])
 
         control = carla_protocol.Control()
         control.steer = steer
         control.throttle = throttle
         control.brake = brake
+        # There is the posibility to replace some of the predictions with oracle predictions.
         if g_conf.USE_ORACLE:
             _, control.throttle, control.brake = self._get_oracle_prediction(
                 measurements, target)
 
-
         if g_conf.USE_FULL_ORACLE:
             control.steer, control.throttle, control.brake = self._get_oracle_prediction(
                 measurements, target)
-
-        # TODO: adapt the client side agent for the new version. ( PROBLEM )
 
         if self.first_iter:
             coil_logger.add_message('Iterating', {"Checkpoint": self.checkpoint['iteration'],
@@ -103,9 +95,8 @@ class CoILAgent(Agent):
                                     self.checkpoint['iteration'])
         self.first_iter = False
 
-
-        print ("speed ", measurements.player_measurements.forward_speed)
-        print ('Steer', control.steer, 'Gas', control.throttle, 'Brake', control.brake)
+        print("speed ", measurements.player_measurements.forward_speed)
+        print('Steer', control.steer, 'Gas', control.throttle, 'Brake', control.brake)
         return control
 
 
@@ -168,10 +159,7 @@ class CoILAgent(Agent):
 
         if throttle > brake:
             brake = 0.0
-        # else:
-        #    throttle = throttle * 2
-        # if speed > 35.0 and brake == 0.0:
-        #    throttle = 0.0
+
 
         return steer, throttle, brake
 
