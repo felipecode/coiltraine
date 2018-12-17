@@ -265,10 +265,7 @@ class CoILDataset(Dataset):
                  # The number of wanted hours achieved
                  break
 
-
-
             # Get all the measuremensts from this episode
-
             measurements_list = glob.glob(os.path.join(episode, 'measurement*'))
             sort_nicely(measurements_list)
 

@@ -31,8 +31,6 @@ TEST_SCHEDULE: [100000]  # The frequency the model is actually tested.
 
 #### Network Related Parameters ####
 
-
-
 MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:

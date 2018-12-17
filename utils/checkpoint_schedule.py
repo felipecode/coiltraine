@@ -61,7 +61,7 @@ def get_latest_saved_checkpoint():
 
 
 """ FUNCTIONS FOR GETTING THE CHECKPOINTS"""
-def get_latest_evaluated_checkpoint(filename):
+def get_latest_evaluated_checkpoint(filename=None):
 
     """
         Get the latest checkpoint that was validated or tested.

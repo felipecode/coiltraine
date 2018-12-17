@@ -4,11 +4,12 @@ Model Configurations
 #### Network
 
 For the network we provide some abstraction to easily change
-the architecture.
-For the networks we have a concept of model type.
-Inside a model type there is a certain training
-strategy related to it. The one we use is called [model icra](https://arxiv.org/pdf/1710.02410.pdf) that has 4 subdivisions:
-percetion, measurements, join and branching.
+the architecture. A few key attributes can be changed
+
+    * MODEL TYPE: Is the kind of is a certain training strategy related to it, right now we just have  [model icra](https://arxiv.org/pdf/1710.02410.pdf) that has 4 subdivisions: percetion, measurements, join and branching.
+    * MODEL CONFIGURATION: Specify all the network
+
+Example:
 
 ```
     MODEL_TYPE: 'coil-icra' # The type of model. Defines which modules the model has.
@@ -39,9 +40,7 @@ percetion, measurements, join and branching.
 ```
 
 The perception can also be defined layer by layer
-as it is defined on the example.
-
-
+as it is defined on the [example](docs/coil_icra.yaml).
 
 
 #### Loss
