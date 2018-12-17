@@ -2,21 +2,20 @@ import os
 import time
 import sys
 
-import numpy as np
+
 import torch
 import traceback
-import torch.optim as optim
 import random
 
 # What do we define as a parameter what not.
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
-from network import CoILModel, Loss
+from network import CoILModel
 from input import CoILDataset, Augmenter
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_checkpoint_ready,\
     maximun_checkpoint_reach, get_next_checkpoint
-from torchvision import transforms
+
 
 
 def write_waypoints_output(iteration, output):

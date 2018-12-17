@@ -155,7 +155,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
     for key in sorted_keys:
 
         experiment = experiments_list[key]
-        generated_name = names_list[experiment+'.yaml']
+        generated_name = names_list[experiment + '.yaml']
 
         if experiment == '':
             raise ValueError("Empty Experiment on List")
@@ -164,7 +164,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
         merge_with_yaml(os.path.join('configs', exp_batch, experiment + '.yaml'))
 
-        print (BOLD +  experiment +' : ' + generated_name + END)
+        print (BOLD + experiment +' : ' + generated_name + END)
 
         for process in process_names:
             try:
@@ -193,7 +193,6 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
                 print('        STATUS: ', RED + status + END)
 
-
             if status == 'Iterating':
                 if 'train' in process:
                     print_train_summary(summary[status])
@@ -214,18 +213,9 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                     else:
                         control_filename = 'control_output'
 
-                    # TODO: Check -- Not using this for now
-                    """
-                                        
-                    csv_file_path = os.path.join('_logs', exp_batch, experiment,
-                                                 process + '_csv', control_filename)
-                    """
-
                     path = exp_batch + '_' + experiment + '_' + str(checkpoint) \
                            + '_' + process.split('_')[0] + '_' + control_filename \
                            + '_' + process.split('_')[1] + '_' + process.split('_')[2]
-
-
 
                     print_drive_summary(get_latest_path(path), None, checkpoint, verbose)
 
@@ -243,7 +233,6 @@ def print_folder_process_names(exp_batch):
             g_conf.immutable(False)
 
             merge_with_yaml(os.path.join('configs', exp_batch, experiment))
-
 
             print (experiment.split('.')[-2] + ': ' + g_conf.EXPERIMENT_GENERATED_NAME)
 
