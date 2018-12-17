@@ -50,6 +50,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         # At this point the log file with the correct naming is created.
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias+'.yaml'))
+        # The validation dataset is always fully loaded, so we fix a very high number of hours
+        g_conf.NUMBER_OF_HOURS = 10000
         set_type_of_process('validation', dataset_name)
 
         if not os.path.exists('_output_logs'):
@@ -72,9 +74,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         # that you can access the HDFILES positions from the root directory as a in a vector.
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], dataset_name)
         augmenter = Augmenter(None)
-        # The validation dataset is always fully loaded, so we fix a very high number of hours
-        g_conf.NUMBER_OF_HOURS = 10000
-        # Definition of the dataset to be used. Pre
+        # Definition of the dataset to be used. Preload name is just the validation data name
         dataset = CoILDataset(full_dataset, transform=augmenter,
                               preload_name=dataset_name)
 
