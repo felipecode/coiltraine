@@ -154,6 +154,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                           'Inputs': dataset.extract_inputs(data)[position].data.tolist()},
                           latest)
                     iteration_on_checkpoint += 1
+                    print ("Iteration on Checkpoint %d  Error %f" % (iteration_on_checkpoint
+                            ,mean_error))
 
                 checkpoint_average_loss = accumulated_loss/(len(data_loader))
                 checkpoint_average_error = accumulated_error/(len(data_loader))
