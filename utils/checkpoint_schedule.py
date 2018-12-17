@@ -70,12 +70,13 @@ def get_latest_evaluated_checkpoint(filename=None):
 
     return monitorer.get_latest_checkpoint(filename)
 
-def is_next_checkpoint_ready( checkpoint_schedule, control_filename):
+
+def is_next_checkpoint_ready(checkpoint_schedule, control_filename=None):
 
     # IT needs
 
     ltst_check = get_latest_evaluated_checkpoint(control_filename)
-    print (" got ", ltst_check)
+
     # This means that we got the last one, so we return false and go back to the loop
     if ltst_check == g_conf.TEST_SCHEDULE[-1]:
         return False
