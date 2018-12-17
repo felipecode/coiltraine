@@ -125,7 +125,18 @@ def print_drive_summary(path, csv_filename, checkpoint, verbose):
 
 def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environments, verbose=False):
 
-    # TODO: if train is not running the user should be warned
+    """
+        Main plotting function for the folder mode.
+    Args:
+        exp_batch:
+        train:
+        validation_datasets:
+        drive_environments:
+        verbose:
+
+    Returns:
+
+    """
 
     os.system('clear')
     process_names = []
@@ -149,8 +160,6 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
     names_list = get_names(exp_batch)
     sorted_keys = sorted(range(len(names_list)), key=lambda k: names_list[experiments_list[k]+'.yaml'])
 
-
-    print (experiments_list)
 
     for key in sorted_keys:
 

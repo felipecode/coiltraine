@@ -92,8 +92,6 @@ is also further documentation about ( CIte 3 modules)
 
 
 
-
-
 ##### Folder execution mode
 
 Experiments are defined in config files inside [CoIL/configs](docs/configuration.md).
@@ -103,7 +101,10 @@ You can run all the experiments in a folder using:
 
 Where the DrivingEnvironmentClass is one of the classes defined in the
 modules at [CoIL/drive/suites](docs/suites.md). Those driving environments
-define the start and end positions for driving, the number of cars, people, etc. That information will define the Benchmark to test the model driving in CARLA in parallel to training. Town0X is either Town01 or Town02.
+define the start and end positions for driving, the number of cars, people, etc.
+ That information will define the Benchmark to test the model driving in CARLA in parallel to training.
+ Town0X is either Town01 or Town02.
+ The
 Note that the training dataset must be set on the experiment file directly,
  since training is strictly associated with the experiment.
  The validation datasets are passed as parameter.

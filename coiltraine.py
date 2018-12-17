@@ -106,8 +106,8 @@ if __name__ == '__main__':
     for gpu in args.gpus:
         try:
             int(gpu)
-        except:
-            raise ValueError(" Gpu is not a valid int number")
+        except ValueError:  # Reraise a meaningful error.
+            raise ValueError("GPU is not a valid int number")
 
     # Check if the mandatory folder argument is passed
     if args.folder is None:
