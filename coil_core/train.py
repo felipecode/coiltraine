@@ -324,7 +324,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                     count += 1
 
             else:
-                print (" CLASSICAL LOSS")
                 loss_function_params = {
                     'branches': branches,
                     'targets': dataset.extract_targets(data).cuda(),
@@ -423,7 +422,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             del data
 
-            print ("The REST", time.time() - capture_time)
             capture_time = time.time()
 
         coil_logger.add_message('Finished', {})
