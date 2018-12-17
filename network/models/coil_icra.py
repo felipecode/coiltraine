@@ -70,14 +70,10 @@ class CoILICRA(nn.Module):
 
             raise ValueError("invalid convolution layer type")
 
-
-
         self.measurements = FC(params={'neurons': [len(g_conf.INPUTS)] +
                                                    params['measurements']['fc']['neurons'],
                                        'dropouts': params['measurements']['fc']['dropouts'],
                                        'end_layer': False})
-
-
 
         self.join = Join(
             params={'after_process':
@@ -157,8 +153,6 @@ class CoILICRA(nn.Module):
         """
         # Convert to integer just in case .
 
-        #print (self.forward(x, a))
-        # TODO: unit test this function
         # TODO: take four branches, this is hardcoded
         output_vec = torch.stack(self.forward(x, a)[0:4])
 
