@@ -19,7 +19,7 @@ SEQUENCE_STRIDE: 1  # Number of frames skipped when reading the data
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 12.0  # The constant that is divides the speed_module in order to make it from 0-1
 TRAIN_DATASET_NAME: 'CARLA100_S6'  # The name of the training dataset used. Must be inside COIL_DATASET_PATH folder
-AUGMENTATION: None  # The image augmentation applyed on every input image
+AUGMENTATION: None  # The image augmentation applied on every input image
 DATA_USED: 'all'  # The part of the data to be used
 USE_NOISE_DATA: True  # If we use the noise data.
 NUMBER_OF_HOURS: 50  # Number of hours to be taken from the input data

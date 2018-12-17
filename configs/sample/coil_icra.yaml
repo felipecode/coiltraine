@@ -8,8 +8,7 @@ NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
 SENSORS:
   rgb: [3, 88, 200]
 MEASUREMENTS:
-  targets: [31]
-
+  float_data: [31]
 BATCH_SIZE: 120
 NUMBER_ITERATIONS: 100000
 TARGETS: ['steer', 'throttle', 'brake']

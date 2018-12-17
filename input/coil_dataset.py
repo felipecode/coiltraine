@@ -75,13 +75,12 @@ def get_episode_weather(episode):
     print (" WEATHER OF EPISODE ", metadata['weather'])
     return int(metadata['weather'])
 
+
 class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
     def __init__(self, root_dir, transform=None, preload_name=None):
 
-
-        print("IONIT COIL DATASET")
         # We add to the preload name all the remove labels
         if g_conf.REMOVE is not None and g_conf.REMOVE is not "None":
             name, self._remove_params = parse_remove_configuration(g_conf.REMOVE)
@@ -92,16 +91,11 @@ class CoILDataset(Dataset):
             self._remove_params = []
             self.preload_name = preload_name
 
-        # Add no brake on the preload name if there is no brake
-        if 'brake' not in g_conf.TARGETS:
-            self.preload_name += '_nobrake'
-
         # If  not all the weathers are present we keep without anything ( WE ASSUME THAT THIS HAS LENGHT 4)
         if len(g_conf.WEATHERS) < 4:
             self.preload_name = self.preload_name + '-'.join(str(e) for e in g_conf.WEATHERS)
 
-
-        print ("preload Name ", self.preload_name)
+        print("preload Name ", self.preload_name)
 
         if self.preload_name is not None and os.path.exists(os.path.join('_preloads', self.preload_name + '.npy')):
             print ( " Loading from NPY ")
@@ -371,8 +365,9 @@ class CoILDataset(Dataset):
         # Make the path to save the pre loaded datasets
         if not os.path.exists('_preloads'):
             os.mkdir('_preloads')
-
-        np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
+        # If there is a name we saved the preloaded data
+        if self.preload_name is not None:
+            np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
 
         return sensor_data_names, float_dicts
 
