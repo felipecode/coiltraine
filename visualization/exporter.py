@@ -122,8 +122,6 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
             experiment_list.append(scenario)
 
 
-    print (" FULL DICT")
-    print (experiment_list)
     with open(csv_outfile, 'a') as f:
         for exp in experiments:
             print ("EXP ", exp)
@@ -138,8 +136,10 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
                             f.write(",")
                             for task in task_list:
                                 if experiment_list[experiments.index(exp)][count][task]:
-                                    f.write("%.3f/" % experiment_list[experiments.index(exp)][count][task][variable])
-
+                                    print(experiment_list[experiments.index(exp)]
+                                                                     [count][task][variable])
+                                    f.write("%.3f/" % experiment_list[experiments.index(exp)]
+                                                                     [count][task][variable])
 
                         f.write("\n")
                     count += 1
