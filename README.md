@@ -43,7 +43,7 @@ by the [executer module](docs/executer.md).
 During the execution, all the information is [logged and
 printed](docs/logger.md) on the screen to summarize the experiment
  training or evaluation status to be checked by a single glance
- of the user.
+ of a user.
 
 
 
@@ -60,22 +60,10 @@ install just run:
 
 
 
-#### Execution
-
-
-Assuming you collected and post-processed the data at:
-
-    ~/CARLA/CARLA100 ---
-            --/episode_00001
-            --/episode_00002
-            …
-
-To collect datasets please check the data collector repository.
-https://github.com/carla-simulator/data-collector
-
+#### Setting Environment/ Getting Data
 
 The first thing you need to do is define the datasets folder.
-This is the folder that contains your training and validation datasets
+This is the folder that will contain your training and validation datasets
 
     export COIL_DATASET_PATH=<Path to where your dataset folders are>
 
@@ -87,20 +75,25 @@ and two validations, by running
 The datasets; CoilTrain , CoilVal1 and CoilVal2; will be stored at
  the COIL_DATASET_PATH folder.
 
-##### Single experiment mode
+To collect other datasets please check the data collector repository.
+https://github.com/carla-simulator/data-collector
+
+
+
+#### Single experiment mode
 
 To run a single experiment, we use the flag single-process train
 and the experiment name.
 
-A full example to train a ResNet_34  is shown below. There
-is also further documentation about the [drive](docs/main_modules.md/#drive)
-and [validation](docs/main_modules.md/#validation) processes
+To train the [configs/sample/icra_model.yaml](configs/sample/icra_model.yaml) model, using the GPU 0, run: 
 
-    python3 coiltraine.py --single-process train -e resnet34 --folder sample --gpus 0 1 2
+    python3 coiltraine.py --single-process train -e coil_icra --folder sample --gpus 0
+
+There other two process that could be run: [drive](docs/main_modules.md/#drive)
+and [validation](docs/main_modules.md/#validation).
 
 
-
-##### Folder execution mode
+#### Folder execution mode
 
 Experiments are defined in config files inside [CoIL/configs](docs/configuration.md).
 You can run all the experiments in a folder using:
@@ -110,7 +103,7 @@ You can run all the experiments in a folder using:
 Where the DrivingEnvironmentClass is one of the classes defined in the
 modules at [CoIL/drive/suites](docs/suites.md). Those driving environments
 define the start and end positions for driving, the number of cars and pedestrians, etc.
- That information will define the Benchmark to test the model driving in CARLA in parallel to training.
+ That information will define the scenario to be driven the by model inside CARLA.
  Town0X is either Town01 or Town02.
 Note that the training dataset must be set on the [experiment configuration file](docs/configuration.md) directly,
 since training is strictly associated with the experiment.
@@ -126,3 +119,8 @@ The validation datasets are passed as parameter with -vd <validation_dataset_lis
 * Conditional Imitation Learning CARLA paper
 * On Offline Evaluation of Vision-based Driving Models
 * New One (Soon)
+
+
+
+
+
