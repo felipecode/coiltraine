@@ -28,11 +28,6 @@ if __name__ == '__main__':
         default='eccv',
         type=str
     )
-    argparser.add_argument(
-        
-    )
-
-
     args = argparser.parse_args()
 
     # Obs this is like a fixed parameter, how much a validation and a train and drives ocupies

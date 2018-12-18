@@ -23,7 +23,7 @@ used DATASETS are stored:
 
     export COIL_DATASET_PATH=<datasets_location>
 
-After that, by running the downloading script you will download
+After that, by running the following script you will download
 all the needed files.
 
     python3 tools/get_offline_online_data.py
@@ -38,27 +38,32 @@ you should run:
 
 
 The folder _logs/eccv/plots/sample_plots should show
-the following plot:
+the following plots:
 
-[ Figure]
+[training_conditions](img/training.png)
+[training_conditions_noise](img/trainingnoise.png)
+[test_conditions](img/test.png)
+[test_conditions_noise](img/testnoise.png)
+
 
 Note, for  few experiments the correlation is usually high.
 A fully commented example on how to compute plots can
 be seen on [sample_plot.py](plotter/plotting_params/sample_plot.py)
 
-To compute all the plots:
+To compute all the plots run:
 
     python3 run_plotting.py -p eccv_online_offline_plots
 
-A loading bar should show up. It takes aproximatelly 4 hours
-to complete the plotting process.
+It takes aproximatelly 4 hours
+to complete the full plotting process.
 
 #### Re-Training
 To re run the trainings:
 
 
-Note: there are non determinism on the training and evaluation, the
-plots when retraining all the models will not be the same.
+Note: there are non-determinism on the training and evaluation, the
+plots, when retraining all the models, will be similar but
+not be the same.
 
 
 
