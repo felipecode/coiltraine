@@ -567,7 +567,7 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
     ]
     weather_name_dict = {1: 'Clear Noon', 3: 'After Rain Noon',
                          6: 'Heavy Rain Noon', 8: 'Clear Sunset',
-                         4: 'Cloudy After Rain', 10:' Rainy after rain',
+                         4: 'Cloudy After Rain', 10: ' Rainy after rain',
                          14: 'Soft Rain Sunset'}
 
     number_of_experiments = len(list(dic_list[0]['episodes_fully_completed'].items())[0][1])

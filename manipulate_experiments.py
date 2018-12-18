@@ -43,6 +43,7 @@ if __name__ == '__main__':
         '-p'
         '--position',
         dest='position',
+        default=100000,
         type=int
 
     )
@@ -67,8 +68,8 @@ if __name__ == '__main__':
                              'end_other_collision', 'driven_kilometers',
                                'percentage_green_lights', 'percentage_off_roa']
         tasks = ['empty', 'normal', 'cluttered']
-        
-        export_csv_separate(args.folder, variables_to_export, tasks, checkpoint_number=100000)
+
+        export_csv_separate(args.folder, variables_to_export, tasks, checkpoint_number=args.position)
 
 
     if args.erase_experiments:
