@@ -111,7 +111,7 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
                         if checkpoint_number is None:
                             position_of_max_success = np.argmax(control_csv['episodes_fully_completed'])
                         else:
-                            position_of_max_success = control_csv['step'].index(float(checkpoint_number))
+                            position_of_max_success = np.argwhere(control_csv['step']==float(checkpoint_number))
 
                         print (dicts_to_write)
 
