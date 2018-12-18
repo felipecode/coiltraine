@@ -67,8 +67,8 @@ if __name__ == '__main__':
                              'end_other_collision', 'driven_kilometers',
                                'percentage_green_lights', 'percentage_off_roa']
         tasks = ['empty', 'normal', 'cluttered']
-        # TODO: for now it basically will just export the best
-        export_csv_separate(args.folder, variables_to_export, tasks, checkpoint_number=args.position)
+        
+        export_csv_separate(args.folder, variables_to_export, tasks, checkpoint_number=100000)
 
 
     if args.erase_experiments:
