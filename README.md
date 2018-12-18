@@ -79,6 +79,13 @@ This is the folder that contains your training and validation datasets
 
     export COIL_DATASET_PATH=<Path to where your dataset folders are>
 
+You can also download a sample dataset pack, with one training
+and two validations, by running
+
+    python3 tools/get_sample_datasets.py
+
+The datasets; CoilTrain , CoilVal1 and CoilVal2; will be stored at
+ the ~/CoILData/ folder.
 
 ##### Single experiment mode
 
@@ -86,7 +93,8 @@ To run a single experiment, we use the flag single-process train
 and the experiment name.
 
 A full example to train a ResNet_34  is shown below. There
-is also further documentation about ( CIte 3 modules)
+is also further documentation about the [drive](docs/main_modules.md/#drive)
+and [validation](docs/main_modules.md/#validation) processes
 
     python3 coiltraine.py --single-process train -e resnet34 --folder sample --gpus 0 1 2
 
@@ -101,20 +109,20 @@ You can run all the experiments in a folder using:
 
 Where the DrivingEnvironmentClass is one of the classes defined in the
 modules at [CoIL/drive/suites](docs/suites.md). Those driving environments
-define the start and end positions for driving, the number of cars, people, etc.
+define the start and end positions for driving, the number of cars and pedestrians, etc.
  That information will define the Benchmark to test the model driving in CARLA in parallel to training.
  Town0X is either Town01 or Town02.
- The
-Note that the training dataset must be set on the experiment file directly,
- since training is strictly associated with the experiment.
- The validation datasets are passed as parameter.
-
- validation datasets ...
+Note that the training dataset must be set on the [experiment configuration file](docs/configuration.md) directly,
+since training is strictly associated with the experiment.
+The validation datasets are passed as parameter with -vd <validation_dataset_list>,
+ for instance, using -vd CoilVal1 CoilVal2
 
 
-#### Paper Results reproduction
 
-* Conditional Imitiation learning
-* Conditional IMitation learning CARLA paper
-* ECCV
-* On
+
+#### Conditional Models Zoo
+
+* Conditional Imitation Learning
+* Conditional Imitation Learning CARLA paper
+* On Offline Evaluation of Vision-based Driving Models
+* New One (Soon)

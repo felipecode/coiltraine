@@ -21,6 +21,11 @@ some [network configurations](docs/network.md).
 
 ### Validation
 
+To run the validation as a single process
+
+The validation module produces one output for each of the data
+inputs from a some validation dataset. This is stored
+
 
 ### Drive
 

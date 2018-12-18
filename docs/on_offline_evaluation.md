@@ -12,7 +12,6 @@ on some dataset.
 ### Reproducing the results
 
 
-
 #### Download the Models/Datasets
 
 First thing is to download all the 64 trained models and the

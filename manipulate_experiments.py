@@ -29,11 +29,9 @@ if __name__ == '__main__':
         type=str
     )
     argparser.add_argument(
-        '--erase-experiments',
-        nargs='+',
-        dest='erase_experiments',
-        type=str
+        
     )
+
 
     args = argparser.parse_args()
 
