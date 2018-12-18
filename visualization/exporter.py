@@ -85,9 +85,6 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
 
         f.write("\n")
 
-
-
-
     experiment_list = []
     for exp in experiments:
         if os.path.isdir(os.path.join(root_path, exp_batch, exp)):
@@ -100,22 +97,24 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
                 print (log)
                 for task in task_list:
                     if 'drive' in log and '_csv' in log:
-                        csv_file_path = os.path.join(root_path, exp_batch, exp, log, 'control_output_' + task + '.csv')
+                        csv_file_path = os.path.join(root_path, exp_batch, exp, log,
+                                                     'control_output_' + task + '.csv')
 
                         if not os.path.exists(csv_file_path):
                             continue
                         control_csv = read_summary_csv(csv_file_path)
                         if control_csv is None:
                             continue
-                        print (control_csv)
+                        print(control_csv)
                         if checkpoint_number is None:
-                            position_of_max_success = np.argmax(control_csv['episodes_fully_completed'])
+                            position_of_max_success = np.argmax(control_csv
+                                                                ['episodes_fully_completed'])
                         else:
-                            position_of_max_success = np.argwhere(control_csv['step']==float(checkpoint_number))
+                            position_of_max_success = np.argwhere(control_csv['step'] ==
+                                                                  float(checkpoint_number))
+                            print("position max ", position_of_max_success)
 
-                        print (dicts_to_write)
-
-
+                        print(dicts_to_write)
                         for variable in variables_to_export:
                             dicts_to_write[task].update({variable: control_csv[variable][position_of_max_success]})
 
@@ -125,10 +124,7 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
 
     print (" FULL DICT")
     print (experiment_list)
-
     with open(csv_outfile, 'a') as f:
-
-
         for exp in experiments:
             print ("EXP ", exp)
             if os.path.isdir(os.path.join(root_path, exp_batch, exp)):
@@ -139,8 +135,6 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
 
                         f.write("%s,%s" % (exp, log.split('_')[1]))
                         for variable in variables_to_export:
-
-
                             f.write(",")
                             for task in task_list:
                                 if experiment_list[experiments.index(exp)][count][task]:
