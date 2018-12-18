@@ -15,5 +15,5 @@ a set of *exp alias* that is the name of the YAML file.
 
 
 A fully commented configuration file can be found at
-[configs/sample/resnet34.yaml](configs/sample/resnet34.yaml)
+[configs/sample/resnet34.yaml](../configs/sample/resnet34.yaml)
 

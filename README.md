@@ -5,11 +5,11 @@ COiLTRAiNE: Conditional Imitation Learning Training Framework
 the "old imitation folder"
 
 This repository can be used to easily train and manage the trainings of imitation
-learning networks toguether with the CARLA simulator.
+learning networks jointly with evaluations  on the CARLA simulator.
 Objectives:
 
  * To enable the user to perform several trainings with a single command.
- * To automatically test the trained system using CARLA.
+ * To automatically test the trained systems using CARLA.
  * Allow the user to monitor several trainings
    and testings on CARLA with a single glance.
  * Allows [to perform the testing methodology proposed](docs/on_offline_evaluation.md)
@@ -19,7 +19,7 @@ Objectives:
 
 
 
-#### System Overview
+### System Overview
 
 
 ![COIL Diagram](docs/img/CoIL.png?raw=true )
@@ -29,32 +29,32 @@ experiments with different [network conditions](docs/network.md) and
 [input data configurations](docs/input.md).
 
 For a given [experiment configuration file](docs/configuration.md), the main executer function
-can perform a [training](docs/training.md), measure the [model prediction error](docs/main_modules.md) on some
-dataset and evaluate the model performance on a [driving benchmark](docs/main_modules.md).
+can perform:  [training](docs/training.md), measurement of the [model prediction error](docs/main_modules.md) on some
+dataset and evaluation of the model performance on a [driving benchmark](docs/main_modules.md).
 
 
 The training, prediction error, and driving benchmarks are performed
 simultaneusly on different process. To perform evaluation
 the validation and driving modules wait for the
 training part to produce checkpoints. All of this is controlled
-by the [execution module](). The user can execute a single configuration
-file but also an entire folder.
+by the [executer module](docs/executer.md).
+
 
 During the execution, all the information is [logged and
 printed](docs/logger.md) on the screen to summarize the experiment
- training or evaluation status
-with a single glance.
+ training or evaluation status to be checked by a single glance
+ of the user.
 
 
 
 
-
-#### Getting started
+### Getting started
 
 #### Installation
 
-To install the CoIL large scale training framework, we provide a conda environment requirements file.
-Basically just do:
+To install COiLTRAiNE, we provide a conda environment requirements file.
+Start by cloning the repository on some folder and then to
+install just run:
 
     conda env create -f requirements.yml
 
@@ -85,7 +85,7 @@ and two validations, by running
     python3 tools/get_sample_datasets.py
 
 The datasets; CoilTrain , CoilVal1 and CoilVal2; will be stored at
- the ~/CoILData/ folder.
+ the COIL_DATASET_PATH folder.
 
 ##### Single experiment mode
 
