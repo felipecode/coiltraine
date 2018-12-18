@@ -85,7 +85,7 @@ https://github.com/carla-simulator/data-collector
 To run a single experiment, we use the flag single-process train
 and the experiment name.
 
-To train the [configs/sample/icra_model.yaml](configs/sample/icra_model.yaml) model, using the GPU 0, run: 
+To train the [configs/sample/icra_model.yaml](configs/sample/coil_icra.yaml) model, using the GPU 0, run: 
 
     python3 coiltraine.py --single-process train -e coil_icra --folder sample --gpus 0
 
