@@ -130,11 +130,12 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
                 count = 0
                 for log in experiments_logs:
                     if 'drive' in log and '_csv' in log:
-
+                        print ("log ",log)
                         f.write("%s,%s" % (exp, log.split('_')[1]))
                         for variable in variables_to_export:
                             f.write(",")
                             for task in task_list:
+                                print ("Task ",task)
                                 if experiment_list[experiments.index(exp)][count][task]:
                                     print(experiment_list[experiments.index(exp)]
                                                                      [count][task][variable])
