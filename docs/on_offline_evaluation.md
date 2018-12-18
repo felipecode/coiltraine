@@ -40,9 +40,9 @@ you should run:
 The folder _logs/eccv/plots/sample_plots should show
 the following plots:
 
-[training_conditions](img/training.png)
-[training_conditions_noise](img/trainingnoise.png)
-[test_conditions](img/test.png)
+[training_conditions](img/training.png),
+[training_conditions_noise](img/trainingnoise.png),
+[test_conditions](img/test.png),
 [test_conditions_noise](img/testnoise.png)
 
 
@@ -60,10 +60,13 @@ to complete the full plotting process.
 #### Re-Training
 To re run the trainings:
 
+    python3 coiltraine.py --folder eccv -de ECCVGeneralization_Town02 ECCVTraining_Town01 -vd Town01W1 Town02W14
 
 Note: there are non-determinism on the training and evaluation, the
 plots, when retraining all the models, will be similar but
 not be the same.
+
+Datasets to be released. 
 
 
 

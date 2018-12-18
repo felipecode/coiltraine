@@ -19,7 +19,6 @@ number_of_seg_classes = 5
 classes_join = {0: 2, 1: 2, 2: 2, 3: 2, 5: 2, 12: 2, 9: 2, 11: 2, 4: 0, 10: 1, 8: 3, 6: 3, 7: 4}
 
 
-# TODO: implement this as a torch operation. maybe...
 def join_classes(labels_image):
     compressed_labels_image = np.copy(labels_image)
     for key, value in classes_join.iteritems():
@@ -80,6 +79,7 @@ class CoILAgent(Agent):
         control.steer = steer
         control.throttle = throttle
         control.brake = brake
+
         # There is the posibility to replace some of the predictions with oracle predictions.
         if g_conf.USE_ORACLE:
             _, control.throttle, control.brake = self._get_oracle_prediction(
@@ -178,10 +178,7 @@ class CoILAgent(Agent):
             brake = -throttle_brake
             throttle = 0.0
 
-        # else:
-        #    throttle = throttle * 2
-        # if speed > 35.0 and brake == 0.0:
-        #    throttle = 0.0
+
 
         return steer, throttle, brake
 
