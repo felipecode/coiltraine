@@ -1,7 +1,7 @@
 COiLTRAiNE: Conditional Imitation Learning Training Framework
 -------------------------------------------------------------
 
-!!! Note: The old imitation learning repo is temporarely inside
+!!! Note: The old imitation learning repo is temporarily inside
 the "old imitation folder"
 
 This repository can be used to easily train and manage the trainings of imitation
@@ -25,7 +25,7 @@ Objectives:
 ![COIL Diagram](docs/img/CoIL.png?raw=true )
 
 The idea of the system is to, by using a single command, train several
-experiments with different [network conditions](docs/network.md) and
+experiments with different [model conditions](docs/network.md) and
 [input data configurations](docs/input.md).
 
 For a given [experiment configuration file](docs/configuration.md), the main executer function
