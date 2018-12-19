@@ -78,6 +78,11 @@ The datasets; CoilTrain , CoilVal1 and CoilVal2; will be stored at
 To collect other datasets please check the data collector repository.
 https://github.com/carla-simulator/data-collector
 
+For doing scenario evaluation in CARLA you must download CARLA 0.8.4 or CARLA 0.8.2
+and unpack it in some directory. After that, you should set the CARLA_PATH
+variable with the path to reach the CARLA root directory:
+
+   export CARLA_PATH=<carla_root_directory>
 
 
 #### Single experiment mode
@@ -100,19 +105,19 @@ You can train all the experiments in a folder using:
 
     python3 coiltraine.py --folder <my_folder> --gpus 0 1
 
-With COiLTRAiNE you can also To add evaluation on a CARLA scenario for each  evaluation
+With COiLTRAiNE you can also do simultaneous evaluation and validation
+on some static dataset. Assuming that you set the CARLA_PATH, 
+to add evaluation on a CARLA scenario and also some evaluation in
+a sample dataset run:
      
- -de <DrivingEnvironmentClass_Town0X> -vd <validation_dataset>
+   python3 coiltraine.py --folder sample --gpus 0 -de CorlTraining_Town01 -vd CoILVal1
 
-Where the DrivingEnvironmentClass is one of the classes defined in the
-modules at [CoIL/drive/suites](docs/suites.md). Those driving environments
-define the start and end positions for driving, the number of cars and pedestrians, etc.
- That information will define the scenario to be driven the by model inside CARLA.
- Town0X is either Town01 or Town02.
-Note that the training dataset must be set on the [experiment configuration file](docs/configuration.md) directly,
+Where the CorlTraining is a driving scenario on Town01, defined as one of the classes on the
+drive/suites folder.  
+Also note that the training dataset must be set on the [experiment configuration file](docs/configuration.md) directly,
 since training is strictly associated with the experiment.
-The validation datasets are passed as parameter with -vd <validation_dataset_list>,
- for instance, using -vd CoilVal1 CoilVal2
+The validation datasets are passed as parameter with -vd  and should be placed 
+at the COIL_DATASET_PATH folder.
 
 
 
