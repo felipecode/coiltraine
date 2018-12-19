@@ -120,11 +120,10 @@ class CoILDataset(Dataset):
 
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
+        print (img_path)
+        print (img)
+
         if self.transform is not None:
-            # if g_conf.SPLIT is not None and g_conf.SPLIT is not 'None' and 'boost' in self.boost_params:
-            #    boost = self.boost_function(self.measurements, index, self.boost_params)
-            # else:
-            #    boost = 1
             boost = 1
             img = self.transform(self.batch_read_number * boost, img)
 
@@ -140,7 +139,6 @@ class CoILDataset(Dataset):
             v = torch.from_numpy(np.asarray([v, ]))
             measurements[k] = v.float()
 
-        # TODO: here just one image
         measurements['rgb'] = img
 
         self.batch_read_number += 1
