@@ -30,7 +30,6 @@ class CoILICRA(nn.Module):
                               sensor_input_shape[2]]
 
 
-
         # For this case we check if the perception layer is of the type "conv"
         if 'conv' in params['perception']:
             perception_convs = Conv(params={'channels': [number_first_layer_channels] +
@@ -106,10 +105,7 @@ class CoILICRA(nn.Module):
                     nn.init.constant_(m.bias, 0.1)
 
 
-
-
     def forward(self, x, a):
-
         """ ###### APPLY THE PERCEPTION MODULE """
         x, inter = self.perception(x)
         self.intermediate_layers = inter
@@ -136,6 +132,7 @@ class CoILICRA(nn.Module):
             branch_number: the branch number to be returned
 
         Returns:
+            the forward operation on the selected branch
 
         """
         # Convert to integer just in case .
@@ -145,10 +142,7 @@ class CoILICRA(nn.Module):
 
         return self.extract_branch(output_vec, branch_number)
 
-
-
     def extract_branch(self, output_vec, branch_number):
-
 
         branch_number = command_number_to_index(branch_number)
 

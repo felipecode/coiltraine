@@ -241,12 +241,14 @@ class CoILDataset(Dataset):
         for episode in episodes_list:
 
             print('Episode ', episode)
+            """
             if not os.path.exists(os.path.join(episode, "checked")) and not os.path.exists(
                     os.path.join(episode, "processed2")) \
                     and not os.path.exists(os.path.join(episode, "bad_episode")):
                 # Episode was not checked. So we don't load it.
                 print("Not checked")
                 continue
+            """
 
             if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
                 # The number of wanted hours achieved
@@ -444,10 +446,3 @@ class CoILDataset(Dataset):
 
         return torch.cat(inputs_vec, 1)
 
-
-if __name__ == "__main__":
-    dataset = NewDataset(root_dir='')
-    print(len(dataset))
-    # print(dataset.sensor_data_names)
-    for k, v in dataset[0].items():
-        print(k, v.shape)

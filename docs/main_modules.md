@@ -61,26 +61,35 @@ A different process is executed for every driving environment that
 is passed as parameter to the execution.
 There are two types of execution:
 
-* Regular: It starts carla process. for that running mode.
-* Docker: Requires the installation
+* Regular: It starts carla process directly by executing the binary
+from the CARLA simulator folder. For that running mode, you should
+set the CARLA_PATH environment variable with the path to a CARLA
+binary folder.
 
-
-For regular
-
-
-
-
-Those driving environments
-define the start and end positions for driving, the number of cars and pedestrians, etc.
- That information will define the scenario to be driven the by model inside CARLA.
- Town0X is either Town01 or Town02.
-
-What it does is to
+* Docker (Recommended): Requires the [docker with carla installation](https://carla.readthedocs.io/en/latest/carla_docker/)
 
 
 
+For regular execution:
 
-For instance to run the
+    python3 coiltraine.py --folder sample --gpus 0 -de <DrivingScenario_Town0X>
+
+
+Where the DrivingScenario is a suite class defined inside the drive/suites folder.
+Each scenario defines the start and end positions for driving, the number of cars and pedestrians,
+weathers etc. The Town0X is the town used on the scenario and must
+ mach its definition, for now it is either Town01 or Town02.
+
+
+For Docker execution:
+
+
+    python3 coiltraine.py --folder sample --gpus 0 -de <DrivingScenario_Town0X> --docker carlasim/carla:version
+
+Where
+
+
+Fianally, multiple instances are allowed, so you can also to run the
 [CoRL 2017 benchmark](https://github.com/carla-simulator/driving-benchmarks/blob/master/Docs/benchmark_start.md/#corl-2017)
 over 4 CARLA processes on the sample experiments, run:
 

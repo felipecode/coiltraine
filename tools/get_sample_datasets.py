@@ -60,6 +60,8 @@ if __name__ == "__main__":
         os.makedirs(destination_final)
 
     print("Unpacking the dataset")
+
     tf = tarfile.open("COiLTRAiNESampleDatasets.tar.gz")
     tf.extractall(destination_final)
+
     os.remove("COiLTRAiNESampleDatasets.tar.gz")
