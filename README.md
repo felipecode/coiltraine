@@ -29,8 +29,8 @@ experiments with different [model conditions](docs/network.md) and
 [input data configurations](docs/input.md).
 
 For a given [experiment configuration file](docs/configuration.md), the main executer function
-can perform:  [training](docs/training.md), measurement of the [model prediction error](docs/main_modules.md) on some
-dataset and evaluation of the model performance on a [driving benchmark](docs/main_modules.md).
+can perform:  [training](docs/main_modules.md/#train), measurement of the [model prediction error](docs/main_modules.md/#validation) on some
+dataset and evaluation of the model performance on a [driving benchmark](docs/main_modules.md/#drive).
 
 
 The training, prediction error, and driving benchmarks are performed
