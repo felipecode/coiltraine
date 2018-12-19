@@ -9,9 +9,6 @@ import torch.nn.functional as F
 class Conv(nn.Module):
 
     def __init__(self, params=None, module_name='Default'):
-        # TODO:  For now the end module is a case
-        # TODO: Make an auto naming function for this.
-
         super(Conv, self).__init__()
 
         if params is None:
@@ -31,21 +28,15 @@ class Conv(nn.Module):
             raise ValueError("Dropouts should be from the len of channel_sizes minus 1")
 
 
-
-
         """" ------------------ IMAGE MODULE ---------------- """
         # Conv2d(input channel, output channel, kernel size, stride), Xavier initialization and 0.1 bias initialization
 
 
         self.layers = []
 
-        # TODO: need to log the loaded networks
-
-
         for i in range(0, len(params['channels'])-1):
             conv = nn.Conv2d(in_channels=params['channels'][i], out_channels=params['channels'][i+1],
                              kernel_size=params['kernels'][i], stride=params['strides'][i])
-
 
             dropout = nn.Dropout2d(p=params['dropouts'][i])
             relu = nn.ReLU(inplace=True)
@@ -59,25 +50,14 @@ class Conv(nn.Module):
         self.module_name = module_name
 
 
-
-
-
-    # TODO: iteration control should go inside the logger, somehow
-
     def forward(self, x):
-        # get only the speeds from measurement labels
 
-        # TODO: TRACK NANS OUTPUTS
-        # TODO: Maybe change the name
-        # TODO: Maybe add internal logs !
-
-        """ conv1 + batch normalization + dropout + relu """
+        """ Each conv is: conv + batch normalization + dropout + relu """
         x = self.layers(x)
 
         x = x.view(-1, self.num_flat_features(x))
 
-
-        return x, None  # output, intermediate
+        return x
 
 
     def num_flat_features(self, x):

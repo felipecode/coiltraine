@@ -58,17 +58,31 @@ Note that the <validation_dataset> must be inside the folder defined
 
 The driving process is executed over the run_drive.py script.
 A different process is executed for every driving environment that
-is passed as parameter to the execution. For instance to run the
+is passed as parameter to the execution.
+There are two types of execution:
+
+* Regular: It starts carla process. for that running mode.
+* Docker: Requires the installation
+
+
+For regular
+
+
+
+
+Those driving environments
+define the start and end positions for driving, the number of cars and pedestrians, etc.
+ That information will define the scenario to be driven the by model inside CARLA.
+ Town0X is either Town01 or Town02.
+
+What it does is to
+
+
+
+
+For instance to run the
 [CoRL 2017 benchmark](https://github.com/carla-simulator/driving-benchmarks/blob/master/Docs/benchmark_start.md/#corl-2017)
 over 4 CARLA processes on the sample experiments, run:
 
     python3 coiltraine.py --folder sample -de CorlTraining_Town01 CorlNewWeather_Town01 CorlNewTown_Town02 CorlNewWeatherTown_Town02
 
-There are two types of execution:
-
-* Regular: It starts carla process. for that running mode.
-* Docker
-
-
-
-What it does is to
