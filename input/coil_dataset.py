@@ -75,7 +75,8 @@ class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
     def __init__(self, root_dir, transform=None, preload_name=None):
-
+        # Setting the root directory for this dataset
+        self.root_dir = root_dir
         # We add to the preload name all the remove labels
         if g_conf.REMOVE is not None and g_conf.REMOVE is not "None":
             name, self._remove_params = parse_remove_configuration(g_conf.REMOVE)
@@ -114,7 +115,7 @@ class CoILDataset(Dataset):
 
     def __getitem__(self, index):
 
-        img_path = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME,
+        img_path = os.path.join(self.root_dir,
                                 self.sensor_data_names[index].split('/')[-2],
                                 self.sensor_data_names[index].split('/')[-1])
 
