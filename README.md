@@ -105,7 +105,7 @@ You can train all the experiments in a folder using:
 
     python3 coiltraine.py --folder <my_folder> --gpus 0 1
 
-With COiLTRAiNE you can also do simultaneous evaluation and validation
+With COiLTRAiNE you can also do simultaneous driving evaluation and validation
 on some static dataset. Assuming that you set the CARLA_PATH, 
 to add evaluation on a CARLA scenario and also some evaluation in
 a sample dataset run:
