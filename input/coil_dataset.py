@@ -106,9 +106,6 @@ class CoILDataset(Dataset):
 
         self.transform = transform
         self.batch_read_number = 0
-        # name, self.boost_params = parse_boost_configuration(g_conf.SPLIT)
-
-        # self.boost_function = getattr(splitter, name)
 
     def __len__(self):
         return len(self.measurements)
@@ -120,10 +117,6 @@ class CoILDataset(Dataset):
                                 self.sensor_data_names[index].split('/')[-1])
 
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-
-        print (img_path)
-        print (img)
-
         if self.transform is not None:
             boost = 1
             img = self.transform(self.batch_read_number * boost, img)
