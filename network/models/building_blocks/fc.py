@@ -52,7 +52,8 @@ class FC(nn.Module):
 
 
     def forward(self, x):
-        # if X is a tuple, just return the other elements, the idea is to repass the layers
+        # if X is a tuple, just return the other elements, the idea is to re pass
+        # the intermediate layers for future attention plotting
         if type(x) is tuple:
             return self.layers(x[0]), x[1]
         else:

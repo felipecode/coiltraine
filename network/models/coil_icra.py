@@ -112,17 +112,10 @@ class CoILICRA(nn.Module):
 
         """ ###### APPLY THE PERCEPTION MODULE """
         x, inter = self.perception(x)
-        print ("X")
-        print(x)
-        print ("INTER")
-        print(inter)
         self.intermediate_layers = inter
 
         """ ###### APPLY THE MEASUREMENT MODULE """
         m = self.measurements(a)
-        print ("M")
-        print (m)
-
         """ Join measurements and perception"""
         j = self.join(x, m)
 
