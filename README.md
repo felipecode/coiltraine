@@ -82,7 +82,7 @@ For doing scenario evaluation in CARLA you must download CARLA 0.8.4 or CARLA 0.
 and unpack it in some directory. After that, you should set the CARLA_PATH
 variable with the path to reach the CARLA root directory:
 
-   export CARLA_PATH=<carla_root_directory>
+    export CARLA_PATH=<carla_root_directory>
 
 
 #### Single experiment mode
@@ -110,7 +110,7 @@ on some static dataset. Assuming that you set the CARLA_PATH,
 to add evaluation on a CARLA scenario and also some evaluation in
 a sample dataset run:
      
-   python3 coiltraine.py --folder sample --gpus 0 -de CorlTraining_Town01 -vd CoILVal1
+    python3 coiltraine.py --folder sample --gpus 0 -de CorlTraining_Town01 -vd CoILVal1
 
 Where the CorlTraining is a driving scenario on Town01, defined as one of the classes on the
 drive/suites folder.  
