@@ -96,9 +96,13 @@ and [validation](docs/main_modules.md/#validation).
 #### Folder execution mode
 
 Experiments are defined in config files inside [CoIL/configs](docs/configuration.md).
-You can run all the experiments in a folder using:
+You can train all the experiments in a folder using:
 
-    python3 coiltraine.py --folder <my_folder> --gpus 0 1 -de <DrivingEnvironmentClass_Town0X> -vd <validation_dataset>
+    python3 coiltraine.py --folder <my_folder> --gpus 0 1
+
+With COiLTRAiNE you can also To add evaluation on a CARLA scenario for each  evaluation
+     
+ -de <DrivingEnvironmentClass_Town0X> -vd <validation_dataset>
 
 Where the DrivingEnvironmentClass is one of the classes defined in the
 modules at [CoIL/drive/suites](docs/suites.md). Those driving environments
