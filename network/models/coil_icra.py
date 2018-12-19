@@ -11,21 +11,15 @@ from .building_blocks import Branching
 from .building_blocks import FC
 from .building_blocks import Join
 
-
-# TODO: REFACTOR
-# TODO: it is interesting the posibility to loop over many models.
-# TODO: Having multiple experiments, over the same alias.
 class CoILICRA(nn.Module):
 
     def __init__(self, params):
         # TODO: Improve the model autonaming function
 
-        self.intermediate_layerss = None
+        self.intermediate_layers = None
         super(CoILICRA, self).__init__()
 
-        # TODO: Make configurable function on the config files by reading other dictionary
         number_first_layer_channels = 0
-
 
         for _, sizes in g_conf.SENSORS.items():
             number_first_layer_channels += sizes[0] * g_conf.NUMBER_FRAMES_FUSION
@@ -120,13 +114,11 @@ class CoILICRA(nn.Module):
 
     def forward(self, x, a):
 
-
         """ ###### APPLY THE PERCEPTION MODULE """
         x, inter = self.perception(x)
         self.intermediate_layers = inter
 
-        """ ###### APPLY THE MEASUREMENT MODUES """
-
+        """ ###### APPLY THE MEASUREMENT MODULE """
         m = self.measurements(a)
 
         """ Join measurements and perception"""
@@ -156,7 +148,6 @@ class CoILICRA(nn.Module):
         # TODO: take four branches, this is hardcoded
         output_vec = torch.stack(self.forward(x, a)[0:4])
 
-
         return self.extract_branch(output_vec, branch_number)
 
 
@@ -174,26 +165,6 @@ class CoILICRA(nn.Module):
         branch_number = torch.stack([branch_number,
                                      torch.cuda.LongTensor(range(0, len(branch_number)))])
 
-        # branch_output_vector = []
-        # for i in range(len(branch_number)):
-        #    branch_output_vector.append(output_vec[branch_number[i]][i])
-
-
         return output_vec[branch_number[0], branch_number[1], :]
-
-    def load_network(self, checkpoint):
-        """
-        Load a network for a given model definition .
-
-        Args:
-            checkpoint: The checkpoint that the user wants to add .
-
-
-
-        """
-        coil_logger.add_message('Loading', {
-                    "Model": {"Loaded checkpoint: " + str(checkpoint) }
-
-                })
 
 
