@@ -33,7 +33,6 @@ class CoILICRA(nn.Module):
 
         # For this case we check if the perception layer is of the type "conv"
         if 'conv' in params['perception']:
-
             perception_convs = Conv(params={'channels': [number_first_layer_channels] +
                                                           params['perception']['conv']['channels'],
                                             'kernels': params['perception']['conv']['kernels'],
@@ -50,10 +49,8 @@ class CoILICRA(nn.Module):
 
             number_output_neurons = params['perception']['fc']['neurons'][-1]
 
-
         elif 'res' in params['perception']:  # pre defined residual networks
             resnet_module = importlib.import_module('network.models.building_blocks.resnet')
-            # TODO: Check network drawing
             resnet_module = getattr(resnet_module, params['perception']['res']['name'])
             self.perception = resnet_module(pretrained=g_conf.PRE_TRAINED,
                                              num_classes=params['perception']['res']['num_classes'])
@@ -85,7 +82,6 @@ class CoILICRA(nn.Module):
                                                   params['speed_branch']['fc']['neurons'] + [1],
                                        'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
                                        'end_layer': True})
-
 
         # Create the fc vector separatedely
         branch_fc_vector = []
