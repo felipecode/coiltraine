@@ -103,7 +103,7 @@ and [validation](docs/main_modules.md/#validation).
 Experiments are defined in config files inside [CoIL/configs](docs/configuration.md).
 You can train all the experiments in a folder using:
 
-    python3 coiltraine.py --folder <my_folder> --gpus 0 1
+    python3 coiltraine.py --folder sample --gpus 0 
 
 With COiLTRAiNE you can also do simultaneous driving evaluation and validation
 on some static dataset. Assuming that you set the CARLA_PATH, 
@@ -126,7 +126,7 @@ at the COIL_DATASET_PATH folder.
 
 * Conditional Imitation Learning
 * Conditional Imitation Learning CARLA paper
-* On Offline Evaluation of Vision-based Driving Models
+* [On Offline Evaluation of Vision-based Driving Models](docs/on_offline_evaluation.md)
 * New One (Soon)
 
 
