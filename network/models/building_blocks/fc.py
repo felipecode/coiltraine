@@ -52,11 +52,13 @@ class FC(nn.Module):
 
 
 
-
     # TODO: iteration control should go inside the logger, somehow
 
     def forward(self, x):
-        # get only the speeds from measurement labels
-        return self.layers(x[0])
+        # if X is a tuple, just return the other elements
+        if len(x) > 0:
+            return self.layers(x[0]), x[1]
+        else:
+            return self.layers(x)
 
 
