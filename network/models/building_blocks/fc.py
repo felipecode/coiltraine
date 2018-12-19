@@ -51,11 +51,8 @@ class FC(nn.Module):
 
 
 
-
-    # TODO: iteration control should go inside the logger, somehow
-
     def forward(self, x):
-        # if X is a tuple, just return the other elements
+        # if X is a tuple, just return the other elements, the idea is to repass the layers
         if len(x) > 0:
             return self.layers(x[0]), x[1]
         else:
