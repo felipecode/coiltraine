@@ -34,13 +34,6 @@ class Join(nn.Module):
     def forward(self, x, m):
         # get only the speeds from measurement labels
 
-        # TODO: TRACK NANS OUTPUTS
-        # TODO: Maybe change the name
-
-        # TODO: Control the frequency of postion log
-
-
-        """ conv1 + batch normalization + dropout + relu """
         if self.mode == 'cat':
             j = torch.cat((x, m), 1)
 
