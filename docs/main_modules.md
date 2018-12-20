@@ -86,10 +86,11 @@ For Docker execution:
 
     python3 coiltraine.py --folder sample --gpus 0 -de <DrivingScenario_Town0X> --docker carlasim/carla:version
 
-Where
+Where carlasim/carla:version is the installed docker version of CARLA.
 
 
-Fianally, multiple instances are allowed, so you can also to run the
+Fianally, multiple driving evaluation instances are also allowed,
+ so you can also to run the
 [CoRL 2017 benchmark](https://github.com/carla-simulator/driving-benchmarks/blob/master/Docs/benchmark_start.md/#corl-2017)
 over 4 CARLA processes on the sample experiments, run:
 
