@@ -115,7 +115,7 @@ a sample dataset run:
 Where the CorlTraining is a driving scenario on Town01, defined as one of the classes on the
 drive/suites folder.  
 Also note that the training dataset must be set on the [experiment configuration file](docs/configuration.md) directly,
-since training is strictly associated with the experiment.
+since training data is strictly associated with the experiment.
 
 The validation datasets are passed as parameter with -vd  and should be placed 
 at the COIL_DATASET_PATH folder.
