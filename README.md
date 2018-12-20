@@ -94,7 +94,7 @@ To train the [configs/sample/icra_model.yaml](configs/sample/coil_icra.yaml) mod
 
     python3 coiltraine.py --single-process train -e coil_icra --folder sample --gpus 0
 
-There other two process that could be run: [drive](docs/main_modules.md/#drive)
+There are other two process that could be run: [drive](docs/main_modules.md/#drive)
 and [validation](docs/main_modules.md/#validation).
 
 
