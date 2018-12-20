@@ -18,13 +18,38 @@ also tensorboard logs.
 To configure the training you can adjust [model configurations](docs/network.md),
 such as network architecture and loss function and also the
  [input data](docs/input.md) format and distribuction.
-To train a single process:
+
+To run a single experiment, we use the flag single-process train
+and the experiment name.
+
+To train the [configs/sample/icra_model.yaml](configs/sample/coil_icra.yaml) model, using the GPU 0, run:
 
     python3 coiltraine.py --single-process train -e coil_icra --folder sample --gpus 0
 
 To train all the models specified on the sample folder:
 
     python3 coiltraine.py --folder sample --gpus 0
+
+
+
+
+#### Single experiment mode
+
+There are other two process that could be run: [drive](docs/main_modules.md/#drive)
+and [validation](docs/main_modules.md/#validation).
+
+
+Experiments are defined in config files inside [CoIL/configs](docs/configuration.md).
+You can train all the experiments in a folder using:
+
+    python3 coiltraine.py --folder sample --gpus 0
+
+With COiLTRAiNE you can also do simultaneous driving evaluation and validation
+on some static dataset.
+
+
+Also note that the training dataset must be set on the [experiment configuration file](docs/configuration.md) directly,
+since training data is strictly associated with the experiment.
 
 
 

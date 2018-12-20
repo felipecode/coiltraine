@@ -10,11 +10,8 @@ class FC(nn.Module):
 
     def __init__(self, params=None, module_name='Default'
                  ):
-
-        #         input_size=, kernel_sizes= [512, 128,128], end_module=False):
         # TODO: Make an auto naming function for this.
-        #  OBS, only xavier init is available
-        #  OBS, only constant = 0.1 initialization of bias
+
         super(FC, self).__init__()
 
 
