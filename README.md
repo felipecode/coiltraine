@@ -63,7 +63,7 @@ variable with the path to reach the CARLA root directory:
 
     export CARLA_PATH=<carla_root_directory>
 
-#### Folder execution mode
+#### Executing
 
  Assuming that you set the CARLA_PATH, 
 to add evaluation on a CARLA scenario and also some evaluation in
