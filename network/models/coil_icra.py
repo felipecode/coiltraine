@@ -16,7 +16,6 @@ class CoILICRA(nn.Module):
     def __init__(self, params):
         # TODO: Improve the model autonaming function
 
-        self.intermediate_layers = None
         super(CoILICRA, self).__init__()
 
         number_first_layer_channels = 0
@@ -108,6 +107,7 @@ class CoILICRA(nn.Module):
     def forward(self, x, a):
         """ ###### APPLY THE PERCEPTION MODULE """
         x, inter = self.perception(x)
+        ## Not a variable, just to store intermediate layers for future vizualization
         self.intermediate_layers = inter
 
         """ ###### APPLY THE MEASUREMENT MODULE """

@@ -65,7 +65,7 @@ if __name__ == '__main__':
         '-ebv', '--erase-bad-validations',
         action='store_true',
         dest='erase_bad_validations',
-        help='Set to carla to run offscreen'
+        help='erase the bad validations (Incomplete)'
     )
     argparser.add_argument(
         '-rv', '--restart-validations',
