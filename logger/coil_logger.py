@@ -105,14 +105,6 @@ def add_message(phase, message, iteration=None):
     # We can monitor the status based on error message. An error should mean the exp is not working
 
 
-
-
-
-# TODO: the logger should also interface with tensorboard.
-
-# TODO: Maybe an add scalar, message ??
-
-
 def write_on_csv(checkpoint_name, output):
     """
     We also create the posibility to write on a csv file. So it is faster to load
@@ -141,7 +133,89 @@ def write_on_csv(checkpoint_name, output):
         f.write("\n")
 
 
+def write_on_error_csv(error_file_name, output):
+    """
+    Keep the errors writen to quickly recover
+    Args
+        dataset_name: the name of the checkpoint being writen
+        output: what is being written on the file
 
+
+    Returns:
+
+    """
+    root_path = "_logs"
+
+    full_path_name = os.path.join(root_path, EXPERIMENT_BATCH_NAME,
+                                  EXPERIMENT_NAME)
+
+    file_name = os.path.join(full_path_name, str(error_file_name) + '_error' + '.csv')
+
+
+    with open(file_name, 'a+') as f:
+        f.write("%f" % output)
+        f.write("\n")
+
+
+def write_stop(validation_dataset, checkpoint):
+    """
+    We write a stop file to indicate to the training process that validation stalled.
+    This also indicates on which checkpoint this was found. So the driving process could use
+    Args
+        checkpoint_name: the name of the checkpoint being writen
+        output: what is being written on the file
+
+
+    Returns:
+
+    """
+    root_path = "_logs"
+
+    full_path_name = os.path.join(root_path, EXPERIMENT_BATCH_NAME,
+                                  EXPERIMENT_NAME)
+
+    file_name = os.path.join(full_path_name, "validation_" + validation_dataset + "_stale.csv")
+
+    with open(file_name, 'w') as f:
+        f.write("%d \n", checkpoint)
+
+def erase_csv(checkpoint_name):
+    """
+    We also create the posibility to erase certain checkpoints
+    Args
+        checkpoint_name: the name of the checkpoint being writen
+
+    Returns:
+
+    """
+    root_path = "_logs"
+
+    full_path_name = os.path.join(root_path, EXPERIMENT_BATCH_NAME,
+                                  EXPERIMENT_NAME, PROCESS_NAME + '_csv')
+
+    file_name = os.path.join(full_path_name, str(checkpoint_name) + '.csv')
+
+    os.remove(file_name)
+
+
+
+def recover_loss_window(dataset_name, iteration):
+
+    root_path = "_logs"
+    full_path_name = os.path.join(root_path, EXPERIMENT_BATCH_NAME,
+                                  EXPERIMENT_NAME)
+    file_name = os.path.join(full_path_name, str(dataset_name) + '_error' + '.csv')
+
+    recovered_list = list(np.loadtxt(file_name))[0:iteration]
+
+    # Now we need to rewrite on top of the recovered list, so everything syncs
+
+    with open(file_name, 'w') as f:
+        print ("Rewriting")
+        for data in recovered_list:
+            f.write("%f\n" % data)
+
+    return recovered_list
 
 
 

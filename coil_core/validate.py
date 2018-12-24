@@ -1,11 +1,12 @@
 import os
 import time
 import sys
+import random
 
 
 import torch
 import traceback
-import random
+import dlib
 
 # What do we define as a parameter what not.
 
@@ -40,9 +41,11 @@ def write_regular_output(iteration, output):
                                             output[i][2]])
 
 
+
+
 # The main function maybe we could call it with a default name
 def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
-
+    latest = None
     try:
         # We set the visible cuda devices
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
@@ -66,8 +69,6 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                                            + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
-        if monitorer.get_status(exp_batch, exp_alias + '.yaml', g_conf.PROCESS_NAME)[0] == "Finished":
-            return
 
         # Define the dataset. This structure is has the __get_item__ redefined in a way
         # that you can access the HDFILES positions from the root directory as a in a vector.
@@ -88,10 +89,12 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                                                   pin_memory=True)
 
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
-
+        # The window used to keep track of the trainings
+        L1_window = []
         latest = get_latest_evaluated_checkpoint()
-        if latest is None:  # When nothing was tested, get latest returns none, we fix that.
-            latest = 0
+        if latest is not None:  # When nothing was tested, get latest returns none, we fix that.
+            L1_window = coil_logger.recover_loss_window(dataset_name, -1)
+
         model.cuda()
 
         best_loss = 1000
@@ -123,7 +126,6 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     output = model.forward_branch(torch.squeeze(data['rgb']).cuda(),
                                                   dataset.extract_inputs(data).cuda(),
                                                   controls)
-
                     # It could be either waypoints
                     if 'waypoint1_angle' in g_conf.TARGETS:
                         write_waypoints_output(checkpoint_iteration, output)
@@ -140,7 +142,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     error = torch.abs(output - dataset.extract_targets(data).cuda())
 
                     # Log a random position
-                    position = random.randint(0, g_conf.BATCH_SIZE - 1)
+                    position = random.randint(0, len(output.data.tolist())-1)
 
                     coil_logger.add_message('Iterating',
                          {'Checkpoint': latest,
@@ -153,8 +155,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                           'Inputs': dataset.extract_inputs(data)[position].data.tolist()},
                           latest)
                     iteration_on_checkpoint += 1
-                    print ("Iteration on Checkpoint %d  Error %f" % (iteration_on_checkpoint
-                            ,mean_error))
+                    print("Iteration %d  on Checkpoint %d : Error %f" % (iteration_on_checkpoint,
+                                                                 checkpoint_iteration, mean_error))
 
                 checkpoint_average_loss = accumulated_loss/(len(data_loader))
                 checkpoint_average_error = accumulated_error/(len(data_loader))
@@ -183,11 +185,19 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                      'Checkpoint': latest},
                                         latest)
 
+                L1_window.append(checkpoint_average_error)
+                print ("L1 Window ", L1_window)
+                coil_logger.write_on_error_csv(dataset_name, checkpoint_average_error)
+                # If we are using the finish when validation stops, we check the current
+                print("Steep without decrease ", dlib.count_steps_without_decrease(L1_window))
+                if g_conf.FINISH_ON_VALIDATION_STALE is not None:
+                    if dlib.count_steps_without_decrease(L1_window) > 3 and \
+                        dlib.count_steps_without_decrease_robust(L1_window) > 3:
+                        coil_logger.write_stop(dataset_name, checkpoint)
+
             else:
 
                 latest = get_latest_evaluated_checkpoint()
-                if latest is None:  # When nothing was tested, get latest returns none, we fix that.
-                    latest = 0
                 time.sleep(1)
                 print ("Waiting for the next Validation")
 
@@ -195,9 +205,14 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
     except KeyboardInterrupt:
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
+        # We erase the output that was unfinished due to some process stop.
+        if latest is not None:
+            coil_logger.erase_csv(latest)
+
     except:
         traceback.print_exc()
 
         coil_logger.add_message('Error', {'Message': 'Something Happened'})
-
-
+        # We erase the output that was unfinished due to some process stop.
+        if latest is not None:
+            coil_logger.erase_csv(latest)

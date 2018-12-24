@@ -5,12 +5,14 @@ import time
 import traceback
 import torch
 import torch.optim as optim
+import dlib
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel, Loss, adjust_learning_rate
 from input import CoILDataset, Augmenter, select_balancing_strategy
 from logger import coil_logger
-from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
+from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint, \
+                                    check_loss_validation_stopped
 
 
 # The main function maybe we could call it with a default name
@@ -88,13 +90,22 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             accumulated_time = checkpoint['total_time']
+            loss_window = coil_logger.recover_loss_window('train', iteration)
         else:  # We accumulate iteration time and keep the average speed
             accumulated_time = 0
+            loss_window = []
 
         criterion = Loss(g_conf.LOSS_FUNCTION)
 
+        # Loss time series window
+
         for data in data_loader:
 
+            # Basically, validate every 20k Steps, if it goes up 3 times ,
+            # add a stop on the _logs folder
+            if g_conf.FINISH_ON_VALIDATION_STALE is not None and \
+                    check_loss_validation_stopped(g_conf.FINISH_ON_VALIDATION_STALE):
+                break
             """
                 ####################################
                     Main optimization loop
@@ -176,7 +187,15 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                                      'Inputs': dataset.extract_inputs(data)[
                                          position].data.tolist()},
                                     iteration)
+            loss_window.append(loss.data)
+
+            coil_logger.write_on_error_csv('train', loss.data)
             print("Iteration: %d  Loss: %f" % (iteration, loss.data))
+            #print("Steps without decrease ", dlib.count_steps_without_decrease(loss_window))
+            #print("Steps without decrease robust ", dlib.count_steps_without_decrease_robust(loss_window))
+
+
+
         coil_logger.add_message('Finished', {})
 
     except KeyboardInterrupt:

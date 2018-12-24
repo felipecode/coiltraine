@@ -94,16 +94,12 @@ def get_latest_checkpoint_validation():
 
     sort_nicely(csv_files)
 
-    # data = json_formatter.readJSONlog(open(log_file_path, 'r'))
-    # print ('csv ', [re.findall('\d+', file)[0] for file in csv_files])
-
     csv_file_numbers = set([float(re.findall('\d+', file)[0]) for file in csv_files])
 
     not_evaluated_logs = list(set(g_conf.TEST_SCHEDULE).difference(csv_file_numbers))
 
     not_evaluated_logs = sorted(not_evaluated_logs, reverse=False)
-    print('csv file numbers ', csv_file_numbers)
-    print("not evaluated logs", not_evaluated_logs)
+
     if len(not_evaluated_logs) == 0:  # Just in case that is the last one
         return g_conf.TEST_SCHEDULE[-1]
 
@@ -149,7 +145,6 @@ def get_latest_checkpoint_drive(control_filename):
 
 def get_latest_checkpoint(filename):
 
-    print (" PROCCESS NAME    ", g_conf.PROCESS_NAME)
     if 'validation' in g_conf.PROCESS_NAME:
         return get_latest_checkpoint_validation()
     elif 'drive' in g_conf.PROCESS_NAME:

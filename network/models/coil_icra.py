@@ -108,7 +108,7 @@ class CoILICRA(nn.Module):
         """ ###### APPLY THE PERCEPTION MODULE """
         x, inter = self.perception(x)
         ## Not a variable, just to store intermediate layers for future vizualization
-        self.intermediate_layers = inter
+        #self.intermediate_layers = inter
 
         """ ###### APPLY THE MEASUREMENT MODULE """
         m = self.measurements(a)

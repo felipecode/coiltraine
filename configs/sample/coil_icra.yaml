@@ -1,7 +1,9 @@
 #### General Configuration Parameters ####
-SAVE_SCHEDULE: range(0,1000001, 20000) # The iterations where training checkpoints are going to be saved
+SAVE_SCHEDULE: range(0,1000001, 200) # The iterations where training checkpoints are going to be saved
 NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
 MAGICAL_SEED: 26957017
+FINISH_ON_VALIDATION_STALE: "CoILVal1"
+
 #### Input related parameters ####
 # A dictionary with all the sensors that are going to be used as input
 # this should match the train dataset
@@ -18,14 +20,14 @@ NUMBER_IMAGES_SEQUENCE: 1  # Number of frames sent in sequence
 SEQUENCE_STRIDE: 1  # Number of frames skipped when reading the data
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 12.0  # The constant that is divides the speed_module in order to make it from 0-1
-TRAIN_DATASET_NAME: 'CoilTrain'  # The name of the training dataset used. Must be inside COIL_DATASET_PATH folder
+TRAIN_DATASET_NAME: 'CoILTrain'  # The name of the training dataset used. Must be inside COIL_DATASET_PATH folder
 AUGMENTATION: None  # The image augmentation applied on every input image
 DATA_USED: 'all'  # The part of the data to be used
 USE_NOISE_DATA: True  # If we use the noise data.
 NUMBER_OF_HOURS: 50  # Number of hours to be taken from the input data
 
 #### Testing Related Parameters ####
-TEST_SCHEDULE: [20000, 100000]  # The frequency the model is actually tested.
+TEST_SCHEDULE: range(200,1000001, 200)  # The frequency the model is actually tested.
 
 #### Model Related Parameters ####
 # Network Parameters #
