@@ -177,7 +177,7 @@ def write_stop(validation_dataset, checkpoint):
     file_name = os.path.join(full_path_name, "validation_" + validation_dataset + "_stale.csv")
 
     with open(file_name, 'w') as f:
-        f.write("%d \n" % checkpoint)
+        f.write("%d\n" % checkpoint)
 
 def erase_csv(checkpoint_name):
     """
