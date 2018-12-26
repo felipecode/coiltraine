@@ -218,7 +218,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             while validation_stale_point(g_conf.FINISH_ON_VALIDATION_STALE) is None:
                 time.sleep(0.1)
 
-            validation_state_iteration = validation_stale_point()
+            validation_state_iteration = validation_stale_point(g_conf.FINISH_ON_VALIDATION_STALE)
             driving_iteration(validation_state_iteration, gpu, town_name, experiment_set, exp_batch,
                               exp_alias, params, control_filename, task_list)
 
@@ -228,20 +228,20 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             Main Loop , Run a benchmark for each specified checkpoint on the "Test Configuration"
             #####
             """
-        while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
-            # Get the correct checkpoint
-            # We check it for some task name, all of then are ready at the same time
-            if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE,
-                                        control_filename + '_' + task_list[0]):
+            while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
+                # Get the correct checkpoint
+                # We check it for some task name, all of then are ready at the same time
+                if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE,
+                                            control_filename + '_' + task_list[0]):
 
-                latest = get_next_checkpoint(g_conf.TEST_SCHEDULE,
-                                             control_filename + '_' + task_list[0])
+                    latest = get_next_checkpoint(g_conf.TEST_SCHEDULE,
+                                                 control_filename + '_' + task_list[0])
 
-                driving_iteration(latest, gpu, town_name, experiment_set, exp_batch,
-                                  exp_alias, params, control_filename, task_list)
+                    driving_iteration(latest, gpu, town_name, experiment_set, exp_batch,
+                                      exp_alias, params, control_filename, task_list)
 
-            else:
-                time.sleep(0.1)
+                else:
+                    time.sleep(0.1)
 
         coil_logger.add_message('Finished', {})
 

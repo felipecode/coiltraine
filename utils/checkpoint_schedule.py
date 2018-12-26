@@ -126,7 +126,7 @@ def check_loss_validation_stopped(checkpoint, validation_name):
 
     """
 
-    stale_file_name = "validation_" + validation_name + "_stale"
+    stale_file_name = "validation_" + validation_name + "_stale.csv"
     full_path = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
                                             g_conf.EXPERIMENT_NAME, stale_file_name)
 
@@ -143,7 +143,7 @@ def check_loss_validation_stopped(checkpoint, validation_name):
 
 def validation_stale_point(validation_name):
 
-    stale_file_name = "validation_" + validation_name + "_stale"
+    stale_file_name = "validation_" + validation_name + "_stale.csv"
     full_path = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
                                             g_conf.EXPERIMENT_NAME, stale_file_name)
 
