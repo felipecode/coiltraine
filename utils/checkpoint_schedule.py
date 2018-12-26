@@ -141,6 +141,7 @@ def check_loss_validation_stopped(checkpoint, validation_name):
     else:
         return False
 
+
 def validation_stale_point(validation_name):
 
     stale_file_name = "validation_" + validation_name + "_stale.csv"
@@ -149,7 +150,7 @@ def validation_stale_point(validation_name):
 
     if os.path.exists(full_path):
         with open(full_path, 'r') as f:
-            # So if training ran more iterations more than the stale point of validation
+            #  Return the stale iteration of the validation
             return int(f.read())
 
     else:
