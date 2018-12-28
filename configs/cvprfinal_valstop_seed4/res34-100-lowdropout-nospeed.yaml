@@ -60,7 +60,7 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       dropouts: [0.0, 0.5]
 
 PRE_TRAINED: False
-MAGICAL_SEED: 310514508
+MAGICAL_SEED: 40746
 
 LEARNING_RATE: 0.0002  # First learning rate
 LEARNING_RATE_DECAY_INTERVAL: 75000 # Number of iterations where the learning rate is reduced
@@ -68,7 +68,7 @@ LEARNING_RATE_THRESHOLD: 5000 # Number of iterations without going down to reduc
 LEARNING_RATE_DECAY_LEVEL: 0.1 # Th factor of reduction applied to the learning rate
 
 #TODO check how to use this part
-BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05]
+BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0]
 LOSS_FUNCTION: 'L1'
 
 VARIABLE_WEIGHT:
@@ -81,4 +81,3 @@ VARIABLE_WEIGHT:
 IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
-AVOID_STOPPING: True

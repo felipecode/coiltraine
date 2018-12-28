@@ -44,6 +44,7 @@ _g_conf.immutable(False)
 
 """#### GENERAL CONFIGURATION PARAMETERS ####"""
 _g_conf.NUMBER_OF_LOADING_WORKERS = 12
+_g_conf.FINISH_ON_VALIDATION_STALE = None
 _g_conf.SENSORS = {'rgb': (3, 88, 200)}
 _g_conf.MEASUREMENTS = {'targets': (31)}
 _g_conf.TARGETS = ['steer', 'throttle', 'brake']
@@ -108,6 +109,7 @@ _g_conf.SAMPLING_SEED = None
 
 _g_conf.LEARNING_RATE_DECAY_INTERVAL = 50000
 _g_conf.LEARNING_RATE_DECAY_LEVEL = 0.5
+_g_conf.LEARNING_RATE_THRESHOLD = 1000
 #TODO check how to use this part
 
 _g_conf.WEIGHT_DECAY = None
@@ -344,8 +346,6 @@ def _check_and_coerce_cfg_value_type(value_a, value_b, key, full_key):
             'key: {}'.format(type_b, type_a, value_b, value_a, full_key)
         )
     return value_a
-
-
 
 
 

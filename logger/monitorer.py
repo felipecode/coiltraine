@@ -13,23 +13,6 @@ from visualization.data_reading import read_summary_csv
 # Check the log and also put it to tensorboard
 
 
-
-def get_current_iteration(exp):
-    """
-
-    Args:
-        exp:
-
-    Returns:
-        The number of iterations this experiments has already run in this mode.
-        ( Depends on validation etc...
-
-    """
-    # TODO:
-
-    pass
-
-
 #### Get things from CARLA benchmark directly to plot as logs #####
 def get_episode_number(benchmark_log_name):
     """ Get the current episode"""
@@ -72,8 +55,6 @@ def get_latest_output(data):
 
 def get_summary(data):
 
-
-    # IT HAS TO BE ITERATING  ! ! !  ! ! !
     for i in range(1, len(data)):
         # Find the summary log in the logging file
         if 'Iterating' in data[-i]:  # Test if it is an iterating log
@@ -94,16 +75,12 @@ def get_latest_checkpoint_validation():
 
     sort_nicely(csv_files)
 
-    # data = json_formatter.readJSONlog(open(log_file_path, 'r'))
-    # print ('csv ', [re.findall('\d+', file)[0] for file in csv_files])
-
     csv_file_numbers = set([float(re.findall('\d+', file)[0]) for file in csv_files])
 
     not_evaluated_logs = list(set(g_conf.TEST_SCHEDULE).difference(csv_file_numbers))
 
     not_evaluated_logs = sorted(not_evaluated_logs, reverse=False)
-    print('csv file numbers ', csv_file_numbers)
-    print("not evaluated logs", not_evaluated_logs)
+
     if len(not_evaluated_logs) == 0:  # Just in case that is the last one
         return g_conf.TEST_SCHEDULE[-1]
 
@@ -147,9 +124,8 @@ def get_latest_checkpoint_drive(control_filename):
 
 
 
-def get_latest_checkpoint(filename=None):
+def get_latest_checkpoint(filename):
 
-    print (" PROCCESS NAME    ", g_conf.PROCESS_NAME)
     if 'validation' in g_conf.PROCESS_NAME:
         return get_latest_checkpoint_validation()
     elif 'drive' in g_conf.PROCESS_NAME:

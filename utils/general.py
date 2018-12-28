@@ -153,13 +153,15 @@ def erase_logs(exp_batch_name):
 
     experiments = os.listdir(os.path.join(root_path, exp_batch_name))
 
-
     for exp in experiments:
         if os.path.isdir(os.path.join(root_path, exp_batch_name, exp)):
             experiments_logs = os.listdir(os.path.join(root_path, exp_batch_name, exp))
             for log in experiments_logs:
-                if not os.path.isdir(os.path.join(root_path, exp_batch_name, exp, log)):
+                if not os.path.isdir(os.path.join(root_path, exp_batch_name, exp, log))\
+                        and '.csv' not in log:
                     os.remove(os.path.join(root_path, exp_batch_name, exp, log))
+
+
 
 def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list, ):
     # TODO: eventually add that for driving

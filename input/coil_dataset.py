@@ -22,6 +22,7 @@ from configs import g_conf
 
 from utils.general import sort_nicely
 
+
 def parse_boost_configuration(configuration):
     """
     Turns the configuration line of sliptting into a name and a set of params.
@@ -29,7 +30,7 @@ def parse_boost_configuration(configuration):
 
     if configuration is None:
         return "None", None
-    print ('conf', configuration)
+    print('conf', configuration)
     conf_dict = collections.OrderedDict(configuration)
 
     name = 'get_boost'
@@ -37,8 +38,6 @@ def parse_boost_configuration(configuration):
         if key != 'weights' and key != 'boost':
             name += '_'
             name += key
-
-
 
     return name, conf_dict
 
@@ -53,7 +52,7 @@ def parse_remove_configuration(configuration):
 
     if configuration is None:
         return "None", None
-    print ('conf', configuration)
+    print('conf', configuration)
     conf_dict = collections.OrderedDict(configuration)
 
     name = 'remove'
@@ -62,26 +61,22 @@ def parse_remove_configuration(configuration):
             name += '_'
             name += key
 
-
-
     return name, conf_dict
 
 
-
 def get_episode_weather(episode):
-
     with open(os.path.join(episode, 'metadata.json')) as f:
         metadata = json.load(f)
-    print (" WEATHER OF EPISODE ", metadata['weather'])
+    print(" WEATHER OF EPISODE ", metadata['weather'])
     return int(metadata['weather'])
+
 
 class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
     def __init__(self, root_dir, transform=None, preload_name=None):
-
-
-        print("IONIT COIL DATASET")
+        # Setting the root directory for this dataset
+        self.root_dir = root_dir
         # We add to the preload name all the remove labels
         if g_conf.REMOVE is not None and g_conf.REMOVE is not "None":
             name, self._remove_params = parse_remove_configuration(g_conf.REMOVE)
@@ -92,82 +87,46 @@ class CoILDataset(Dataset):
             self._remove_params = []
             self.preload_name = preload_name
 
-        # Add no brake on the preload name if there is no brake
-        if 'brake' not in g_conf.TARGETS:
-            self.preload_name += '_nobrake'
-
         # If  not all the weathers are present we keep without anything ( WE ASSUME THAT THIS HAS LENGHT 4)
         if len(g_conf.WEATHERS) < 4:
             self.preload_name = self.preload_name + '-'.join(str(e) for e in g_conf.WEATHERS)
 
+        print("preload Name ", self.preload_name)
 
-        print ("preload Name ", self.preload_name)
-
-        if self.preload_name is not None and os.path.exists(os.path.join('_preloads', self.preload_name + '.npy')):
-            print ( " Loading from NPY ")
-            self.sensor_data_names, self.measurements  = np.load(os.path.join('_preloads', self.preload_name + '.npy'))
-            print (self.sensor_data_names)
+        if self.preload_name is not None and os.path.exists(
+                os.path.join('_preloads', self.preload_name + '.npy')):
+            print(" Loading from NPY ")
+            self.sensor_data_names, self.measurements = np.load(
+                os.path.join('_preloads', self.preload_name + '.npy'))
+            print(self.sensor_data_names)
         else:
             self.sensor_data_names, self.measurements = self.pre_load_image_folders(root_dir)
 
-
-        print ("preload Name ", self.preload_name)
+        print("preload Name ", self.preload_name)
 
         self.transform = transform
         self.batch_read_number = 0
-        #name, self.boost_params = parse_boost_configuration(g_conf.SPLIT)
-
-        #self.boost_function = getattr(splitter, name)
 
     def __len__(self):
         return len(self.measurements)
 
     def __getitem__(self, index):
 
-        img_path = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME,
+        img_path = os.path.join(self.root_dir,
                                 self.sensor_data_names[index].split('/')[-2],
                                 self.sensor_data_names[index].split('/')[-1])
 
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-
         if self.transform is not None:
-            #if g_conf.SPLIT is not None and g_conf.SPLIT is not 'None' and 'boost' in self.boost_params:
-            #    boost = self.boost_function(self.measurements, index, self.boost_params)
-            #else:
-            #    boost = 1
             boost = 1
-            if g_conf.GATED_AUGMENTATION is None:
-                img = self.transform(self.batch_read_number * boost, img)
-            else:
-                # The
-                intention_value = 1.0
-                for intention in g_conf.INTENTIONS:
-                    intention_value = min(intention_value, self.measurements[index][intention])
+            img = self.transform(self.batch_read_number * boost, img)
 
-                if g_conf.GATED_AUGMENTATION == 'easy':
-                    if intention_value == 1:
-                        boost = intention_value
-                        img = self.transform(self.batch_read_number * boost, img)
-                    else:
-                        img = img.transpose(2, 0, 1)
-
-                elif g_conf.GATED_AUGMENTATION == 'hard':
-                    if intention_value != 1:
-                        boost = 1 - intention_value
-                        img = self.transform(self.batch_read_number * boost, img)
-                    else:
-                        img = img.transpose(2, 0, 1)
-
-                else:
-                    raise ValueError(" Not valid Gated Augmentation")
         else:
             img = img.transpose(2, 0, 1)
 
         img = img.astype(np.float)
         img = torch.from_numpy(img).type(torch.FloatTensor)
         img = img / 255.
-
-
 
         measurements = self.measurements[index].copy()
         for k, v in measurements.items():
@@ -182,9 +141,8 @@ class CoILDataset(Dataset):
 
     def is_measurement_partof_experiment(self, measurement_data):
 
-        # If the measurement data is not removable is because it is part of this experiment dataa
+        # If the measument data is not removable is because it is part of this experiment dataa
         return not self._check_remove_function(measurement_data, self._remove_params)
-
 
     def _get_final_measurement(self, speed, measurement_data, angle, directions):
         """
@@ -194,21 +152,19 @@ class CoILDataset(Dataset):
         :return:
         """
         if angle != 0:
-            measurement_augmented = self.augment_measurement(copy.copy(measurement_data), angle, 3.6 * speed)
+            measurement_augmented = self.augment_measurement(copy.copy(measurement_data), angle,
+                                                             3.6 * speed)
         else:
             # We have to copy since it reference a file.
             measurement_augmented = copy.copy(measurement_data)
 
-
         if 'gameTimestamp' in measurement_augmented:
             time_stamp = measurement_augmented['gameTimestamp']
         else:
-            time_stamp =measurement_augmented['game_time']
+            time_stamp = measurement_augmented['game_time']
 
         if 'brake' not in g_conf.TARGETS:
             # A bit of repeating code, but helps for the sake of clarity
-
-
 
             if measurement_augmented['brake'] > 0.01:
                 final_throtle = -measurement_augmented['brake']
@@ -217,36 +173,32 @@ class CoILDataset(Dataset):
                 final_throtle = measurement_augmented['throttle']
                 final_throtle_noise = measurement_augmented['throttle_noise']
 
-
             final_measurement = {'steer': measurement_augmented['steer'],
-                             'steer_noise': measurement_augmented['steer_noise'],
-                             'throttle': final_throtle,
-                             'throttle_noise': final_throtle_noise,
-                             'speed_module': speed/g_conf.SPEED_FACTOR,
-                             'directions': directions,
-                             "pedestrian": measurement_augmented['stop_pedestrian'],
-                             "traffic_lights": measurement_augmented['stop_traffic_lights'],
-                             "vehicle": measurement_augmented['stop_vehicle'],
-                             "game_time": time_stamp,
-                             'angle': angle}
+                                 'steer_noise': measurement_augmented['steer_noise'],
+                                 'throttle': final_throtle,
+                                 'throttle_noise': final_throtle_noise,
+                                 'speed_module': speed / g_conf.SPEED_FACTOR,
+                                 'directions': directions,
+                                 "pedestrian": measurement_augmented['stop_pedestrian'],
+                                 "traffic_lights": measurement_augmented['stop_traffic_lights'],
+                                 "vehicle": measurement_augmented['stop_vehicle'],
+                                 "game_time": time_stamp,
+                                 'angle': angle}
 
         else:
             final_measurement = {'steer': measurement_augmented['steer'],
-                             'steer_noise': measurement_augmented['steer_noise'],
-                             'throttle': measurement_augmented['throttle'],
-                             'throttle_noise': measurement_augmented['throttle_noise'],
-                             'brake': measurement_augmented['brake'],
-                             'brake_noise': measurement_augmented['brake_noise'],
-                             'speed_module': speed/g_conf.SPEED_FACTOR,
-                             'directions': directions,
-                             "pedestrian": measurement_augmented['stop_pedestrian'],
-                             "traffic_lights": measurement_augmented['stop_traffic_lights'],
-                             "vehicle": measurement_augmented['stop_vehicle'],
-                             "game_time": time_stamp,
-                             'angle': angle}
-
-
-
+                                 'steer_noise': measurement_augmented['steer_noise'],
+                                 'throttle': measurement_augmented['throttle'],
+                                 'throttle_noise': measurement_augmented['throttle_noise'],
+                                 'brake': measurement_augmented['brake'],
+                                 'brake_noise': measurement_augmented['brake_noise'],
+                                 'speed_module': speed / g_conf.SPEED_FACTOR,
+                                 'directions': directions,
+                                 "pedestrian": measurement_augmented['stop_pedestrian'],
+                                 "traffic_lights": measurement_augmented['stop_traffic_lights'],
+                                 "vehicle": measurement_augmented['stop_vehicle'],
+                                 "game_time": time_stamp,
+                                 'angle': angle}
 
         return final_measurement
 
@@ -257,7 +209,7 @@ class CoILDataset(Dataset):
 
         args
             the path for the dataset
-        0
+
 
         returns
          sensor data names: it is a vector with n dimensions being one for each sensor modality
@@ -269,7 +221,9 @@ class CoILDataset(Dataset):
 
         episodes_list = glob.glob(os.path.join(path, 'episode_*'))
         sort_nicely(episodes_list)
-        print (path)
+        # Do a check if the episodes list is empty
+        if len(episodes_list) == 0:
+            raise ValueError("There are no episodes on the training dataset folder %s" % path)
 
         sensor_data_names = []
         float_dicts = []
@@ -279,41 +233,31 @@ class CoILDataset(Dataset):
         for episode in episodes_list:
 
             print('Episode ', episode)
-
-            if not os.path.exists(os.path.join(episode, "checked")) and not os.path.exists(os.path.join(episode, "processed2")) \
-                  and not os.path.exists(os.path.join(episode, "bad_episode")) and \
-                    not g_conf.TRAIN_DATASET_NAME == 'CARLA80TL':
-                # Episode was not checked. So we dont load it.
-                print (" Not checked")
+            """
+            if not os.path.exists(os.path.join(episode, "checked")) and not os.path.exists(
+                    os.path.join(episode, "processed2")) \
+                    and not os.path.exists(os.path.join(episode, "bad_episode")):
+                # Episode was not checked. So we don't load it.
+                print("Not checked")
                 continue
-
+            """
 
             if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
-                 # The number of wanted hours achieved
-                 break
-
-
+                # The number of wanted hours achieved
+                break
 
             # Get all the measuremensts from this episode
-
             measurements_list = glob.glob(os.path.join(episode, 'measurement*'))
             sort_nicely(measurements_list)
 
-            if len (measurements_list) == 0:
-                print ("EMPTY EPISODE")
+            if len(measurements_list) == 0:
+                print("EMPTY EPISODE")
                 continue
-
-            if g_conf.TRAIN_DATASET_NAME != 'CARLA80TL' and get_episode_weather(episode) not in g_conf.WEATHERS:
-                print("WEATHER NOT CORRECT")
-                continue
-
-
 
             # A simple count to keep track how many measurements were added this episode.
             count_added_measurements = 0
 
             for measurement in measurements_list[:-3]:
-
 
                 data_point_number = measurement.split('_')[-1].split('.')[0]
 
@@ -321,25 +265,20 @@ class CoILDataset(Dataset):
                 with open(measurement) as f:
                     measurement_data = json.load(f)
 
-                # depending on the configuration file, we eliminated the kind of measurements that are not
-                # going to be used for this experiment
-
-
+                # depending on the configuration file, we eliminated the kind of measurements
+                # that are not going to be used for this experiment
 
                 # We extract the interesting subset from the measurement dict
-                if 'forwardSpeed' in  measurement_data['playerMeasurements']:
+                if 'forwardSpeed' in measurement_data['playerMeasurements']:
                     speed = measurement_data['playerMeasurements']['forwardSpeed']
                 else:
                     speed = 0
 
 
-                # TODO: BEFORE DEADLINE HEURISTICS, TAKE CARE
-                if not g_conf.TRAIN_DATASET_NAME == 'CARLA80TL':
-                    directions = self.augment_directions(measurement_data['directions'])
-                else:
-                    directions = measurement_data['directions']
+                directions = measurement_data['directions']
 
-                final_measurement = self._get_final_measurement(speed, measurement_data, 0, directions)
+                final_measurement = self._get_final_measurement(speed, measurement_data, 0,
+                                                                directions)
 
                 if self.is_measurement_partof_experiment(final_measurement):
                     float_dicts.append(final_measurement)
@@ -347,14 +286,13 @@ class CoILDataset(Dataset):
                     sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
                     count_added_measurements += 1
 
-
                 # We do measurements for the left side camera
-                # #TOdo the angle does not need to be hardcoded
-                # We convert the speed to KM/h for the augmentation
+                # We convert the speed to KM/h for the augmentaiton
 
                 # We extract the interesting subset from the measurement dict
 
-                final_measurement = self._get_final_measurement(speed, measurement_data, -30.0, directions)
+                final_measurement = self._get_final_measurement(speed, measurement_data, -30.0,
+                                                                directions)
 
                 if self.is_measurement_partof_experiment(final_measurement):
                     float_dicts.append(final_measurement)
@@ -364,9 +302,8 @@ class CoILDataset(Dataset):
 
                 # We do measurements augmentation for the right side cameras
 
-
-                final_measurement = self._get_final_measurement(speed, measurement_data, 30.0, directions)
-
+                final_measurement = self._get_final_measurement(speed, measurement_data, 30.0,
+                                                                directions)
 
                 if self.is_measurement_partof_experiment(final_measurement):
                     float_dicts.append(final_measurement)
@@ -377,26 +314,20 @@ class CoILDataset(Dataset):
             # Check how many hours were actually added
 
             last_data_point_number = measurements_list[-4].split('_')[-1].split('.')[0]
-            print ("last and float dicts len", last_data_point_number, count_added_measurements )
-
-            print ("ERASED ", float(last_data_point_number)*3 -  count_added_measurements)
-
-            number_of_hours_pre_loaded += (float(count_added_measurements / 10.0)/3600.0)
-            print (" Added ", ((float(count_added_measurements) / 10.0)/3600.0))
-            print (" TOtal Hours (partial) ", number_of_hours_pre_loaded)
+            print("last and float dicts len", last_data_point_number, count_added_measurements)
+            number_of_hours_pre_loaded += (float(count_added_measurements / 10.0) / 3600.0)
+            print(" Added ", ((float(count_added_measurements) / 10.0) / 3600.0))
+            print(" LOADED ", number_of_hours_pre_loaded, " hours of data")
 
 
-
-        print ( " LOADED ", number_of_hours_pre_loaded, " This hours")
-        print ()
         # Make the path to save the pre loaded datasets
         if not os.path.exists('_preloads'):
             os.mkdir('_preloads')
-
-        np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
+        # If there is a name we saved the preloaded data
+        if self.preload_name is not None:
+            np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
 
         return sensor_data_names, float_dicts
-
 
     def augment_directions(self, directions):
 
@@ -405,7 +336,6 @@ class CoILDataset(Dataset):
                 directions = random.choice([3.0, 4.0, 5.0])
 
         return directions
-
 
     def augment_steering(self, camera_angle, steer, speed):
         """
@@ -447,7 +377,6 @@ class CoILDataset(Dataset):
                                           speed)
         measurements['steer'] = new_steer
         return measurements
-
 
     def controls_position(self):
         return np.where(self.meta_data[:, 0] == b'control')[0][0]
@@ -509,10 +438,3 @@ class CoILDataset(Dataset):
 
         return torch.cat(inputs_vec, 1)
 
-
-if __name__ == "__main__":
-    dataset = NewDataset(root_dir='')
-    print(len(dataset))
-    # print(dataset.sensor_data_names)
-    for k, v in dataset[0].items():
-        print(k, v.shape)

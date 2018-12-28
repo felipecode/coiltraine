@@ -157,7 +157,6 @@ if __name__ == "__main__":
                 camera_label = data['targets'][i][25]
                 speed = data['targets'][i][10]
                 steer = augment_steering(camera_angle, steer, speed)
-                #camera_label_file.write(str(camera_angle) + '\n')
                 wpa1 = data['targets'][i][31]
                 wpa2 = data['targets'][i][33]
 

@@ -73,29 +73,31 @@ def start_carla_simulator(gpu, town_name, docker):
     return sp, port, out
 
 
-def driving_iteration(checkpoint, gpu, town_name, experiment_set, exp_batch, exp_alias, params,
+
+def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_batch, exp_alias, params,
                       control_filename, task_list):
 
+    port = 2006
     try:
         """ START CARLA"""
-        carla_process, port, out = start_carla_simulator(gpu, town_name,
-                                                         params['docker'])
+        #carla_process, port, out = start_carla_simulator(gpu, town_name,
+        #                                                 params['docker'])
 
         checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
-                                             , 'checkpoints', str(checkpoint) + '.pth'))
+                                             , 'checkpoints', str(checkpoint_number) + '.pth'))
 
         coil_agent = CoILAgent(checkpoint, town_name)
-
-        coil_logger.add_message('Iterating', {"Checkpoint": checkpoint}, checkpoint)
+        print ("Checkpoint ", checkpoint_number)
+        coil_logger.add_message('Iterating', {"Checkpoint": checkpoint_number}, checkpoint_number)
 
         """ MAIN PART, RUN THE DRIVING BENCHMARK """
         run_driving_benchmark(coil_agent, experiment_set, town_name,
-                              exp_batch + '_' + exp_alias + '_' + str(checkpoint)
+                              exp_batch + '_' + exp_alias + '_' + str(checkpoint_number)
                               + '_drive_' + control_filename
                               , True, params['host'], port)
 
         """ Processing the results to write a summary"""
-        path = exp_batch + '_' + exp_alias + '_' + str(checkpoint) \
+        path = exp_batch + '_' + exp_alias + '_' + str(checkpoint_number) \
                + '_' + g_conf.PROCESS_NAME.split('_')[0] + '_' + control_filename \
                + '_' + g_conf.PROCESS_NAME.split('_')[1] + '_' + g_conf.PROCESS_NAME.split('_')[2]
 
@@ -115,7 +117,7 @@ def driving_iteration(checkpoint, gpu, town_name, experiment_set, exp_batch, exp
 
         for i in range(len(task_list)):
             write_data_point_control_summary(file_base, task_list[i],
-                                             averaged_dict, checkpoint, i)
+                                             averaged_dict, checkpoint_number, i)
 
         # plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
         #                     )

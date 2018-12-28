@@ -223,7 +223,7 @@ if __name__ == "__main__":
             central_measurements = _get_final_measurement(speed, measurement_data, -30.0,
                                                             directions)
 
-            
+
             error += get_error(ground_truth[count], central_measurements['steer'])
             count += 1
 
@@ -241,17 +241,3 @@ if __name__ == "__main__":
             count +=1
             #
 
-
-
-
-
-
-
-
-    print( 'Total Hours = ',  total_number_of_seconds/3600.0)
-
-    print( 'Total Hours Valid = ',  total_number_of_checked_seconds/3600.0)
-
-    print( 'Total Hours BAD = ',  total_number_of_bad_seconds/3600.0)
-
-    # save_gta_surface(gta_surface)

@@ -27,6 +27,8 @@ def is_open(file_name):
 
 
 def maximun_checkpoint_reach(iteration, checkpoint_schedule):
+    if iteration is None:
+        return False
 
     if iteration >= max(checkpoint_schedule):
         return True
@@ -61,6 +63,7 @@ def get_latest_saved_checkpoint():
 
 
 """ FUNCTIONS FOR GETTING THE CHECKPOINTS"""
+
 def get_latest_evaluated_checkpoint(filename=None):
 
     """
@@ -70,12 +73,12 @@ def get_latest_evaluated_checkpoint(filename=None):
 
     return monitorer.get_latest_checkpoint(filename)
 
-def is_next_checkpoint_ready( checkpoint_schedule, control_filename=None):
+
+def is_next_checkpoint_ready(checkpoint_schedule, control_filename=None):
 
     # IT needs
-
     ltst_check = get_latest_evaluated_checkpoint(control_filename)
-    print (" got ", ltst_check)
+
     # This means that we got the last one, so we return false and go back to the loop
     if ltst_check == g_conf.TEST_SCHEDULE[-1]:
         return False
@@ -107,14 +110,12 @@ def get_next_checkpoint(checkpoint_schedule, filename=None):
     if ltst_check is None:
         return checkpoint_schedule[0]
 
-
-
     if checkpoint_schedule.index(ltst_check) + 1 == len(checkpoint_schedule):
         raise RuntimeError("Not able to get next checkpoint, maximum checkpoint is reach")
 
+    print(checkpoint_schedule.index(ltst_check))
+    print (ltst_check)
     return checkpoint_schedule[checkpoint_schedule.index(ltst_check) + 1]
-
-
 
 
 def check_loss_validation_stopped(checkpoint, validation_name):

@@ -12,12 +12,13 @@ import collections
 # What do we define as a parameter what not.
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
-from network import CoILModel, Loss, adjust_learning_rate
+from network import CoILModel, Loss, adjust_learning_rate, adjust_learning_rate_auto
 from network.loss_functional import compute_attention_map_l2, compute_attention_map_l1, weight_decay_l1, \
 weight_decay_l2
 from input import CoILDataset, PreSplittedSampler, splitter, Augmenter, RandomSampler
 from logger import monitorer, coil_logger
-from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint
+from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint, \
+                                      check_loss_validation_stopped
 from utils.general import softmax
 
 from torchvision import transforms
@@ -267,24 +268,30 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         criterion = Loss(g_conf.LOSS_FUNCTION)
         optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
         if checkpoint_file is not None:
-            print("LOAD A STATE DICT ")
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
 
         if checkpoint_file is not None:
             accumulated_time = checkpoint['total_time']
-        else:
-            accumulated_time = 0  # We accumulate iteration time and keep the average speed
+            loss_window = coil_logger.recover_loss_window('train', iteration)
+        else:  # We accumulate iteration time and keep the average speed
+            accumulated_time = 0
+            loss_window = []
 
-        #TODO: test experiment continuation. Is the data sampler going to continue were it started.. ?
+
         capture_time = time.time()
         for data in data_loader:
 
             iteration += 1
+            # Basically, validate every 20k Steps, if it goes up 3 times ,
+            # add a stop on the _logs folder
+            if g_conf.FINISH_ON_VALIDATION_STALE is not None and \
+                    check_loss_validation_stopped(iteration, g_conf.FINISH_ON_VALIDATION_STALE):
+                break
             print (iteration)
             # Try to adjust the iteration.
             if iteration % 1000 == 0:
-                adjust_learning_rate(optimizer, iteration)
+                adjust_learning_rate_auto(optimizer, loss_window)
             print("READ TIME ", time.time() - capture_time)
             # get the control commands from float_data, size = [120,1]
             capture_time = time.time()
@@ -401,9 +408,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             # TODO: For now we are computing the error for just the correct branch, it could be multi-branch,
 
+            loss_window.append(loss.data.tolist())
 
-            # TODO: save also the optimizer state dictionary
-
+            coil_logger.write_on_error_csv('train', loss.data)
             if is_ready_to_save(iteration):
                 print("Is Going To save ", iteration)
                 state = {
