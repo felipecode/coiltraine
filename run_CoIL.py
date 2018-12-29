@@ -100,7 +100,6 @@ if __name__ == '__main__':
     )
     argparser.add_argument(
         '-dk', '--docker',
-        action='store_true',
         dest='docker',
         help='Set to run carla using docker'
     )
