@@ -103,6 +103,10 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         best_error_iter = 0
 
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
+
+            print ("L1 Window", L1_window)
+            print("Steep without decrease ", dlib.count_steps_without_decrease(L1_window))
+
             if g_conf.FINISH_ON_VALIDATION_STALE is not None:
                 if dlib.count_steps_without_decrease(L1_window) > 3 and \
                         dlib.count_steps_without_decrease_robust(L1_window) > 3:
