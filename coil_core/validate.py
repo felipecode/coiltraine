@@ -103,7 +103,11 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         best_error_iter = 0
 
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
-
+            if g_conf.FINISH_ON_VALIDATION_STALE is not None:
+                if dlib.count_steps_without_decrease(L1_window) > 3 and \
+                        dlib.count_steps_without_decrease_robust(L1_window) > 3:
+                    coil_logger.write_stop(dataset_name, latest)
+                    break
             if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
 
                 latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
