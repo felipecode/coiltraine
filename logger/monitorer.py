@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import numpy as np
 
 from logger import json_formatter
@@ -182,7 +183,11 @@ def get_status(exp_batch, experiment, process_name):
     # Read the full json file.
     try:
         data = json_formatter.readJSONlog(open(log_file_path, 'r'))
-    except Exception:
+
+    except ValueError:
+        print ("Still writing")
+
+    except Exception:  # Todo: general exception, try to fix.
         import traceback
         traceback.print_exc()
         return ['Error', "Couldn't read the json"]
