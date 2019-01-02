@@ -249,7 +249,7 @@ def get_latest_path(path):
     import glob
     print (path)
     files_list = glob.glob(os.path.join('_benchmarks_results', path+'*'))
-    print (files_list)
+    print (" Files List ", files_list)
     sort_nicely(files_list)
 
     return files_list[-1]
