@@ -107,7 +107,7 @@ def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_bat
             benchmark_dict = json.loads(f.read())
 
         print(" number of episodes ", len(experiment_set.build_experiments()))
-        averaged_dict = compute_average_std_separatetasks([benchmark_dict],
+        averaged_dict, std_dict = compute_average_std_separatetasks([benchmark_dict],
                                                           experiment_set.weathers,
                                                           len(experiment_set.build_experiments()))
 
@@ -116,7 +116,7 @@ def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_bat
 
         for i in range(len(task_list)):
             write_data_point_control_summary(file_base, task_list[i],
-                                             averaged_dict, checkpoint_number, i)
+                                             averaged_dict, checkpoint_number, i, std_dict)
 
         # plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
         #                     )
