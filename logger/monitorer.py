@@ -186,6 +186,7 @@ def get_status(exp_batch, experiment, process_name):
 
     except ValueError:
         print ("Still writing")
+        return ['Loading', '']
 
     except Exception:  # Todo: general exception, try to fix.
         import traceback
