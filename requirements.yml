@@ -1,4 +1,4 @@
-name: coil
+name: coiltraine
 channels:
   - defaults
 dependencies:
