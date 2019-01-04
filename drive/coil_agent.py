@@ -40,7 +40,6 @@ class CoILAgent(Agent):
         self.first_iter = True
 
         self.model.load_state_dict(checkpoint['state_dict'])
-        print("loaded state", checkpoint)
 
         self.model.cuda()
         self.model.eval()

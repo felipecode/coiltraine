@@ -117,10 +117,6 @@ def folder_execute(params=None):
 
     # No process is executing right now.
 
-    print(tasks_queue)
-
-    # TODO: the while should go outside, so the monitorer process is independent of the type of execution
-
     while True:
         #        if not done or executing  get to the list
         # If amount of resources is smaller than a threshold.
@@ -148,17 +144,6 @@ def folder_execute(params=None):
 
                 executing_processes.append(process_specs)
 
-            elif process_specs['type'] == 'validation' and resources_on_most_free_gpu >= \
-                    allocation_parameters['validation_cost'] \
-                    and (train_status == 'Iterating' or train_status == 'Loading' or
-                         train_status == 'Finished'):
-                free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
-                                        free_gpus, allocation_parameters['validation_cost'])
-                execute_validation(gpu_number, process_specs['folder'], process_specs['experiment'],
-                                   process_specs['dataset'])
-                process_specs.update({'gpu': gpu_number})
-                executing_processes.append(process_specs)
-
             elif process_specs['type'] == 'drive' and resources_on_most_free_gpu >= \
                     allocation_parameters['drive_cost'] \
                     and (train_status == 'Iterating' or train_status == 'Loading' or
@@ -170,8 +155,16 @@ def folder_execute(params=None):
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 
-
-
+            elif process_specs['type'] == 'validation' and resources_on_most_free_gpu >= \
+                    allocation_parameters['validation_cost'] \
+                    and (train_status == 'Iterating' or train_status == 'Loading' or
+                         train_status == 'Finished'):
+                free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
+                                        free_gpus, allocation_parameters['validation_cost'])
+                execute_validation(gpu_number, process_specs['folder'], process_specs['experiment'],
+                                   process_specs['dataset'])
+                process_specs.update({'gpu': gpu_number})
+                executing_processes.append(process_specs)
 
 
 

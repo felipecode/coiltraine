@@ -72,8 +72,6 @@ def get_latest_output(data):
 
 def get_summary(data):
 
-
-    # IT HAS TO BE ITERATING  ! ! !  ! ! !
     for i in range(1, len(data)):
         # Find the summary log in the logging file
         if 'Iterating' in data[-i]:  # Test if it is an iterating log

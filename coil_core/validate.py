@@ -194,6 +194,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     if dlib.count_steps_without_decrease(L1_window) > 3 and \
                             dlib.count_steps_without_decrease_robust(L1_window) > 3:
                         coil_logger.write_stop(dataset_name, latest)
+                        break
 
             else:
 

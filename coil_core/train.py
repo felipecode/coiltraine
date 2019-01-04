@@ -5,10 +5,9 @@ import time
 import traceback
 import torch
 import torch.optim as optim
-import dlib
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
-from network import CoILModel, Loss, adjust_learning_rate
+from network import CoILModel, Loss, adjust_learning_rate, adjust_learning_rate_auto
 from input import CoILDataset, Augmenter, select_balancing_strategy
 from logger import coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint, \
@@ -104,7 +103,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             # Basically, validate every 20k Steps, if it goes up 3 times ,
             # add a stop on the _logs folder
             if g_conf.FINISH_ON_VALIDATION_STALE is not None and \
-                    check_loss_validation_stopped(g_conf.FINISH_ON_VALIDATION_STALE):
+                    check_loss_validation_stopped(iteration, g_conf.FINISH_ON_VALIDATION_STALE):
                 break
             """
                 ####################################
@@ -114,7 +113,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             iteration += 1
             if iteration % 1000 == 0:
-                adjust_learning_rate(optimizer, iteration)
+                adjust_learning_rate_auto(optimizer, loss_window)
 
             # get the control commands from float_data, size = [120,1]
 
@@ -187,13 +186,10 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                                      'Inputs': dataset.extract_inputs(data)[
                                          position].data.tolist()},
                                     iteration)
-            loss_window.append(loss.data)
+            loss_window.append(loss.data.tolist())
 
             coil_logger.write_on_error_csv('train', loss.data)
             print("Iteration: %d  Loss: %f" % (iteration, loss.data))
-            #print("Steps without decrease ", dlib.count_steps_without_decrease(loss_window))
-            #print("Steps without decrease robust ", dlib.count_steps_without_decrease_robust(loss_window))
-
 
 
         coil_logger.add_message('Finished', {})

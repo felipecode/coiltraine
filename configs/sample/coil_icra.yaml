@@ -65,7 +65,8 @@ MODEL_CONFIGURATION:  # Based on the MODEL_TYPE, we specify the structure
 # For now we use only use adam
 LEARNING_RATE: 0.0002  # First learning rate
 LEARNING_RATE_DECAY_INTERVAL: 75000 # Number of iterations where the learning rate is reduced
-LEARNING_RATE_DECAY_LEVEL: 0.5 # Th factor of reduction applied to the learning rate
+LEARNING_RATE_THRESHOLD: 5000 # Number of iterations without going down to reduce learning rate
+LEARNING_RATE_DECAY_LEVEL: 0.1 # Th factor of reduction applied to the learning rate
 
 # Loss Parameters #
 BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05] # how much each branch is weighted when computing loss

@@ -154,13 +154,13 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
         for val_data in validation_datasets:
             task_to_add = None
             if monitorer.get_status(folder, experiment, 'validation_' + val_data)[0] == "Not Started":
-                task_to_add = (2, experiment + '_validation_' + val_data,
+                task_to_add = (1, experiment + '_validation_' + val_data,
                                              {'type': 'validation', 'folder': folder,
                                               'experiment': experiment, 'dataset': val_data})
 
             elif restart_error and monitorer.get_status(folder, experiment, 'validation_'
                                                                 + val_data)[0] == "Error":
-                task_to_add = (2, experiment + '_validation_' + val_data,
+                task_to_add = (1, experiment + '_validation_' + val_data,
                                              {'type': 'validation', 'folder': folder,
                                               'experiment': experiment, 'dataset': val_data})
 
@@ -179,13 +179,13 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
         for drive_env in drive_environments:
             task_to_add = None
             if monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] == "Not Started":
-                task_to_add = (1, experiment + '_drive_' + drive_env,
+                task_to_add = (2, experiment + '_drive_' + drive_env,
                                              {'type': 'drive', 'folder': folder,
                                               'experiment': experiment, 'environment': drive_env})
 
             elif restart_error and monitorer.get_status(folder, experiment, 'drive_' + drive_env)\
                                                         [0] == "Error":
-                task_to_add = (1, experiment + '_drive_' + drive_env,
+                task_to_add = (2, experiment + '_drive_' + drive_env,
                                {'type': 'drive', 'folder': folder,
                                 'experiment': experiment, 'environment': drive_env})
 
