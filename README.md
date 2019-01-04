@@ -25,7 +25,7 @@ Objectives:
 ![COIL Diagram](docs/img/CoIL.png?raw=true )
 
 
-The [COiLTRAiNE](docs/coitraine.md) framework allows simultaneous [training](docs/main_modules.md/#train), driving on [scenarios in CARLA](docs/main_modules.md/#drive) and [prediction of controls](docs/main_modules.md/#validation) on some static dataset. This process can be done on several experiments at the same time. 
+The [COiLTRAiNE](docs/coiltraine.md) framework allows simultaneous [training](docs/main_modules.md/#train), driving on [scenarios in CARLA](docs/main_modules.md/#drive) and [prediction of controls](docs/main_modules.md/#validation) on some static dataset. This process can be done on several experiments at the same time. 
 
 
 
@@ -86,7 +86,7 @@ Finally, note that the execution of the driving scenario on CARLA can also be do
 
 * Conditional Imitation Learning
 * Conditional Imitation Learning CARLA paper
-* [On Offline Evaluation of Vision-based Driving Models](docs/on_offline_evaluation.md)
+* [On Offline Evaluation of Vision-based Driving Models](docs/on_offline_evaluation.md) [paper](https://arxiv.org/abs/1809.04843)
 * New One (Soon)
 
 
