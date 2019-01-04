@@ -23,16 +23,14 @@ from configs import g_conf, merge_with_yaml, set_type_of_process
 from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkpoint,\
     is_next_checkpoint_ready, get_latest_evaluated_checkpoint, validation_stale_point
 from utils.general import compute_average_std_separatetasks, get_latest_path, write_header_control_summary,\
-    snakecase_to_camelcase, write_data_point_control_summary, camelcase_to_snakecase, unique
+     write_data_point_control_summary, camelcase_to_snakecase, unique
 
 
 def frame2numpy(frame, frame_size):
     return np.resize(np.fromstring(frame, dtype='uint8'), (frame_size[1], frame_size[0], 3))
 
 
-
 def find_free_port():
-    # Elimitate
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
         s.bind(('', 0))
         return s.getsockname()[1]
