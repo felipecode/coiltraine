@@ -34,8 +34,8 @@ The [COiLTRAiNE](docs/coitraine.md) framework allows simultaneous [training](doc
 #### Installation
 
 To install COiLTRAiNE, we provide a conda environment requirements file.
-Start by cloning the repository on some folder and then to
-install just run:
+Start by cloning the repository on some folder and then, to
+install, just run:
 
     conda env create -f requirements.yml
 
@@ -46,7 +46,7 @@ This is the folder that will contain your training and validation datasets
 
     export COIL_DATASET_PATH=<Path to where your dataset folders are>
 
-You can also download a sample dataset pack, with one training
+Download a sample dataset pack, with one training
 and two validations, by running
 
     python3 tools/get_sample_datasets.py
