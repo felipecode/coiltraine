@@ -30,26 +30,24 @@ To train all the models specified on the sample folder:
 
     python3 coiltraine.py --folder sample --gpus 0
 
-
-
-
-#### Single experiment mode
-
-There are other two process that could be run: [drive](docs/main_modules.md/#drive)
-and [validation](docs/main_modules.md/#validation).
-
-
-Experiments are defined in config files inside [CoIL/configs](docs/configuration.md).
-You can train all the experiments in a folder using:
-
-    python3 coiltraine.py --folder sample --gpus 0
-
 With COiLTRAiNE you can also do simultaneous driving evaluation and validation
 on some static dataset.
 
-
 Also note that the training dataset must be set on the [experiment configuration file](docs/configuration.md) directly,
 since training data is strictly associated with the experiment.
+
+
+
+#### Validation Curve Dependency Mode
+
+For some experiments we can condition the driving test and the amount
+of training into a stop of improvement in validation.
+
+    python3 coiltraine.py --single-process train -e coil_icra --folder val_based_sample --gpus 0
+
+In this example it will train until the slope of the validation
+curve becomes positive. After that, it will use this checkpoint
+as the checkpoint for testing drive.
 
 
 

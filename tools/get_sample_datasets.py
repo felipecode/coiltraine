@@ -49,7 +49,7 @@ if __name__ == "__main__":
         print("")
         raise e
 
-    # Download the datasets 
+    # Download the datasets
     file_id = '1cXX7Pdxfkz5MD6oMjbmNlXDkUIAxPd6m'
     destination_pack = 'COiLTRAiNESampleDatasets.tar.gz'
 
