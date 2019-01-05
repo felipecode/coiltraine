@@ -182,21 +182,23 @@ def print_cause_of_end():
 
 
 
-def plot_episodes_tracks(exp_batch, experiment, checkpoint, city_name, exp_suite, ):
+def plot_episodes_tracks(exp_batch, experiment, checkpoint, town_name, exp_suite):
 
     # We build the measurement file used for the benchmarks.
-    '_benchmarks_results/eccv_debug_experiment_24_200000_drive_control_output_auto_ECCVGeneralizationSuite_Town02'
-    meas_file = 'a'
+    meas_file = os.path.join('_benchmarks_results', exp_batch + '_'+ experiment + '_'
+                             + str(checkpoint) + '_drive_control_output_'
+                             + exp_suite + '_' + town_name)
 
     image_location = map.__file__[:-7]
-    carla_map = map.CarlaMap(city_name, 0.164, 50)
+    carla_map = map.CarlaMap(town_name, 0.164, 50)
 
     # Split the measurements for each of the episodes
     episodes_positions, travelled_distances = split_episodes(meas_file)
 
+    # Prepare the folder where the results are going to be written
     root_folder = "_logs"
     paths_dir = os.path.join(root_folder, exp_batch, experiment,
-                             'drive_' + exp_suite + '_' + city_name + '_paths')
+                             'drive_' + exp_suite + '_' + town_name + '_paths')
 
     if not os.path.exists(paths_dir):
         os.mkdir(paths_dir)
@@ -208,7 +210,7 @@ def plot_episodes_tracks(exp_batch, experiment, checkpoint, city_name, exp_suite
     count = 0  # To count the number
     for episode_vec in episodes_positions:
 
-        map_image = Image.open(os.path.join(image_location, city_name + '.png'))
+        map_image = Image.open(os.path.join(image_location, town_name + '.png'))
         map_image.load()
         map_image = np.asarray(map_image, dtype="int32")
 
@@ -311,7 +313,7 @@ if __name__ == '__main__':
 
     ]
     plot_episodes_tracks('cvprfinal_valstop', 'res34-100-lowdropout',
-                         140000, 'Town01','Long3NewWeather'):
+                         140000, 'Town01', 'Long3NewWeather')
 
 """
     plot_episodes_tracks_sameimage('eccv_debug',
