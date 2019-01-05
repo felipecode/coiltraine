@@ -142,6 +142,23 @@ def check_loss_validation_stopped(checkpoint, validation_name):
         return False
 
 
+def check_loss_validation_stop_exists(validation_name):
+    """
+     Check if validation has already found a point that the curve is not going down
+
+    """
+
+    stale_file_name = "validation_" + validation_name + "_stale.csv"
+    full_path = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
+                                            g_conf.EXPERIMENT_NAME, stale_file_name)
+
+    if os.path.exists(full_path):
+
+        return True
+
+    else:
+        return False
+
 def validation_stale_point(validation_name):
 
     stale_file_name = "validation_" + validation_name + "_stale.csv"

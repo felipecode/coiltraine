@@ -15,7 +15,7 @@ from network import CoILModel
 from input import CoILDataset, Augmenter
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_checkpoint_ready,\
-    maximun_checkpoint_reach, get_next_checkpoint
+    maximun_checkpoint_reach, get_next_checkpoint, check_loss_validation_stop_exists
 
 
 
@@ -102,7 +102,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         best_loss_iter = 0
         best_error_iter = 0
 
-        while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
+        while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE) and \
+                not check_loss_validation_stop_exists(dataset_name):
 
             if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
 

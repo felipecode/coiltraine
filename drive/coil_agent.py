@@ -54,7 +54,7 @@ def join_classes(labels_image):
 class CoILAgent(Agent):
 
 
-    def __init__(self, checkpoint, town_name, record_collisions):
+    def __init__(self, checkpoint, town_name, record_collisions=False):
 
 
         Agent.__init__(self)
