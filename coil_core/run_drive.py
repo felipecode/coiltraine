@@ -203,7 +203,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             for i in range(len(task_list)):
                 # Write the header of the summary file used conclusion
                 # While the checkpoint is not there
-                write_header_control_summary(file_base, task_list[i])
+                write_header_control_summary(file_base, task_list[i], write_std=True)
 
         """ 
             ######
