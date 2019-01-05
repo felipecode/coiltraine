@@ -133,13 +133,15 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
                         print ("log ",log)
                         f.write("%s,%s" % (exp, log.split('_')[1]))
                         for variable in variables_to_export:
+                            print ("Variable ", variable)
                             f.write(",")
                             for task in task_list:
-                                print ("Task ",task)
+                                print ("Task ", task)
                                 if experiment_list[experiments.index(exp)][count][task] \
                                     and experiment_list[experiments.index(exp)]  \
                                                                      [count][task][variable]:
-
+                                    print ("    ", experiment_list[experiments.index(exp)]
+                                                                     [count][task][variable])
                                     f.write("%.3f/" % experiment_list[experiments.index(exp)]
                                                                      [count][task][variable])
 

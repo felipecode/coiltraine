@@ -171,14 +171,26 @@ def get_start_end_points(summary):
 
 
 
+def print_cause_of_end():
+    """
+        The dot that finilizes the printing is codified differently depending on the
+        cause ( pedestrian, vehicle, timeout, other)
+    :return: 
+    """
+    pass
+
+
 
 
 def plot_episodes_tracks(exp_batch, experiment, checkpoint, city_name, exp_suite, meas_file):
 
+    # We build the measurement file used for the
+
+
     image_location = map.__file__[:-7]
     carla_map = map.CarlaMap(city_name, 0.164, 50)
 
-
+    # Split the measurements for each of the episodes
     episodes_positions, travelled_distances = split_episodes(meas_file)
 
     root_folder = "_logs"
@@ -297,7 +309,10 @@ if __name__ == '__main__':
         [255, 255, 0]
 
     ]
+    plot_episodes_tracks('cvprfinal_valstop', 'res34-100-lowdropout',
+                         140000, 'Town01','Long3NewWeather'):
 
+"""
     plot_episodes_tracks_sameimage('eccv_debug',
                          'experiment_24',
                          '200000',
@@ -325,3 +340,4 @@ if __name__ == '__main__':
                          color_palete,
                          episode_list
                          )
+"""
