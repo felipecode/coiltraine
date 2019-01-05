@@ -124,6 +124,8 @@ def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         # plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
         #                     )
         print(averaged_dict)
+        print("Std computed")
+        print(std_dict)
 
         carla_process.kill()
         """ KILL CARLA, FINISHED THIS BENCHMARK"""
