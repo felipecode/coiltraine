@@ -43,7 +43,6 @@ if __name__ == '__main__':
         '-p'
         '--position',
         dest='position',
-        default=100000,
         type=int
 
     )
