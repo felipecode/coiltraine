@@ -114,6 +114,9 @@ def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         file_base = os.path.join('_logs', exp_batch, exp_alias,
                                  g_conf.PROCESS_NAME + '_csv', control_filename)
 
+        # If want to write paths, write all the paths + mark cause of death.
+
+
         for i in range(len(task_list)):
             write_data_point_control_summary(file_base, task_list[i],
                                              averaged_dict, checkpoint_number, i, std_dict)
