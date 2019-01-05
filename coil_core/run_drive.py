@@ -68,7 +68,7 @@ def start_carla_simulator(gpu, town_name, docker):
 
 
     coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4' 
-                           '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
+                           '-windowed'+ '-benchmark' + '-fps=10' + '-world-port='+ str(port)})
 
     return sp, port, out
 
