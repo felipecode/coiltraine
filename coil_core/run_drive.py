@@ -120,7 +120,7 @@ def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         # If want to write paths, write all the paths + mark cause of death.
         if params['write_paths']:
             plot_episodes_tracks(exp_batch, exp_alias,
-                                 checkpoint_number, town_name, experiment_set)
+                                 checkpoint_number, town_name, g_conf.PROCESS_NAME.split('_')[1])
 
         for i in range(len(task_list)):
             write_data_point_control_summary(file_base, task_list[i],
