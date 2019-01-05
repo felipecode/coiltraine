@@ -25,6 +25,8 @@ from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkp
 from utils.general import compute_average_std_separatetasks, get_latest_path, write_header_control_summary,\
      write_data_point_control_summary, camelcase_to_snakecase, unique
 
+from visualization.plot_on_map import plot_episodes_tracks
+
 
 def frame2numpy(frame, frame_size):
     return np.resize(np.fromstring(frame, dtype='uint8'), (frame_size[1], frame_size[0], 3))
@@ -116,7 +118,9 @@ def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_bat
                                  g_conf.PROCESS_NAME + '_csv', control_filename)
 
         # If want to write paths, write all the paths + mark cause of death.
-
+        if params['write_paths']:
+            plot_episodes_tracks(exp_batch, exp_alias,
+                                 checkpoint_number, town_name, experiment_set)
 
         for i in range(len(task_list)):
             write_data_point_control_summary(file_base, task_list[i],

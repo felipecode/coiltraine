@@ -85,6 +85,12 @@ if __name__ == '__main__':
         help='Set to carla to run offscreen'
     )
     argparser.add_argument(
+        '-nwp', '--no_write-paths',
+        action='store_true',
+        dest='no_write_paths',
+        help='Set to write paths'
+    )
+    argparser.add_argument(
         '-gv',
         '--gpu-value',
         dest='gpu_value',
@@ -157,7 +163,8 @@ if __name__ == '__main__':
         "suppress_output": True,
         "no_screen": args.no_screen,
         "docker": args.docker,
-        "record_collisions": args.record_collisions
+        "record_collisions": args.record_collisions,
+        "write_paths": not args.no_write_paths
     }
 
     if args.single_process is not None:
