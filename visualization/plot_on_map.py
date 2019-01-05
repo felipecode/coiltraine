@@ -182,10 +182,11 @@ def print_cause_of_end():
 
 
 
-def plot_episodes_tracks(exp_batch, experiment, checkpoint, city_name, exp_suite, meas_file):
+def plot_episodes_tracks(exp_batch, experiment, checkpoint, city_name, exp_suite, ):
 
-    # We build the measurement file used for the
-
+    # We build the measurement file used for the benchmarks.
+    '_benchmarks_results/eccv_debug_experiment_24_200000_drive_control_output_auto_ECCVGeneralizationSuite_Town02'
+    meas_file = 'a'
 
     image_location = map.__file__[:-7]
     carla_map = map.CarlaMap(city_name, 0.164, 50)

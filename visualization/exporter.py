@@ -138,7 +138,7 @@ def export_csv_separate(exp_batch, variables_to_export, task_list, checkpoint_nu
                             for task in task_list:
                                 print ("Task ", task)
                                 if experiment_list[experiments.index(exp)][count][task] \
-                                    and experiment_list[experiments.index(exp)]  \
+                                    and experiment_list[experiments.index(exp)] \
                                                                      [count][task][variable]:
                                     print ("    ", experiment_list[experiments.index(exp)]
                                                                      [count][task][variable])
