@@ -25,7 +25,7 @@ Objectives:
 ![COIL Diagram](docs/img/CoIL.png?raw=true )
 
 
-The [COiLTRAiNE](docs/coitraine.md) framework allows simultaneous [training](docs/main_modules.md/#train), driving on [scenarios in CARLA](docs/main_modules.md/#drive) and [prediction of controls](docs/main_modules.md/#validation) on some static dataset. This process can be done on several experiments at the same time. 
+The [COiLTRAiNE](docs/coiltraine.md) framework allows simultaneous [training](docs/main_modules.md/#train), driving on [scenarios in CARLA](docs/main_modules.md/#drive) and [prediction of controls](docs/main_modules.md/#validation) on some static dataset. This process can be done on several experiments at the same time. 
 
 
 
@@ -65,14 +65,15 @@ variable with the path to reach the CARLA root directory:
 
 #### Executing
 
- Assuming that you set the CARLA_PATH, 
-to add evaluation on a CARLA scenario and also some evaluation in
-a sample dataset run:
+ Assuming that you set the CARLA_PATH, you can run the coiltraine system by running:
      
     python3 coiltraine.py --folder sample --gpus 0 -de CorlTraining_Town01 -vd CoILVal1
 
-Where the CorlTraining is a driving scenario on Town01, defined as one of the classes on the
-drive/suites folder.The validation datasets are passed as parameter with -vd  and should be placed 
+Where the --folder sample is the [experiment batch](https://github.com/felipecode/CoIL/blob/master/docs/configuration.md)
+containg all the experiments taht are going to 
+be trained and validated.
+The CorlTraining is a driving scenario on Town01, defined as one of the classes on the
+drive/suites folder. The validation datasets are passed as parameter with -vd  and should be placed 
 at the COIL_DATASET_PATH folder.
 
 Finally, note that the execution of the driving scenario on CARLA can also be done [using docker](docs/main_modules.md/#drive),
@@ -85,7 +86,7 @@ Finally, note that the execution of the driving scenario on CARLA can also be do
 
 * Conditional Imitation Learning
 * Conditional Imitation Learning CARLA paper
-* [On Offline Evaluation of Vision-based Driving Models](docs/on_offline_evaluation.md)
+* [On Offline Evaluation of Vision-based Driving Models](docs/on_offline_evaluation.md) [paper](https://arxiv.org/abs/1809.04843)
 * New One (Soon)
 
 
