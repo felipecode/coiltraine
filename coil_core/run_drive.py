@@ -75,11 +75,10 @@ def start_carla_simulator(gpu, town_name, docker):
 def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_batch, exp_alias, params,
                       control_filename, task_list):
 
-    port = 2006
     try:
         """ START CARLA"""
-        #carla_process, port, out = start_carla_simulator(gpu, town_name,
-        #                                                 params['docker'])
+        carla_process, port, out = start_carla_simulator(gpu, town_name,
+                                                         params['docker'])
 
         checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                              , 'checkpoints', str(checkpoint_number) + '.pth'))
