@@ -67,7 +67,7 @@ variable with the path to reach the CARLA root directory:
 
  Assuming that you set the CARLA_PATH, you can run the coiltraine system by running:
      
-    python3 coiltraine.py --folder sample --gpus 0 -de CorlTraining_Town01 -vd CoILVal1
+    python3 coiltraine.py --folder sample --gpus 0 -de CorlNewWeather_Town01 -vd CoILVal1
 
 Where the --folder sample is the [experiment batch](https://github.com/felipecode/CoIL/blob/master/docs/configuration.md)
 containg all the experiments taht are going to 
