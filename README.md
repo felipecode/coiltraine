@@ -37,7 +37,7 @@ To install COiLTRAiNE, we provide a conda environment requirements file.
 Start by cloning the repository on some folder and then, to
 install, just run:
 
-    conda env create -f requirements.yml
+    conda env create -f requirements.yaml
 
 #### Setting Environment/ Getting Data
 
