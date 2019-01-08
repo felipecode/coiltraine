@@ -42,9 +42,6 @@ def parse_boost_configuration(configuration):
     return name, conf_dict
 
 
-# THIS PARSING IS A BIT HARDCODED
-
-
 def parse_remove_configuration(configuration):
     """
     Turns the configuration line of sliptting into a name and a set of params.
@@ -87,10 +84,6 @@ class CoILDataset(Dataset):
             self._remove_params = []
             self.preload_name = preload_name
 
-        # If  not all the weathers are present we keep without anything ( WE ASSUME THAT THIS HAS LENGHT 4)
-        if len(g_conf.WEATHERS) < 4:
-            self.preload_name = self.preload_name + '-'.join(str(e) for e in g_conf.WEATHERS)
-
         print("preload Name ", self.preload_name)
 
         if self.preload_name is not None and os.path.exists(
@@ -111,16 +104,26 @@ class CoILDataset(Dataset):
         return len(self.measurements)
 
     def __getitem__(self, index):
+        """
+        Get item function used by the dataset loader
+        returns all the measurements with the desired image.
+
+        Args:
+            index:
+
+        Returns:
+
+        """
 
         img_path = os.path.join(self.root_dir,
                                 self.sensor_data_names[index].split('/')[-2],
                                 self.sensor_data_names[index].split('/')[-1])
 
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+        # Apply the image transformation
         if self.transform is not None:
             boost = 1
             img = self.transform(self.batch_read_number * boost, img)
-
         else:
             img = img.transpose(2, 0, 1)
 
@@ -141,7 +144,7 @@ class CoILDataset(Dataset):
 
     def is_measurement_partof_experiment(self, measurement_data):
 
-        # If the measument data is not removable is because it is part of this experiment dataa
+        # If the measurement data is not removable is because it is part of this experiment dataa
         return not self._check_remove_function(measurement_data, self._remove_params)
 
     def _get_final_measurement(self, speed, measurement_data, angle, directions):
@@ -165,7 +168,6 @@ class CoILDataset(Dataset):
 
         if 'brake' not in g_conf.TARGETS:
             # A bit of repeating code, but helps for the sake of clarity
-
             if measurement_augmented['brake'] > 0.01:
                 final_throtle = -measurement_augmented['brake']
                 final_throtle_noise = -measurement_augmented['brake_noise']
@@ -205,17 +207,16 @@ class CoILDataset(Dataset):
     def pre_load_image_folders(self, path):
         """
         Pre load the image folders for each episode, keep in mind that we only take
-        the measurements that we think that are interesting for now
+        the measurements that we think that are interesting for now.
 
-        args
+        Args
             the path for the dataset
 
-
-        returns
-         sensor data names: it is a vector with n dimensions being one for each sensor modality
-         for instance, rgb only dataset will have a single vector with all the image names.
-         float_data: all the wanted float data is loaded inside a vector, that is a vector
-         of dictionaries.
+        Returns
+            sensor data names: it is a vector with n dimensions being one for each sensor modality
+            for instance, rgb only dataset will have a single vector with all the image names.
+            float_data: all the wanted float data is loaded inside a vector, that is a vector
+            of dictionaries.
 
         """
 
@@ -233,20 +234,12 @@ class CoILDataset(Dataset):
         for episode in episodes_list:
 
             print('Episode ', episode)
-            """
-            if not os.path.exists(os.path.join(episode, "checked")) and not os.path.exists(
-                    os.path.join(episode, "processed2")) \
-                    and not os.path.exists(os.path.join(episode, "bad_episode")):
-                # Episode was not checked. So we don't load it.
-                print("Not checked")
-                continue
-            """
 
             if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
                 # The number of wanted hours achieved
                 break
 
-            # Get all the measuremensts from this episode
+            # Get all the measurements from this episode
             measurements_list = glob.glob(os.path.join(episode, 'measurement*'))
             sort_nicely(measurements_list)
 
@@ -261,14 +254,14 @@ class CoILDataset(Dataset):
 
                 data_point_number = measurement.split('_')[-1].split('.')[0]
 
-                # TODO the dataset camera name can be a parameter
                 with open(measurement) as f:
                     measurement_data = json.load(f)
 
                 # depending on the configuration file, we eliminated the kind of measurements
                 # that are not going to be used for this experiment
-
                 # We extract the interesting subset from the measurement dict
+
+                # If the forward speed is not on the dataset it is because speed is zero.
                 if 'forwardSpeed' in measurement_data['playerMeasurements']:
                     speed = measurement_data['playerMeasurements']['forwardSpeed']
                 else:
@@ -287,7 +280,7 @@ class CoILDataset(Dataset):
                     count_added_measurements += 1
 
                 # We do measurements for the left side camera
-                # We convert the speed to KM/h for the augmentaiton
+                # We convert the speed to KM/h for the augmentation
 
                 # We extract the interesting subset from the measurement dict
 
@@ -329,6 +322,8 @@ class CoILDataset(Dataset):
 
         return sensor_data_names, float_dicts
 
+    # TODO: Clean up this part.
+
     def augment_directions(self, directions):
 
         if directions == 2.0:
@@ -339,17 +334,16 @@ class CoILDataset(Dataset):
 
     def augment_steering(self, camera_angle, steer, speed):
         """
-            Apply the steering physical equation to augment for the lateral cameras.
+            Apply the steering physical equation to augment for the lateral cameras steering
         Args:
-            camera_angle_batch:
-            steer_batch:
-            speed_batch:
+            camera_angle: the angle of the camera
+            steer: the central steering
+            speed: the speed that the car is going
 
         Returns:
             the augmented steering
 
         """
-
         time_use = 1.0
         car_length = 6.0
 
@@ -380,6 +374,11 @@ class CoILDataset(Dataset):
 
     def controls_position(self):
         return np.where(self.meta_data[:, 0] == b'control')[0][0]
+
+
+    """
+        Methods to interact with the dataset attributes that are used for training.
+    """
 
     def extract_targets(self, data):
         """

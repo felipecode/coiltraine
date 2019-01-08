@@ -80,7 +80,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         # can be found
         dataset = CoILDataset(full_dataset, transform=augmenter,
                               preload_name=str(g_conf.NUMBER_OF_HOURS)
-                                            + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+                                               + 'hours_' + g_conf.TRAIN_DATASET_NAME)
 
         data_loader = select_balancing_strategy(dataset, iteration, number_of_workers)
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
@@ -99,11 +99,10 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         criterion = Loss(g_conf.LOSS_FUNCTION)
 
         # Loss time series window
-
         for data in data_loader:
 
-            # Basically, validate every 20k Steps, if it goes up 3 times ,
-            # add a stop on the _logs folder
+            # Basically in this mode of execution, we validate every X Steps, if it goes up 3 times,
+            # add a stop on the _logs folder that is going to be read by this process
             if g_conf.FINISH_ON_VALIDATION_STALE is not None and \
                     check_loss_validation_stopped(iteration, g_conf.FINISH_ON_VALIDATION_STALE):
                 break
@@ -192,7 +191,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             coil_logger.write_on_error_csv('train', loss.data)
             print("Iteration: %d  Loss: %f" % (iteration, loss.data))
-
 
         coil_logger.add_message('Finished', {})
 

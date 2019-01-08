@@ -1,7 +1,4 @@
 from __future__ import unicode_literals
-
-import json
-import logging
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,13 +17,7 @@ PROCESS_NAME = ''
 LOG_FREQUENCY = 1
 IMAGE_LOG_FREQUENCY = 1
 tl = ''
-# This next bit is to ensure the script runs unchanged on 2.x and 3.x
 
-
-
-
-
-#logging.info(SM('message 1', set_value={1, 2, 3}, snowman='\u2603'))
 
 def create_log(exp_batch_name, exp_name, process_name, log_frequency=1, image_log_frequency=15):
 
@@ -59,7 +50,6 @@ def create_log(exp_batch_name, exp_name, process_name, log_frequency=1, image_lo
         flog = filelogger(exp_name + '_' + process_name, [], full_name, writing_level='w')
 
 
-
     # TODO: This needs to be updated after a while. ???
     g_logger = flog
     EXPERIMENT_BATCH_NAME = exp_batch_name
@@ -86,9 +76,7 @@ def add_message(phase, message, iteration=None):
 
     Returns:
 
-
     """
-
 
     if phase == 'Iterating' and iteration is None:
         raise ValueError(" Iterating messages should have the iteration/checkpoint.")
@@ -123,8 +111,6 @@ def write_on_csv(checkpoint_name, output):
                                   EXPERIMENT_NAME, PROCESS_NAME + '_csv')
 
     file_name = os.path.join(full_path_name, str(checkpoint_name) + '.csv')
-
-    #print (file_name)
 
     with open(file_name, 'a+') as f:
         f.write("%f" % output[0])
@@ -211,14 +197,11 @@ def recover_loss_window(dataset_name, iteration):
     # Now we need to rewrite on top of the recovered list, so everything syncs
 
     with open(file_name, 'w') as f:
-        print ("Rewriting")
+        print("Rewriting")
         for data in recovered_list:
             f.write("%f\n" % data)
 
     return recovered_list
-
-
-
 
 
 
@@ -229,8 +212,6 @@ def add_scalar(tag, value, iteration=None, force_writing=False):
     If you force writing it always writes regardless of the iteration
     # TODO: how about making the decision to write outside ?
     # TODO: The problem is that we dont want that in a main
-
-
     """
 
     if iteration is not None:
