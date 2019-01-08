@@ -13,10 +13,9 @@ import dlib
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel
 from input import CoILDataset, Augmenter
-from logger import monitorer, coil_logger
+from logger import coil_logger
 from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_checkpoint_ready,\
     maximun_checkpoint_reach, get_next_checkpoint
-
 
 
 def write_waypoints_output(iteration, output):
@@ -90,16 +89,16 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         # The window used to keep track of the trainings
-        L1_window = []
+        l1_window = []
         latest = get_latest_evaluated_checkpoint()
-        if latest is not None:  # When nothing was tested, get latest returns none, we fix that.
-            L1_window = coil_logger.recover_loss_window(dataset_name, -1)
+        if latest is not None:  # When latest is noe
+            l1_window = coil_logger.recover_loss_window(dataset_name, -1)
 
         model.cuda()
 
-        best_loss = 1000
+        best_mse = 1000
         best_error = 1000
-        best_loss_iter = 0
+        best_mse_iter = 0
         best_error_iter = 0
 
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE):
@@ -116,7 +115,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                 model.load_state_dict(checkpoint['state_dict'])
 
                 model.eval()
-                accumulated_loss = 0
+                accumulated_mse = 0
                 accumulated_error = 0
                 iteration_on_checkpoint = 0
                 for data in data_loader:
@@ -126,19 +125,20 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                     output = model.forward_branch(torch.squeeze(data['rgb']).cuda(),
                                                   dataset.extract_inputs(data).cuda(),
                                                   controls)
-                    # It could be either waypoints
+                    # It could be either waypoints or direct control
                     if 'waypoint1_angle' in g_conf.TARGETS:
                         write_waypoints_output(checkpoint_iteration, output)
                     else:
                         write_regular_output(checkpoint_iteration, output)
 
-                    # TODO: Change this a functional standard using the loss functions.
-                    # LOSS is actually the square error
-                    loss = torch.mean((output - dataset.extract_targets(data).cuda())**2).data.tolist()
-                    mean_error = torch.mean(torch.abs(output - dataset.extract_targets(data).cuda())).data.tolist()
+                    mse = torch.mean((output -
+                                      dataset.extract_targets(data).cuda())**2).data.tolist()
+                    mean_error = torch.mean(
+                                    torch.abs(output -
+                                              dataset.extract_targets(data).cuda())).data.tolist()
 
                     accumulated_error += mean_error
-                    accumulated_loss += loss
+                    accumulated_mse += mse
                     error = torch.abs(output - dataset.extract_targets(data).cuda())
 
                     # Log a random position
@@ -148,7 +148,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                          {'Checkpoint': latest,
                           'Iteration': (str(iteration_on_checkpoint*120)+'/'+str(len(dataset))),
                           'MeanError': mean_error,
-                          'Loss': loss,
+                          'MSE': mse,
                           'Output': output[position].data.tolist(),
                           'GroundTruth': dataset.extract_targets(data)[position].data.tolist(),
                           'Error': error[position].data.tolist(),
@@ -156,16 +156,22 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                           latest)
                     iteration_on_checkpoint += 1
                     print("Iteration %d  on Checkpoint %d : Error %f" % (iteration_on_checkpoint,
-                                                                 checkpoint_iteration, mean_error))
+                                                                checkpoint_iteration, mean_error))
 
-                checkpoint_average_loss = accumulated_loss/(len(data_loader))
+                """
+                    ########
+                    Finish a round of validation, write results, wait for the next
+                    ########
+                """
+
+                checkpoint_average_mse = accumulated_mse/(len(data_loader))
                 checkpoint_average_error = accumulated_error/(len(data_loader))
-                coil_logger.add_scalar('Loss', checkpoint_average_loss, latest, True)
+                coil_logger.add_scalar('Loss', checkpoint_average_mse, latest, True)
                 coil_logger.add_scalar('Error', checkpoint_average_error, latest, True)
 
-                if checkpoint_average_loss < best_loss:
-                    best_loss = checkpoint_average_loss
-                    best_loss_iter = latest
+                if checkpoint_average_mse < best_mse:
+                    best_mse = checkpoint_average_mse
+                    best_mse_iter = latest
 
                 if checkpoint_average_error < best_error:
                     best_error = checkpoint_average_error
@@ -175,24 +181,23 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                      {'Summary':
                          {
                           'Error': checkpoint_average_error,
-                          'Loss': checkpoint_average_loss,
+                          'Loss': checkpoint_average_mse,
                           'BestError': best_error,
-                          'BestLoss': best_loss,
-                          'BestLossCheckpoint': best_loss_iter,
+                          'BestMSE': best_mse,
+                          'BestMSECheckpoint': best_mse_iter,
                           'BestErrorCheckpoint': best_error_iter
                          },
 
-                     'Checkpoint': latest},
+                      'Checkpoint': latest},
                                         latest)
 
-                L1_window.append(checkpoint_average_error)
-                print ("L1 Window ", L1_window)
+                l1_window.append(checkpoint_average_error)
                 coil_logger.write_on_error_csv(dataset_name, checkpoint_average_error)
+
                 # If we are using the finish when validation stops, we check the current
-                print("Steep without decrease ", dlib.count_steps_without_decrease(L1_window))
                 if g_conf.FINISH_ON_VALIDATION_STALE is not None:
-                    if dlib.count_steps_without_decrease(L1_window) > 3 and \
-                            dlib.count_steps_without_decrease_robust(L1_window) > 3:
+                    if dlib.count_steps_without_decrease(l1_window) > 3 and \
+                            dlib.count_steps_without_decrease_robust(l1_window) > 3:
                         coil_logger.write_stop(dataset_name, latest)
                         break
 
@@ -200,7 +205,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
                 latest = get_latest_evaluated_checkpoint()
                 time.sleep(1)
-                print ("Waiting for the next Validation")
+                print("Waiting for the next Validation")
 
         coil_logger.add_message('Finished', {})
 
@@ -209,10 +214,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         # We erase the output that was unfinished due to some process stop.
         if latest is not None:
             coil_logger.erase_csv(latest)
-
     except:
         traceback.print_exc()
-
         coil_logger.add_message('Error', {'Message': 'Something Happened'})
         # We erase the output that was unfinished due to some process stop.
         if latest is not None:

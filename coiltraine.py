@@ -102,7 +102,7 @@ if __name__ == '__main__':
     )
     args = argparser.parse_args()
 
-    # Check if the vector of GPUS passed are valid.
+    # Check if the vector of GPUs passed are valid.
     for gpu in args.gpus:
         try:
             int(gpu)
@@ -111,13 +111,13 @@ if __name__ == '__main__':
 
     # Check if the mandatory folder argument is passed
     if args.folder is None:
-        raise ValueError(" You should set a folder name where the experiments are placed")
+        raise ValueError("You should set a folder name where the experiments are placed")
 
     # Check if the driving parameters are passed in a correct way
     if args.driving_environments is not None:
         for de in list(args.driving_environments):
-            if len(de.split('_'))  < 2:
-                raise ValueError("Invalid format for the driving envinronments should be Suite_Town")
+            if len(de.split('_')) < 2:
+                raise ValueError("Invalid format for the driving environments should be Suite_Town")
 
     # This is the folder creation of the
     create_log_folder(args.folder)

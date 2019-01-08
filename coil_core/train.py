@@ -7,7 +7,7 @@ import torch
 import torch.optim as optim
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
-from network import CoILModel, Loss, adjust_learning_rate, adjust_learning_rate_auto
+from network import CoILModel, Loss, adjust_learning_rate_auto
 from input import CoILDataset, Augmenter, select_balancing_strategy
 from logger import coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint, \
@@ -47,9 +47,11 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             if not os.path.exists('_output_logs'):
                 os.mkdir('_output_logs')
             sys.stdout = open(os.path.join('_output_logs', exp_alias + '_' +
-                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a", buffering=1)
+                              g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"), "a",
+                              buffering=1)
             sys.stderr = open(os.path.join('_output_logs',
-                              exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
+                              exp_alias + '_err_'+g_conf.PROCESS_NAME + '_'
+                                           + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
         # Get the latest checkpoint to be loaded

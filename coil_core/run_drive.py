@@ -26,18 +26,24 @@ from utils.general import compute_average_std_separatetasks, get_latest_path, wr
      write_data_point_control_summary, camelcase_to_snakecase, unique
 
 
-def frame2numpy(frame, frame_size):
-    return np.resize(np.fromstring(frame, dtype='uint8'), (frame_size[1], frame_size[0], 3))
-
-
 def find_free_port():
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
         s.bind(('', 0))
         return s.getsockname()[1]
 
 
-
 def start_carla_simulator(gpu, town_name, docker):
+    """
+        Start a CARLA simulator, either by running a docker image or by running the binary
+        directly. For that, the CARLA_PATH environment variable should be specified.
+    Args:
+        gpu: the gpu number to run carla
+        town_name: The town name
+        docker: the docker name, if used. If not used docker should be None.
+
+    Returns:
+
+    """
     # The out part is only used for docker
     # Set the outfiles for the process
     carla_out_file = os.path.join('_output_logs',
@@ -47,8 +53,9 @@ def start_carla_simulator(gpu, town_name, docker):
     port = find_free_port()
 
     if docker is not None:
-        sp = subprocess.Popen(['docker', 'run', '--rm', '-d', '-p', str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
-                              '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), docker,
+        sp = subprocess.Popen(['docker', 'run', '--rm', '-d', '-p',
+                               str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
+                               '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), docker,
                                '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name, '-windowed',
                                '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
                               stdout=subprocess.PIPE)
@@ -58,13 +65,13 @@ def start_carla_simulator(gpu, town_name, docker):
     else:  # If you run carla without docker it requires a screen.
 
         carla_path = os.environ['CARLA_PATH']
-        sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4', '/Game/Maps/' + town_name,
+        sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
+                               '/Game/Maps/' + town_name,
                                '-windowed',
                                '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
                                stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
 
         out = "0"
-
 
     coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4' 
                            '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
@@ -72,8 +79,25 @@ def start_carla_simulator(gpu, town_name, docker):
     return sp, port, out
 
 
-def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_batch, exp_alias, params,
-                      control_filename, task_list):
+def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_batch, exp_alias,
+                      params, control_filename, task_list):
+    """
+        The function to run a driving benchmark, it starts a carla process, run a driving
+        benchmark with a certain agent, then log the results.
+    Args:
+        checkpoint_number: Checkpoint used for the agent being benchmarked
+        gpu: The GPU allocated for the driving benchmark
+        town_name: The name of the CARLA town
+        experiment_set: The experiment set ( inside the drive suites)
+        exp_batch: The batch which this experiment is part of
+        exp_alias: The alias used to identify all the experiments
+        params: Params for the driving, all of them passed on the command line.
+        control_filename: the output file name for the results of the benchmark
+        task_list: the list of tasks
+
+    Returns:
+
+    """
 
     try:
         """ START CARLA"""
@@ -116,10 +140,6 @@ def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_bat
             write_data_point_control_summary(file_base, task_list[i],
                                              averaged_dict, checkpoint_number, i)
 
-        # plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
-        #                     )
-        print(averaged_dict)
-
         carla_process.kill()
         """ KILL CARLA, FINISHED THIS BENCHMARK"""
         subprocess.call(['docker', 'stop', out[:-1]])
@@ -147,6 +167,18 @@ def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_bat
 
 
 def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
+    """
+
+    Args:
+        gpu:
+        exp_batch:
+        exp_alias:
+        drive_conditions:
+        params:
+
+    Returns:
+
+    """
 
     try:
         print("Running ", __file__, " On GPU ", gpu, "of experiment name ", exp_alias)
@@ -157,18 +189,10 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
 
-
-        print ("drive cond", drive_conditions)
         exp_set_name, town_name = drive_conditions.split('_')
 
-        # Here is some way to diferentiate betwen using the oracle to output acc/brake
-        if g_conf.USE_ORACLE:
-            control_filename = 'control_output_auto'
-        else:
-            control_filename = 'control_output'
-
-
-        experiment_suite_module = __import__('drive.suites.' + camelcase_to_snakecase(exp_set_name) + '_suite',
+        experiment_suite_module = __import__('drive.suites.' + camelcase_to_snakecase(exp_set_name)
+                                             + '_suite',
                                              fromlist=[exp_set_name])
         experiment_suite_module = getattr(experiment_suite_module, exp_set_name)
 
@@ -185,7 +209,16 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                               "a", buffering=1)
 
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
+        if g_conf.USE_ORACLE:
+            control_filename = 'control_output_auto'
+        else:
+            control_filename = 'control_output'
 
+        """
+            #####
+            Preparing the output files that will contain the driving summary
+            #####
+        """
         experiment_list = experiment_set.build_experiments()
         # Get all the uniquely named tasks
         task_list = unique([experiment.task_name for experiment in experiment_list ])
@@ -206,7 +239,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
         """ 
             ######
-            Run a single driving iteration specified by the iteration were validation is stale
+            Run a single driving benchmark specified by the checkpoint were validation is stale
             ######
         """
 
@@ -216,7 +249,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                 time.sleep(0.1)
 
             validation_state_iteration = validation_stale_point(g_conf.FINISH_ON_VALIDATION_STALE)
-            driving_iteration(validation_state_iteration, gpu, town_name, experiment_set, exp_batch,
+            driving_benchmark(validation_state_iteration, gpu, town_name, experiment_set, exp_batch,
                               exp_alias, params, control_filename, task_list)
 
         else:
@@ -234,7 +267,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                     latest = get_next_checkpoint(g_conf.TEST_SCHEDULE,
                                                  control_filename + '_' + task_list[0])
 
-                    driving_iteration(latest, gpu, town_name, experiment_set, exp_batch,
+                    driving_benchmark(latest, gpu, town_name, experiment_set, exp_batch,
                                       exp_alias, params, control_filename, task_list)
 
                 else:

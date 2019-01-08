@@ -69,26 +69,6 @@ def plot_test_image(image, name):
     image_to_plot = Image.fromarray(image)
     image_to_plot.save(name)
 
-# TODO: this is a temporary function until carla is able to deal with changing towns
-def fix_driving_environments(drive_environents):
-    new_drive_environments = []
-    for exp_set_name in drive_environents:
-
-        if exp_set_name == 'Town01':
-            new_drive_environments.append('ECCVTrainingSuite_' + exp_set_name)
-
-        elif exp_set_name == 'Town02':
-            new_drive_environments.append('ECCVGeneralizationSuite_' + exp_set_name)
-
-        elif exp_set_name == 'TestT1':
-
-            new_drive_environments.append('TestT1_Town01')
-        elif exp_set_name == 'TestT2':
-
-            new_drive_environments.append('TestT2_Town02')
-
-
-    return new_drive_environments
 
 def create_log_folder(exp_batch_name):
     """
@@ -114,6 +94,7 @@ def create_exp_path(exp_batch_name, experiment_name):
     if not os.path.exists(os.path.join(root_path, exp_batch_name, experiment_name)):
         os.mkdir(os.path.join(root_path, exp_batch_name, experiment_name))
 
+
 def get_validation_datasets(exp_batch_name):
     root_path = '_logs'
 
@@ -129,6 +110,7 @@ def get_validation_datasets(exp_batch_name):
                     validation_datasets.add(folder_file.split('_')[-1])
 
     return list(validation_datasets)
+
 
 def get_driving_environments(exp_batch_name):
     root_path = '_logs'
@@ -146,6 +128,7 @@ def get_driving_environments(exp_batch_name):
 
     return list(driving_environments)
 
+
 def erase_logs(exp_batch_name):
 
     root_path = '_logs'
@@ -160,13 +143,10 @@ def erase_logs(exp_batch_name):
                         and '.csv' not in log:
                     os.remove(os.path.join(root_path, exp_batch_name, exp, log))
 
-def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list, ):
-    # TODO: eventually add that for driving
 
-    # Erase wrong plotting for validation!
+def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list, ):
 
     root_path = '_logs'
-
 
     experiments = os.listdir(os.path.join(root_path, exp_batch_name))
 
@@ -178,8 +158,6 @@ def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list, ):
                                                validation_data, 'ground_truth.csv'),
                                   delimiter=","))
         validation_sizes.update({validation_data: val_size})
-
-
 
     for exp in experiments:
         print ("exp", exp)
@@ -209,6 +187,7 @@ def erase_wrong_plotting_summaries(exp_batch_name, validation_data_list, ):
 
                     print ("    deleting")
                     os.remove(csv_file_path)
+
 
 def erase_validations(exp_batch_name, validation_data_list ):
     # TODO: eventually add that for driving
@@ -243,28 +222,21 @@ def erase_validations(exp_batch_name, validation_data_list ):
 def get_latest_path(path):
     """ Considering a certain path for experiments, get the latest one."""
     import glob
-    print (path)
     files_list = glob.glob(os.path.join('_benchmarks_results', path+'*'))
-    print (files_list)
     sort_nicely(files_list)
 
     return files_list[-1]
 
 
-
 def send_email(address, message):
     msg = MIMEText(message)
-
     msg['Subject'] = 'The experiment is finished '
     msg['From'] = address
     msg['To'] = address
 
-
     s = smtplib.SMTP('localhost')
     s.sendmail(address, [address], msg.as_string())
     s.quit()
-
-
 
 
 def compute_average_std(dic_list, weathers, number_of_tasks=1):
@@ -443,12 +415,11 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
 
         """
 
-
-
-
-
-
     return average_results_matrix
+
+"""
+    Writing for the driving summary calculation.
+"""
 def write_header_control_summary(path, task):
 
     filename = os.path.join(path + '_' + task + '.csv')
@@ -492,10 +463,7 @@ def write_data_point_control_summary(path, task, averaged_dict, step, pos):
 
     csv_outfile.close()
 
-
-
-#TODO REFACTOR THIS TWO EPISODES INTO MANY FUNCTIONS
-
+# TODO: Needs refactoring
 def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1):
     """
     There are two types of outputs, these come packed in a dictionary

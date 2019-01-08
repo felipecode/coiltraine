@@ -39,7 +39,6 @@ def save_response_content(response, destination):
                 f.write(chunk)
 
 
-
 if __name__ == "__main__":
     try:
         path = os.environ["COIL_DATASET_PATH"]
@@ -53,7 +52,7 @@ if __name__ == "__main__":
     file_id = '1cXX7Pdxfkz5MD6oMjbmNlXDkUIAxPd6m'
     destination_pack = 'COiLTRAiNESampleDatasets.tar.gz'
 
-    print("Downloading Train an two validations datasets 7GB")
+    print("Downloading on training an two validations datasets (7GB total)")
     download_file_from_google_drive(file_id, destination_pack)
     destination_final = os.path.join("~/", os.environ["COIL_DATASET_PATH"])
     if not os.path.exists(destination_final):
