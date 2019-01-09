@@ -1,9 +1,9 @@
-#### General Configuration Parameters ####
+####General Configuration Parameters####
 SAVE_SCHEDULE: range(0,10001, 2000) # The iterations where training checkpoints are going to be saved
 NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
 MAGICAL_SEED: 26957017
 
-#### Input related parameters ####
+####Input related parameters####
 # A dictionary with all the sensors that are going to be used as input
 # this should match the train dataset
 SENSORS:
