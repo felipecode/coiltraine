@@ -92,7 +92,7 @@ You should see a colored screen on the terminal.
 ![Initial](docs/img/initial.png?raw=true)
 
 
-After finishing training and validation the terminal screen should start driving
+After finishing training and validation, the terminal screen should start driving
 look like as below.
 
 ![Second](docs/img/second.png?raw=true)
