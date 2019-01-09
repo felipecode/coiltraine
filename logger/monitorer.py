@@ -65,12 +65,9 @@ def get_summary(data):
 
 def get_error_summary(data):
 
-    for i in range(1, len(data)):
-        # Find the summary log in the logging file
-        if 'Iterating' in data[-i]:  # Test if it is an iterating log
-            if 'Summary' in data[-i]['Iterating']:
-                return data[-i] # found the summary.
-    else:  # NO SUMMARY YET COMPUTED
+    if 'Error' in data[-1]:
+        return data[-1]['Error']['Message']  # found the summary.
+    else:
         return ''
 
 def get_latest_checkpoint_validation():
@@ -217,7 +214,7 @@ def get_status(exp_batch, experiment, process_name):
     if 'Finished' in data[-1]:
         return ['Finished', ' ']
     if 'Error' in data[-1]:
-        return ['Error', ' ']
+        return ['Error', get_error_summary(data)]
 
 
     raise ValueError(" No valid status found")
