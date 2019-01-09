@@ -184,6 +184,9 @@ def get_status(exp_batch, experiment, process_name):
     # Read the full json file.
     try:
         data = json_formatter.readJSONlog(open(log_file_path, 'r'))
+    except ValueError:
+        return ['Loading', 'Writing Logs']
+
     except Exception:
         import traceback
         traceback.print_exc()
