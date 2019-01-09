@@ -47,7 +47,7 @@ def start_carla_simulator(gpu, town_name, docker):
     # The out part is only used for docker
     # Set the outfiles for the process
     carla_out_file = os.path.join('_output_logs',
-                                  'CARLA_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
+                                  'CARLA_' + g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
     carla_out_file_err = os.path.join('_output_logs',
                                 'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
     port = find_free_port()
@@ -58,23 +58,26 @@ def start_carla_simulator(gpu, town_name, docker):
                                '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), docker,
                                '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name, '-windowed',
                                '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
-                              stdout=subprocess.PIPE)
-
+                               stdout=subprocess.PIPE)
         (out, err) = sp.communicate()
 
     else:  # If you run carla without docker it requires a screen.
-
         carla_path = os.environ['CARLA_PATH']
+
+
         sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
                                '/Game/Maps/' + town_name,
                                '-windowed',
                                '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
-                               stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err, 'w'))
+                               stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err,
+                                                                             'w'))
 
-        out = "0"
+        out = '0'
+    print("Going to communicate")
+
 
     coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4' 
-                           '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
+                            '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
 
     return sp, port, out
 
