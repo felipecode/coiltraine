@@ -92,10 +92,13 @@ You should see a colored screen on the terminal.
 ![Initial](docs/img/initial.png?raw=true)
 
 
-After finishing training and validation the terminal screen should look like as below.
+After finishing training and validation the terminal screen should start driving
+look like as below.
 
+![Second](docs/img/second.png?raw=true)
 
 You will not see any CARLA server screen popping up since CARLA running under docker runs offscreen.
+
 Checking the driving results.
 
 
