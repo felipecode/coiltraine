@@ -31,6 +31,13 @@ The [COiLTRAiNE](docs/coiltraine.md) framework allows simultaneous [training](do
 
 ### Getting started
 
+#### Requirements
+
+  * Hardware: A computer with a dedicated GPU capable of running Unreal Engine. NVIDIA 1070 or
+  better is recommended.
+  * OS: Ubuntu also compatible with CARLA (16.04)
+
+
 #### Installation
 
 To install COiLTRAiNE, we provide a conda environment requirements file.
@@ -66,18 +73,29 @@ For doing scenario evaluation in CARLA you must install CARLA 0.8.4 or CARLA 0.8
 
  Assuming that you have CARLA docker with a docker image name as "carlasim/carla:version" , you can execute the coiltraine system by running:
      
-    python3 coiltraine.py --folder sample --gpus 0 -de CorlNewWeather_Town01 -vd CoILVal1 --docker carlasim/carla:version
+    python3 coiltraine.py --folder sample --gpus 0 -de TestT1_Town01 -vd CoILVal1 --docker carlasim/carla:version
 
 Where the --folder sample is the [experiment batch](https://github.com/felipecode/CoIL/blob/master/docs/configuration.md)
 containg all the experiments that are going to 
 be trained and validated.
-The CorlTraining is a driving scenario on Town01, defined as one of the classes on the
+The TestT1 is a driving scenario on Town01, defined as one of the classes on the
 drive/suites folder. The validation datasets are passed as parameter with -vd  and should be placed 
 at the COIL_DATASET_PATH folder.
 
-Note that you will not see any screen popping up since CARLA running under docker runs offscreen.
+##### Expected outputs
+
+First note that this example trains on sample data and tests on a sample benchmark.
+Thus, the resulting driving model will be of poor quality. Test some of the models
+from the conditional models zoo to get high performance conditional imitation models.
+You should see a colored screen on the terminal. 
 
 
+
+After finishing training and validation the terminal screen should look like as below.
+
+
+You will not see any CARLA server screen popping up since CARLA running under docker runs offscreen.
+Checking the driving results.
 
 
 
