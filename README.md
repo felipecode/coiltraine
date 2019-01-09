@@ -57,27 +57,27 @@ The datasets; CoILTrain , CoILVal1 and CoILVal2; will be stored at
 To collect other datasets please check the data collector repository.
 https://github.com/carla-simulator/data-collector
 
-For doing scenario evaluation in CARLA you must download CARLA 0.8.4 or CARLA 0.8.2
-and unpack it in some directory. After that, you should set the CARLA_PATH
-variable with the path to reach the CARLA root directory:
+#### Getting CARLA
 
-    export CARLA_PATH=<carla_root_directory>
+For doing scenario evaluation in CARLA you must install CARLA 0.8.4 or CARLA 0.8.2 under docker.
+[This tutorial](https://carla.readthedocs.io/en/latest/carla_docker/) explain how to install  carla under docker.
 
 #### Executing
 
- Assuming that you set the CARLA_PATH, you can run the coiltraine system by running:
+ Assuming that you have CARLA docker with a docker image name as "carlasim/carla:version" , you can execute the coiltraine system by running:
      
-    python3 coiltraine.py --folder sample --gpus 0 -de CorlNewWeather_Town01 -vd CoILVal1
+    python3 coiltraine.py --folder sample --gpus 0 -de CorlNewWeather_Town01 -vd CoILVal1 --docker carlasim/carla:version
 
 Where the --folder sample is the [experiment batch](https://github.com/felipecode/CoIL/blob/master/docs/configuration.md)
-containg all the experiments taht are going to 
+containg all the experiments that are going to 
 be trained and validated.
 The CorlTraining is a driving scenario on Town01, defined as one of the classes on the
 drive/suites folder. The validation datasets are passed as parameter with -vd  and should be placed 
 at the COIL_DATASET_PATH folder.
 
-Finally, note that the execution of the driving scenario on CARLA can also be done [using docker](docs/main_modules.md/#drive),
- option which we recommend.
+Note that you will not see any screen popping up since CARLA running under docker runs offscreen.
+
+
 
 
 
