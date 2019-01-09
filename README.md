@@ -89,6 +89,7 @@ Thus, the resulting driving model will be of poor quality. Test some of the mode
 from the conditional models zoo to get high performance conditional imitation models.
 You should see a colored screen on the terminal. 
 
+![Initial](docs/img/initial.png?raw=true)
 
 
 After finishing training and validation the terminal screen should look like as below.
