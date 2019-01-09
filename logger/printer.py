@@ -58,9 +58,9 @@ def print_validation_summary(current, latest, verbose):
 
     print('        LATEST: ')
     print('            Loss: ', UNDERLINE + str(latest['Loss']) + END)
-    print('            Best Loss: ', LIGHT_GREEN + UNDERLINE + str(latest['BestLoss']) + END)
-    print('            Best Loss Checkpoint: ',
-          BLUE + UNDERLINE + str(latest['BestLossCheckpoint']) + END)
+    print('            Best MSE: ', LIGHT_GREEN + UNDERLINE + str(latest['BestMSE']) + END)
+    print('            Best MSE Checkpoint: ',
+          BLUE + UNDERLINE + str(latest['BestMSECheckpoint']) + END)
     print('            Error: ', UNDERLINE + str(latest['Error']) + END)
     print('            Best Error: ', LIGHT_GREEN + UNDERLINE + str(latest['BestError']) + END)
     print('            Best Error Checkpoint: ',
