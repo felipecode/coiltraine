@@ -4,7 +4,6 @@ import traceback
 import sys
 import logging
 
-import numpy as np
 import os
 import time
 import subprocess
@@ -24,6 +23,7 @@ from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkp
     is_next_checkpoint_ready, get_latest_evaluated_checkpoint, validation_stale_point
 from utils.general import compute_average_std_separatetasks, get_latest_path, write_header_control_summary,\
      write_data_point_control_summary, camelcase_to_snakecase, unique
+from plotter.plot_on_map import plot_episodes_tracks
 
 
 def find_free_port():
@@ -44,37 +44,18 @@ def start_carla_simulator(gpu, town_name, docker):
     Returns:
 
     """
-    # The out part is only used for docker
-    # Set the outfiles for the process
-    carla_out_file = os.path.join('_output_logs',
-                                  'CARLA_' + g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
-    carla_out_file_err = os.path.join('_output_logs',
-                                'CARLA_err_'+ g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out")
+
     port = find_free_port()
 
-    if docker is not None:
-        sp = subprocess.Popen(['docker', 'run', '--rm', '-d', '-p',
-                               str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
-                               '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), docker,
-                               '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name, '-windowed',
-                               '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
-                               stdout=subprocess.PIPE)
-        (out, err) = sp.communicate()
+    sp = subprocess.Popen(['docker', 'run', '--rm', '-d', '-p',
+                           str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
+                           '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), docker,
+                           '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name, '-windowed',
+                           '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
+                           stdout=subprocess.PIPE)
+    (out, err) = sp.communicate()
 
-    else:  # If you run carla without docker it requires a screen.
-        carla_path = os.environ['CARLA_PATH']
-
-
-        sp = subprocess.Popen([carla_path + '/CarlaUE4/Binaries/Linux/CarlaUE4',
-                               '/Game/Maps/' + town_name,
-                               '-windowed',
-                               '-benchmark', '-fps=10', '-world-port='+str(port)], shell=False,
-                               stdout=open(carla_out_file, 'w'), stderr=open(carla_out_file_err,
-                                                                             'w'))
-
-        out = '0'
     print("Going to communicate")
-
 
     coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4' 
                             '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
@@ -139,9 +120,15 @@ def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         file_base = os.path.join('_logs', exp_batch, exp_alias,
                                  g_conf.PROCESS_NAME + '_csv', control_filename)
 
+        """ Write the  CSV for the resulting driving performance """
         for i in range(len(task_list)):
             write_data_point_control_summary(file_base, task_list[i],
                                              averaged_dict, checkpoint_number, i)
+
+        """ Write the  paths for the resulting driving performance """
+
+        plot_episodes_tracks(exp_batch, exp_alias,
+                             checkpoint_number, town_name, g_conf.PROCESS_NAME.split('_')[1])
 
         carla_process.kill()
         """ KILL CARLA, FINISHED THIS BENCHMARK"""
@@ -171,7 +158,7 @@ def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_bat
 
 def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
     """
-
+    Main loop function. Executes driving benchmarks the specified iterations.
     Args:
         gpu:
         exp_batch:
@@ -186,7 +173,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
     try:
         print("Running ", __file__, " On GPU ", gpu, "of experiment name ", exp_alias)
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
-
         if not os.path.exists('_output_logs'):
             os.mkdir('_output_logs')
 

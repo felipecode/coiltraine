@@ -13,23 +13,6 @@ from plotter.data_reading import read_summary_csv
 # Check the log and also put it to tensorboard
 
 
-
-def get_current_iteration(exp):
-    """
-
-    Args:
-        exp:
-
-    Returns:
-        The number of iterations this experiments has already run in this mode.
-        ( Depends on validation etc...
-
-    """
-    # TODO:
-
-    pass
-
-
 #### Get things from CARLA benchmark directly to plot as logs #####
 def get_episode_number(benchmark_log_name):
     """ Get the current episode"""
@@ -80,6 +63,15 @@ def get_summary(data):
     else:  # NO SUMMARY YET COMPUTED
         return ''
 
+def get_error_summary(data):
+
+    for i in range(1, len(data)):
+        # Find the summary log in the logging file
+        if 'Iterating' in data[-i]:  # Test if it is an iterating log
+            if 'Summary' in data[-i]['Iterating']:
+                return data[-i] # found the summary.
+    else:  # NO SUMMARY YET COMPUTED
+        return ''
 
 def get_latest_checkpoint_validation():
     csv_file_path = os.path.join('_logs', g_conf.EXPERIMENT_BATCH_NAME,
@@ -136,9 +128,7 @@ def get_latest_checkpoint_drive(control_filename):
     if len(data_matrix.shape) == 1:
         data_matrix = np.expand_dims(data_matrix, axis=0)
 
-
     return float(data_matrix[-1][header.index('step')])
-
 
 
 def get_latest_checkpoint(filename):
@@ -149,7 +139,6 @@ def get_latest_checkpoint(filename):
         return get_latest_checkpoint_drive(filename)
     else:
         raise ValueError("The process name is not producing checkpoints")
-
 
 
 def get_status(exp_batch, experiment, process_name):
@@ -176,7 +165,6 @@ def get_status(exp_batch, experiment, process_name):
         * Finished ( Summarize)
 
     """
-
 
     # Configuration file path
     config_file_path = os.path.join('configs', exp_batch, experiment + '.yaml')

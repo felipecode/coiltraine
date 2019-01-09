@@ -90,7 +90,7 @@ if __name__ == '__main__':
     argparser.add_argument(
         '-dk', '--docker',
         dest='docker',
-        default=None,
+        default='carlasim/carla:0.8.4',
         type=str,
         help='Set to run carla using docker'
     )
@@ -168,8 +168,8 @@ if __name__ == '__main__':
         # We set by default that each gpu has a value of 3.5, allowing a training and
         # a driving/validation
         allocation_parameters = {'gpu_value': args.gpu_value,
-                                 'train_cost': 2,
-                                 'validation_cost': 1.5,
+                                 'train_cost': 1.5,
+                                 'validation_cost': 1.0,
                                  'drive_cost': 1.5}
 
         params = {

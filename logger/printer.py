@@ -165,7 +165,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
             elif status == 'Error':
 
-                print('        STATUS: ', RED + status + END)
+                print('        STATUS: ', RED + status + END, ' - ',  RED + summary + END)
 
             if status == 'Iterating':
                 if 'train' in process:

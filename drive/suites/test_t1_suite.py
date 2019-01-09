@@ -28,7 +28,9 @@ class TestT1(ExperimentSuite):
     @property
     def test_weathers(self):
         return []
-
+    @property
+    def collision_as_failure(self):
+        return True
     def _poses(self):
 
         return [[[36, 40], [39, 35]]]
@@ -80,6 +82,5 @@ class TestT1(ExperimentSuite):
                     Repetitions=1
                 )
                 experiments_vector.append(experiment)
-
 
         return experiments_vector
