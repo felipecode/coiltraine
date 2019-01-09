@@ -81,35 +81,18 @@ Note that the <validation_dataset> must be inside the folder defined
 
 The driving process is executed over the run_drive.py script.
 A different process is executed for every driving environment that
-is passed as parameter to the execution.
-There are two types of execution:
-
-* Regular: It starts carla process directly by executing the binary
-from the CARLA simulator folder. For that running mode, you should
-set the CARLA_PATH environment variable with the path to a CARLA
-binary folder.
-
-* Docker (Recommended): Requires the [docker with carla installation](https://carla.readthedocs.io/en/latest/carla_docker/)
-
-
+is passed as parameter to the execution.  Requires the [docker with carla installation](https://carla.readthedocs.io/en/latest/carla_docker/)
 
 For regular execution:
 
-    python3 coiltraine.py --folder sample --gpus 0 -de <DrivingScenario_Town0X>
+    python3 coiltraine.py --folder sample --gpus 0 -de <DrivingScenario_Town0X> --docker carlasim/carla:version
 
 
-Where the DrivingScenario is a suite class defined inside the drive/suites folder.
+Where carlasim/carla:version is the installed docker version of CARLA.
+The DrivingScenario is a suite class defined inside the drive/suites folder.
 Each scenario defines the start and end positions for driving, the number of cars and pedestrians,
 weathers etc. The Town0X is the town used on the scenario and must
  mach its definition, for now it is either Town01 or Town02.
-
-
-For Docker execution:
-
-
-    python3 coiltraine.py --folder sample --gpus 0 -de <DrivingScenario_Town0X> --docker carlasim/carla:version
-
-Where carlasim/carla:version is the installed docker version of CARLA.
 
 
 Fianally, multiple driving evaluation instances are also allowed,
@@ -117,5 +100,5 @@ Fianally, multiple driving evaluation instances are also allowed,
 [CoRL 2017 benchmark](https://github.com/carla-simulator/driving-benchmarks/blob/master/Docs/benchmark_start.md/#corl-2017)
 over 4 CARLA processes on the sample experiments, run:
 
-    python3 coiltraine.py --folder sample -de CorlTraining_Town01 CorlNewWeather_Town01 CorlNewTown_Town02 CorlNewWeatherTown_Town02
+    python3 coiltraine.py --folder sample -de CorlTraining_Town01 CorlNewWeather_Town01 CorlNewTown_Town02   CorlNewWeatherTown_Town02 --docker carlasim/carla:version
 
