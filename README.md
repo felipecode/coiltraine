@@ -60,7 +60,7 @@ https://github.com/carla-simulator/data-collector
 #### Getting CARLA
 
 For doing scenario evaluation in CARLA you must install CARLA 0.8.4 or CARLA 0.8.2 under docker.
-[This tutorial](https://carla.readthedocs.io/en/latest/carla_docker/) explain how to install  carla under docker.
+[This tutorial](https://carla.readthedocs.io/en/latest/carla_docker/) explains how to install  carla under docker.
 
 #### Executing
 
