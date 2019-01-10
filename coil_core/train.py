@@ -188,7 +188,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                                          position].data.tolist()},
                                     iteration)
             loss_window.append(loss.data.tolist())
-
             coil_logger.write_on_error_csv('train', loss.data)
             print("Iteration: %d  Loss: %f" % (iteration, loss.data))
 
@@ -196,6 +195,10 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
     except KeyboardInterrupt:
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
+
+    except RuntimeError as e:
+
+        coil_logger.add_message('Error', {'Message': str(e)})
 
     except:
         traceback.print_exc()

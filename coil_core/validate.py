@@ -214,6 +214,12 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         # We erase the output that was unfinished due to some process stop.
         if latest is not None:
             coil_logger.erase_csv(latest)
+
+    except RuntimeError as e:
+        if latest is not None:
+            coil_logger.erase_csv(latest)
+        coil_logger.add_message('Error', {'Message': str(e)})
+
     except:
         traceback.print_exc()
         coil_logger.add_message('Error', {'Message': 'Something Happened'})

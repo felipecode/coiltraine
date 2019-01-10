@@ -58,9 +58,9 @@ def print_validation_summary(current, latest, verbose):
 
     print('        LATEST: ')
     print('            Loss: ', UNDERLINE + str(latest['Loss']) + END)
-    print('            Best Loss: ', LIGHT_GREEN + UNDERLINE + str(latest['BestLoss']) + END)
-    print('            Best Loss Checkpoint: ',
-          BLUE + UNDERLINE + str(latest['BestLossCheckpoint']) + END)
+    print('            Best MSE: ', LIGHT_GREEN + UNDERLINE + str(latest['BestMSE']) + END)
+    print('            Best MSE Checkpoint: ',
+          BLUE + UNDERLINE + str(latest['BestMSECheckpoint']) + END)
     print('            Error: ', UNDERLINE + str(latest['Error']) + END)
     print('            Best Error: ', LIGHT_GREEN + UNDERLINE + str(latest['BestError']) + END)
     print('            Best Error Checkpoint: ',
@@ -155,7 +155,11 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
                 print('       STATUS: ', BOLD + status + END)
 
-            elif status == 'Iterating' or status == 'Loading':
+            elif status == 'Loading':
+
+                print('        STATUS: ', YELLOW + status + END, ' - ',  YELLOW + summary + END)
+
+            elif status == 'Iterating':
 
                 print('        STATUS: ', YELLOW + status + END)
 
@@ -165,7 +169,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
 
             elif status == 'Error':
 
-                print('        STATUS: ', RED + status + END)
+                print('        STATUS: ', RED + status + END, ' - ',  RED + summary + END)
 
             if status == 'Iterating':
                 if 'train' in process:

@@ -28,6 +28,9 @@ class TestT2(ExperimentSuite):
     def test_weathers(self):
         return [14]
 
+    @property
+    def collision_as_failure(self):
+        return True
 
     def _poses(self):
 
