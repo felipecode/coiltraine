@@ -31,8 +31,16 @@ def find_free_port():
         s.bind(('', 0))
         return s.getsockname()[1]
 
+def kill_docker(launch_process, id, borgy):
+    launch_process.kill()
+    if borgy:
+        subprocess.call(['borgy', 'kill', id])
+    else:
+        subprocess.call(['docker', 'stop', id])
 
-def start_carla_simulator(gpu, town_name, docker):
+
+
+def start_carla_simulator(gpu, town_name, docker, borgy, borgy_user):
     """
         Start a CARLA simulator, either by running a docker image or by running the binary
         directly. For that, the CARLA_PATH environment variable should be specified.
@@ -45,22 +53,49 @@ def start_carla_simulator(gpu, town_name, docker):
 
     """
 
-    port = find_free_port()
+    if borgy:
+        sp = subprocess.Popen(['borgy', 'submit', '--alphabit', 'borgyx11', '-e',
+                               'LD_LIBRARY_PATH=/usr/local/nvidia/lib64', '-e',
+                               'SDL_VIDEODRIVER=x11', '--mem', '16', '--cpu', '4',
+                               '--gpu', '1', '-i', docker,
+                               '-v', '/mnt/projects/carla:/mnt/projects/carla',
+                               '-v', '/mnt/home/+'borgy_user':/mnt/home/'+borgy_user,
+                               '-w', '/mnt/home/'+borgy_user+'/carla/',
+                               '--', '/mnt/home/'+borgy_user+'/carla/Carla091/CarlaUE4.sh',
+                               '/Game/Carla/Maps/Town01', '-benchmark', '-fps=40'], shell=False,
+                               stdout=subprocess.PIPE)
 
-    sp = subprocess.Popen(['docker', 'run', '--rm', '-d', '-p',
-                           str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
-                           '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), docker,
-                           '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name, '-windowed',
-                           '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
-                           stdout=subprocess.PIPE)
-    (out, err) = sp.communicate()
+        (out, err) = sp.communicate()
 
-    print("Going to communicate")
+        print("Going to communicate")
 
-    coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4' 
-                            '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
+        # borgy info ad4147c1-a0f9-4dcb-856a-e7e72835ba1b|grep ip|cut -d':' -f2|xargs
 
-    return sp, port, out
+        port = 2000 # default Carla port
+
+        # get ip address
+        host_sub = subprocess.run(['borgy', 'info', out[-1], '|', 'grep', 'ip', '|', 'cut', "-d':'", '-f2', '|', 'xargs'], stdout=subprocess.PIPE)
+        host = host_sub.stdout.decode('utf-8')
+
+        return sp, host, port, out
+    else:
+        port = find_free_port()
+        host = '127.0.0.1'
+
+        sp = subprocess.Popen(['docker', 'run', '--rm', '-d', '-p',
+                               str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
+                               '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), docker,
+                               '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name, '-windowed',
+                               '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
+                               stdout=subprocess.PIPE)
+        (out, err) = sp.communicate()
+
+        print("Going to communicate")
+
+        coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4'
+                                '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
+
+        return sp, host, port, out
 
 
 def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_batch, exp_alias,
@@ -85,8 +120,8 @@ def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_bat
 
     try:
         """ START CARLA"""
-        carla_process, port, out = start_carla_simulator(gpu, town_name,
-                                                         params['docker'])
+        carla_process, host, port, out = start_carla_simulator(gpu, town_name,
+                                                         params['docker'], params['borgy'], params['borgy_user'])
 
         checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                              , 'checkpoints', str(checkpoint_number) + '.pth'))
@@ -99,7 +134,7 @@ def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         run_driving_benchmark(coil_agent, experiment_set, town_name,
                               exp_batch + '_' + exp_alias + '_' + str(checkpoint_number)
                               + '_drive_' + control_filename
-                              , True, params['host'], port)
+                              , True, host, port)
 
         """ Processing the results to write a summary"""
         path = exp_batch + '_' + exp_alias + '_' + str(checkpoint_number) \
@@ -130,28 +165,24 @@ def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         plot_episodes_tracks(exp_batch, exp_alias,
                              checkpoint_number, town_name, g_conf.PROCESS_NAME.split('_')[1])
 
-        carla_process.kill()
         """ KILL CARLA, FINISHED THIS BENCHMARK"""
-        subprocess.call(['docker', 'stop', out[:-1]])
+        kill_docker(carla_process, out[:-1], params['borgy'])
 
 
     except TCPConnectionError as error:
         logging.error(error)
         time.sleep(1)
-        carla_process.kill()
-        subprocess.call(['docker', 'stop', out[:-1]])
+        kill_docker(carla_process, out[:-1], params['borgy'])
         coil_logger.add_message('Error', {'Message': 'TCP serious Error'})
         exit(1)
 
     except KeyboardInterrupt:
-        carla_process.kill()
-        subprocess.call(['docker', 'stop', out[:-1]])
+        kill_docker(carla_process, out[:-1], params['borgy'])
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
         exit(1)
     except:
         traceback.print_exc()
-        carla_process.kill()
-        subprocess.call(['docker', 'stop', out[:-1]])
+        kill_docker(carla_process, out[:-1], params['borgy'])
         coil_logger.add_message('Error', {'Message': 'Something Happened'})
         exit(1)
 
@@ -226,7 +257,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                 # While the checkpoint is not there
                 write_header_control_summary(file_base, task_list[i])
 
-        """ 
+        """
             ######
             Run a single driving benchmark specified by the checkpoint were validation is stale
             ######
@@ -271,6 +302,3 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
     except:
         traceback.print_exc()
         coil_logger.add_message('Error', {'Message': 'Something happened'})
-
-
-

@@ -100,6 +100,17 @@ if __name__ == '__main__':
         dest='record_collisions',
         help='Set to run carla using docker'
     )
+    argparser.add_argument(
+        '--borgy',
+        action='store_true',
+        dest='borgy',
+        help='Use borgy')
+    argparser.add_argument(
+        '--borgy-user',
+        dest='borgy_user',
+        default='daniel',
+        type=str,
+        help='Borgy user')
     args = argparser.parse_args()
 
     # Check if the vector of GPUs passed are valid.
@@ -180,7 +191,9 @@ if __name__ == '__main__':
             'driving_environments': list(args.driving_environments),
             'driving_parameters': drive_params,
             'allocation_parameters': allocation_parameters,
-            'number_of_workers': args.number_of_workers
+            'number_of_workers': args.number_of_workers,
+            'borgy': args.borgy,
+            'borgy_user': args.borgy_user
 
         }
 
