@@ -59,7 +59,7 @@ def start_carla_simulator(gpu, town_name, docker, borgy, borgy_user):
                                'SDL_VIDEODRIVER=x11', '--mem', '16', '--cpu', '4',
                                '--gpu', '1', '-i', docker,
                                '-v', '/mnt/projects/carla:/mnt/projects/carla',
-                               '-v', '/mnt/home/+'borgy_user+':/mnt/home/'+borgy_user,
+                               '-v', '/mnt/home/'+borgy_user+':/mnt/home/'+borgy_user,
                                '-w', '/mnt/home/'+borgy_user+'/carla/',
                                '--', '/mnt/home/'+borgy_user+'/carla/Carla091/CarlaUE4.sh',
                                '/Game/Carla/Maps/Town01', '-benchmark', '-fps=40'], shell=False,

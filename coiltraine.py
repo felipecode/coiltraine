@@ -143,7 +143,9 @@ if __name__ == '__main__':
         "suppress_output": True,
         "no_screen": args.no_screen,
         "docker": args.docker,
-        "record_collisions": args.record_collisions
+        "record_collisions": args.record_collisions,
+        "borgy": args.borgy,
+        "borgy_user": args.borgy_user
     }
     # There are two modes of execution
     if args.single_process is not None:
@@ -191,9 +193,7 @@ if __name__ == '__main__':
             'driving_environments': list(args.driving_environments),
             'driving_parameters': drive_params,
             'allocation_parameters': allocation_parameters,
-            'number_of_workers': args.number_of_workers,
-            'borgy': args.borgy,
-            'borgy_user': args.borgy_user
+            'number_of_workers': args.number_of_workers
 
         }
 
