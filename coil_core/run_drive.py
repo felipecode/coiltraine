@@ -72,10 +72,20 @@ def start_carla_simulator(gpu, town_name, docker, borgy, borgy_user):
         # borgy info ad4147c1-a0f9-4dcb-856a-e7e72835ba1b|grep ip|cut -d':' -f2|xargs
 
         port = 2000 # default Carla port
+        out = out.decode('utf-8')
 
         # get ip address
-        host_sub = subprocess.run(['borgy', 'info', out[-1], '|', 'grep', 'ip', '|', 'cut', "-d':'", '-f2', '|', 'xargs'], stdout=subprocess.PIPE)
-        host = host_sub.stdout.decode('utf-8')
+        host = None
+        while host is None:
+            host_sub = subprocess.run(['borgy', 'info', out], stdout=subprocess.PIPE)
+            host_str = host_sub.stdout.decode('utf-8').splitlines()
+
+            for host_line in host_str:
+                if 'ip' in host_line:
+                    host = host_line[6:]
+
+            if host is None:
+                time.sleep(1)
 
         return sp, host, port, out
     else:
