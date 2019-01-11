@@ -313,3 +313,30 @@ def soft(image_iteration):
 
     return augmenter
 
+
+def color(image_iteration):
+
+    iteration = 10000 + image_iteration/(120)
+    frequency_factor = 0.05 + float(iteration)/1200000.0
+    color_factor = 1.0
+
+    add_factor = 10 + 10*iteration/170000.0
+
+    multiply_factor_pos = 1 + (2.5*iteration/800000.0)
+    multiply_factor_neg = 1 - (0.91 * iteration / 800000.0)
+
+    augmenter = iaa.Sequential([
+
+
+        iaa.Sometimes(frequency_factor,
+                      iaa.Add((-add_factor, add_factor), per_channel=color_factor)),
+        # change brightness of images (by -X to Y of original value)
+        iaa.Sometimes(frequency_factor,
+                      iaa.Multiply((multiply_factor_neg, multiply_factor_pos), per_channel=color_factor)),
+
+
+    ],
+        random_order=True  # do all of the above in random order
+    )
+
+    return augmenter
