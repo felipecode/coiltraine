@@ -72,7 +72,7 @@ def start_carla_simulator(gpu, town_name, docker, borgy, borgy_user):
         # borgy info ad4147c1-a0f9-4dcb-856a-e7e72835ba1b|grep ip|cut -d':' -f2|xargs
 
         port = 2000 # default Carla port
-        out = out.decode('utf-8')
+        out = out.rstrip().decode('utf-8')
 
         # get ip address
         host = None
