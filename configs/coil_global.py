@@ -57,6 +57,7 @@ _g_conf.SPEED_DIVISION = []
 #_g_conf.STEERING_DIVISION = [0.01, 0.02, 0.07, 0.4, 0.4, 0.07, 0.02, 0.01]  # Forcing curves alot
 _g_conf.LABELS_DIVISION = [[0, 2, 5], [3], [4]]
 _g_conf.BATCH_SIZE = 120
+_g_conf.VAL_BATCH_SIZE = 120
 _g_conf.SPLIT = None
 _g_conf.REMOVE = None
 

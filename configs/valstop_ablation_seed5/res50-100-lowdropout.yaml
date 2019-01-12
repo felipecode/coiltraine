@@ -61,7 +61,7 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       dropouts: [0.0, 0.5]
 
 PRE_TRAINED: False
-MAGICAL_SEED: 441629
+MAGICAL_SEED: 394204
 
 # Optimizer Parameters #
 # For now we use only use adam

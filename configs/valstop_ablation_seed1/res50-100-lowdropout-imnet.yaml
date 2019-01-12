@@ -12,6 +12,7 @@ MEASUREMENTS:
 
 BATCH_SIZE: 120
 NUMBER_ITERATIONS: 1000000
+VAL_BATCH_SIZE: 80 # We had to reduce because of memory issues.
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
 NUMBER_FRAMES_FUSION: 1

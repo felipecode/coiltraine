@@ -11,7 +11,6 @@ MEASUREMENTS:
   targets: [31]
 
 BATCH_SIZE: 120
-VAL_BATCH_SIZE: 80 # We had to reduce because of memory issues.
 NUMBER_ITERATIONS: 1000000
 TARGETS: ['steer', 'throttle', 'brake']
 INPUTS: ['speed_module']
@@ -24,7 +23,7 @@ TRAIN_DATASET_NAME: 'CARLA100_S6'
 AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
-NUMBER_OF_HOURS: 100
+NUMBER_OF_HOURS: 10
 
 #### Testing Related Parameters ####
 TEST_SCHEDULE: range(20000, 1000001, 20000)  # The frequency the model is actually tested.
@@ -39,7 +38,7 @@ MODEL_TYPE: 'coil-icra'
 MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
   perception:
     res:
-      name: 'resnet50'
+      name: 'resnet34'
       num_classes: 512
 
   measurements:
@@ -60,16 +59,13 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       neurons: [256, 256]
       dropouts: [0.0, 0.5]
 
-PRE_TRAINED: False
-MAGICAL_SEED: 441629
+PRE_TRAINED: True
+MAGICAL_SEED: 394204
 
-# Optimizer Parameters #
-# For now we use only use adam
 LEARNING_RATE: 0.0002  # First learning rate
 LEARNING_RATE_DECAY_INTERVAL: 75000 # Number of iterations where the learning rate is reduced
 LEARNING_RATE_THRESHOLD: 5000 # Number of iterations without going down to reduce learning rate
 LEARNING_RATE_DECAY_LEVEL: 0.1 # Th factor of reduction applied to the learning rate
-
 #TODO check how to use this part
 BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.00]
 LOSS_FUNCTION: 'L1'
