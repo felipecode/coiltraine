@@ -93,8 +93,8 @@ if __name__ == "__main__":
                 success_values_stds.append(np.std(variation_values))
                 absce_avg[count] += np.mean(variation_values) * 0.2
                 absce_std[count] += math.sqrt(np.mean(variation_values_std)) * 0.2
-                absce_cv[count] += (np.mean(variation_values)/
-                                    math.sqrt(np.mean(variation_values_std))) * 0.2
+                absce_cv[count] += (math.sqrt(np.mean(variation_values_std)) /
+                                    np.mean(variation_values)) * 0.2
                 count += 1
 
 
