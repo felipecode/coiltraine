@@ -122,5 +122,6 @@ if __name__ == "__main__":
 
             plt.close(fig)
 
+        print ("Task  ", t)
         print ("Average Task ", absce_avg)
         print ("Average Task STD ", absce_std)
