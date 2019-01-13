@@ -18,7 +18,7 @@ weight_decay_l2
 from input import CoILDataset, PreSplittedSampler, splitter, Augmenter, RandomSampler
 from logger import monitorer, coil_logger
 from utils.checkpoint_schedule import is_ready_to_save, get_latest_saved_checkpoint, \
-                                      check_loss_validation_stopped
+                                      check_loss_validation_stopped, is_open
 from utils.general import softmax
 
 from torchvision import transforms
@@ -199,6 +199,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         g_conf.VARIABLE_WEIGHT = {}
         print("BEFOE MERGET variable ", g_conf.VARIABLE_WEIGHT, 'conf targets',
               g_conf.TARGETS)
+
 
         # At this point the log file with the correct naming is created.
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
@@ -434,6 +435,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         coil_logger.add_message('Finished', {})
 
     except KeyboardInterrupt:
+        while is_open(os.path.join('_logs', exp_batch, exp_alias
+                                               , 'checkpoints', str(iteration) + '.pth')):
+            time.sleep(0.1)
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
     except:
         traceback.print_exc()
