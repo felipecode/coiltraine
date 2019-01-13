@@ -137,5 +137,8 @@ if __name__ == "__main__":
         task_cv = [t+a*0.333 for t, a in zip(task_cv, absce_cv)]
         task_std = [t+a*0.333 for t, a in zip(task_std, absce_std)]
 
+    print (" Overal average ")
 
-
+    print ("Average  ", task_avg)
+    print ("Average  STD ", task_std)
+    print ("Average  CV ", task_cv)
