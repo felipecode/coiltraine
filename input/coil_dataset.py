@@ -158,6 +158,8 @@ class CoILDataset(Dataset):
             # We have to copy since it reference a file.
             measurement_augmented = copy.copy(measurement_data)
 
+        #speed = self.augment_speed(speed)
+
         if 'gameTimestamp' in measurement_augmented:
             time_stamp = measurement_augmented['gameTimestamp']
         else:
@@ -377,6 +379,14 @@ class CoILDataset(Dataset):
                                           speed)
         measurements['steer'] = new_steer
         return measurements
+
+    def augment_speed(self,  speed):
+        """
+            Augment the speed to test if it can solve the problem
+
+        """
+        return speed + random.randint(0, 40*1000)/10000.0
+
 
     def controls_position(self):
         return np.where(self.meta_data[:, 0] == b'control')[0][0]

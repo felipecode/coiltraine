@@ -606,10 +606,10 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
                             print('    Metric Not Computed')
                         else:
                             for r in range(number_of_reps):
-                                print ("Rep ", r)
+                                print("Rep ", r)
                                 metric_sum_values[count][r] += (float(sum(t[r:-1:number_of_reps])))
-                                print ("episodes ", range(r, len(t), number_of_reps))
-                                print (metric_sum_values[count][r])
+                                print("episodes ", range(r, len(t), number_of_reps))
+                                print(metric_sum_values[count][r])
                         count += 1
 
             for i in range(len(metric_sum_values)):
@@ -626,10 +626,8 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
                             metric_sum_values[i][r]/ ((number_of_episodes/number_of_reps)*
                                                       len(weathers)))/number_of_reps
 
-
-
-        # For the metrics we sum over all the weathers here, this is to better subdivide the driving envs
-        # The infraction metrics are divided by the number of kilometers in the end
+        # For the metrics we sum over all the weathers here, this is to better subdivide the driving
+        #  envs. The infraction metrics are divided by the number of kilometers in the end
         for metric in infraction_metrics:
             values_driven = metrics_summary['driven_kilometers']
             values = metrics_summary[metric]

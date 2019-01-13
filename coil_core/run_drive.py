@@ -25,6 +25,8 @@ from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkp
 from utils.general import compute_average_std_separatetasks, get_latest_path, write_header_control_summary,\
      write_data_point_control_summary, camelcase_to_snakecase, unique
 
+from visualization.plot_on_map import plot_episodes_tracks
+
 
 def frame2numpy(frame, frame_size):
     return np.resize(np.fromstring(frame, dtype='uint8'), (frame_size[1], frame_size[0], 3))
@@ -68,7 +70,7 @@ def start_carla_simulator(gpu, town_name, docker):
 
 
     coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4' 
-                           '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
+                           '-windowed'+ '-benchmark' + '-fps=10' + '-world-port='+ str(port)})
 
     return sp, port, out
 
@@ -109,10 +111,16 @@ def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         print(" number of episodes ", len(experiment_set.build_experiments()))
         averaged_dict, std_dict = compute_average_std_separatetasks([benchmark_dict],
                                                           experiment_set.weathers,
-                                                          len(experiment_set.build_experiments()))
+                                                          len(experiment_set.build_experiments()),
+                                  number_of_reps=experiment_set.build_experiments()[0].repetitions)
 
         file_base = os.path.join('_logs', exp_batch, exp_alias,
                                  g_conf.PROCESS_NAME + '_csv', control_filename)
+
+        # If want to write paths, write all the paths + mark cause of death.
+        if params['write_paths']:
+            plot_episodes_tracks(exp_batch, exp_alias,
+                                 checkpoint_number, town_name, g_conf.PROCESS_NAME.split('_')[1])
 
         for i in range(len(task_list)):
             write_data_point_control_summary(file_base, task_list[i],
@@ -121,6 +129,8 @@ def driving_iteration(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         # plot_episodes_tracks(os.path.join(get_latest_path(path), 'measurements.json'),
         #                     )
         print(averaged_dict)
+        print("Std computed")
+        print(std_dict)
 
         carla_process.kill()
         """ KILL CARLA, FINISHED THIS BENCHMARK"""
@@ -203,7 +213,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             for i in range(len(task_list)):
                 # Write the header of the summary file used conclusion
                 # While the checkpoint is not there
-                write_header_control_summary(file_base, task_list[i])
+                write_header_control_summary(file_base, task_list[i], write_std=True)
 
         """ 
             ######

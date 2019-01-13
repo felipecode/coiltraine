@@ -21,7 +21,7 @@ from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_c
 
 def write_waypoints_output(iteration, output):
 
-    for i in range(g_conf.BATCH_SIZE):
+    for i in range(g_conf.VAL_BATCH_SIZE):
         steer = 0.7 * output[i][3]
 
         if steer > 0:
@@ -83,7 +83,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
         # The data loader is the multi threaded module from pytorch that release a number of
         # workers to get all the data.
-        data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.BATCH_SIZE,
+        data_loader = torch.utils.data.DataLoader(dataset, batch_size=g_conf.VAL_BATCH_SIZE,
                                                   shuffle=False,
                                                   num_workers=g_conf.NUMBER_OF_LOADING_WORKERS,
                                                   pin_memory=True)
