@@ -44,6 +44,9 @@ if __name__ == "__main__":
                  'Long3NewTown_Town02', 'Long3NewWeatherTown_Town02']
 
     check_point = 0
+    task_avg = [0] * 3
+    task_std = [0] * 3
+    task_cv = [0] * 3
 
     for t in tasks:
         print ("tasks   ", t)
@@ -129,3 +132,10 @@ if __name__ == "__main__":
         print ("Average Task ", absce_avg)
         print ("Average Task STD ", absce_std)
         print ("Average Task CV ", absce_cv)
+
+        task_avg = [t+a*0.333 for t, a in zip(task_avg, absce_avg)]
+        task_cv = [t+a*0.333 for t, a in zip(task_cv, absce_cv)]
+        task_std = [t+a*0.333 for t, a in zip(task_std, absce_std)]
+
+
+
