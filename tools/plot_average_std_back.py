@@ -49,6 +49,7 @@ if __name__ == "__main__":
         print ("tasks   ", t)
         absce_avg = [0] * 5
         absce_std = [0] * 5
+        absce_cv = [0] * 5
 
 
 
@@ -90,8 +91,10 @@ if __name__ == "__main__":
                 success_values_averages.append(np.mean(variation_values))
                 success_values_std_average.append(math.sqrt(np.mean(variation_values_std)))
                 success_values_stds.append(np.std(variation_values))
-                absce_avg[count] += np.mean(variation_values)*0.2
-                absce_std[count] += math.sqrt(np.mean(variation_values_std))*0.2
+                absce_avg[count] += np.mean(variation_values) * 0.2
+                absce_std[count] += math.sqrt(np.mean(variation_values_std)) * 0.2
+                absce_cv[count] += (np.mean(variation_values)/
+                                    math.sqrt(np.mean(variation_values_std))) * 0.2
                 count += 1
 
 
@@ -125,3 +128,4 @@ if __name__ == "__main__":
         print ("Task  ", t)
         print ("Average Task ", absce_avg)
         print ("Average Task STD ", absce_std)
+        print ("Average Task CV ", absce_cv)
