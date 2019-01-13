@@ -46,11 +46,20 @@ if __name__ == "__main__":
     check_point = 0
 
     for t in tasks:
+        print ("tasks   ", t)
+        absce_avg = [0] * 5
+        absce_std = [0] * 5
+
+
+
         for s in scenarios:
             # HERe we do a plot
             success_values_averages = []
             success_values_std_average = []
             success_values_stds = []
+
+            print ("scenarios ", s)
+            count = 0
             for key, values in experiments.items():
 
                 print (key)
@@ -81,6 +90,11 @@ if __name__ == "__main__":
                 success_values_averages.append(np.mean(variation_values))
                 success_values_std_average.append(math.sqrt(np.mean(variation_values_std)))
                 success_values_stds.append(np.std(variation_values))
+                absce_avg[count] += np.mean(variation_values)*0.2
+                absce_std[count] += math.sqrt(np.mean(variation_values_std))*0.2
+                count += 1
+
+
 
             print("avg")
             print(success_values_averages)
@@ -108,3 +122,5 @@ if __name__ == "__main__":
 
             plt.close(fig)
 
+        print ("Average Task ", absce_avg)
+        print ("Average Task STD ", absce_std)
