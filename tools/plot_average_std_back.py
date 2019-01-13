@@ -44,9 +44,9 @@ if __name__ == "__main__":
                  'Long3NewTown_Town02', 'Long3NewWeatherTown_Town02']
 
     check_point = 0
-    task_avg = [0] * 3
-    task_std = [0] * 3
-    task_cv = [0] * 3
+    task_avg = [0] * 5
+    task_std = [0] * 5
+    task_cv = [0] * 5
 
     for t in tasks:
         print ("tasks   ", t)
