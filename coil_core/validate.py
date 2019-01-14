@@ -93,7 +93,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         L1_window = []
         latest = get_latest_evaluated_checkpoint()
         if latest is not None:  # When nothing was tested, get latest returns none, we fix that.
-            L1_window = coil_logger.recover_loss_window(dataset_name, -1)
+            L1_window = coil_logger.recover_loss_window(dataset_name, None)
 
         model.cuda()
 
@@ -190,6 +190,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                 print ("L1 Window ", L1_window)
                 coil_logger.write_on_error_csv(dataset_name, checkpoint_average_error)
                 # If we are using the finish when validation stops, we check the current
+                # slope
                 print("Steep without decrease ", dlib.count_steps_without_decrease(L1_window))
                 if g_conf.FINISH_ON_VALIDATION_STALE is not None:
                     if dlib.count_steps_without_decrease(L1_window) > 3 and \
