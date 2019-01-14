@@ -162,7 +162,6 @@ def write_on_error_csv(error_file_name, output):
 
     file_name = os.path.join(full_path_name, str(error_file_name) + '_error' + '.csv')
 
-
     with open(file_name, 'a+') as f:
         f.write("%f" % output)
         f.write("\n")
@@ -216,8 +215,13 @@ def recover_loss_window(dataset_name, iteration):
     full_path_name = os.path.join(root_path, EXPERIMENT_BATCH_NAME,
                                   EXPERIMENT_NAME)
     file_name = os.path.join(full_path_name, str(dataset_name) + '_error' + '.csv')
-
-    recovered_list = list(np.loadtxt(file_name))[0:iteration]
+    print (np.loadtxt(file_name).tolist())
+    # We check if the object is subscriptable
+    try:
+        recovered_list = np.loadtxt(file_name).tolist()[0:iteration]
+    except TypeError:
+        # If it is not subscriptable it is just an one element list
+        recovered_list = [np.loadtxt(file_name).tolist()]
 
     # Now we need to rewrite on top of the recovered list, so everything syncs
 

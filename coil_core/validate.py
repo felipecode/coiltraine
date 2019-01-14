@@ -30,22 +30,21 @@ def write_waypoints_output(iteration, output):
             steer = max(steer, -1)
 
         coil_logger.write_on_csv(iteration, [steer,
-                                            output[i][1],
-                                            output[i][2]])
+                                             output[i][1],
+                                             output[i][2]])
 
 
 def write_regular_output(iteration, output):
     for i in range(len(output)):
         coil_logger.write_on_csv(iteration, [output[i][0],
-                                            output[i][1],
-                                            output[i][2]])
-
-
+                                             output[i][1],
+                                             output[i][2]])
 
 
 # The main function maybe we could call it with a default name
 def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
     latest = None
+    waiting = False
     try:
         # We set the visible cuda devices
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
@@ -101,12 +100,11 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         best_error = 1000
         best_loss_iter = 0
         best_error_iter = 0
-
         while not maximun_checkpoint_reach(latest, g_conf.TEST_SCHEDULE) and \
                 not check_loss_validation_stop_exists(dataset_name):
 
             if is_next_checkpoint_ready(g_conf.TEST_SCHEDULE):
-
+                waiting = False
                 latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
 
                 checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
@@ -199,7 +197,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                         break
 
             else:
-
+                waiting = True
                 latest = get_latest_evaluated_checkpoint()
                 time.sleep(1)
                 print ("Waiting for the next Validation")
@@ -209,13 +207,13 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
     except KeyboardInterrupt:
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
         # We erase the output that was unfinished due to some process stop.
-        if latest is not None:
+        if latest is not None and not waiting:
             coil_logger.erase_csv(latest)
+
 
     except:
         traceback.print_exc()
-
         coil_logger.add_message('Error', {'Message': 'Something Happened'})
         # We erase the output that was unfinished due to some process stop.
-        if latest is not None:
+        if latest is not None and not waiting:
             coil_logger.erase_csv(latest)

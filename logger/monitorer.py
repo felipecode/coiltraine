@@ -185,8 +185,7 @@ def get_status(exp_batch, experiment, process_name):
         data = json_formatter.readJSONlog(open(log_file_path, 'r'))
 
     except ValueError:
-        print ("Still writing")
-        return ['Loading', '']
+        return ['Loading', 'Writing Logs']
 
     except Exception:  # Todo: general exception, try to fix.
         import traceback
