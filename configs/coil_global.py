@@ -65,6 +65,10 @@ _g_conf.REMOVE = None
 #                             #iag.GaussianBlur(sigma=(0.0, 3.0)),
 #                             iag.ContrastNormalization((0.5, 1.5))
 #                             ]
+# Validation related parameters
+
+_g_conf.ITERATIONS_WITHOUT_DECREASING = 3
+
 
 _g_conf.AUGMENTATION = None
 _g_conf.GATED_AUGMENTATION = None

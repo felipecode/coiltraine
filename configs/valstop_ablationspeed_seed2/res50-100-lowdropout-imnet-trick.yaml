@@ -3,6 +3,7 @@
 SAVE_SCHEDULE: range(0,1000001, 20000)
 FINISH_ON_VALIDATION_STALE: "TrainValidation"
 NUMBER_OF_LOADING_WORKERS: 12   # Number of threads used in the data loader
+ITERATIONS_WITHOUT_DECREASING: 4
 
 #### Input related parameters ####
 SENSORS:
