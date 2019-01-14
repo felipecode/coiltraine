@@ -192,7 +192,7 @@ def select_balancing_strategy(dataset, iteration, number_of_workers):
 def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=12):
     # We set the visible cuda devices
 
-
+    saving = False
     # TODO: probable race condition, the train has to be started before.
     try:
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu
@@ -422,10 +422,10 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                     'optimizer': optimizer.state_dict(),
                     'best_loss_iter': best_loss_iter
                 }
-                # TODO : maybe already summarize the best model ???
+                saving = True
                 torch.save(state, os.path.join('_logs', exp_batch, exp_alias
                                                , 'checkpoints', str(iteration) + '.pth'))
-
+                saving = False
 
 
             del data
@@ -435,9 +435,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         coil_logger.add_message('Finished', {})
 
     except KeyboardInterrupt:
-        while is_open(os.path.join('_logs', exp_batch, exp_alias
-                                               , 'checkpoints', str(iteration) + '.pth')):
-            time.sleep(0.1)
+        if saving:
+            os.remove(os.path.join('_logs', exp_batch, exp_alias
+                                               , 'checkpoints', str(iteration) + '.pth'))
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
     except:
         traceback.print_exc()
