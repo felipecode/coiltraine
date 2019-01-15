@@ -96,7 +96,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, num_classes=1000):
+    def __init__(self, block, layers, num_classes=1000, init_seed=None):
         self.inplanes = 64
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
@@ -116,6 +116,9 @@ class ResNet(nn.Module):
         else:
             self.fc = nn.Linear(1536, num_classes)
 
+        if init_seed is not None:
+            torch.manual_seed(init_seed)
+            torch.cuda.manual_seed_all(init_seed)
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')

@@ -222,12 +222,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                               exp_alias + '_err_' + g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
-        print("Loaded Information")
-        print(exp_batch, exp_alias)
-        for keys, values in g_conf.items():
-            print(keys)
-            print(values)
 
+        # We seed everything
         seed_everything(g_conf.MAGICAL_SEED)
         print("Reseting seed to ", g_conf.MAGICAL_SEED)
 
@@ -260,9 +256,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
         data_loader = select_balancing_strategy(dataset, iteration, number_of_workers)
 
-        seed_everything(g_conf.MAGICAL_SEED)
-        print (" Reseting seed to ", g_conf.MAGICAL_SEED)
-
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         model.cuda()
 
@@ -280,6 +273,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             loss_window = []
 
 
+        seed_everything(g_conf.MAGICAL_SEED)
+        print (" Reseting seed to ", g_conf.MAGICAL_SEED)
         capture_time = time.time()
         for data in data_loader:
 
@@ -299,7 +294,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             controls = data['directions']
 
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
-
+            if g_conf.DROPOUT_SEED is not None:
+                torch.manual_seed(g_conf.DROPOUT_SEED)
+                torch.cuda.manual_seed_all(g_conf.DROPOUT_SEED)
             model.zero_grad()
             branches = model(torch.squeeze(data['rgb'].cuda()),
                              dataset.extract_inputs(data).cuda())

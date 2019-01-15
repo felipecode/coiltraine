@@ -8,7 +8,7 @@ import torch.nn.functional as F
 
 class FC(nn.Module):
 
-    def __init__(self, params=None, module_name='Default'
+    def __init__(self, params=None, module_name='Default', dropout_seed=None
                  ):
 
         #         input_size=, kernel_sizes= [512, 128,128], end_module=False):
@@ -34,7 +34,6 @@ class FC(nn.Module):
 
         self.layers = []
 
-
         for i in range(0, len(params['neurons']) -1):
 
             fc = nn.Linear(params['neurons'][i], params['neurons'][i+1])
@@ -45,7 +44,6 @@ class FC(nn.Module):
                 self.layers.append(nn.Sequential(*[fc, dropout]))
             else:
                 self.layers.append(nn.Sequential(*[fc, dropout, relu]))
-
 
         self.layers = nn.Sequential(*self.layers)
 
@@ -58,6 +56,6 @@ class FC(nn.Module):
     def forward(self, x, *args):
         # get only the speeds from measurement labels
         # TODO: TRACK NANS OUTPUTS
-
+        print (self.layers(x))
         return self.layers(x)
 

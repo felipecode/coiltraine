@@ -38,25 +38,3 @@ class Branching(nn.Module):
 
         return branches_outputs
 
-
-    def load_network(self, checkpoint):
-        """
-        Load a network for a given model definition .
-
-        Args:
-            checkpoint: The checkpoint that the user wants to add .
-
-
-
-        """
-        coil_logger.add_message('Loading', {
-                    "Model": {"Loaded checkpoint: " + str(checkpoint) }
-
-                })
-
-
-
-        # TODO: implement
-
-
-

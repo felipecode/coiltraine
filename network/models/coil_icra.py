@@ -21,6 +21,7 @@ class CoILICRA(nn.Module):
         # TODO: Improve the model autonaming function
 
         self.intermediate_layers = None
+
         super(CoILICRA, self).__init__()
 
         # TODO: Make configurable function on the config files by reading other dictionary
@@ -37,7 +38,7 @@ class CoILICRA(nn.Module):
         sensor_input_shape = [number_first_layer_channels, sensor_input_shape[1],
                               sensor_input_shape[2]]
 
-        self._params= params
+        self._params = params
 
         # For this case we check if the perception layer is of the type "conv"
         if 'conv' in params['perception']:
@@ -52,7 +53,7 @@ class CoILICRA(nn.Module):
             perception_fc = FC(params={'neurons': [perception_convs.get_conv_output(sensor_input_shape)]
                                                     + params['perception']['fc']['neurons'],
                                         'dropouts': params['perception']['fc']['dropouts'],
-                                        'end_layer': False})
+                                        'end_layer': False}, dropout_seed=g_conf.DROPOUT_SEED)
 
             self.perception = nn.Sequential(*[perception_convs, perception_fc])
 
@@ -61,25 +62,18 @@ class CoILICRA(nn.Module):
 
         elif 'res' in params['perception']:  # pre defined residual networks
             resnet_module = importlib.import_module('network.models.building_blocks.resnet')
-            #+ params['perception']['res']['name']
-            #fromlist = ['resnet']
+
             # TODO: Check network drawing
             resnet_module = getattr(resnet_module, params['perception']['res']['name'])
-            self.perception  = resnet_module(pretrained=g_conf.PRE_TRAINED,
-                                             num_classes=params['perception']['res']['num_classes'])
+            self.perception = resnet_module(pretrained=g_conf.PRE_TRAINED,
+                                            num_classes=params['perception']['res']['num_classes'],
+                                            init_seed=g_conf.INIT_SEED)
 
             number_output_neurons = params['perception']['res']['num_classes']
-
-
-            #elif 'res_attention' in params['perception']:  # pre defined residual networks
-            #    resnet_module = importlib.import_module('network.models.building_blocks.resnet')
-            #    # + params['perception']['res']['name']
-            #    # fromlist = ['resnet']
-            #    # TODO: Check network drawing
-            #    resnet_module = getattr(resnet_module, params['perception']['res']['name'])
-            #    self.perception= resnet_module(num_classes=params['perception']['res']['num_classes'])#
-            #
-            #     number_output_neurons = params['perception']['res']['num_classes']
+            # Se the seed back to global.
+            if g_conf.INIT_SEED is not None:
+                torch.manual_seed(g_conf.MAGICAL_SEED)
+                torch.cuda.manual_seed_all(g_conf.MAGICAL_SEED)
 
         else:
 
@@ -93,8 +87,7 @@ class CoILICRA(nn.Module):
         self.measurements = FC(params={'neurons': [len(g_conf.INPUTS)] +
                                                    params['measurements']['fc']['neurons'],
                                        'dropouts': params['measurements']['fc']['dropouts'],
-                                       'end_layer': False})
-
+                                       'end_layer': False}, dropout_seed=g_conf.DROPOUT_SEED)
 
 
         self.join = Join(
@@ -104,7 +97,7 @@ class CoILICRA(nn.Module):
                                          number_output_neurons] +
                                         params['join']['fc']['neurons'],
                                      'dropouts': params['join']['fc']['dropouts'],
-                                     'end_layer': False}),
+                                     'end_layer': False}, dropout_seed=g_conf.DROPOUT_SEED),
                      'mode': 'cat'
                     }
          )
@@ -112,8 +105,7 @@ class CoILICRA(nn.Module):
         self.speed_branch = FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                   params['speed_branch']['fc']['neurons'] + [1],
                                        'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
-                                       'end_layer': True})
-
+                                       'end_layer': True}, dropout_seed=g_conf.DROPOUT_SEED)
 
         # Create the fc vector separatedely
         branch_fc_vector = []
@@ -122,9 +114,17 @@ class CoILICRA(nn.Module):
                                                          params['branches']['fc']['neurons'] +
                                                          [len(g_conf.TARGETS)],
                                                'dropouts': params['branches']['fc']['dropouts'] + [0.0],
-                                               'end_layer': True}))
+                                               'end_layer': True}, dropout_seed=g_conf.DROPOUT_SEED))
 
         self.branches = Branching(branch_fc_vector) #  Here we set branching automatically
+
+
+        if g_conf.INIT_SEED is not None:
+            torch.manual_seed(g_conf.INIT_SEED)
+            torch.cuda.manual_seed_all(g_conf.INIT_SEED)
+        else:
+            torch.manual_seed(g_conf.MAGICAL_SEED)
+            torch.cuda.manual_seed_all(g_conf.MAGICAL_SEED)
 
         if 'conv' in params['perception']:
             for m in self.modules():
@@ -137,11 +137,13 @@ class CoILICRA(nn.Module):
                     nn.init.xavier_uniform_(m.weight)
                     nn.init.constant_(m.bias, 0.1)
 
-
+        # Return the seed back to the global one
+        if g_conf.INIT_SEED is not None:
+            torch.manual_seed(g_conf.MAGICAL_SEED)
+            torch.cuda.manual_seed_all(g_conf.MAGICAL_SEED)
 
 
     def forward(self, x, a, intentions=None):
-
         # TODO: THISIS A PRE DEADLINE HACKKK REMOVEE.
 
         if 'res' in self._params['perception']:
@@ -220,26 +222,9 @@ class CoILICRA(nn.Module):
         branch_number = torch.stack([branch_number,
                                      torch.cuda.LongTensor(range(0, len(branch_number)))])
 
-        # branch_output_vector = []
-        # for i in range(len(branch_number)):
-        #    branch_output_vector.append(output_vec[branch_number[i]][i])
-
 
         return output_vec[branch_number[0], branch_number[1], :]
 
-    def load_network(self, checkpoint):
-        """
-        Load a network for a given model definition .
 
-        Args:
-            checkpoint: The checkpoint that the user wants to add .
-
-
-
-        """
-        coil_logger.add_message('Loading', {
-                    "Model": {"Loaded checkpoint: " + str(checkpoint) }
-
-                })
 
 
