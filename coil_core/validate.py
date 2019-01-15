@@ -191,8 +191,10 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
                 # slope
                 print("Steep without decrease ", dlib.count_steps_without_decrease(L1_window))
                 if g_conf.FINISH_ON_VALIDATION_STALE is not None:
-                    if dlib.count_steps_without_decrease(L1_window) > 3 and \
-                            dlib.count_steps_without_decrease_robust(L1_window) > 3:
+                    if dlib.count_steps_without_decrease(L1_window) >\
+                            g_conf.ITERATIONS_WITHOUT_DECREASING and \
+                            dlib.count_steps_without_decrease_robust(L1_window) > \
+                                g_conf.ITERATIONS_WITHOUT_DECREASING:
                         coil_logger.write_stop(dataset_name, latest)
                         break
 
