@@ -111,6 +111,20 @@ if __name__ == '__main__':
         default='daniel',
         type=str,
         help='Borgy user')
+    argparser.add_argument(
+        '-b', '--benchmark_json',
+        default=None,
+        help='The benchmark configuration file')
+
+    argparser.add_argument(
+        '-c', '--cameras_json',
+        default=None,
+        help='Camera configuration file')
+
+    argparser.add_argument(
+        '-pdt', '--path_data_collector',
+        default=None,
+        help='The path used to save the data')
     args = argparser.parse_args()
 
     # Check if the vector of GPUs passed are valid.
@@ -168,7 +182,11 @@ if __name__ == '__main__':
 
         elif args.single_process == 'drive':
             drive_params['suppress_output'] = False
-            execute_drive("0", args.folder, args.exp, list(args.driving_environments)[0], drive_params)
+            execute_drive("0", args.folder, args.exp, list(args.driving_environments)[0],
+                            args.cameras_json,
+                            args.benchmark_json,
+                            args.path_data_collector,
+                            drive_params)
 
         else:
             raise Exception("Invalid name for single process, chose from (train, validation, test)")
@@ -193,7 +211,10 @@ if __name__ == '__main__':
             'driving_environments': list(args.driving_environments),
             'driving_parameters': drive_params,
             'allocation_parameters': allocation_parameters,
-            'number_of_workers': args.number_of_workers
+            'number_of_workers': args.number_of_workers,
+            'cameras_json': args.cameras_json,
+            'benchmark_json': args.benchmark_json,
+            'path_data_collector': args.path_data_collector
 
         }
 

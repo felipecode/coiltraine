@@ -92,9 +92,9 @@ def execvec_to_names(executing_processes):
     Creates a name_vec for each the dictonary on the list of executing processss
     Args:
         List of executing process
-        
-    returns 
-        List of name vecs 
+
+    returns
+        List of name vecs
     """
 
 
@@ -109,7 +109,8 @@ def execvec_to_names(executing_processes):
 
 # TODO: function need severe refactoring  !!! !
 def mount_experiment_heap(folder, experiments_list, is_training, executing_processes, old_tasks_queue,
-                          validation_datasets, drive_environments, restart_error=True):
+                          validation_datasets, drive_environments, cameras_json, benchmark_json,
+                          path_data_collector, restart_error=True):
 
 
     tasks_queue = []
@@ -181,13 +182,19 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
             if monitorer.get_status(folder, experiment, 'drive_' + drive_env)[0] == "Not Started":
                 task_to_add = (2, experiment + '_drive_' + drive_env,
                                              {'type': 'drive', 'folder': folder,
-                                              'experiment': experiment, 'environment': drive_env})
+                                              'experiment': experiment, 'environment': drive_env,
+                                              'cameras_json': cameras_json,
+                                              'benchmark_json': benchmark_json,
+                                              'path_data_collector': path_data_collector})
 
             elif restart_error and monitorer.get_status(folder, experiment, 'drive_' + drive_env)\
                                                         [0] == "Error":
                 task_to_add = (2, experiment + '_drive_' + drive_env,
                                {'type': 'drive', 'folder': folder,
-                                'experiment': experiment, 'environment': drive_env})
+                                'experiment': experiment, 'environment': drive_env,
+                                'cameras_json': cameras_json,
+                                'benchmark_json': benchmark_json,
+                                'path_data_collector': path_data_collector})
 
 
             if task_to_add is not None:

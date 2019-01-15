@@ -77,15 +77,6 @@ class Recording(object):
     def path(self):
         return self._path
 
-    def log_poses(self, start_index, end_index, weather_id):
-        with open(self._internal_log_name, 'a+') as log:
-            log.write(' Start Poses  (%d  %d ) on weather %d \n ' %
-                      (start_index, end_index, weather_id))
-
-    def log_poses_finish(self):
-        with open(self._internal_log_name, 'a+') as log:
-            log.write('Finished Task')
-
     def log_start(self, id_experiment):
 
         with open(self._internal_log_name, 'a+') as log:
@@ -96,30 +87,30 @@ class Recording(object):
         with open(self._internal_log_name, 'a+') as log:
             log.write('====== Finished Entire Benchmark ======')
 
-    def write_summary_results(self, experiment, pose, rep,
-                              path_distance, remaining_distance,
-                              final_time, time_out, result,
-                              end_pedestrian, end_vehicle, end_other,
-                              number_red_lights, number_green_lights):
+    def write_summary_results(self, episode_json, episode, result):
         """
         Method to record the summary of an episode(pose) execution
         """
 
-        self._dict_summary['exp_id'] = experiment.task
-        self._dict_summary['rep'] = rep
-        self._dict_summary['weather'] = experiment.Conditions.WeatherId
-        self._dict_summary['start_point'] = pose[0]
-        self._dict_summary['end_point'] = pose[1]
         self._dict_summary['result'] = result
-        self._dict_summary['initial_distance'] = path_distance
-        self._dict_summary['final_distance'] = remaining_distance
-        self._dict_summary['final_time'] = final_time
-        self._dict_summary['time_out'] = time_out
-        self._dict_summary['end_pedestrian_collision'] = end_pedestrian
-        self._dict_summary['end_vehicle_collision'] = end_vehicle
-        self._dict_summary['end_other_collision'] = end_other
-        self._dict_summary['number_red_lights'] = number_red_lights
-        self._dict_summary['number_green_lights'] = number_green_lights
+
+        self._dict_summary['exp_id'] = episode_json['id']
+        self._dict_summary['weather'] = episode_json['weather']
+        self._dict_summary['start_point'] = episode_json['vehicles'][0]['position']
+        self._dict_summary['end_point'] = episode_json['vehicles'][0]['end_position']
+
+        self._dict_summary['rep'] = episode.repetition
+        self._dict_summary['initial_distance'] = episode.shortest_path_distance()
+        self._dict_summary['final_distance'] = episode.remaining_distance()
+        self._dict_summary['final_time'] = episode.elapsed_seconds()
+        self._dict_summary['time_out'] = episode.timeout()
+
+        end_collision, collision_vehicle = episode.ego_collision()
+        self._dict_summary['end_pedestrian_collision'] = 0
+        self._dict_summary['end_vehicle_collision'] = collision_vehicle
+        self._dict_summary['end_other_collision'] = collision and not collision_vehicle
+        self._dict_summary['number_red_lights'] = 0
+        self._dict_summary['number_green_lights'] = 0
 
 
 
@@ -128,43 +119,6 @@ class Recording(object):
             w.fieldnames = self._summary_fieldnames
 
             w.writerow(self._dict_summary)
-
-    def write_measurements_results(self, experiment, rep, pose, reward_vec, control_vec):
-        """
-        Method to record the measurements, sensors,
-        controls and status of the entire benchmark.
-        """
-        with open(os.path.join(self._path, 'measurements.csv'), 'a+') as rfd:
-            mw = csv.DictWriter(rfd, self._dict_measurements.keys())
-            mw.fieldnames = self._measurements_fieldnames
-            for i in range(len(reward_vec)):
-                self._dict_measurements['exp_id'] = experiment.task
-                self._dict_measurements['rep'] = rep
-                self._dict_measurements['start_point'] = pose[0]
-                self._dict_measurements['end_point'] = pose[1]
-                self._dict_measurements['weather'] = experiment.Conditions.WeatherId
-                self._dict_measurements['collision_other'] = reward_vec[
-                    i].collision_other
-                self._dict_measurements['collision_pedestrians'] = reward_vec[
-                    i].collision_pedestrians
-                self._dict_measurements['collision_vehicles'] = reward_vec[
-                    i].collision_vehicles
-                self._dict_measurements['intersection_otherlane'] = reward_vec[
-                    i].intersection_otherlane
-                self._dict_measurements['intersection_offroad'] = reward_vec[
-                    i].intersection_offroad
-                self._dict_measurements['pos_x'] = reward_vec[
-                    i].transform.location.x
-                self._dict_measurements['pos_y'] = reward_vec[
-                    i].transform.location.y
-                self._dict_measurements['steer'] = control_vec[
-                    i].steer
-                self._dict_measurements['throttle'] = control_vec[
-                    i].throttle
-                self._dict_measurements['brake'] = control_vec[
-                    i].brake
-
-                mw.writerow(self._dict_measurements)
 
     def _create_log_files(self):
         """
@@ -244,7 +198,7 @@ class Recording(object):
                 image.save_to_disk(self._image_filename_format.format(
                     episode_name, name, frame))
 
-    def get_pose_experiment_rep(self, number_poses_task, repetitions):
+    def get_start_episode_rep(self, repetitions):
         """
         Based on the line in log file, return the current pose, experiment and repetition.
         If the line is zero, create new log files.
@@ -253,10 +207,9 @@ class Recording(object):
         # Warning: assumes that all tasks have the same size
         line_on_file = self._get_last_position() - 1
         if line_on_file == 0:
-            return 0, 0, 0
+            return 0, 0
         else:
-            return int(line_on_file/repetitions) % number_poses_task, \
-                   line_on_file // (number_poses_task * repetitions), \
+            return int(line_on_file/repetitions)
                    line_on_file % repetitions
 
 

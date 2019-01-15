@@ -51,7 +51,8 @@ def execute_validation(gpu, exp_batch, exp_alias, dataset, suppress_output=True)
     p.start()
 
 
-def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, params):
+def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, camera_json,
+                benchmark_json, data_collector_path, params):
     """
 
     Args:
@@ -73,7 +74,8 @@ def execute_drive(gpu, exp_batch, exp_alias, exp_set_name, params):
     create_exp_path(exp_batch, exp_alias)
     p = multiprocessing.Process(target=run_drive.execute,
                                 args=(gpu, exp_batch, exp_alias, exp_set_name,
-                                      params))
+                                        camera_json, benchmark_json,
+                                        data_collector_path, params))
 
     p.start()
 
@@ -91,6 +93,9 @@ def folder_execute(params=None):
     validation_datasets = params['validation_datasets']
     driving_environments = params['driving_environments']
     allocation_parameters = params['allocation_parameters']
+    cameras_json = params['cameras_json']
+    benchmark_json = params['benchmark_json']
+    path_data_collector = params['path_data_collector']
 
     experiments_list = os.listdir(os.path.join('configs', folder))
     experiments_list = [experiment.split('.')[-2] for experiment in experiments_list]
@@ -111,7 +116,9 @@ def folder_execute(params=None):
     print (" drive environments ", driving_environments)
     tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
                                         [], [],
-                                        validation_datasets, driving_environments)
+                                        validation_datasets, driving_environments,
+                                        cameras_json, benchmark_json,
+                                        path_data_collector)
 
     # No process is executing right now.
 
@@ -148,8 +155,11 @@ def folder_execute(params=None):
                          train_status == 'Finished'):
                 free_gpus, resources_on_most_free_gpu, gpu_number = allocate_gpu_resources(
                                             free_gpus, allocation_parameters['drive_cost'])
+
                 execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
-                              process_specs['environment'], params['driving_parameters'])
+                              process_specs['environment'],
+                              process_specs['camera_json'], process_specs['benchmark_json'],
+                              process_specs['data_collector_path'], params['driving_parameters'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 

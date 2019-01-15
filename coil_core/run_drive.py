@@ -13,9 +13,6 @@ import json
 import torch
 from contextlib import closing
 
-from carla.tcp import TCPConnectionError
-from carla.driving_benchmark import run_driving_benchmark
-
 from drive import CoILAgent
 from logger import coil_logger
 from configs import g_conf, merge_with_yaml, set_type_of_process
@@ -24,6 +21,9 @@ from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkp
 from utils.general import compute_average_std_separatetasks, get_latest_path, write_header_control_summary,\
      write_data_point_control_summary, camelcase_to_snakecase, unique
 from plotter.plot_on_map import plot_episodes_tracks
+
+from data_collector import multi_agent
+from drive.recording import Recording
 
 
 def find_free_port():
@@ -62,7 +62,7 @@ def start_carla_simulator(gpu, town_name, docker, borgy, borgy_user):
                                '-v', '/mnt/home/'+borgy_user+':/mnt/home/'+borgy_user,
                                '-w', '/mnt/home/'+borgy_user+'/carla/',
                                '--', '/mnt/home/'+borgy_user+'/carla/Carla091/CarlaUE4.sh',
-                               '/Game/Carla/Maps/Town01', '-benchmark', '-fps=40'], shell=False,
+                               '/Game/Carla/Maps/'+town_name, '-benchmark', '-fps=40'], shell=False,
                                stdout=subprocess.PIPE)
 
         (out, err) = sp.communicate()
@@ -95,21 +95,21 @@ def start_carla_simulator(gpu, town_name, docker, borgy, borgy_user):
         sp = subprocess.Popen(['docker', 'run', '--rm', '-d', '-p',
                                str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
                                '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), docker,
-                               '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name, '-windowed',
-                               '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
+                               '/bin/bash', 'CarlaUE4.sh', '/Game/Carla/Maps/' + town_name,
+                               '-benchmark', '-fps=40', '-world-port=' + str(port)], shell=False,
                                stdout=subprocess.PIPE)
         (out, err) = sp.communicate()
 
         print("Going to communicate")
 
         coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4'
-                                '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
+                                + '-benchmark'+ '-fps=40'+ '-world-port='+ str(port)})
 
         return sp, host, port, out
 
 
-def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_batch, exp_alias,
-                      params, control_filename, task_list):
+def driving_benchmark(checkpoint_number, gpu, town_name, camera_json, benchmark_json, exp_batch, exp_alias,
+                      params, control_filename, task_list, data_collector_path):
     """
         The function to run a driving benchmark, it starts a carla process, run a driving
         benchmark with a certain agent, then log the results.
@@ -136,15 +136,59 @@ def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                              , 'checkpoints', str(checkpoint_number) + '.pth'))
 
-        coil_agent = CoILAgent(checkpoint, town_name)
         print ("Checkpoint ", checkpoint_number)
         coil_logger.add_message('Iterating', {"Checkpoint": checkpoint_number}, checkpoint_number)
 
         """ MAIN PART, RUN THE DRIVING BENCHMARK """
-        run_driving_benchmark(coil_agent, experiment_set, town_name,
-                              exp_batch + '_' + exp_alias + '_' + str(checkpoint_number)
-                              + '_drive_' + control_filename
-                              , True, host, port)
+        log_name = exp_batch + '_' + exp_alias + '_' + str(checkpoint_number) + '_drive_' + control_filename
+        name_to_save = log_name + '_' + benchmark_json + '_' + town_name
+        recording = Recording(name_to_save=name_to_save, continue_experiment=True, save_images=False)
+
+        # Instantiate a metric object that will be used to compute the metrics for
+        # the benchmark afterwards.
+
+        metrics_parameters = {
+            'intersection_offroad': {'frames_skip': 10,
+                                     'frames_recount': 20,
+                                     'threshold': 0.3
+                                     },
+            'intersection_otherlane': {'frames_skip': 10,
+                                       'frames_recount': 20,
+                                       'threshold': 0.4
+                                       },
+            'collision_other': {'frames_skip': 10,
+                                'frames_recount': 20,
+                                'threshold': 400
+                                },
+            'collision_vehicles': {'frames_skip': 10,
+                                   'frames_recount': 30,
+                                   'threshold': 400
+                                   },
+            'collision_pedestrians': {'frames_skip': 5,
+                                      'frames_recount': 100,
+                                      'threshold': 300
+                                      },
+        }
+
+        multi_agent_args = multi_agent.Arguments(port,
+                                   data_collector_path,
+                                   benchmark_json,
+                                   camera_json,
+                                   CoILAgent,
+                                   checkpoint,
+                                   recording=recording)
+        episodes_conf = multi_agent.execute(multi_agent_args)
+        num_episodes, weathers = len(episode_conf.episodes), episode_conf.weathers
+
+        num_dynamic_tasks = 0
+        for episode in episode_conf.episodes:
+            if len(episode['vehicles']) > 1: # More than one vehicle (ego-vehicle)
+                num_dynamic_tasks += 1
+
+        metrics_object = Metrics(metrics_parameters, num_dynamic_tasks)
+        benchmark_summary = metrics_object.compute(recording.path)
+
+        save_summary(benchmark_summary, recording.path)
 
         """ Processing the results to write a summary"""
         path = exp_batch + '_' + exp_alias + '_' + str(checkpoint_number) \
@@ -157,10 +201,10 @@ def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         with open(benchmark_json_path, 'r') as f:
             benchmark_dict = json.loads(f.read())
 
-        print(" number of episodes ", len(experiment_set.build_experiments()))
+        print(" number of episodes ", num_episodes)
         averaged_dict = compute_average_std_separatetasks([benchmark_dict],
-                                                          experiment_set.weathers,
-                                                          len(experiment_set.build_experiments()))
+                                                          weathers,
+                                                          num_episodes)
 
         file_base = os.path.join('_logs', exp_batch, exp_alias,
                                  g_conf.PROCESS_NAME + '_csv', control_filename)
@@ -179,13 +223,6 @@ def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         kill_docker(carla_process, out[:-1], params['borgy'])
 
 
-    except TCPConnectionError as error:
-        logging.error(error)
-        time.sleep(1)
-        kill_docker(carla_process, out[:-1], params['borgy'])
-        coil_logger.add_message('Error', {'Message': 'TCP serious Error'})
-        exit(1)
-
     except KeyboardInterrupt:
         kill_docker(carla_process, out[:-1], params['borgy'])
         coil_logger.add_message('Error', {'Message': 'Killed By User'})
@@ -197,7 +234,7 @@ def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_bat
         exit(1)
 
 
-def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
+def execute(gpu, exp_batch, exp_alias, drive_conditions, camera_json, benchmark_json, data_collector_path, params):
     """
     Main loop function. Executes driving benchmarks the specified iterations.
     Args:
@@ -220,14 +257,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
         merge_with_yaml(os.path.join('configs', exp_batch, exp_alias + '.yaml'))
 
         exp_set_name, town_name = drive_conditions.split('_')
-
-        experiment_suite_module = __import__('drive.suites.' + camelcase_to_snakecase(exp_set_name)
-                                             + '_suite',
-                                             fromlist=[exp_set_name])
-        experiment_suite_module = getattr(experiment_suite_module, exp_set_name)
-
-        experiment_set = experiment_suite_module()
-
         set_type_of_process('drive', drive_conditions)
 
         if params['suppress_output']:
@@ -238,7 +267,6 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                               exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
-        coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
         if g_conf.USE_ORACLE:
             control_filename = 'control_output_auto'
         else:
@@ -249,9 +277,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             Preparing the output files that will contain the driving summary
             #####
         """
-        experiment_list = experiment_set.build_experiments()
         # Get all the uniquely named tasks
-        task_list = unique([experiment.task_name for experiment in experiment_list ])
+        #task_list = unique([experiment.task_name for experiment in experiment_list ])
+        task_list = ['dummy_task']
         # Now actually run the driving_benchmark
 
         latest = get_latest_evaluated_checkpoint(control_filename + '_' + task_list[0])
@@ -279,8 +307,8 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                 time.sleep(0.1)
 
             validation_state_iteration = validation_stale_point(g_conf.FINISH_ON_VALIDATION_STALE)
-            driving_benchmark(validation_state_iteration, gpu, town_name, experiment_set, exp_batch,
-                              exp_alias, params, control_filename, task_list)
+            driving_benchmark(validation_state_iteration, gpu, town_name, camera_json, benchmark_json, exp_batch,
+                              exp_alias, params, control_filename, task_list, data_collector_path)
 
         else:
             """
@@ -297,8 +325,8 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                     latest = get_next_checkpoint(g_conf.TEST_SCHEDULE,
                                                  control_filename + '_' + task_list[0])
 
-                    driving_benchmark(latest, gpu, town_name, experiment_set, exp_batch,
-                                      exp_alias, params, control_filename, task_list)
+                    driving_benchmark(latest, gpu, town_name, camera_json, benchmark_json, exp_batch,
+                                      exp_alias, params, control_filename, task_list, data_collector_path)
 
                 else:
                     time.sleep(0.1)
@@ -312,3 +340,14 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
     except:
         traceback.print_exc()
         coil_logger.add_message('Error', {'Message': 'Something happened'})
+
+
+def save_summary(metrics_summary, path):
+    """
+        We plot the summary of the testing for the set selected weathers.
+        We take the raw data and print the way it was described on CORL 2017 paper
+    """
+
+    # First we write the entire dictionary on the benchmark folder.
+    with open(os.path.join(path, 'metrics.json'), 'w') as fo:
+        fo.write(json.dumps(metrics_summary))
