@@ -68,6 +68,24 @@ def get_episode_weather(episode):
     return int(metadata['weather'])
 
 
+# get the speed
+def orientation_vector(measurement_data):
+    pitch = np.deg2rad(measurement_data['rotation_pitch'])
+    yaw = np.deg2rad(measurement_data['rotation_yaw'])
+    orientation = np.array([np.cos(pitch)*np.cos(yaw), np.cos(pitch)*np.sin(yaw), np.sin(pitch)])
+    return orientation
+
+def forward_speed(measurement_data):
+    vel_np = np.array([measurement_data['velocity_x'], measurement_data['velocity_y'],
+                       measurement_data['velocity_z']])
+    speed = np.dot(vel_np, orientation_vector(measurement_data))
+    #speed2 = math.sqrt(vel.x*vel.x+vel.y*vel.y+vel.z*vel.z)
+    #print('forward speed: ' +str(speed) + ' speed: ' +str(speed2))
+
+    return speed
+
+
+
 class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
@@ -115,28 +133,33 @@ class CoILDataset(Dataset):
 
         """
 
-        img_path = os.path.join(self.root_dir,
-                                self.sensor_data_names[index].split('/')[-2],
-                                self.sensor_data_names[index].split('/')[-1])
-
-        img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-        # Apply the image transformation
-        if self.transform is not None:
-            boost = 1
-            img = self.transform(self.batch_read_number * boost, img)
-        else:
-            img = img.transpose(2, 0, 1)
-
-        img = img.astype(np.float)
-        img = torch.from_numpy(img).type(torch.FloatTensor)
-        img = img / 255.
-
+        # First add the float data correspondent to it.
         measurements = self.measurements[index].copy()
         for k, v in measurements.items():
             v = torch.from_numpy(np.asarray([v, ]))
             measurements[k] = v.float()
 
-        measurements['rgb'] = img
+        # For each sensor we try to add them to the vector.
+        for name, size in g_conf.SENSORS.items():
+
+            img_path = os.path.join(self.root_dir,
+                                    self.sensor_data_names[name][index].split('/')[-2],
+                                    self.sensor_data_names[name][index].split('/')[-1])
+
+            img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+            # Apply the image transformation
+            if self.transform is not None:
+                boost = 1
+                img = self.transform(self.batch_read_number * boost, img)
+            else:
+                img = img.transpose(2, 0, 1)
+
+            # TODO Here we need to convert it properly.
+            img = img.astype(np.float)
+            img = torch.from_numpy(img).type(torch.FloatTensor)
+            img = img / 255.
+
+            measurements[name] = img
 
         self.batch_read_number += 1
 
@@ -181,9 +204,6 @@ class CoILDataset(Dataset):
                                  'throttle_noise': final_throtle_noise,
                                  'speed_module': speed / g_conf.SPEED_FACTOR,
                                  'directions': directions,
-                                 "pedestrian": measurement_augmented['stop_pedestrian'],
-                                 "traffic_lights": measurement_augmented['stop_traffic_lights'],
-                                 "vehicle": measurement_augmented['stop_vehicle'],
                                  "game_time": time_stamp,
                                  'angle': angle}
 
@@ -196,9 +216,6 @@ class CoILDataset(Dataset):
                                  'brake_noise': measurement_augmented['brake_noise'],
                                  'speed_module': speed / g_conf.SPEED_FACTOR,
                                  'directions': directions,
-                                 "pedestrian": measurement_augmented['stop_pedestrian'],
-                                 "traffic_lights": measurement_augmented['stop_traffic_lights'],
-                                 "vehicle": measurement_augmented['stop_vehicle'],
                                  "game_time": time_stamp,
                                  'angle': angle}
 
@@ -226,7 +243,22 @@ class CoILDataset(Dataset):
         if len(episodes_list) == 0:
             raise ValueError("There are no episodes on the training dataset folder %s" % path)
 
-        sensor_data_names = []
+
+        # Initialize sensor data with all the sensor names
+        sensor_data_names = {}
+        for name in g_conf.SENSORS.keys():
+            sensor_data_names.update({name: []})
+
+
+        # WE HAVE THIS HARDCODED DITIONARY TO TRANSLATE DATA COLLECTION INTO THE SYSTEM.
+        # THIS SHOULD BE SPECIFIED IN SOME CONFIGURATION , INPUT CONFIGURATION TO TRANSLATE
+
+        translate_collect_system = {'labels_front': 'CentralSemantic',
+                                    'labels_left': 'LeftAugmentationCameraSemantic' ,
+                                    'labels_right': 'RightAugmentationCameraSemantic'
+                                    }
+
+
         float_dicts = []
 
         number_of_hours_pre_loaded = 0
@@ -261,48 +293,42 @@ class CoILDataset(Dataset):
                 # that are not going to be used for this experiment
                 # We extract the interesting subset from the measurement dict
 
-                # If the forward speed is not on the dataset it is because speed is zero.
-                if 'forwardSpeed' in measurement_data['playerMeasurements']:
-                    speed = measurement_data['playerMeasurements']['forwardSpeed']
-                else:
-                    speed = 0
 
 
                 directions = measurement_data['directions']
 
-                final_measurement = self._get_final_measurement(speed, measurement_data, 0,
-                                                                directions)
+                speed = forward_speed(measurement_data)
+                # store the  forward velocity of all the other vectors
+                others_speed = []
+                for i in range(len(measurement_data["vehicles"])):
 
-                if self.is_measurement_partof_experiment(final_measurement):
+                    others_speed.append(forward_speed(measurement_data["vehicles"][i]))
+
+                final_measurement = {'steer': measurement_data['control_steer'],
+                                     'steer_noise': measurement_data['control_noise_f_steer'],
+                                     'throttle': measurement_data['control_noise_f_throttle'],
+                                     'throttle_noise': measurement_data['control_noise_f_throttle'],
+                                     'brake': measurement_data['control_brake'],
+                                     'brake_noise': measurement_data['control_noise_f_brake'],
+                                     'speed_module': speed / g_conf.SPEED_FACTOR,
+                                     'directions': directions,
+                                     'other_vehicles_speed': others_speed,
+                                     "game_time": measurement_data['elapsed_seconds'],
+                                     'angle': 0}
+
+                # Now we have three cameras used simultaneously !
+
+                # the different sensors
+
+                for name in g_conf.SENSORS.keys():
+
+
                     float_dicts.append(final_measurement)
-                    rgb = 'CentralRGB_' + data_point_number + '.png'
-                    sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
+                    label = translate_collect_system[name] + '_' + data_point_number + '.png'
+                    sensor_data_names[name].append(os.path.join(episode.split('/')[-1], label))
                     count_added_measurements += 1
 
-                # We do measurements for the left side camera
-                # We convert the speed to KM/h for the augmentation
 
-                # We extract the interesting subset from the measurement dict
-
-                final_measurement = self._get_final_measurement(speed, measurement_data, -30.0,
-                                                                directions)
-
-                if self.is_measurement_partof_experiment(final_measurement):
-                    float_dicts.append(final_measurement)
-                    rgb = 'LeftRGB_' + data_point_number + '.png'
-                    sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
-                    count_added_measurements += 1
-
-                # We do measurements augmentation for the right side cameras
-
-                final_measurement = self._get_final_measurement(speed, measurement_data, 30.0,
-                                                                directions)
-
-                if self.is_measurement_partof_experiment(final_measurement):
-                    float_dicts.append(final_measurement)
-                    rgb = 'RightRGB_' + data_point_number + '.png'
-                    sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
-                    count_added_measurements += 1
 
             # Check how many hours were actually added
 
