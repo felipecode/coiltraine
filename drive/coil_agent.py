@@ -86,8 +86,8 @@ class CoILAgent(Agent):
                                     self.checkpoint['iteration'])
         self.first_iter = False
 
-        print("speed ", vehicle.geo.forward_speed)
-        print('Steer', control.steer, 'Gas', control.throttle, 'Brake', control.brake)
+        #print("speed ", vehicle.geo.forward_speed)
+        print('COILAGENT Steer', control.steer, 'Gas', control.throttle, 'Brake', control.brake)
 
         state = {
             'control': control
@@ -141,7 +141,7 @@ class CoILAgent(Agent):
 
         image_input = image_input.unsqueeze(0)
 
-        print(image_input.shape)
+
 
         return image_input
 

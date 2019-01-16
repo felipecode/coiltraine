@@ -201,7 +201,7 @@ if __name__ == '__main__':
         allocation_parameters = {'gpu_value': args.gpu_value,
                                  'train_cost': 1.5,
                                  'validation_cost': 1.0,
-                                 'drive_cost': 1.5}
+                                 'drive_cost': 1.0}
 
         params = {
             'folder': args.folder,
