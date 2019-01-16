@@ -158,8 +158,8 @@ def folder_execute(params=None):
 
                 execute_drive(gpu_number, process_specs['folder'], process_specs['experiment'],
                               process_specs['environment'],
-                              process_specs['camera_json'], process_specs['benchmark_json'],
-                              process_specs['data_collector_path'], params['driving_parameters'])
+                              process_specs['cameras_json'], process_specs['benchmark_json'],
+                              process_specs['path_data_collector'], params['driving_parameters'])
                 process_specs.update({'gpu': gpu_number})
                 executing_processes.append(process_specs)
 
