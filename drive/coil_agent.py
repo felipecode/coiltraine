@@ -2,7 +2,7 @@ import numpy as np
 import scipy
 
 import torch
-from agent.agent import Agent, CommandFollower
+from agent import Agent, CommandFollower
 from carla import VehicleControl
 
 from network import CoILModel
@@ -88,7 +88,11 @@ class CoILAgent(Agent):
 
         print("speed ", vehicle.geo.forward_speed)
         print('Steer', control.steer, 'Gas', control.throttle, 'Brake', control.brake)
-        return control
+
+        state = {
+            'control': control
+        }
+        return state
 
 
 
@@ -99,10 +103,12 @@ class CoILAgent(Agent):
         iteration = 0
         for name, size in g_conf.SENSORS.items():
 
-            sensor = sensors[name].raw_data[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
+            raw_data = np.array(sensors[name].raw_data)
+            raw_data = np.reshape(raw_data, (600, 800, 4))
+            raw_data = raw_data[:, :, :3] # remove transparency channel
+            sensor = raw_data[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
 
-            #if sensors[name].type == 'SemanticSegmentation':
-            if 'Semantic' in name:
+            if 'semantic' in name:
                 # For now we have just for RGB images and semantic segmentation.
 
                 # TODO: the camera name has to be sincronized with what is in the experiment...
@@ -145,7 +151,8 @@ class CoILAgent(Agent):
         Returns:
 
         """
-        steer, throttle, brake = outputs[0], outputs[1], outputs[2]
+        steer, throttle, brake = outputs[0].item(), outputs[1].item(), outputs[2].item()
+        brake = brake
         if brake < 0.05:
             brake = 0.0
 
@@ -161,7 +168,7 @@ class CoILAgent(Agent):
         Returns:
 
         """
-        steer, throttle_brake = outputs[0], outputs[1]
+        steer, throttle_brake = outputs[0].item(), outputs[1].item()
 
         if throttle_brake >= 0.0:
             throttle = throttle_brake

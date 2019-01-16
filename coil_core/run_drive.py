@@ -20,9 +20,9 @@ from utils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkp
     is_next_checkpoint_ready, get_latest_evaluated_checkpoint, validation_stale_point
 from utils.general import compute_average_std_separatetasks, get_latest_path, write_header_control_summary,\
      write_data_point_control_summary, camelcase_to_snakecase, unique
-from plotter.plot_on_map import plot_episodes_tracks
+#from plotter.plot_on_map import plot_episodes_tracks
 
-from data_collector import multi_agent
+import multi_agent
 from drive.recording import Recording
 
 
@@ -87,6 +87,8 @@ def start_carla_simulator(gpu, town_name, docker, borgy, borgy_user):
             if host is None:
                 time.sleep(1)
 
+        # wait for Carla to start
+        time.sleep(20)
         return sp, host, port, out
     else:
         port = find_free_port()
@@ -141,7 +143,7 @@ def driving_benchmark(checkpoint_number, gpu, town_name, camera_json, benchmark_
 
         """ MAIN PART, RUN THE DRIVING BENCHMARK """
         log_name = exp_batch + '_' + exp_alias + '_' + str(checkpoint_number) + '_drive_' + control_filename
-        name_to_save = log_name + '_' + benchmark_json + '_' + town_name
+        name_to_save = log_name + '_' + os.path.basename(benchmark_json[:-5]) + '_' + town_name
         recording = Recording(name_to_save=name_to_save, continue_experiment=True, save_images=False)
 
         # Instantiate a metric object that will be used to compute the metrics for
@@ -170,7 +172,7 @@ def driving_benchmark(checkpoint_number, gpu, town_name, camera_json, benchmark_
                                       },
         }
 
-        multi_agent_args = multi_agent.Arguments(port,
+        multi_agent_args = multi_agent.Arguments(host, port,
                                    data_collector_path,
                                    benchmark_json,
                                    camera_json,
@@ -216,8 +218,8 @@ def driving_benchmark(checkpoint_number, gpu, town_name, camera_json, benchmark_
 
         """ Write the  paths for the resulting driving performance """
 
-        plot_episodes_tracks(exp_batch, exp_alias,
-                             checkpoint_number, town_name, g_conf.PROCESS_NAME.split('_')[1])
+        #plot_episodes_tracks(exp_batch, exp_alias,
+        #                     checkpoint_number, town_name, g_conf.PROCESS_NAME.split('_')[1])
 
         """ KILL CARLA, FINISHED THIS BENCHMARK"""
         kill_docker(carla_process, out[:-1], params['borgy'])

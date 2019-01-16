@@ -209,8 +209,7 @@ class Recording(object):
         if line_on_file == 0:
             return 0, 0
         else:
-            return int(line_on_file/repetitions)
-                   line_on_file % repetitions
+            return int(line_on_file/repetitions), line_on_file % repetitions
 
 
     def _experiment_exist(self):

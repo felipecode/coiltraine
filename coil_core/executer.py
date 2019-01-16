@@ -175,10 +175,11 @@ def folder_execute(params=None):
                 executing_processes.append(process_specs)
 
 
-
         tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
                                             executing_processes, tasks_queue,
-                                            validation_datasets, driving_environments, False)
+                                            validation_datasets, driving_environments,
+                                            cameras_json, benchmark_json,
+                                            path_data_collector, False)
 
         printer.plot_folder_summaries(folder,
                                       params['is_training'],

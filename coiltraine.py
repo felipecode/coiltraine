@@ -113,17 +113,17 @@ if __name__ == '__main__':
         help='Borgy user')
     argparser.add_argument(
         '-b', '--benchmark_json',
-        default=None,
+        required=True,
         help='The benchmark configuration file')
 
     argparser.add_argument(
         '-c', '--cameras_json',
-        default=None,
+        required=True,
         help='Camera configuration file')
 
     argparser.add_argument(
         '-pdt', '--path_data_collector',
-        default=None,
+        required=True,
         help='The path used to save the data')
     args = argparser.parse_args()
 
