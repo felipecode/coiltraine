@@ -225,6 +225,9 @@ def get_latest_path(path):
     files_list = glob.glob(os.path.join('_benchmarks_results', path+'*'))
     sort_nicely(files_list)
 
+    if len(files_list) == 0:
+        return None
+
     return files_list[-1]
 
 
@@ -410,7 +413,7 @@ def compute_average_std(dic_list, weathers, number_of_tasks=1):
         """
         for i in range(len(vectors)):
 
-            
+
             average_results_matrix[metric][i] = np.mean(average_results_matrix[metric][i])
 
         """

@@ -195,7 +195,10 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                            + '_' + process.split('_')[0] + '_' + control_filename \
                            + '_' + process.split('_')[1] + '_' + process.split('_')[2]
 
-                    print_drive_summary(get_latest_path(path), None, checkpoint, verbose)
+                    latest_path = get_latest_path(path)
+                    if latest_path is None:
+                        continue
+                    print_drive_summary(latest_path, None, checkpoint, verbose)
 
 
 def print_folder_process_names(exp_batch):
