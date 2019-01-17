@@ -237,7 +237,7 @@ class CoILDataset(Dataset):
 
         """
 
-        episodes_list = glob.glob(os.path.join(path, 'episode_*'))
+        episodes_list = glob.glob(os.path.join(path, 'episode_*/episode_*'))
         sort_nicely(episodes_list)
         # Do a check if the episodes list is empty
         if len(episodes_list) == 0:
@@ -253,9 +253,10 @@ class CoILDataset(Dataset):
         # WE HAVE THIS HARDCODED DITIONARY TO TRANSLATE DATA COLLECTION INTO THE SYSTEM.
         # THIS SHOULD BE SPECIFIED IN SOME CONFIGURATION , INPUT CONFIGURATION TO TRANSLATE
 
-        translate_collect_system = {'labels_front': 'CentralSemantic',
-                                    'labels_left': 'LeftAugmentationCameraSemantic' ,
-                                    'labels_right': 'RightAugmentationCameraSemantic'
+        translate_collect_system = {'rgb': 'rgb',
+                                    'labels_front': 'semantic',
+                                    'labels_left': 'left_augmentation_semantic' ,
+                                    'labels_right': 'right_augmentation_semantic'
                                     }
 
 
@@ -462,4 +463,3 @@ class CoILDataset(Dataset):
             inputs_vec.append(data[input_name])
 
         return torch.cat(inputs_vec, 1)
-
