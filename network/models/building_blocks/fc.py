@@ -56,6 +56,5 @@ class FC(nn.Module):
     def forward(self, x, *args):
         # get only the speeds from measurement labels
         # TODO: TRACK NANS OUTPUTS
-        print (self.layers(x))
         return self.layers(x)
 
