@@ -487,8 +487,7 @@ def compute_our_res_dict(experiment_name):
                                        usecols=(
                                            [header_details.index('end_other_collision')]))
 
-                print("        end other", end_other)
-                print("        end other shape", end_other.shape)
+
                 if end_other.shape != (0,) or  end_other.shape != ():
                     try:
                         end_other = end_other[0]
@@ -498,6 +497,9 @@ def compute_our_res_dict(experiment_name):
 
                     metric_dict['end_other_collision'].append(end_other)
 
+                    
+                print("        end other", end_other)
+                print("        end other shape", end_other.shape)
                 # Timeout
 
                 metric_dict['timeout'].append(1 - (
@@ -506,17 +508,17 @@ def compute_our_res_dict(experiment_name):
                 metric_dict['stopping'].append(0.0)
 
 
-        maximun_value_index = int(np.argmax(metric_dict['episodes_fully_completed']))
-        print ("max value index", maximun_value_index)
-        minimun_value_index = int(np.argmin(metric_dict['episodes_fully_completed']))
-        for metric in metric_dict.keys():
-            maximun_success = metric_dict[metric][maximun_value_index]
-            minimun_success = metric_dict[metric][minimun_value_index]
-            # maximun_std = variation_values_std[maximun_value_index]
-            # minimun_std = variation_values_std[minimun_value_index]
+            maximun_value_index = int(np.argmax(metric_dict['episodes_fully_completed']))
+            print ("max value index", maximun_value_index)
+            minimun_value_index = int(np.argmin(metric_dict['episodes_fully_completed']))
+            for metric in metric_dict.keys():
+                maximun_success = metric_dict[metric][maximun_value_index]
+                minimun_success = metric_dict[metric][minimun_value_index]
+                # maximun_std = variation_values_std[maximun_value_index]
+                # minimun_std = variation_values_std[minimun_value_index]
 
-            scenarios_dict.update({out_scenarios[s]: [maximun_success * 100,
-                                                      minimun_success * 100]})
+                scenarios_dict.update({out_scenarios[s]: [maximun_success * 100,
+                                                          minimun_success * 100]})
 
         results_dict.update({out_tasks[t]: scenarios_dict})
 
