@@ -2,7 +2,9 @@ import numpy as np
 import os
 import math
 import matplotlib.pyplot as plt
-import seaborn; seaborn.set_style('whitegrid')
+import seaborn;
+
+seaborn.set_style('whitegrid')
 import copy
 from matplotlib import rcParams
 
@@ -10,10 +12,7 @@ from matplotlib import rcParams
 def sldist(c1, c2): return math.sqrt((c2[0] - c1[0]) ** 2 + (c2[1] - c1[1]) ** 2)
 
 
-
-
 def split_episodes(meas_file, exp_id=-1):
-
     """
         The idea is to split the positions assumed by the ego vehicle on every episode.
     Args:
@@ -31,14 +30,14 @@ def split_episodes(meas_file, exp_id=-1):
     header_details[-1] = header_details[-1][:-1]
     f.close()
 
-    #print (header_details)
+    # print (header_details)
 
     details_matrix = np.loadtxt(open(meas_file, "rb"), delimiter=",", skiprows=1)
 
     #
-    #print (details_matrix)
+    # print (details_matrix)
     previous_pos = [details_matrix[0, header_details.index('pos_x')],
-                 details_matrix[0, header_details.index('pos_y')]]
+                    details_matrix[0, header_details.index('pos_y')]]
 
     #
     exp_id_vec = details_matrix[:, header_details.index('exp_id')]
@@ -87,7 +86,8 @@ def split_episodes(meas_file, exp_id=-1):
         positions_vector.append(point)
 
         if (previous_start_point != start_point or end_point != previous_end_point) or \
-                repetition != previous_repetition or i == len(details_matrix)-1 :              # "or i == len(details_matrix)-1 ": To conclude the last episode
+                repetition != previous_repetition or i == len(
+            details_matrix) - 1:  # "or i == len(details_matrix)-1 ": To conclude the last episode
 
             travelled_distances.append(travel_this_episode)
             travel_this_episode = 0
@@ -103,12 +103,12 @@ def split_episodes(meas_file, exp_id=-1):
             offroads = []
             offroads.append(intersection_offroad)
 
-            #This is for saving the intersection_otherlane for each episode
+            # This is for saving the intersection_otherlane for each episode
             episodes_otherlane.append(otherlanes)
             otherlanes = []
             otherlanes.append(intersection_otherlane)
 
-            #This is for saving the expected start and end points for each episode
+            # This is for saving the expected start and end points for each episode
             expected_start_points.append(int(previous_start_point))
             expected_end_points.append(int(previous_end_point))
 
@@ -125,7 +125,6 @@ def split_episodes(meas_file, exp_id=-1):
         previous_repetition = repetition
 
     return episode_positions_matrix, travelled_distances, expected_start_points, expected_end_points, episodes_throttles, episodes_offroad, episodes_otherlane
-
 
 
 def get_results(summary_file):
@@ -147,7 +146,7 @@ def get_results(summary_file):
 
     details_matrix = np.loadtxt(open(summary_file, "rb"), delimiter=",", skiprows=1)
 
-    results=[]
+    results = []
     for i in range(len(details_matrix)):
         result = details_matrix[i, header_details.index('result')]
         results.append(int(result))
@@ -155,8 +154,6 @@ def get_results(summary_file):
 
 
 def analyze_stopping_problem(batch_folder, exp_id):
-
-
     # We build the measurement file used for the benchmarks.
     meas_file = os.path.join(batch_folder,
                              'measurements.csv')
@@ -164,14 +161,12 @@ def analyze_stopping_problem(batch_folder, exp_id):
     summary_file = os.path.join(batch_folder,
                                 'summary.csv')
 
-    #image_location = map.__file__[:-7]
-
+    # image_location = map.__file__[:-7]
 
     # Split the measurements for each of the episodes
     episodes_positions, travelled_distances, \
     expected_start_points, expected_end_points, \
     episodes_throttles, episodes_offroad, episodes_otherlane = split_episodes(meas_file, exp_id)
-
 
     episode_results = get_results(summary_file)
 
@@ -189,7 +184,8 @@ def analyze_stopping_problem(batch_folder, exp_id):
             offroads = episodes_offroad[i]
             otherlanes = episodes_otherlane[i]
             throttles = episodes_throttles[i]
-            if all(num == 0.0 for num in offroads[-50:]) and all(num == 0.0 for num in otherlanes[-50:]):
+            if all(num == 0.0 for num in offroads[-50:]) and all(
+                    num == 0.0 for num in otherlanes[-50:]):
                 if all(num <= 0.1 for num in throttles[-30:]):
                     print(throttles[-50:])
                     episodes_fail_on_stopping.append(i)
@@ -201,7 +197,6 @@ def analyze_stopping_problem(batch_folder, exp_id):
     percentage = fail_on_stopping / fail_count
     print('Percentage', percentage)
     return percentage
-
 
 
 def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, number_of_reps=1):
@@ -248,8 +243,6 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
     number_of_experiments = len(list(dic_list[0]['episodes_fully_completed'].items())[0][1])
     number_of_episodes = len(list(dic_list[0]['episodes_fully_completed'].items())[0][1][0])
 
-
-
     # The average results between the dictionaries.
     average_results_matrix = {}
     std_results_matrix = {}
@@ -289,15 +282,16 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
                 average_results_matrix[metric][i][count_dic_pos] = 0
                 # We take the average of each rep and them average again
                 for r in range(number_of_reps):
-                    average_results_matrix[metric][i][count_dic_pos] += metric_sum_values[i][r]/\
-                                                               (number_of_episodes*len(weathers))
+                    average_results_matrix[metric][i][count_dic_pos] += metric_sum_values[i][r] / \
+                                                                        (number_of_episodes * len(
+                                                                            weathers))
 
                 std_results_matrix[metric][i][count_dic_pos] = 0
                 for r in range(number_of_reps):
                     std_results_matrix[metric][i][count_dic_pos] += \
-                        math.fabs(average_results_matrix[metric][i][count_dic_pos]-
-                            metric_sum_values[i][r]/ ((number_of_episodes/number_of_reps)*
-                                                      len(weathers)))/number_of_reps
+                        math.fabs(average_results_matrix[metric][i][count_dic_pos] -
+                                  metric_sum_values[i][r] / ((number_of_episodes / number_of_reps) *
+                                                             len(weathers))) / number_of_reps
 
         # For the metrics we sum over all the weathers here, this is to better subdivide the driving
         #  envs. The infraction metrics are divided by the number of kilometers in the end
@@ -359,12 +353,11 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
             # On this part average results matrix basically assume the number of infractions.
             print(" metric sum ", metric_sum_values)
             for i in range(len(metric_sum_values)):
-                average_results_matrix[metric][i][count_dic_pos] = metric_sum_values[i]/\
-                                                                   (number_of_episodes*len(weathers))
+                average_results_matrix[metric][i][count_dic_pos] = metric_sum_values[i] / \
+                                                                   (number_of_episodes * len(
+                                                                       weathers))
 
         count_dic_pos += 1
-
-
 
     average_speed_task = sum(metrics_summary['average_speed'][str(float(list(weathers)[0]))])
 
@@ -373,19 +366,7 @@ def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1, num
     average_results_matrix.update({'average_speed': np.array([average_speed_task])})
     print(average_results_matrix)
 
-
     return average_results_matrix, std_results_matrix
-
-
-
-
-
-
-
-
-
-
-
 
 
 def compute_our_res_dict(experiment_name):
@@ -394,23 +375,21 @@ def compute_our_res_dict(experiment_name):
 
     # Add several experiments parts
     experiments = [
-            'cvprfinal_valstop_seed1/' + experiment_name,
-            'cvprfinal_valstop_seed2/' + experiment_name,
-            'cvprfinal_valstop_seed3/' + experiment_name,
-            'cvprfinal_valstop_seed4/' + experiment_name,
-            'cvprfinal_valstop_seed5/' + experiment_name]
+        'cvprfinal_valstop_seed1/' + experiment_name,
+        'cvprfinal_valstop_seed2/' + experiment_name,
+        'cvprfinal_valstop_seed3/' + experiment_name,
+        'cvprfinal_valstop_seed4/' + experiment_name,
+        'cvprfinal_valstop_seed5/' + experiment_name]
 
     metric_dict = {'episodes_fully_completed': [],
-                                 'end_pedestrian_collision':[],
-                                 'end_vehicle_collision':[],
-                                 'end_other_collision':[],
-                                 'timeout':[],
-                                 'stopping': []
-                                 }
+                   'end_pedestrian_collision': [],
+                   'end_vehicle_collision': [],
+                   'end_other_collision': [],
+                   'timeout': [],
+                   'stopping': []
+                   }
 
-
-
-    results_dict  = {}
+    results_dict = {}
 
     tasks = ['empty', 'normal', 'cluttered']
     scenarios = ['Long3Training_Town01', 'Long3NewWeather_Town01',
@@ -418,8 +397,9 @@ def compute_our_res_dict(experiment_name):
 
     out_tasks = {'empty': 'Empty', 'normal': 'Normal', 'cluttered': 'Cluttered'}
 
-    out_scenarios = {'Long3Training_Town01': 'Training', 'Long3NewWeather_Town01':'NewWeather',
-                     'Long3NewTown_Town02': 'NewTown', 'Long3NewWeatherTown_Town02':'NewWeatherTown'}
+    out_scenarios = {'Long3Training_Town01': 'Training', 'Long3NewWeather_Town01': 'NewWeather',
+                     'Long3NewTown_Town02': 'NewTown',
+                     'Long3NewWeatherTown_Town02': 'NewWeatherTown'}
 
     check_point = 0
 
@@ -430,53 +410,107 @@ def compute_our_res_dict(experiment_name):
             # HERe we do a plot
             print("  Scenario ", s)
 
-            variation_values = []
-            variation_values_std = []
             for exp in experiments:
                 print("      exp ", exp)
                 f = open(os.path.join(root_path, exp, 'drive_' + s + '_csv',
-                                                  'control_output_' + t + '.csv'), "rU")
+                                      'control_output_' + t + '.csv'), "rU")
                 header_details = f.readline()
 
                 header_details = header_details.split(',')
-                #header_details[-1] = header_details[-1][:-1]
+                # header_details[-1] = header_details[-1][:-1]
                 f.close()
 
-                for metric in metric_dict.keys():
-                    metric_value = np.loadtxt(os.path.join(root_path, exp, 'drive_' + s + '_csv',
-                                                      'control_output_' + t + '.csv'),
-                                         delimiter=",",
-                                         skiprows=1,
-                                         usecols=([header_details.index(metric)]))
+                # 'episodes_fully_completed': [],
+                # 'end_pedestrian_collision':[],
+                # 'end_vehicle_collision':[],
+                # 'end_other_collision':[],
+                # 'timeout':[],
+                # 'stopping': []
+
+                success = np.loadtxt(os.path.join(root_path, exp, 'drive_' + s + '_csv',
+                                                  'control_output_' + t + '.csv'),
+                                     delimiter=",",
+                                     skiprows=1,
+                                     usecols=([header_details.index('episodes_fully_completed')]))
+
+                print("        success", success)
+
+                if success.shape != (0,):
+                    try:
+                        success = success[0]
+                        # std = std[0]
+                    except IndexError:
+                        pass
+
+                    metric_dict['episodes_fully_completed'].append(success)
+
+                end_ped = np.loadtxt(os.path.join(root_path, exp, 'drive_' + s + '_csv',
+                                                  'control_output_' + t + '.csv'),
+                                     delimiter=",",
+                                     skiprows=1,
+                                     usecols=(
+                                         [header_details.index('end_pedestrian_collision')]))
+
+                print("        end ped", end_ped)
+
+                if end_ped.shape != (0,):
+                    try:
+                        end_ped = end_ped[0]
+                        # std = std[0]
+                    except IndexError:
+                        pass
+
+                    metric_dict['end_pedestrian_collision'].append(end_ped)
+
+                end_car = np.loadtxt(os.path.join(root_path, exp, 'drive_' + s + '_csv',
+                                                  'control_output_' + t + '.csv'),
+                                     delimiter=",",
+                                     skiprows=1,
+                                     usecols=(
+                                         [header_details.index('end_vehicle_collision')]))
+
+                print("        end car", end_car)
+
+                if end_car.shape != (0,):
+                    try:
+                        end_car = end_car[0]
+                        # std = std[0]
+                    except IndexError:
+                        pass
+
+                    metric_dict['end_vehicle_collision'].append(end_car)
+
+                end_other = np.loadtxt(os.path.join(root_path, exp, 'drive_' + s + '_csv',
+                                                    'control_output_' + t + '.csv'),
+                                       delimiter=",",
+                                       skiprows=1,
+                                       usecols=(
+                                           [header_details.index('end_other_collision')]))
+
+                print("        end other", end_other)
+
+                if end_other.shape != (0,):
+                    try:
+                        end_other = end_other[0]
+                        # std = std[0]
+                    except IndexError:
+                        pass
+
+                    metric_dict['end_other_collision'].append(end_other)
 
 
-                    print("        metric", metric)
-                    print("        metric_value", metric_value)
 
-                    if metric_value.shape != (0,):
-                        try:
-                            metric_value = metric_value[0]
-                            #std = std[0]
-                        except IndexError:
-                            pass
+        maximun_value_index = int(np.argmax(metric_dict['episodes_fully_completed']))
+        print ("max value index", maximun_value_index)
+        minimun_value_index = int(np.argmin(metric_dict['episodes_fully_completed']))
+        for metric in metric_dict.keys():
+            maximun_success = metric_dict[metric][maximun_value_index]
+            minimun_success = metric_dict[metric][minimun_value_index]
+            # maximun_std = variation_values_std[maximun_value_index]
+            # minimun_std = variation_values_std[minimun_value_index]
 
-                        metric_dict[metric].append(metric_value)
-                        #variation_values.append(success)
-                        #variation_values_std.append(std)
-
-            for metric in metric_dict.keys():
-
-                maximun_value_index = int(np.argmax(metric_dict[metric]))
-                print ("max value index", maximun_value_index)
-                minimun_value_index = int(np.argmin(metric_dict[metric]))
-
-                maximun_success = metric_dict[metric][maximun_value_index]
-                minimun_success = metric_dict[metric][minimun_value_index]
-                #maximun_std = variation_values_std[maximun_value_index]
-                #minimun_std = variation_values_std[minimun_value_index]
-
-                scenarios_dict.update({out_scenarios[s]: [maximun_success*100,
-                                                          minimun_success*100]})
+            scenarios_dict.update({out_scenarios[s]: [maximun_success * 100,
+                                                      minimun_success * 100]})
 
         results_dict.update({out_tasks[t]: scenarios_dict})
 
@@ -484,10 +518,7 @@ def compute_our_res_dict(experiment_name):
     return results_dict
 
 
-
 def add_data_for_method(compared_results, paths_dict, method_name):
-
-
     # Translates from tasks to positions
     task_pos_dict = {'Empty': 0, 'Normal': 1, 'Cluttered': 2}
 
@@ -503,61 +534,64 @@ def add_data_for_method(compared_results, paths_dict, method_name):
                 benchmark_dict = json.loads(f.read())
 
             avg_train_metrics, _ = compute_average_std_separatetasks([benchmark_dict],
-                                                                  scenario_weather[scenario],
-                                                                  number_of_tasks=3,
-                                                                  number_of_reps=1)
+                                                                     scenario_weather[scenario],
+                                                                     number_of_tasks=3,
+                                                                     number_of_reps=1)
             print ('AVG ')
             print (avg_train_metrics)
 
             for task, methods in compared_results.items():
-
                 completed = avg_train_metrics['episodes_fully_completed'][task_pos_dict[task]][0]
-                compared_results[task][method_name][scenario]['episodes_fully_completed'].append(completed)
+                compared_results[task][method_name][scenario]['episodes_fully_completed'].append(
+                    completed)
 
                 # End pedestrians
                 end_ped = avg_train_metrics['end_pedestrian_collision'][task_pos_dict[task]][0]
-                compared_results[task][method_name][scenario]['end_pedestrian_collision'].append(end_ped)
+                compared_results[task][method_name][scenario]['end_pedestrian_collision'].append(
+                    end_ped)
 
                 # End Cars
                 end_cars = avg_train_metrics['end_vehicle_collision'][task_pos_dict[task]][0]
-                compared_results[task][method_name][scenario]['end_vehicle_collision'].append(end_cars)
-
+                compared_results[task][method_name][scenario]['end_vehicle_collision'].append(
+                    end_cars)
 
                 # End Others
                 end_others = avg_train_metrics['end_other_collision'][task_pos_dict[task]][0]
-                compared_results[task][method_name][scenario]['end_other_collision'].append(end_others)
+                compared_results[task][method_name][scenario]['end_other_collision'].append(
+                    end_others)
 
                 # Timeout
 
-                compared_results[task]['MT'][scenario]['timeout'].append(1 -(
-                                                         completed + end_cars + end_others + end_ped)
-                                                                                     )
-                # Stopping problem
-                compared_results[task]['MT'][scenario]['stopping'].append(
-                                                    analyze_stopping_problem(path, task_pos_dict[task])
+                compared_results[task][method_name][scenario]['timeout'].append(1 - (
+                        completed + end_cars + end_others + end_ped)
                                                                          )
+                # Stopping problem
+                compared_results[task][method_name][scenario]['stopping'].append(
+                    analyze_stopping_problem(path, task_pos_dict[task])
+                )
 
 
 import json
+
 # ***** main loop *****
 if __name__ == "__main__":
 
-    #root path for each case
+    # root path for each case
 
     scenario_dict = {'episodes_fully_completed': [],
-                                 'end_pedestrian_collision':[],
-                                 'end_vehicle_collision':[],
-                                 'end_other_collision':[],
-                                 'timeout':[],
-                                 'stopping': []
-                                 }
+                     'end_pedestrian_collision': [],
+                     'end_vehicle_collision': [],
+                     'end_other_collision': [],
+                     'timeout': [],
+                     'stopping': []
+                     }
 
-    compared_results= {
+    compared_results = {
         'Empty':
-            {"MT": {"Training":copy.deepcopy(scenario_dict),
-                     "NewWeather": copy.deepcopy(scenario_dict),
-                     "NewTown": copy.deepcopy(scenario_dict),
-                     "NewWeatherTown":copy.deepcopy(scenario_dict)
+            {"MT": {"Training": copy.deepcopy(scenario_dict),
+                    "NewWeather": copy.deepcopy(scenario_dict),
+                    "NewTown": copy.deepcopy(scenario_dict),
+                    "NewWeatherTown": copy.deepcopy(scenario_dict)
                     },
              "CAL": {"Training": copy.deepcopy(scenario_dict),
                      "NewWeather": copy.deepcopy(scenario_dict),
@@ -565,10 +599,10 @@ if __name__ == "__main__":
                      "NewWeatherTown": copy.deepcopy(scenario_dict)
                      },
              "CoIL": {"Training": copy.deepcopy(scenario_dict),
-                     "NewWeather": copy.deepcopy(scenario_dict),
-                     "NewTown": copy.deepcopy(scenario_dict),
-                     "NewWeatherTown": copy.deepcopy(scenario_dict)
-                     },
+                      "NewWeather": copy.deepcopy(scenario_dict),
+                      "NewTown": copy.deepcopy(scenario_dict),
+                      "NewWeatherTown": copy.deepcopy(scenario_dict)
+                      },
              },
         'Normal':
             {"MT": {"Training": copy.deepcopy(scenario_dict),
@@ -609,93 +643,83 @@ if __name__ == "__main__":
     MT_root = '/home/felipe/CoIL_TRI/_results_MT/_benchmarks_results'
     # Translate scenarios to weathers
 
-    MT_bench_paths = {'Training': [os.path.join(MT_root, 'town02_test_LongitudinalControl2018_Town01')
-                                   #os.path.join(MT_root, 'test3_test_LongitudinalControl2018_Town01')
-                                   ],
-                      'NewWeather': [os.path.join(MT_root, 'town02_test_LongitudinalControl2018_Town01')
-                                   #os.path.join(MT_root, 'test3_test_LongitudinalControl2018_Town01')
-                                    ],
-                      'NewTown': [os.path.join(MT_root, 'town02_test_LongitudinalControl2018_Town02'),
-                                   os.path.join(MT_root, 'test2_LongitudinalControl2018_Town02'),
-                                   os.path.join(MT_root, 'test3_LongitudinalControl2018_Town02')
-                                    ],
-                      'NewWeatherTown':[os.path.join(MT_root, 'town02_test_LongitudinalControl2018_Town02'),
-                                   os.path.join(MT_root, 'test2_LongitudinalControl2018_Town02'),
-                                   os.path.join(MT_root, 'test3_LongitudinalControl2018_Town02')
-                                    ],
-                      }
+    MT_bench_paths = {
+        'Training': [os.path.join(MT_root, 'town02_test_LongitudinalControl2018_Town01')
+                     # os.path.join(MT_root, 'test3_test_LongitudinalControl2018_Town01')
+                     ],
+        'NewWeather': [os.path.join(MT_root, 'town02_test_LongitudinalControl2018_Town01')
+                       # os.path.join(MT_root, 'test3_test_LongitudinalControl2018_Town01')
+                       ],
+        'NewTown': [os.path.join(MT_root, 'town02_test_LongitudinalControl2018_Town02'),
+                    os.path.join(MT_root, 'test2_LongitudinalControl2018_Town02'),
+                    os.path.join(MT_root, 'test3_LongitudinalControl2018_Town02')
+                    ],
+        'NewWeatherTown': [os.path.join(MT_root, 'town02_test_LongitudinalControl2018_Town02'),
+                           os.path.join(MT_root, 'test2_LongitudinalControl2018_Town02'),
+                           os.path.join(MT_root, 'test3_LongitudinalControl2018_Town02')
+                           ],
+        }
 
     CAL_root = '/home/felipe/CoIL_TRI/_results_CAL/_benchmarks_results'
     CAL_bench_paths = {'Training': [os.path.join(CAL_root, 'test_LongitudinalControl2018_Town01'),
-                                    os.path.join(CAL_root, 'test110_LongitudinalControl2018_Town01'),
+                                    os.path.join(CAL_root,
+                                                 'test110_LongitudinalControl2018_Town01'),
                                     os.path.join(CAL_root, 'test320_LongitudinalControl2018_Town01')
+                                    ],
+                       'NewWeather': [os.path.join(CAL_root, 'test_LongitudinalControl2018_Town01'),
+                                      os.path.join(CAL_root,
+                                                   'test110_LongitudinalControl2018_Town01'),
+                                      os.path.join(CAL_root,
+                                                   'test320_LongitudinalControl2018_Town01')
+                                      ],
+                       'NewTown': [os.path.join(CAL_root, 'test_LongitudinalControl2018_Town02'),
+                                   os.path.join(CAL_root, 'test220_LongitudinalControl2018_Town02'),
+                                   os.path.join(CAL_root, 'test320_LongitudinalControl2018_Town02')
                                    ],
-                      'NewWeather': [os.path.join(CAL_root, 'test_LongitudinalControl2018_Town01'),
-                                    os.path.join(CAL_root, 'test110_LongitudinalControl2018_Town01'),
-                                    os.path.join(CAL_root, 'test320_LongitudinalControl2018_Town01')
-                                    ],
-                      'NewTown': [os.path.join(CAL_root, 'test_LongitudinalControl2018_Town02'),
-                                   os.path.join(CAL_root, 'test220_LongitudinalControl2018_Town02'),
-                                   os.path.join(CAL_root, 'test320_LongitudinalControl2018_Town02')
-                                    ],
-                      'NewWeatherTown':[os.path.join(CAL_root, 'test_LongitudinalControl2018_Town02'),
-                                   os.path.join(CAL_root, 'test220_LongitudinalControl2018_Town02'),
-                                   os.path.join(CAL_root, 'test320_LongitudinalControl2018_Town02')
-                                    ],
-                      }
+                       'NewWeatherTown': [
+                           os.path.join(CAL_root, 'test_LongitudinalControl2018_Town02'),
+                           os.path.join(CAL_root, 'test220_LongitudinalControl2018_Town02'),
+                           os.path.join(CAL_root, 'test320_LongitudinalControl2018_Town02')
+                           ],
+                       }
 
     IL_root = '/home/felipe/CoIL_TRI/_results_IL/_benchmarks_results'
     IL_bench_paths = {'Training': [os.path.join(IL_root, 'test_LongitudinalControl2018_Town01'),
                                    os.path.join(IL_root, 'test2_LongitudinalControl2018_Town01')
-                                    #os.path.join(IL_root, 'test110_LongitudinalControl2018_Town01'),
-                                    #os.path.join(IL_root, 'test320_LongitudinalControl2018_Town01')
+                                   # os.path.join(IL_root, 'test110_LongitudinalControl2018_Town01'),
+                                   # os.path.join(IL_root, 'test320_LongitudinalControl2018_Town01')
                                    ],
                       'NewWeather': [os.path.join(IL_root, 'test_LongitudinalControl2018_Town01'),
                                      os.path.join(IL_root, 'test2_LongitudinalControl2018_Town01')
-                                    #os.path.join(IL_root, 'test110_LongitudinalControl2018_Town01'),
-                                    #os.path.join(IL_root, 'test320_LongitudinalControl2018_Town01')
-                                    ],
+                                     # os.path.join(IL_root, 'test110_LongitudinalControl2018_Town01'),
+                                     # os.path.join(IL_root, 'test320_LongitudinalControl2018_Town01')
+                                     ],
                       'NewTown': [os.path.join(IL_root, 'test_LongitudinalControl2018_Town02'),
-                                   os.path.join(IL_root, 'test2_LongitudinalControl2018_Town02'),
-                                   os.path.join(IL_root, 'test3_LongitudinalControl2018_Town02')
-                                    ],
-                      'NewWeatherTown':[os.path.join(IL_root, 'test_LongitudinalControl2018_Town02'),
-                                   os.path.join(IL_root, 'test2_LongitudinalControl2018_Town02'),
-                                   os.path.join(IL_root, 'test3_LongitudinalControl2018_Town02')
-                                    ],
+                                  os.path.join(IL_root, 'test2_LongitudinalControl2018_Town02'),
+                                  os.path.join(IL_root, 'test3_LongitudinalControl2018_Town02')
+                                  ],
+                      'NewWeatherTown': [
+                          os.path.join(IL_root, 'test_LongitudinalControl2018_Town02'),
+                          os.path.join(IL_root, 'test2_LongitudinalControl2018_Town02'),
+                          os.path.join(IL_root, 'test3_LongitudinalControl2018_Town02')
+                          ],
                       }
 
+    add_data_for_method(compared_results, paths_dict=MT_bench_paths, method_name='MT')
 
+    add_data_for_method(compared_results, paths_dict=CAL_bench_paths, method_name='CAL')
 
-
-    add_data_for_method(compared_results, paths_dict= MT_bench_paths, method_name ='MT')
-
-    add_data_for_method(compared_results, paths_dict= CAL_bench_paths, method_name ='CAL')
-
-
-    add_data_for_method(compared_results, paths_dict= IL_bench_paths, method_name ='CoIL')
+    add_data_for_method(compared_results, paths_dict=IL_bench_paths, method_name='CoIL')
 
     print (compared_results)
-
-
-
-    print ()
-
-
 
     scenarios_list = ["Training", "New Weather", "New Town", "New Weather & Town"]
 
     print_sd = {'Empty': 'Empty Town', 'Normal': 'Regular Traffic', 'Cluttered': 'Dense Traffic'}
 
 
-    our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
-
-
-    #our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
-    print (our_results)
 
     colors = ['k', 'b', 'y']
-
 
     for task, methods in compared_results.items():
 
@@ -715,80 +739,81 @@ if __name__ == "__main__":
                     print("         ", np.mean(runs))
                     print("         ", np.std(runs))
 
+            # count += 1
 
-            #count += 1
+    our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
 
+    # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
+    print (our_results)
 
+    """
+    min_mean_vec = []
+    min_std_vec = []
+    max_mean_vec = []
+    max_std_vec = []
+    print (our_results[task].items())
+    for env, values in our_results[task].items():
+        print (env, values)
+        # Now we plot for our method
+        max_mean_vec.append(our_results[task][env][0])
+        max_std_vec.append(our_results[task][env][1])
+        min_mean_vec.append(our_results[task][env][2])
+        min_std_vec.append(our_results[task][env][3])
 
+    print("min mean ", min_mean_vec)
+    print("min std ", min_std_vec)
 
-        """
-        min_mean_vec = []
-        min_std_vec = []
-        max_mean_vec = []
-        max_std_vec = []
-        print (our_results[task].items())
-        for env, values in our_results[task].items():
-            print (env, values)
-            # Now we plot for our method
-            max_mean_vec.append(our_results[task][env][0])
-            max_std_vec.append(our_results[task][env][1])
-            min_mean_vec.append(our_results[task][env][2])
-            min_std_vec.append(our_results[task][env][3])
+    ax.errorbar(range(len(scenarios_list)), min_mean_vec,
+                yerr=min_std_vec, ecolor='b', color='r',
+                fmt='o', capsize=2, markersize=10, label='Ours Min')
 
-        print("min mean ", min_mean_vec)
-        print("min std ", min_std_vec)
+    ax.errorbar(range(len(scenarios_list)), max_mean_vec,
+                yerr=max_std_vec, ecolor='r', color='g',
+                fmt='o', capsize=2, markersize=10, label='Ours Max')
 
-        ax.errorbar(range(len(scenarios_list)), min_mean_vec,
-                    yerr=min_std_vec, ecolor='b', color='r',
-                    fmt='o', capsize=2, markersize=10, label='Ours Min')
+    min_mean_vec = []
+    min_std_vec = []
+    max_mean_vec = []
+    max_std_vec = []
+    print (our_results_2[task].items())
+    for env, values in our_results_2[task].items():
+        print (env, values)
+        # Now we plot for our method
+        max_mean_vec.append(our_results_2[task][env][0])
+        max_std_vec.append(our_results_2[task][env][1])
+        min_mean_vec.append(our_results_2[task][env][2])
+        min_std_vec.append(our_results_2[task][env][3])
 
-        ax.errorbar(range(len(scenarios_list)), max_mean_vec,
-                    yerr=max_std_vec, ecolor='r', color='g',
-                    fmt='o', capsize=2, markersize=10, label='Ours Max')
+    print("min mean ", min_mean_vec)
+    print("min std ", min_std_vec)
 
-        min_mean_vec = []
-        min_std_vec = []
-        max_mean_vec = []
-        max_std_vec = []
-        print (our_results_2[task].items())
-        for env, values in our_results_2[task].items():
-            print (env, values)
-            # Now we plot for our method
-            max_mean_vec.append(our_results_2[task][env][0])
-            max_std_vec.append(our_results_2[task][env][1])
-            min_mean_vec.append(our_results_2[task][env][2])
-            min_std_vec.append(our_results_2[task][env][3])
+    ax.errorbar(range(len(scenarios_list)), min_mean_vec,
+                yerr=min_std_vec, ecolor='b', color='m',
+                fmt='o', capsize=2, markersize=10, label='Ours 2 Min')
 
-        print("min mean ", min_mean_vec)
-        print("min std ", min_std_vec)
-
-        ax.errorbar(range(len(scenarios_list)), min_mean_vec,
-                    yerr=min_std_vec, ecolor='b', color='m',
-                    fmt='o', capsize=2, markersize=10, label='Ours 2 Min')
-
-        ax.errorbar(range(len(scenarios_list)), max_mean_vec,
-                    yerr=max_std_vec, ecolor='r', color='b',
-                    fmt='o', capsize=2, markersize=10, label='Ours 2 Max')
-
-
-
-        ax.locator_params(nbins=4)
-        ax.set_ylim([0, 100])
-        ax.set_ylabel('Success Rate')
-
-        ax.set_xticklabels(['a'] + scenarios_list)
-
-        ax.legend(fontsize=30)
-        for item in ([ax.xaxis.label, ax.yaxis.label]
-                     + ax.get_xticklabels() + ax.get_yticklabels()):
-            item.set_fontsize(30)
+    ax.errorbar(range(len(scenarios_list)), max_mean_vec,
+                yerr=max_std_vec, ecolor='r', color='b',
+                fmt='o', capsize=2, markersize=10, label='Ours 2 Max')
 
 
-        fig.savefig('plot' + task + '.png', orientation='landscape',
-                    bbox_inches='tight')
 
-        plt.close(fig)
-        """
+    ax.locator_params(nbins=4)
+    ax.set_ylim([0, 100])
+    ax.set_ylabel('Success Rate')
+
+    ax.set_xticklabels(['a'] + scenarios_list)
+
+    ax.legend(fontsize=30)
+    for item in ([ax.xaxis.label, ax.yaxis.label]
+                 + ax.get_xticklabels() + ax.get_yticklabels()):
+        item.set_fontsize(30)
+
+
+    fig.savefig('plot' + task + '.png', orientation='landscape',
+                bbox_inches='tight')
+
+    plt.close(fig)
+    """
 
 """
 ax.locator_params(axis='x', nbins=len(experiments))
