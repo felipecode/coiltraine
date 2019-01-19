@@ -172,9 +172,6 @@ def folder_execute(params=None):
 
 
 
-
-
-
         tasks_queue = mount_experiment_heap(folder, experiments_list, params['is_training'],
                                             executing_processes, tasks_queue,
                                             validation_datasets, driving_environments, False)
@@ -184,13 +181,16 @@ def folder_execute(params=None):
                                       validation_datasets,
                                       driving_environments)
         # Check allocated process, and look which ones finished.
+        
+        if len(tasks_queue) == 0 and len(executing_processes) == 0:
+            break
+
         free_gpus, resources_on_most_free_gpu, executing_processes = get_gpu_resources(
             allocated_gpus,
             executing_processes,
             allocation_parameters)
 
-        if len(tasks_queue) == 0 and len(executing_processes) == 0:
-            break
+
         print ("Task queue", tasks_queue)
         print ("")
         print ("exec proc", executing_processes)
