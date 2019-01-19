@@ -705,6 +705,14 @@ if __name__ == "__main__":
                           ],
                       }
 
+
+
+    our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
+
+    # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
+    print (our_results)
+
+
     add_data_for_method(compared_results, paths_dict=MT_bench_paths, method_name='MT')
 
     add_data_for_method(compared_results, paths_dict=CAL_bench_paths, method_name='CAL')
@@ -735,16 +743,11 @@ if __name__ == "__main__":
             for env, metrics in envs.items():
                 print("    env ", env)
                 for metric, runs in metrics.items():
-                    print("       metric", metric)
-                    print("         ", np.mean(runs))
-                    print("         ", np.std(runs))
+                    print ( " %f &" % np.mean(runs), end='')
+
 
             # count += 1
 
-    our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
-
-    # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
-    print (our_results)
 
     """
     min_mean_vec = []
