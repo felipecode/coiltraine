@@ -99,7 +99,7 @@ class CoILDataset(Dataset):
         # If the dataset is not starting to be loaded from the beggining then we
         # add the number describing were it starts after.
 
-        self.start_part = 0.0
+        self.start_part = start_part
         if start_part != 0.0:
             self.preload_name += '_' + str(start_part)
         print("preload Name ", self.preload_name)
