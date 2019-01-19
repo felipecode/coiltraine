@@ -707,11 +707,6 @@ if __name__ == "__main__":
 
 
 
-    our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
-
-    # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
-    print (our_results)
-
 
     add_data_for_method(compared_results, paths_dict=MT_bench_paths, method_name='MT')
 
@@ -748,8 +743,37 @@ if __name__ == "__main__":
 
             # count += 1
 
+    our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
+
+    # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
+    print (our_results)
+
 
     """
+    
+    exp  cvprfinal_valstop_seed3/res34-50-lowdropout-imnet
+        success [0.506667 0.506667 0.506667 0.506667]
+        end ped [0. 0. 0. 0.]
+        end car [0. 0. 0. 0.]
+        end other [0.013333 0.013333 0.013333 0.013333]
+      exp  cvprfinal_valstop_seed4/res34-50-lowdropout-imnet
+        success [0.453333 0.453333 0.453333 0.453333]
+        end ped [0. 0. 0. 0.]
+        end car [0. 0. 0. 0.]
+        end other [0.146667 0.146667 0.146667 0.146667]
+      exp  cvprfinal_valstop_seed5/res34-50-lowdropout-imnet
+        success 0.246667
+        end ped 0.0
+        end car 0.0
+        end other 0.06
+max value index 5
+Traceback (most recent call last):
+  File "tools/compute_average_from_benchs.py", line 710, in <module>
+    our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
+  File "tools/compute_average_from_benchs.py", line 507, in compute_our_res_dict
+    maximun_success = metric_dict[metric][maximun_value_index]
+
+
     min_mean_vec = []
     min_std_vec = []
     max_mean_vec = []
