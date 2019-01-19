@@ -222,6 +222,9 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                               exp_alias + '_err_' + g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
+        if coil_logger.check_finish('train'):
+            coil_logger.add_message('Finished', {})
+            return
 
         # We seed everything
         seed_everything(g_conf.MAGICAL_SEED)
@@ -429,6 +432,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
             capture_time = time.time()
 
+        coil_logger.write_finish('train', iteration)
         coil_logger.add_message('Finished', {})
 
     except KeyboardInterrupt:

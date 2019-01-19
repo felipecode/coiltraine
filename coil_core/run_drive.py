@@ -195,6 +195,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                               exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
+        if coil_logger.check_finish('drive'):
+            coil_logger.add_message('Finished', {})
+            return
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
 
         experiment_list = experiment_set.build_experiments()
@@ -226,6 +229,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
             while validation_stale_point(g_conf.FINISH_ON_VALIDATION_STALE) is None:
                 time.sleep(0.1)
 
+
             validation_state_iteration = validation_stale_point(g_conf.FINISH_ON_VALIDATION_STALE)
             driving_iteration(validation_state_iteration, gpu, town_name, experiment_set, exp_batch,
                               exp_alias, params, control_filename, task_list)
@@ -251,7 +255,9 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                 else:
                     time.sleep(0.1)
 
+        coil_logger.write_finish('drive', latest)
         coil_logger.add_message('Finished', {})
+
 
     except KeyboardInterrupt:
         traceback.print_exc()
