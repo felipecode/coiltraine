@@ -569,31 +569,31 @@ def add_data_for_method(compared_results, paths_dict, method_name):
             for task, methods in compared_results.items():
                 completed = avg_train_metrics['episodes_fully_completed'][task_pos_dict[task]][0]
                 compared_results[task][method_name][scenario]['episodes_fully_completed'].append(
-                    completed)
+                    completed*100)
 
                 # End pedestrians
                 end_ped = avg_train_metrics['end_pedestrian_collision'][task_pos_dict[task]][0]
                 compared_results[task][method_name][scenario]['end_pedestrian_collision'].append(
-                    end_ped)
+                    end_ped*100)
 
                 # End Cars
                 end_cars = avg_train_metrics['end_vehicle_collision'][task_pos_dict[task]][0]
                 compared_results[task][method_name][scenario]['end_vehicle_collision'].append(
-                    end_cars)
+                    end_cars*100)
 
                 # End Others
                 end_others = avg_train_metrics['end_other_collision'][task_pos_dict[task]][0]
                 compared_results[task][method_name][scenario]['end_other_collision'].append(
-                    end_others)
+                    end_others*100)
 
                 # Timeout
 
-                compared_results[task][method_name][scenario]['timeout'].append(1 - (
-                        completed + end_cars + end_others + end_ped)
+                compared_results[task][method_name][scenario]['timeout'].append((1 - (
+                        completed + end_cars + end_others + end_ped))*100
                                                                          )
                 # Stopping problem
                 compared_results[task][method_name][scenario]['stopping'].append(
-                    analyze_stopping_problem(path, task_pos_dict[task])
+                    analyze_stopping_problem(path, task_pos_dict[task])*100
                 )
 
 
@@ -741,9 +741,6 @@ if __name__ == "__main__":
 
     # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
 
-    print (compared_results)
-
-    exit(1)
 
     add_data_for_method(compared_results, paths_dict=MT_bench_paths, method_name='MT')
 
