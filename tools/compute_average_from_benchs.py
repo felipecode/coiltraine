@@ -488,7 +488,7 @@ def compute_our_res_dict(experiment_name):
                                            [header_details.index('end_other_collision')]))
 
                 print("        end other", end_other)
-
+                print("        end other shape", end_other.shape)
                 if end_other.shape != (0,):
                     try:
                         end_other = end_other[0]
@@ -714,8 +714,13 @@ if __name__ == "__main__":
 
     our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
 
+
+    # merge both results
+    for task in compared_results.keys():
+        compared_results[task].update(our_results[task])
+
     # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
-    print (our_results)
+    print (compared_results)
 
     exit(1)
 
