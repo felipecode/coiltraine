@@ -35,8 +35,6 @@ from configs.namer import generate_name
 from logger.coil_logger import create_log, add_message
 
 
-
-# TODO: NAMing conventions ?
 _g_conf = AttributeDict()
 
 
@@ -78,9 +76,11 @@ _g_conf.GATED_AUGMENTATION = None
 #                              ia.GaussianBlur(sigma=(0.0, 3.0)),
 #                              ia.ContrastNormalization((0.5, 1.5))
 #                              ]
+
 _g_conf.DATA_USED = 'all' #  central, all, sides,
 _g_conf.USE_NOISE_DATA = True
 _g_conf.TRAIN_DATASET_NAME = '1HoursW1-3-6-8'  # We only set the dataset in configuration for training
+_g_conf.START_PART = 0.0
 
 _g_conf.LOG_SCALAR_WRITING_FREQUENCY = 2   # TODO NEEDS TO BE TESTED ON THE LOGGING FUNCTION ON  CREATE LOG
 _g_conf.LOG_IMAGE_WRITING_FREQUENCY = 1000
