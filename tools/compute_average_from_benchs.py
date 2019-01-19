@@ -410,7 +410,7 @@ def compute_our_res_dict(experiment_name):
                            'timeout': [],
                            'stopping': []
                            }
-            
+
             for exp in experiments:
                 print("      exp ", exp)
                 f = open(os.path.join(root_path, exp, 'drive_' + s + '_csv',
@@ -741,7 +741,7 @@ if __name__ == "__main__":
 
     # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
 
-    print compared_results
+    print (compared_results)
 
     exit(1)
 
