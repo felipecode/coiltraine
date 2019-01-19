@@ -112,7 +112,7 @@ def mount_experiment_heap(folder, experiments_list, is_training, executing_proce
                           validation_datasets, drive_environments, restart_error=True):
 
 
-    tasks_queue = []
+    tasks_queue = old_tasks_queue
 
     exec_name_vec = execvec_to_names(executing_processes)
     for experiment in experiments_list:
