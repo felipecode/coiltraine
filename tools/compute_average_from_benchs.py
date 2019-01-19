@@ -500,7 +500,7 @@ def compute_our_res_dict(experiment_name):
 
                 # Timeout
 
-                metric_dict['timout'].append(1 - (
+                metric_dict['timeout'].append(1 - (
                         success + end_car + end_other + end_ped))
                 # Stopping problem
                 metric_dict['stopping'].append(0.0)
