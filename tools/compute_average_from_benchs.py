@@ -400,6 +400,15 @@ def compute_our_res_dict(experiment_name):
             'cvprfinal_valstop_seed4/' + experiment_name,
             'cvprfinal_valstop_seed5/' + experiment_name]
 
+    metric_dict = {'episodes_fully_completed': [],
+                                 'end_pedestrian_collision':[],
+                                 'end_vehicle_collision':[],
+                                 'end_other_collision':[],
+                                 'timeout':[],
+                                 'stopping': []
+                                 }
+
+
 
     results_dict  = {}
 
@@ -425,41 +434,49 @@ def compute_our_res_dict(experiment_name):
             variation_values_std = []
             for exp in experiments:
                 print("      exp ", exp)
-                success = np.loadtxt(os.path.join(root_path, exp, 'drive_' + s + '_csv',
-                                                  'control_output_' + t + '.csv'),
-                                     delimiter=",",
-                                     skiprows=1,
-                                     usecols=([5]))
+                f = open(os.path.join(root_path, exp, 'drive_' + s + '_csv',
+                                                  'control_output_' + t + '.csv'), "rU")
+                header_details = f.readline()
 
-                std = np.loadtxt(os.path.join(root_path, exp, 'drive_' + s + '_csv',
-                                              'control_output_' + t + '.csv'),
-                                 delimiter=",",
-                                 skiprows=1,
-                                 usecols=([6]))
-                print("        succ", success)
-                print("        std", std)
+                header_details = header_details.split(',')
+                #header_details[-1] = header_details[-1][:-1]
+                f.close()
 
-                if success.shape != (0,):
-                    try:
-                        success = success[0]
-                        std = std[0]
-                    except IndexError:
-                        pass
+                for metric in metric_dict.keys():
+                    metric_value = np.loadtxt(os.path.join(root_path, exp, 'drive_' + s + '_csv',
+                                                      'control_output_' + t + '.csv'),
+                                         delimiter=",",
+                                         skiprows=1,
+                                         usecols=([header_details.index(metric)]))
 
-                    variation_values.append(success)
-                    variation_values_std.append(std)
 
-            maximun_value_index = int(np.argmax(variation_values))
-            print ("max value index", maximun_value_index)
-            minimun_value_index = int(np.argmin(variation_values))
+                    print("        metric", metric)
+                    print("        metric_value", metric_value)
 
-            maximun_success = variation_values[maximun_value_index]
-            minimun_success = variation_values[minimun_value_index]
-            maximun_std = variation_values_std[maximun_value_index]
-            minimun_std = variation_values_std[minimun_value_index]
+                    if metric_value.shape != (0,):
+                        try:
+                            metric_value = metric_value[0]
+                            #std = std[0]
+                        except IndexError:
+                            pass
 
-            scenarios_dict.update({out_scenarios[s]: [maximun_success*100, maximun_std*100,
-                                                      minimun_success*100, minimun_std*100]})
+                        metric_dict[metric].append(metric_value)
+                        #variation_values.append(success)
+                        #variation_values_std.append(std)
+
+            for metric in metric_dict.keys():
+
+                maximun_value_index = int(np.argmax(metric_dict[metric]))
+                print ("max value index", maximun_value_index)
+                minimun_value_index = int(np.argmin(metric_dict[metric]))
+
+                maximun_success = metric_dict[metric][maximun_value_index]
+                minimun_success = metric_dict[metric][minimun_value_index]
+                #maximun_std = variation_values_std[maximun_value_index]
+                #minimun_std = variation_values_std[minimun_value_index]
+
+                scenarios_dict.update({out_scenarios[s]: [maximun_success*100,
+                                                          minimun_success*100]})
 
         results_dict.update({out_tasks[t]: scenarios_dict})
 
@@ -617,11 +634,11 @@ if __name__ == "__main__":
                                     os.path.join(CAL_root, 'test110_LongitudinalControl2018_Town01'),
                                     os.path.join(CAL_root, 'test320_LongitudinalControl2018_Town01')
                                     ],
-                      'NewTown': [os.path.join(CAL_root, 'test120_LongitudinalControl2018_Town02'),
+                      'NewTown': [os.path.join(CAL_root, 'test_LongitudinalControl2018_Town02'),
                                    os.path.join(CAL_root, 'test220_LongitudinalControl2018_Town02'),
                                    os.path.join(CAL_root, 'test320_LongitudinalControl2018_Town02')
                                     ],
-                      'NewWeatherTown':[os.path.join(CAL_root, 'test120_LongitudinalControl2018_Town02'),
+                      'NewWeatherTown':[os.path.join(CAL_root, 'test_LongitudinalControl2018_Town02'),
                                    os.path.join(CAL_root, 'test220_LongitudinalControl2018_Town02'),
                                    os.path.join(CAL_root, 'test320_LongitudinalControl2018_Town02')
                                     ],
@@ -671,11 +688,11 @@ if __name__ == "__main__":
     print_sd = {'Empty': 'Empty Town', 'Normal': 'Regular Traffic', 'Cluttered': 'Dense Traffic'}
 
 
-    #our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
+    our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
 
 
     #our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
-    #print (our_results)
+    print (our_results)
 
     colors = ['k', 'b', 'y']
 

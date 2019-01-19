@@ -181,7 +181,7 @@ def folder_execute(params=None):
                                       validation_datasets,
                                       driving_environments)
         # Check allocated process, and look which ones finished.
-        
+
         if len(tasks_queue) == 0 and len(executing_processes) == 0:
             break
 
