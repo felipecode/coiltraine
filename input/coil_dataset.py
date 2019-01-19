@@ -74,8 +74,9 @@ def get_episode_weather(episode):
 class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
-    def __init__(self, root_dir, transform=None, preload_name=None):
+    def __init__(self, root_dir, transform=None, preload_name=None, start_part=0.0):
         # Setting the root directory for this dataset
+
         self.root_dir = root_dir
         # We add to the preload name all the remove labels
         if g_conf.REMOVE is not None and g_conf.REMOVE is not "None":
@@ -91,6 +92,16 @@ class CoILDataset(Dataset):
         if len(g_conf.WEATHERS) < 4:
             self.preload_name = self.preload_name + '-'.join(str(e) for e in g_conf.WEATHERS)
 
+        # First check if the start part is between 0 and 1
+        if start_part <= 0.0 or start_part >=1.0:
+            raise  ValueError('Start Part shold be a percentage >=0 and <=1')
+
+        # If the dataset is not starting to be loaded from the beggining then we
+        # add the number describing were it starts after.
+
+        self.start_part = 0.0
+        if start_part != 0.0:
+            self.preload_name += '_' + str(start_part)
         print("preload Name ", self.preload_name)
 
         if self.preload_name is not None and os.path.exists(
@@ -103,6 +114,8 @@ class CoILDataset(Dataset):
             self.sensor_data_names, self.measurements = self.pre_load_image_folders(root_dir)
 
         print("preload Name ", self.preload_name)
+
+
 
         self.transform = transform
         self.batch_read_number = 0
@@ -223,6 +236,8 @@ class CoILDataset(Dataset):
 
         episodes_list = glob.glob(os.path.join(path, 'episode_*'))
         sort_nicely(episodes_list)
+        # Take the episodes starting from the start part
+        episodes_list = episodes_list[int(len(episodes_list)*self.start_part)]
         # Do a check if the episodes list is empty
         if len(episodes_list) == 0:
             raise ValueError("There are no episodes on the training dataset folder %s" % path)
