@@ -34,7 +34,14 @@ TEST_SCHEDULE: range(400, 1000001, 4000)  # The frequency the model is actually 
 MODEL_TYPE: 'coil-icra' # The type of model. Defines which modules the model has.
 MODEL_CONFIGURATION:  # Based on the MODEL_TYPE, we specify the structure
   perception:  # The module that process the image input, it ouput the number of classes
-    res
+    conv:
+      channels: [32, 32, 64, 64, 128, 128, 256, 256]
+      kernels: [5, 3, 3, 3, 3, 3, 3, 3]
+      strides: [2, 1, 2, 1, 2, 1, 1, 1]
+      dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    fc:
+      neurons: [512, 512]
+      dropouts: [0.5, 0.5]
   measurements:  # The module the process the input float data, in this case speed_input
     fc:  # Easy to configure fully connected layer
       neurons: [128, 128] # Each position add a new layer with the specified number of neurons

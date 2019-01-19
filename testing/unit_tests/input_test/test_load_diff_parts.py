@@ -13,12 +13,12 @@ class testDataset(unittest.TestCase):
 
     def test_load_diff_parts(self):
 
-        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CoILTrain')
-
         g_conf.EXPERIMENT_NAME = 'coil_icra'
         merge_with_yaml('configs/sample/coil_icra.yaml')
         # JUST A TRICK TO CONTAIN THE CURRENT LIMITATIONS
         set_type_of_process('train')
+
+        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], 'CoILTrain')
 
         # By instantiating the augmenter we get a callable that augment images and transform them
         # into tensors.
