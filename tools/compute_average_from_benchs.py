@@ -673,7 +673,7 @@ if __name__ == "__main__":
     add_data_for_method(compared_results, paths_dict= CAL_bench_paths, method_name ='CAL')
 
 
-    add_data_for_method(compared_results, paths_dict= IL_bench_paths, method_name ='IL')
+    add_data_for_method(compared_results, paths_dict= IL_bench_paths, method_name ='CoIL')
 
     print (compared_results)
 
