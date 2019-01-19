@@ -93,8 +93,8 @@ class CoILDataset(Dataset):
             self.preload_name = self.preload_name + '-'.join(str(e) for e in g_conf.WEATHERS)
 
         # First check if the start part is between 0 and 1
-        if start_part <= 0.0 or start_part >=1.0:
-            raise  ValueError('Start Part shold be a percentage >=0 and <=1')
+        if start_part < 0.0 or start_part >=1.0:
+            raise  ValueError('Start Part shold be a percentage >0 and <=1')
 
         # If the dataset is not starting to be loaded from the beggining then we
         # add the number describing were it starts after.
