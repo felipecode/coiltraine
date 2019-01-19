@@ -497,7 +497,7 @@ def compute_our_res_dict(experiment_name):
 
                     metric_dict['end_other_collision'].append(end_other)
 
-                    
+
                 print("        end other", end_other)
                 print("        end other shape", end_other.shape)
                 # Timeout
@@ -511,14 +511,31 @@ def compute_our_res_dict(experiment_name):
             maximun_value_index = int(np.argmax(metric_dict['episodes_fully_completed']))
             print ("max value index", maximun_value_index)
             minimun_value_index = int(np.argmin(metric_dict['episodes_fully_completed']))
+
+            maximun_metric_dict ={'episodes_fully_completed': [],
+                   'end_pedestrian_collision': [],
+                   'end_vehicle_collision': [],
+                   'end_other_collision': [],
+                   'timeout': [],
+                   'stopping': []
+                   }
+            minimun_metric_dict ={'episodes_fully_completed': [],
+                   'end_pedestrian_collision': [],
+                   'end_vehicle_collision': [],
+                   'end_other_collision': [],
+                   'timeout': [],
+                   'stopping': []
+                   }
             for metric in metric_dict.keys():
                 maximun_success = metric_dict[metric][maximun_value_index]
                 minimun_success = metric_dict[metric][minimun_value_index]
                 # maximun_std = variation_values_std[maximun_value_index]
                 # minimun_std = variation_values_std[minimun_value_index]
+                maximun_metric_dict[metric] = maximun_success * 100
+                minimun_metric_dict[metric] = minimun_success * 100
 
-                scenarios_dict.update({out_scenarios[s]: [maximun_success * 100,
-                                                          minimun_success * 100]})
+
+            scenarios_dict.update({out_scenarios[s]: maximun_metric_dict})
 
         results_dict.update({out_tasks[t]: scenarios_dict})
 
