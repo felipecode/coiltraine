@@ -237,6 +237,7 @@ class CoILDataset(Dataset):
         episodes_list = glob.glob(os.path.join(path, 'episode_*'))
         sort_nicely(episodes_list)
         # Take the episodes starting from the start part
+        print (episodes_list)
         episodes_list = episodes_list[int(len(episodes_list)*self.start_part)]
         # Do a check if the episodes list is empty
         if len(episodes_list) == 0:
