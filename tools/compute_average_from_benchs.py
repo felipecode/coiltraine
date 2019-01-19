@@ -435,7 +435,7 @@ def compute_our_res_dict(experiment_name):
 
                 print("        success", success)
 
-                if success.shape != (0,):
+                if success.shape != (0,)  or  success.shape != ():
                     try:
                         success = success[0]
                         # std = std[0]
@@ -453,7 +453,7 @@ def compute_our_res_dict(experiment_name):
 
                 print("        end ped", end_ped)
 
-                if end_ped.shape != (0,):
+                if end_ped.shape != (0,)  or  end_ped.shape != ():
                     try:
                         end_ped = end_ped[0]
                         # std = std[0]
@@ -471,7 +471,7 @@ def compute_our_res_dict(experiment_name):
 
                 print("        end car", end_car)
 
-                if end_car.shape != (0,):
+                if end_car.shape != (0,)  or  end_car.shape != ():
                     try:
                         end_car = end_car[0]
                         # std = std[0]
@@ -489,7 +489,7 @@ def compute_our_res_dict(experiment_name):
 
                 print("        end other", end_other)
                 print("        end other shape", end_other.shape)
-                if end_other.shape != (0,):
+                if end_other.shape != (0,) or  end_other.shape != ():
                     try:
                         end_other = end_other[0]
                         # std = std[0]
@@ -717,7 +717,7 @@ if __name__ == "__main__":
 
     # merge both results
     for task in compared_results.keys():
-        compared_results[task].update(our_results[task])
+        compared_results[task].update({'Ours':our_results[task]})
 
     # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
     print (compared_results)
