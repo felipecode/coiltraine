@@ -178,7 +178,7 @@ def write_finish(process, checkpoint):
     Returns:
 
     """
-    if process != 'drive' or process != 'train':
+    if process != 'drive' and process != 'train':
         raise ValueError('Wrong process to write finish')
 
     root_path = "_logs"
