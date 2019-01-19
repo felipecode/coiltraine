@@ -381,13 +381,7 @@ def compute_our_res_dict(experiment_name):
         'cvprfinal_valstop_seed4/' + experiment_name,
         'cvprfinal_valstop_seed5/' + experiment_name]
 
-    metric_dict = {'episodes_fully_completed': [],
-                   'end_pedestrian_collision': [],
-                   'end_vehicle_collision': [],
-                   'end_other_collision': [],
-                   'timeout': [],
-                   'stopping': []
-                   }
+
 
     results_dict = {}
 
@@ -409,7 +403,14 @@ def compute_our_res_dict(experiment_name):
         for s in scenarios:
             # HERe we do a plot
             print("  Scenario ", s)
-
+            metric_dict = {'episodes_fully_completed': [],
+                           'end_pedestrian_collision': [],
+                           'end_vehicle_collision': [],
+                           'end_other_collision': [],
+                           'timeout': [],
+                           'stopping': []
+                           }
+            
             for exp in experiments:
                 print("      exp ", exp)
                 f = open(os.path.join(root_path, exp, 'drive_' + s + '_csv',
@@ -740,7 +741,9 @@ if __name__ == "__main__":
 
     # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
 
+    print compared_results
 
+    exit(1)
 
     add_data_for_method(compared_results, paths_dict=MT_bench_paths, method_name='MT')
 
