@@ -498,6 +498,12 @@ def compute_our_res_dict(experiment_name):
 
                     metric_dict['end_other_collision'].append(end_other)
 
+                # Timeout
+
+                metric_dict['timout'].append(1 - (
+                        success + end_car + end_other + end_ped))
+                # Stopping problem
+                metric_dict['stopping'].append(0.0)
 
 
         maximun_value_index = int(np.argmax(metric_dict['episodes_fully_completed']))
@@ -706,7 +712,12 @@ if __name__ == "__main__":
                       }
 
 
+    our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
 
+    # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
+    print (our_results)
+
+    exit(1)
 
     add_data_for_method(compared_results, paths_dict=MT_bench_paths, method_name='MT')
 
