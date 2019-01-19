@@ -738,7 +738,7 @@ if __name__ == "__main__":
             for env, metrics in envs.items():
                 print("    env ", env)
                 for metric, runs in metrics.items():
-                    print ( " %f &" % np.mean(runs), end='')
+                    print ( " $%.2f$ &" % np.mean(runs), end='')
 
 
             # count += 1
