@@ -739,9 +739,8 @@ if __name__ == "__main__":
         compared_results[task].update({'Ours':our_results[task]})
 
     # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
-    print (compared_results)
 
-    exit(1)
+
 
     add_data_for_method(compared_results, paths_dict=MT_bench_paths, method_name='MT')
 
@@ -778,10 +777,6 @@ if __name__ == "__main__":
 
             # count += 1
 
-    our_results = compute_our_res_dict('res34-50-lowdropout-imnet')
-
-    # our_results_2 = compute_our_res_dict('res34-50-lowdropout-imnet-nospeed')
-    print (our_results)
 
 
     """
