@@ -13,30 +13,47 @@ if __name__ == "__main__":
 
     # Add several experiments parts
     experiments = {
-        'vary-sample': ['cvprfixed_sampling/res34-50-varyseed-s1',
-                      'cvprfixed_sampling/res34-50-varyseed-s2',
-                      'cvprfixed_sampling/res34-50-varyseed-s3',
-                      'cvprfixed_sampling/res34-50-varyseed-s4'],
+        '50': [
+            'cvprfinal_valstop_seed1/res34-50-lowdropout',
+            'cvprfinal_valstop_seed2/res34-50-lowdropout',
+            'cvprfinal_valstop_seed3/res34-50-lowdropout',
+            'cvprfinal_valstop_seed4/res34-50-lowdropout'],
+        '50-ns': [
+            'cvprfinal_valstop_seed1/res34-50-lowdropout-nospeed',
+            'cvprfinal_valstop_seed2/res34-50-lowdropout-nospeed',
+            'cvprfinal_valstop_seed3/res34-50-lowdropout-nospeed',
+            'cvprfinal_valstop_seed4/res34-50-lowdropout-nospeed'],
+        '50-imnet': [
+            'cvprfinal_valstop_seed1/res34-50-lowdropout-imnet',
+            'cvprfinal_valstop_seed2/res34-50-lowdropout-imnet',
+            'cvprfinal_valstop_seed3/res34-50-lowdropout-imnet',
+            'cvprfinal_valstop_seed4/res34-50-lowdropout-imnet'],
+        '50-imnet-ns': [
+            'cvprfinal_valstop_seed1/res34-50-lowdropout-imnet-nospeed',
+            'cvprfinal_valstop_seed2/res34-50-lowdropout-imnet-nospeed',
+            'cvprfinal_valstop_seed3/res34-50-lowdropout-imnet-nospeed',
+            'cvprfinal_valstop_seed4/res34-50-lowdropout-imnet-nospeed'],
+        '100': [
+            'cvprfinal_valstop_seed1/res34-100-lowdropout',
+            'cvprfinal_valstop_seed2/res34-100-lowdropout',
+            'cvprfinal_valstop_seed3/res34-100-lowdropout',
+            'cvprfinal_valstop_seed4/res34-100-lowdropout'],
+        '100-ns': [
+            'cvprfinal_valstop_seed1/res34-100-lowdropout-nospeed',
+            'cvprfinal_valstop_seed2/res34-100-lowdropout-nospeed',
+            'cvprfinal_valstop_seed3/res34-100-lowdropout-nospeed',
+            'cvprfinal_valstop_seed4/res34-100-lowdropout-nospeed'],
+        '100-imnet': [
+                           'cvprfinal_valstop_seed1/res34-100-lowdropout-imnet',
+                           'cvprfinal_valstop_seed2/res34-100-lowdropout-imnet',
+                           'cvprfinal_valstop_seed3/res34-100-lowdropout-imnet',
+                           'cvprfinal_valstop_seed4/res34-100-lowdropout-imnet'],
+        '100-imnet-ns': [
+            'cvprfinal_valstop_seed1/res34-100-lowdropout-imnet-nospeed',
+            'cvprfinal_valstop_seed2/res34-100-lowdropout-imnet-nospeed',
+            'cvprfinal_valstop_seed3/res34-100-lowdropout-imnet-nospeed',
+            'cvprfinal_valstop_seed4/res34-100-lowdropout-imnet-nospeed']
 
-        'vary-init': ['cvprfixed_sampling/res34-50-varyinit-s1',
-                      'cvprfixed_sampling/res34-50-varyinit-s2',
-                      'cvprfixed_sampling/res34-50-varyinit-s3',
-                      'cvprfixed_sampling/res34-50-varyinit-s4'],
-        'vary-all': [
-                     'cvprnoimage_seed2/res34-50-lowdropout',
-                     'cvprnoimage_seed3/res34-50-lowdropout',
-                     'cvprnoimage_seed4/res34-50-lowdropout',
-                     'cvprnoimage_seed5/res34-50-lowdropout'],
-        'vary-all-speed': [
-                           'cvprnoimage_seed2/res34-50-lowdropout-speed',
-                           'cvprnoimage_seed3/res34-50-lowdropout-speed',
-                           'cvprnoimage_seed4/res34-50-lowdropout-speed',
-                           'cvprnoimage_seed5/res34-50-lowdropout-speed'],
-        'vary-all-imnet': [
-                           'cvprnoimage_seed2/res34-50-lowdropout-imnet',
-                           'cvprnoimage_seed3/res34-50-lowdropout-imnet',
-                           'cvprnoimage_seed4/res34-50-lowdropout-imnet',
-                           'cvprnoimage_seed5/res34-50-lowdropout-imnet']
     }
 
     tasks = ['empty', 'normal', 'cluttered']
@@ -46,37 +63,44 @@ if __name__ == "__main__":
     check_point = 0
 
     for t in tasks:
+        print ("Task ", t)
         for s in scenarios:
             # HERe we do a plot
             success_values_averages = []
             success_values_std_average = []
             success_values_stds = []
+            print("  Scenario ", s)
             for key, values in experiments.items():
 
-                print (key)
+                print("    key ", key)
                 variation_values = []
                 variation_values_std = []
                 for exp in values:
+                    print ("      exp ", exp)
                     success = np.loadtxt(os.path.join(root_path, exp, 'drive_' + s + '_csv',
                                                                     'control_output_' + t + '.csv'),
-                                                    delimiter=",",
-                                                    skiprows=1,
-                                                    usecols=([5]))
+                                                        delimiter=",",
+                                                        skiprows=1,
+                                                        usecols=([5]))
 
                     std = np.loadtxt(os.path.join(root_path, exp, 'drive_' + s + '_csv',
                                                                     'control_output_' + t + '.csv'),
                                                     delimiter=",",
                                                     skiprows=1,
                                                     usecols=([6]))
-                    try:
-                        success = success[0]
-                        std = std[0]
-                    except IndexError:
-                        pass
+                    print("        succ", success)
+                    print("        std", std)
 
-                    variation_values.append(success)
+                    if success.shape != (0,):
+                        try:
+                            success = success[0]
+                            std = std[0]
+                        except IndexError:
+                            pass
 
-                    variation_values_std.append(std*std)
+                        variation_values.append(success)
+                        variation_values_std.append(std*std)
+
 
                 success_values_averages.append(np.mean(variation_values))
                 success_values_std_average.append(math.sqrt(np.mean(variation_values_std)))
@@ -101,7 +125,7 @@ if __name__ == "__main__":
 
             for item in ([ax.title, ax.xaxis.label, ax.yaxis.label]
                          + ax.get_xticklabels() + ax.get_yticklabels()):
-                item.set_fontsize(14)
+                item.set_fontsize(10)
 
             fig.savefig('plot' + t + '_' + s + '.png', orientation='landscape',
                         bbox_inches='tight')

@@ -75,7 +75,6 @@ def plot_point(map_image, x, y, colour):
 
 
 
-
 def plot_on_map(map_image, position, color, size):
     def plot_square(map_image, position, color, size):
         for i in range(0, size):
@@ -86,13 +85,13 @@ def plot_on_map(map_image, position, color, size):
         plot_square(map_image, position, color, i)
 
 
-
-def split_episodes(meas_file):
+def split_episodes(meas_file, exp_id=-1):
 
     """
         The idea is to split the positions assumed by the ego vehicle on every episode.
     Args:
         meas_file: the file containing the measurements.
+        exp_id: the expid used
 
     Returns:
         a matrix where each vector is a vector of points from the episodes.
@@ -111,21 +110,27 @@ def split_episodes(meas_file):
 
     details_matrix = np.loadtxt(open(meas_file, "rb"), delimiter=",", skiprows=1)
 
-    #
-    #print (details_matrix)
-    previous_pos = [details_matrix[0, header_details.index('pos_x')],
-                 details_matrix[0, header_details.index('pos_y')]]
 
+    exp_id_vec = details_matrix[:, header_details.index('exp_id')]
     #
+    if exp_id != -1:
+        exp_id_vec = np.where(exp_id_vec == exp_id)
+        print(" Exp id ", len(details_matrix[exp_id_vec[0], :]))
+        print(exp_id_vec[0][0:50])
+        details_matrix = details_matrix[exp_id_vec[0], :]
 
     episode_positions_matrix = []
     positions_vector = []
     travelled_distances = []
     travel_this_episode = 0
+
+    previous_pos = [details_matrix[0, header_details.index('pos_x')],
+                 details_matrix[0, header_details.index('pos_y')]]
     previous_start_point = details_matrix[0, header_details.index('start_point')]
     previous_end_point = details_matrix[0, header_details.index('end_point')]
     previous_repetition = details_matrix[0, header_details.index('rep')]
     for i in range(1, len(details_matrix)):
+
         point = [details_matrix[i, header_details.index('pos_x')],
                  details_matrix[i, header_details.index('pos_y')]]
 
@@ -141,9 +146,11 @@ def split_episodes(meas_file):
             travel_this_episode = 0
             positions_vector.pop()
             episode_positions_matrix.append(positions_vector)
+            print ("episode ", len(episode_positions_matrix))
+            print ("len ", len(positions_vector))
             positions_vector = []
 
-        travel_this_episode += sldist(point, previous_pos)
+            travel_this_episode += sldist(point, previous_pos)
         previous_pos = point
 
         previous_start_point = start_point
@@ -153,20 +160,9 @@ def split_episodes(meas_file):
     return episode_positions_matrix, travelled_distances
 
 
-def get_start_end_points(summary):
-
-    f = open(summary, "rU")
-    header_details = f.readline()
-
-    header_details = header_details.split(',')
-    header_details[-1] = header_details[-1][:-2]
-    f.close()
-
-    # TODO: implement
 
 
-
-def get_causes_of_end(summary_file):
+def get_causes_of_end(summary_file, exp_id=-1):
     """
         The dot that finalizes the printing is codified differently depending on the
         cause ( pedestrian, vehicle, timeout, other)
@@ -179,15 +175,15 @@ def get_causes_of_end(summary_file):
     header_summary[-1] = header_summary[-1][:-2]
     f.close()
 
-
     summary_matrix = np.loadtxt(open(summary_file, "rb"), delimiter=",", skiprows=1)
-
 
     success = summary_matrix[:, header_summary.index('result')]
     end_pedestrian = summary_matrix[:, header_summary.index('end_pedestrian_collision')]
     end_vehicle = summary_matrix[:, header_summary.index('end_vehicle_collision')]
     end_other = summary_matrix[:, header_summary.index('end_other_collision')]
 
+
+    exp_id_vec = summary_matrix[:, header_summary.index('exp_id')]
 
     print ("end peds ", end_pedestrian)
     print ("success ", success)
@@ -205,34 +201,52 @@ def get_causes_of_end(summary_file):
     final_end_cause = np.zeros((len(success)))
     final_end_cause[no_timeout_pos] = end_cause + 1
 
+    if exp_id != -1:
+        exp_id_vec = np.where(exp_id_vec == exp_id)
+        print(" Exp id ", len(final_end_cause[exp_id_vec[0]]))
+        print(exp_id_vec)
+        final_end_cause = final_end_cause[exp_id_vec[0]]
 
     return final_end_cause
 
 
 
-def plot_episodes_tracks(exp_batch, experiment, checkpoint, town_name, exp_suite):
+def plot_episodes_tracks(exp_batch, experiment, checkpoint, town_name, exp_suite, exp_id=-1):
 
     # We build the measurement file used for the benchmarks.
     meas_file = os.path.join('_benchmarks_results',
-                                exp_batch + '_'+ experiment + '_'
+                             exp_batch + '_' + experiment + '_'
+                             + str(checkpoint) + '_drive_control_output_'
+                             + exp_suite + '_' + town_name,
+                             'measurements.csv')
+    # We build the summary file used for the benchmarks.
+    summary_file = os.path.join('_benchmarks_results',
+                                exp_batch + '_' + experiment + '_'
                                 + str(checkpoint) + '_drive_control_output_'
+                                + exp_suite + '_' + town_name,
+                                'summary.csv')
+
+
+    """
+    meas_file = os.path.join('_benchmarks_results',
+                                exp_batch + '_'
                                 + exp_suite + '_' + town_name,
                              'measurements.csv')
     # We build the summary file used for the benchmarks.
     summary_file = os.path.join('_benchmarks_results',
-                                exp_batch + '_'+ experiment + '_'
-                                + str(checkpoint) + '_drive_control_output_'
+                                exp_batch + '_'
                                 + exp_suite + '_' + town_name,
                              'summary.csv')
+    """
 
     image_location = map.__file__[:-7]
     carla_map = map.CarlaMap(town_name, 0.164, 50)
 
     # Split the measurements for each of the episodes
-    episodes_positions, travelled_distances = split_episodes(meas_file)
+    episodes_positions, travelled_distances = split_episodes(meas_file, exp_id)
 
     # Get causes of end
-    end_cause = get_causes_of_end(summary_file)
+    end_cause = get_causes_of_end(summary_file, exp_id)
 
     print ("End casues ", len(end_cause))
     print (end_cause)
@@ -261,51 +275,46 @@ def plot_episodes_tracks(exp_batch, experiment, checkpoint, town_name, exp_suite
         [255, 0, 255, 255],  # Magenta for end other
 
     ]
-    print ("Number of episodes ", len(episodes_positions))
+    print("Number of episodes ", len(episodes_positions))
+    #episodes_positions = episodes_positions[::-1]
 
     # We instance an image that is going to have all the final position plots
     map_image_dots = Image.open(os.path.join(image_location, town_name + '.png'))
     map_image_dots.load()
     map_image_dots = np.asarray(map_image_dots, dtype="int32")
 
-    for episode_vec in episodes_positions:
-
+    # Cluttered
+    #positions = list(range(149, 225, 1)) + list(range(376, 449, 1))
+    #print (positions)
+    for i in range(len(episodes_positions)):
+        episode_vec = episodes_positions[i]
         map_image = Image.open(os.path.join(image_location, town_name + '.png'))
         map_image.load()
         map_image = np.asarray(map_image, dtype="int32")
 
-        travel_this_episode = 0
-        previous_pos = episode_vec[0]
         # This is for plotting the path driven by the car.
         for point in episode_vec[1:]:
 
-            travel_this_episode += sldist(point, previous_pos)
-            previous_pos = point
-            value = travel_this_episode / travelled_distances[count]
-
-            color_palate_inst = [0 + (value * x) for x in [255, 0, 0]]
-            color_palate_inst.append(255)
-
+            point[1] = point[1] - 3
+            point[0] = point[0] - 2
+            color_palate_inst = [255, 0, 0, 255]
             point.append(0.0)
 
             plot_on_map(map_image, carla_map.convert_to_pixel(point), color_palate_inst, 8)
 
         # Plot the end point on the path map
         plot_on_map(map_image, carla_map.convert_to_pixel(point),
-                    end_color_palete[int(end_cause[count])], 16)
+                    end_color_palete[int(end_cause[i])], 16)
         # Plot the end point on the map just showing the dots
         plot_on_map(map_image_dots, carla_map.convert_to_pixel(point),
-                    end_color_palete[int(end_cause[count])], 16)
+                    end_color_palete[int(end_cause[i])], 16)
 
         count += 1
         map_image = rescale(map_image.astype('float'), 1.0 / 4.0)
-        plot_test_image(map_image, os.path.join(paths_dir, str(checkpoint), str(count) + '.png'))
+        plot_test_image(map_image, os.path.join(paths_dir, str(checkpoint), str(i) + '.png'))
 
     map_image_dots = rescale(map_image_dots.astype('float'), 1.0 / 4.0)
     plot_test_image(map_image_dots, os.path.join(paths_dir, str(checkpoint), 'all_dots.png'))
-
-
-
 
 
 def plot_episodes_tracks_sameimage(exp_batch, experiment, checkpoint,
@@ -382,6 +391,8 @@ if __name__ == '__main__':
         [255, 255, 0]
 
     ]
-    plot_episodes_tracks('cvprfinal_valstop_seed4', 'res34-100-lowdropout',
-                         140000, 'Town01', 'Long3NewWeather')
+
+
+    plot_episodes_tracks('cvprfinal_valstop_seed1', 'res34-100-lowdropout-imnet-nospeed',
+                          500000, 'Town02', 'Long3NewWeatherTown', 0)
 

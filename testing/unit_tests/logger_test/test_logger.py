@@ -16,9 +16,9 @@ class testLogger(unittest.TestCase):
 
     def test_recover_loss_window(self):
 
-        g_conf.EXPERIMENT_NAME = 'res34-50-lowdropout'
-        merge_with_yaml('configs/cvprfinal_valstop_seed1/res34-50-lowdropout.yaml')
+        g_conf.EXPERIMENT_NAME = 'coil_icra'
+        merge_with_yaml('configs/sample/coil_icra.yaml')
         # JUST A TRICK TO CONTAIN THE CURRENT LIMITATIONS
         set_type_of_process('train')
 
-        print (recover_loss_window('TrainValidation', None))
+        print (recover_loss_window('CoILVal1', None))
