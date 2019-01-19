@@ -195,7 +195,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                               exp_alias + '_err_'+g_conf.PROCESS_NAME + '_' + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
-        if coil_logger.check_finish('drive'):
+        if coil_logger.check_finish('drive', exp_set_name):
             coil_logger.add_message('Finished', {})
             return
         coil_logger.add_message('Loading', {'Poses': experiment_set.build_experiments()[0].poses})
@@ -255,7 +255,7 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
                 else:
                     time.sleep(0.1)
 
-        coil_logger.write_finish('drive', latest)
+        coil_logger.write_finish('drive', latest, drive_name=exp_set_name)
         coil_logger.add_message('Finished', {})
 
 

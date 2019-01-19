@@ -167,7 +167,7 @@ def write_on_error_csv(error_file_name, output):
         f.write("\n")
 
 
-def write_finish(process, checkpoint):
+def write_finish(process, checkpoint, drive_name=None):
     """
     We write a stop file to indicate that some process ended.
     Args
@@ -186,13 +186,16 @@ def write_finish(process, checkpoint):
     full_path_name = os.path.join(root_path, EXPERIMENT_BATCH_NAME,
                                   EXPERIMENT_NAME)
 
-    file_name = os.path.join(full_path_name, process  + "_finish.csv")
+    if drive_name is not None:
+        process += '_' + drive_name
+
+    file_name = os.path.join(full_path_name,  process + "_finish.csv")
 
     with open(file_name, 'w') as f:
         f.write("%d\n" % checkpoint)
 
 
-def check_finish(process):
+def check_finish(process, drive_name=None):
     """
     Check if the finish file is already written.
     Args
@@ -210,8 +213,30 @@ def check_finish(process):
 
     full_path_name = os.path.join(root_path, EXPERIMENT_BATCH_NAME,
                                   EXPERIMENT_NAME)
+    if drive_name is not None:
+        process += '_' + drive_name
 
-    file_name = os.path.join(full_path_name, process  + "_finish.csv")
+    file_name = os.path.join(full_path_name, process + "_finish.csv")
+    return os.path.exists(file_name)
+
+
+def check_stop(validation_dataset):
+    """
+    Check if the finish file is already written.
+    Args
+        checkpoint_name: the name of the checkpoint being writen
+        output: what is being written on the file
+
+
+    Returns:
+
+    """
+    root_path = "_logs"
+
+    full_path_name = os.path.join(root_path, EXPERIMENT_BATCH_NAME,
+                                  EXPERIMENT_NAME)
+
+    file_name = os.path.join(full_path_name, "validation_" + validation_dataset + "_stale.csv")
     return os.path.exists(file_name)
 
 
