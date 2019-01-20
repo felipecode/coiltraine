@@ -68,7 +68,7 @@ LEARNING_RATE_DECAY_INTERVAL: 75000 # Number of iterations where the learning ra
 LEARNING_RATE_THRESHOLD: 5000 # Number of iterations without going down to reduce learning rate
 LEARNING_RATE_DECAY_LEVEL: 0.1 # Th factor of reduction applied to the learning rate
 #TODO check how to use this part
-BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.00]
+BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05]
 LOSS_FUNCTION: 'L1'
 
 VARIABLE_WEIGHT:

@@ -61,7 +61,7 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       dropouts: [0.0, 0.5]
 
 PRE_TRAINED: True
-MAGICAL_SEED: 394204
+MAGICAL_SEED: 159789
 
 LEARNING_RATE: 0.0002  # First learning rate
 LEARNING_RATE_DECAY_INTERVAL: 75000 # Number of iterations where the learning rate is reduced

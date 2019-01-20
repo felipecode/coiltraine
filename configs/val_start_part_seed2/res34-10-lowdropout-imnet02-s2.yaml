@@ -24,7 +24,7 @@ AUGMENTATION: None
 DATA_USED: 'all'
 USE_NOISE_DATA: True
 NUMBER_OF_HOURS: 10
-START_PART: 0.4
+START_PART: 0.2
 
 #### Testing Related Parameters ####
 TEST_SCHEDULE: range(20000, 1000001, 20000)  # The frequency the model is actually tested.
@@ -61,7 +61,7 @@ MODEL_CONFIGURATION:  # good place to check integrity. All sizes should match
       dropouts: [0.0, 0.5]
 
 PRE_TRAINED: True
-MAGICAL_SEED: 394204
+MAGICAL_SEED: 159789
 
 LEARNING_RATE: 0.0002  # First learning rate
 LEARNING_RATE_DECAY_INTERVAL: 75000 # Number of iterations where the learning rate is reduced
