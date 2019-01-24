@@ -122,7 +122,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             controls = data['directions']
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
             model.zero_grad()
-            branches = model(torch.squeeze(data['rgb'].cuda()),
+            print('dataset.extract_inputs(data).shape', dataset.extract_inputs(data).shape)
+            branches = model(torch.squeeze(data['labels_front'].cuda()),
                              dataset.extract_inputs(data).cuda())
             loss_function_params = {
                 'branches': branches,
@@ -162,7 +163,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                 #################################################
             """
             coil_logger.add_scalar('Loss', loss.data, iteration)
-            coil_logger.add_image('Image', torch.squeeze(data['rgb']), iteration)
+            coil_logger.add_image('Image', torch.squeeze(data['labels_front']), iteration)
             if loss.data < best_loss:
                 best_loss = loss.data.tolist()
                 best_loss_iter = iteration

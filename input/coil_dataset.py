@@ -237,7 +237,7 @@ class CoILDataset(Dataset):
 
         """
 
-        episodes_list = glob.glob(os.path.join(path, 'episode_*/episode_*'))
+        episodes_list = glob.glob(os.path.join(path, 'episode_*'))
         sort_nicely(episodes_list)
         # Do a check if the episodes list is empty
         if len(episodes_list) == 0:
@@ -305,6 +305,9 @@ class CoILDataset(Dataset):
 
                     others_speed.append(forward_speed(measurement_data["vehicles"][i]))
 
+                if len(others_speed) == 1:
+                    others_speed = others_speed[0]
+
                 final_measurement = {'steer': measurement_data['control_steer'],
                                      'steer_noise': measurement_data['control_noise_f_steer'],
                                      'throttle': measurement_data['control_noise_f_throttle'],
@@ -321,10 +324,8 @@ class CoILDataset(Dataset):
 
                 # the different sensors
 
+                float_dicts.append(final_measurement)
                 for name in g_conf.SENSORS.keys():
-
-
-                    float_dicts.append(final_measurement)
                     label = translate_collect_system[name] + '_' + data_point_number + '.png'
                     sensor_data_names[name].append(os.path.join(episode.split('/')[-1], label))
                     count_added_measurements += 1
@@ -441,8 +442,10 @@ class CoILDataset(Dataset):
         """
         inputs_vec = []
         for input_name in g_conf.INPUTS:
+            print('data[',input_name,']', len(data[input_name]))
             inputs_vec.append(data[input_name])
 
+        print('inputs_vec', inputs_vec)
         return torch.cat(inputs_vec, 1)
 
     def extract_intentions(self, data):

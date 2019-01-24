@@ -16,7 +16,7 @@ classes_join = {0: 2, 1: 2, 2: 2, 3: 2, 5: 2, 12: 2, 9: 2, 11: 2, 4: 0, 10: 1, 8
 
 def join_classes(labels_image):
     compressed_labels_image = np.copy(labels_image)
-    for key, value in classes_join.iteritems():
+    for key, value in classes_join.items():
         compressed_labels_image[np.where(labels_image == key)] = value
 
     return compressed_labels_image
@@ -100,9 +100,14 @@ class CoILAgent(Agent):
 
     def _process_sensors(self, sensors):
 
+        translate_collect_system = {'rgb': 'rgb',
+                                    'labels_front': 'semantic',
+                                    'labels_left': 'left_augmentation_semantic' ,
+                                    'labels_right': 'right_augmentation_semantic'
+                                    }
         iteration = 0
-        for name, size in g_conf.SENSORS.items():
-
+        for o_name, size in g_conf.SENSORS.items():
+            name = translate_collect_system[o_name]
             raw_data = np.array(sensors[name].raw_data)
             raw_data = np.reshape(raw_data, (600, 800, 4))
             raw_data = raw_data[:, :, :3] # remove transparency channel
@@ -112,9 +117,12 @@ class CoILAgent(Agent):
                 # For now we have just for RGB images and semantic segmentation.
 
                 # TODO: the camera name has to be sincronized with what is in the experiment...
+                print('sensor.shape', sensor.shape)
                 sensor = join_classes(sensor)
                 sensor = sensor[:, :, np.newaxis]
 
+                print('size', size)
+                print('sensor.shape', sensor.shape)
                 sensor = scipy.misc.imresize(sensor, (size[1], size[2]), interp='nearest')
                 sensor = sensor * (1 / (number_of_seg_classes - 1))
 

@@ -13,7 +13,7 @@ def is_open(file_name):
         file1_size = file1.st_size
 
         # your script here that collects and writes data (increase file size)
-        time.sleep(0.5)
+        time.sleep(3)
         file2 = os.stat(file_name)  # updated file size
         file2_size = file2.st_size
         comp = file2_size - file1_size  # compares sizes

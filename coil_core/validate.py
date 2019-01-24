@@ -107,6 +107,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
                 latest = get_next_checkpoint(g_conf.TEST_SCHEDULE)
 
+                print(os.path.join('_logs', exp_batch, exp_alias
+                                        , 'checkpoints', str(latest) + '.pth'))
                 checkpoint = torch.load(os.path.join('_logs', exp_batch, exp_alias
                                         , 'checkpoints', str(latest) + '.pth'))
                 checkpoint_iteration = checkpoint['iteration']
@@ -122,7 +124,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
                     # Compute the forward pass on a batch from  the validation dataset
                     controls = data['directions']
-                    output = model.forward_branch(torch.squeeze(data['rgb']).cuda(),
+                    output = model.forward_branch(torch.squeeze(data['labels_front']).cuda(),
                                                   dataset.extract_inputs(data).cuda(),
                                                   controls)
                     # It could be either waypoints or direct control
