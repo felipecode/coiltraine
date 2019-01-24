@@ -110,7 +110,7 @@ class CoILAgent(Agent):
             name = translate_collect_system[o_name]
             raw_data = np.array(sensors[name].raw_data)
             raw_data = np.reshape(raw_data, (600, 800, 4))
-            raw_data = raw_data[:, :, :3] # remove transparency channel
+            raw_data = raw_data[:, :, 0] # remove transparency channel
             sensor = raw_data[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
 
             if 'semantic' in name:
