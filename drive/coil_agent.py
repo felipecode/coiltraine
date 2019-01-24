@@ -10,8 +10,8 @@ from configs import g_conf
 from logger import coil_logger
 
 # Parameters for using semantic segmentation as input.
-number_of_seg_classes = 5
-classes_join = {0: 2, 1: 2, 2: 2, 3: 2, 5: 2, 12: 2, 9: 2, 11: 2, 4: 0, 10: 1, 8: 3, 6: 3, 7: 4}
+number_of_seg_classes = 4
+classes_join = {0: 1, 1: 1, 2: 1, 3: 1, 5: 1, 12: 1, 9: 1, 11: 1, 4: 1, 10: 0, 8: 2, 6: 2, 7: 3}
 
 
 def join_classes(labels_image):
@@ -117,16 +117,16 @@ class CoILAgent(Agent):
                 # For now we have just for RGB images and semantic segmentation.
 
                 # TODO: the camera name has to be sincronized with what is in the experiment...
-                print('sensor.shape', sensor.shape)
                 sensor = join_classes(sensor)
-                sensor = sensor[:, :, np.newaxis]
+                sensor = sensor[:, :, 0]
+                #sensor = sensor[:, :, np.newaxis]
 
-                print('size', size)
-                print('sensor.shape', sensor.shape)
                 sensor = scipy.misc.imresize(sensor, (size[1], size[2]), interp='nearest')
                 sensor = sensor * (1 / (number_of_seg_classes - 1))
 
                 sensor = torch.from_numpy(sensor).type(torch.FloatTensor).cuda()
+                sensor = sensor.unsqueeze(0)
+                #print('sensor.shape', sensor.shape)
 
                 # OBS: Is using image transform better ?
 
@@ -148,6 +148,7 @@ class CoILAgent(Agent):
             iteration += 1
 
         image_input = image_input.unsqueeze(0)
+        #print('image_input.shape', image_input.shape)
 
 
 
@@ -224,4 +225,4 @@ class CoILAgent(Agent):
         # For the oracle, the current version of sensor data is not really relevant.
         state = self.control_agent.run_step(vehicle, sensor_data, direction, timestamp)
 
-        return state['control'].steer, state['control'].throttle, state['control'].brake
+        return state['control'].steer, state['control'].throttle, state['control'].brak
