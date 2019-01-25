@@ -51,7 +51,7 @@ class CoILICRA(nn.Module):
             resnet_module = importlib.import_module('network.models.building_blocks.resnet')
             resnet_module = getattr(resnet_module, params['perception']['res']['name'])
             self.perception = resnet_module(pretrained=g_conf.PRE_TRAINED,
-                                             num_classes=params['perception']['res']['num_classes'])
+                                             num_classes=params['perception']['res']['num_classes'], num_channels=number_first_layer_channels)
 
             number_output_neurons = params['perception']['res']['num_classes']
 
@@ -155,5 +155,3 @@ class CoILICRA(nn.Module):
                                      torch.cuda.LongTensor(range(0, len(branch_number)))])
 
         return output_vec[branch_number[0], branch_number[1], :]
-
-

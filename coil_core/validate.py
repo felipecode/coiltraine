@@ -124,7 +124,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
                     # Compute the forward pass on a batch from  the validation dataset
                     controls = data['directions']
-                    output = model.forward_branch(torch.squeeze(data['labels_front']).cuda(),
+                    output = model.forward_branch(data['labels_front'].cuda(),
                                                   dataset.extract_inputs(data).cuda(),
                                                   controls)
                     # It could be either waypoints or direct control

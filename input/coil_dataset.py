@@ -146,18 +146,23 @@ class CoILDataset(Dataset):
                                     self.sensor_data_names[name][index].split('/')[-2],
                                     self.sensor_data_names[name][index].split('/')[-1])
 
-            img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+            img = cv2.imread(img_path, -1)
+            #print('img.shape', img.shape)
             # Apply the image transformation
             if self.transform is not None:
                 boost = 1
                 img = self.transform(self.batch_read_number * boost, img)
-            else:
+
+            if 'rgb' in name:
                 img = img.transpose(2, 0, 1)
 
             # TODO Here we need to convert it properly.
             img = img.astype(np.float)
             img = torch.from_numpy(img).type(torch.FloatTensor)
             img = img / 255.
+            if 'labels' in name:
+                img = img.unsqueeze(0)
+                print('img.shape', img.shape)
 
             measurements[name] = img
 
@@ -442,10 +447,10 @@ class CoILDataset(Dataset):
         """
         inputs_vec = []
         for input_name in g_conf.INPUTS:
-            print('data[',input_name,']', len(data[input_name]))
+            #print('data[',input_name,']', len(data[input_name]))
             inputs_vec.append(data[input_name])
 
-        print('inputs_vec', inputs_vec)
+        #print('inputs_vec', inputs_vec)
         return torch.cat(inputs_vec, 1)
 
     def extract_intentions(self, data):

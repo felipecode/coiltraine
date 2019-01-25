@@ -28,8 +28,8 @@ class Augmenter(object):
             #print (t)
             img = t.augment_image(img)
 
-        img = np.swapaxes(img, 0, 2)
-        img = np.swapaxes(img, 1, 2)
+        #img = np.swapaxes(img, 0, 2)
+        #img = np.swapaxes(img, 1, 2)
 
         return img
 

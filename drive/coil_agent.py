@@ -54,11 +54,24 @@ class CoILAgent(Agent):
         our_car_transform = vehicle.geo.transform
         our_car_velocity = vehicle.geo.velocity
 
-        norm_speed = vehicle.geo.forward_speed / g_conf.SPEED_FACTOR
-        norm_speed = torch.cuda.FloatTensor([norm_speed]).unsqueeze(0)
+        inputs_vec = []
+        for input_name in g_conf.INPUTS:
+            input_data = None
+            #print('data[',input_name,']', len(data[input_name]))
+            if input_name == 'speed_module':
+                input_data = vehicle.geo.forward_speed / g_conf.SPEED_FACTOR
+                input_data = torch.cuda.FloatTensor([input_data]).unsqueeze(0)
+            elif input_name == 'other_vehicles_speed':
+                input_data = vehicle.other_vehicles[0].geo.forward_speed / g_conf.SPEED_FACTOR
+                input_data = torch.cuda.FloatTensor([input_data]).unsqueeze(0)
+
+            inputs_vec.append(input_data)
+        inputs_vec = torch.cat(inputs_vec, 1)
+
+        #print('inputs_vec', inputs_vec)
         directions_tensor = torch.cuda.LongTensor([direction])
         # Compute the forward pass processing the sensors got from CARLA.
-        model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), norm_speed,
+        model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), inputs_vec,
                                                   directions_tensor)
 
         if 'brake' in g_conf.TARGETS:
@@ -110,7 +123,7 @@ class CoILAgent(Agent):
             name = translate_collect_system[o_name]
             raw_data = np.array(sensors[name].raw_data)
             raw_data = np.reshape(raw_data, (600, 800, 4))
-            raw_data = raw_data[:, :, 0] # remove transparency channel
+            raw_data = raw_data[:, :, :3] # remove transparency channel
             sensor = raw_data[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
 
             if 'semantic' in name:
@@ -148,7 +161,6 @@ class CoILAgent(Agent):
             iteration += 1
 
         image_input = image_input.unsqueeze(0)
-        #print('image_input.shape', image_input.shape)
 
 
 
@@ -225,4 +237,4 @@ class CoILAgent(Agent):
         # For the oracle, the current version of sensor data is not really relevant.
         state = self.control_agent.run_step(vehicle, sensor_data, direction, timestamp)
 
-        return state['control'].steer, state['control'].throttle, state['control'].brak
+        return state['control'].steer, state['control'].throttle, state['control'].brake
