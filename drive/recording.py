@@ -105,7 +105,7 @@ class Recording(object):
         self._dict_summary['final_time'] = episode.elapsed_seconds()
         self._dict_summary['time_out'] = episode.timeout()
 
-        end_collision, collision_vehicle = episode.ego_collision()
+        collision, collision_vehicle = episode.ego_collision()
         self._dict_summary['end_pedestrian_collision'] = 0
         self._dict_summary['end_vehicle_collision'] = collision_vehicle
         self._dict_summary['end_other_collision'] = collision and not collision_vehicle
