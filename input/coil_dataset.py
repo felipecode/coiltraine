@@ -166,41 +166,19 @@ class CoILDataset(Dataset):
         else:
             time_stamp = measurement_augmented['game_time']
 
-        if 'brake' not in g_conf.TARGETS:
-            # A bit of repeating code, but helps for the sake of clarity
-            if measurement_augmented['brake'] > 0.01:
-                final_throtle = -measurement_augmented['brake']
-                final_throtle_noise = -measurement_augmented['brake_noise']
-            else:
-                final_throtle = measurement_augmented['throttle']
-                final_throtle_noise = measurement_augmented['throttle_noise']
-
-            final_measurement = {'steer': measurement_augmented['steer'],
-                                 'steer_noise': measurement_augmented['steer_noise'],
-                                 'throttle': final_throtle,
-                                 'throttle_noise': final_throtle_noise,
-                                 'speed_module': speed / g_conf.SPEED_FACTOR,
-                                 'directions': directions,
-                                 "pedestrian": measurement_augmented['stop_pedestrian'],
-                                 "traffic_lights": measurement_augmented['stop_traffic_lights'],
-                                 "vehicle": measurement_augmented['stop_vehicle'],
-                                 "game_time": time_stamp,
-                                 'angle': angle}
-
-        else:
-            final_measurement = {'steer': measurement_augmented['steer'],
-                                 'steer_noise': measurement_augmented['steer_noise'],
-                                 'throttle': measurement_augmented['throttle'],
-                                 'throttle_noise': measurement_augmented['throttle_noise'],
-                                 'brake': measurement_augmented['brake'],
-                                 'brake_noise': measurement_augmented['brake_noise'],
-                                 'speed_module': speed / g_conf.SPEED_FACTOR,
-                                 'directions': directions,
-                                 "pedestrian": measurement_augmented['stop_pedestrian'],
-                                 "traffic_lights": measurement_augmented['stop_traffic_lights'],
-                                 "vehicle": measurement_augmented['stop_vehicle'],
-                                 "game_time": time_stamp,
-                                 'angle': angle}
+        final_measurement = {'steer': measurement_augmented['steer'],
+                             'steer_noise': measurement_augmented['steer_noise'],
+                             'throttle': measurement_augmented['throttle'],
+                             'throttle_noise': measurement_augmented['throttle_noise'],
+                             'brake': measurement_augmented['brake'],
+                             'brake_noise': measurement_augmented['brake_noise'],
+                             'speed_module': speed / g_conf.SPEED_FACTOR,
+                             'directions': directions,
+                             "pedestrian": measurement_augmented['stop_pedestrian'],
+                             "traffic_lights": measurement_augmented['stop_traffic_lights'],
+                             "vehicle": measurement_augmented['stop_vehicle'],
+                             "game_time": time_stamp,
+                             'angle': angle}
 
         return final_measurement
 
@@ -322,7 +300,6 @@ class CoILDataset(Dataset):
 
         return sensor_data_names, float_dicts
 
-    # TODO: Clean up this part.
 
     def augment_directions(self, directions):
 

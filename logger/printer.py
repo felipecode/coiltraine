@@ -70,7 +70,7 @@ def print_validation_summary(current, latest, verbose):
 @static_vars(previous_checkpoint=g_conf.TEST_SCHEDULE[0],
              previous_checkpoint_number=None,
              previous_checkpoint_time=0)
-def print_drive_summary(path, csv_filename, checkpoint, verbose):
+def print_drive_summary(path,  checkpoint ):
     print('        CHECKPOINT: ', DARK_BLUE + str(checkpoint) + END)
 
     # Check if there is already files to check
@@ -195,7 +195,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                            + '_' + process.split('_')[0] + '_' + control_filename \
                            + '_' + process.split('_')[1] + '_' + process.split('_')[2]
 
-                    print_drive_summary(get_latest_path(path), None, checkpoint, verbose)
+                    print_drive_summary(get_latest_path(path), checkpoint)
 
 
 def print_folder_process_names(exp_batch):

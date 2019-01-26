@@ -43,6 +43,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         coil_logger.add_message('Loading', {'GPU': gpu})
 
         # Put the output to a separate file if it is the case
+        # TODO: Go to an alternative file ( Organize the utils file)
         if suppress_output:
             if not os.path.exists('_output_logs'):
                 os.mkdir('_output_logs')
@@ -76,6 +77,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         # By instantiating the augmenter we get a callable that augment images and transform them
         # into tensors.
         augmenter = Augmenter(g_conf.AUGMENTATION)
+
         # Instantiate the class used to read a dataset. The coil dataset generator
         # can be found
         dataset = CoILDataset(full_dataset, transform=augmenter,

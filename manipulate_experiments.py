@@ -6,9 +6,7 @@ from utils.general import get_validation_datasets, get_driving_environments
 from utils.exporter import export_status, export_csv_separate
 
 
-
 # You could send the module to be executed and they could have the same interface.
-
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description=__doc__)
@@ -42,7 +40,6 @@ if __name__ == '__main__':
                                'end_vehicle_collision',
                                'end_other_collision', 'driven_kilometers']
 
-        # TODO: for now it basically will just export the best
         export_csv_separate(args.folder, variables_to_export,
                             ['empty', 'cluttered'])
 

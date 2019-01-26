@@ -92,7 +92,7 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
         l1_window = []
         latest = get_latest_evaluated_checkpoint()
         if latest is not None:  # When latest is noe
-            l1_window = coil_logger.recover_loss_window(dataset_name, -1)
+            l1_window = coil_logger.recover_loss_window(dataset_name, None)
 
         model.cuda()
 
@@ -205,6 +205,8 @@ def execute(gpu, exp_batch, exp_alias, dataset_name, suppress_output):
 
                 latest = get_latest_evaluated_checkpoint()
                 time.sleep(1)
+
+                coil_logger.add_message('Loading', {'Message': 'Waiting Checkpoint'})
                 print("Waiting for the next Validation")
 
         coil_logger.add_message('Finished', {})

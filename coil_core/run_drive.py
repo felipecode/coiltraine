@@ -106,13 +106,10 @@ def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_bat
                + '_' + g_conf.PROCESS_NAME.split('_')[0] + '_' + control_filename \
                + '_' + g_conf.PROCESS_NAME.split('_')[1] + '_' + g_conf.PROCESS_NAME.split('_')[2]
 
-        print(path)
-        print("Finished")
         benchmark_json_path = os.path.join(get_latest_path(path), 'metrics.json')
         with open(benchmark_json_path, 'r') as f:
             benchmark_dict = json.loads(f.read())
 
-        print(" number of episodes ", len(experiment_set.build_experiments()))
         averaged_dict = compute_average_std_separatetasks([benchmark_dict],
                                                           experiment_set.weathers,
                                                           len(experiment_set.build_experiments()))
