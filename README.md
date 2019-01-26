@@ -83,10 +83,6 @@ drive/suites folder. The validation datasets are passed as parameter with -vd  a
 at the COIL_DATASET_PATH folder.
 
 ##### Expected outputs
-
-First note that this example trains on sample data and tests on a sample benchmark.
-Thus, the resulting driving model will be of poor quality. Test some of the models
-from the conditional models zoo to get high performance conditional imitation models.
 You should see a colored screen on the terminal. 
 
 ![Initial](docs/img/initial.png?raw=true)
@@ -98,8 +94,10 @@ look like as below.
 ![Second](docs/img/second.png?raw=true)
 
 You will not see any CARLA server screen popping up since CARLA running under docker runs offscreen.
+Also note that this example trains on sample data and tests on a sample benchmark.
+Thus, the resulting driving model will be of poor quality. 
+Please, test some of the models from the conditional models zoo to get high performance conditional imitation models.
 
-Checking the driving results.
 
 
 
