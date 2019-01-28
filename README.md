@@ -1,9 +1,6 @@
 COiLTRAiNE: Conditional Imitation Learning Training Framework
 -------------------------------------------------------------
 
-!!! Note: The old imitation learning repo is temporarily inside
-the "old imitation folder"
-
 This repository can be used to easily train and manage the trainings of imitation
 learning networks jointly with evaluations  on the CARLA simulator.
 Objectives:
