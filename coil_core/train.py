@@ -70,7 +70,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             best_loss = 10000.0
             best_loss_iter = 0
 
-        if g_conf.PRELOAD_MODEL is not None:
+        if g_conf.PRELOAD_MODEL_ALIAS is not None:
             checkpoint = torch.load(os.path.join('_logs', g_conf.PRELOAD_MODEL_BATCH,
                                                   g_conf.PRELOAD_MODEL_ALIAS,
                                                  'checkpoints', g_conf.PRELOAD_MODEL_CHECKPOINT))
