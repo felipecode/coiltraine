@@ -77,7 +77,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                                                  str(g_conf.PRELOAD_MODEL_CHECKPOINT)+'.pth'))
             checkpoint_file = g_conf.PRELOAD_MODEL_CHECKPOINT
 
-
         # Define the dataset. This structure is has the __get_item__ redefined in a way
         # that you can access the positions from the root directory as a in a vector.
         full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
