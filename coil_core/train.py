@@ -43,7 +43,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         coil_logger.add_message('Loading', {'GPU': gpu})
 
         # Put the output to a separate file if it is the case
-        # TODO: Go to an alternative file ( Organize the utils file)
         if suppress_output:
             if not os.path.exists('_output_logs'):
                 os.mkdir('_output_logs')
@@ -64,7 +63,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             iteration = checkpoint['iteration']
             best_loss = checkpoint['best_loss']
             best_loss_iter = checkpoint['best_loss_iter']
-
         else:
             iteration = 0
             best_loss = 10000.0

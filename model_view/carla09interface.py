@@ -258,7 +258,6 @@ class World(object):
         # Spawn the sensor at the vehicle
         self.cam = Camera(self.world, camera, self.vehicle)
 
-
         weak_self = weakref.ref(self)
         self.cam.actor.listen(lambda image: World._parse_camera(weak_self, image))
 
