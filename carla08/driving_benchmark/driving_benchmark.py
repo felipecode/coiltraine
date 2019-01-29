@@ -11,12 +11,12 @@ import math
 import time
 import numpy as np
 
-from carla.client import VehicleControl
-from carla.client import make_carla_client
-from carla.driving_benchmark.metrics import Metrics
-from carla.planner.planner import Planner
-from carla.settings import CarlaSettings
-from carla.tcp import TCPConnectionError
+from ..client import VehicleControl
+from ..client import make_carla_client
+from ..driving_benchmark.metrics import Metrics
+from ..planner.planner import Planner
+from ..settings import CarlaSettings
+from ..tcp import TCPConnectionError
 
 from . import results_printer
 from .recording import Recording

@@ -1,7 +1,7 @@
 import math
 
 from pid_controller.pid import PID
-from carla.client import VehicleControl
+from carla08.client import VehicleControl
 # PID based controller, we can have different ones
 
 

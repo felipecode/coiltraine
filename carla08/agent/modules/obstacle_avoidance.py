@@ -1,7 +1,7 @@
 import math
 
 from .utils import get_vec_dist, get_angle
-from carla.planner.map import CarlaMap
+from carla08.planner.map import CarlaMap
 
 class ObstacleAvoidance(object):
 

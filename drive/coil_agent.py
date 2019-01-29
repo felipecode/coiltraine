@@ -1,19 +1,38 @@
 import numpy as np
 import scipy
-
+import sys
+import os
+import glob
 import torch
+
+from scipy.misc import imresize
+from PIL import Image
+
+import matplotlib.pyplot as plt
+
 try:
-    from carla import carla_server_pb2 as carla_protocol
+    from carla08 import carla_server_pb2 as carla_protocol
 except ImportError:
     raise RuntimeError(
         'cannot import "carla_server_pb2.py", run the protobuf compiler to generate this file')
 
-from carla.agent import Agent, CommandFollower
+from carla08.agent import CommandFollower
+from carla08.client import VehicleControl
 
 from network import CoILModel
 from configs import g_conf
 from logger import coil_logger
 
+try:
+    sys.path.append(glob.glob('**/carla-*%d.%d-%s.egg' % (
+        sys.version_info.major,
+        sys.version_info.minor,
+        'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
+except IndexError:
+    pass
+
+
+import carla
 # Parameters for using semantic segmentation as input.
 number_of_seg_classes = 5
 classes_join = {0: 2, 1: 2, 2: 2, 3: 2, 5: 2, 12: 2, 9: 2, 11: 2, 4: 0, 10: 1, 8: 3, 6: 3, 7: 4}
@@ -27,26 +46,24 @@ def join_classes(labels_image):
     return compressed_labels_image
 
 
-class CoILAgent(Agent):
+class CoILAgent(object):
 
+    def __init__(self, checkpoint, town_name, carla_version='0.84'):
 
-    def __init__(self, checkpoint, town_name):
-
-
-        Agent.__init__(self)
-
+        # Set the carla version that is going to be used by the interface
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
-        self.model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
+        self._model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         self.first_iter = True
+        # Load the model and prepare set it for evaluation
+        self._model.load_state_dict(checkpoint['state_dict'])
+        self._model.cuda()
+        self._model.eval()
 
-        self.model.load_state_dict(checkpoint['state_dict'])
-
-        self.model.cuda()
-        self.model.eval()
+        self.latest_image = None
+        self.latest_image_tensor = None
 
         if g_conf.USE_ORACLE or g_conf.USE_FULL_ORACLE:
             self.control_agent = CommandFollower(town_name)
-
 
     def run_step(self, measurements, sensor_data, directions, target):
         """
@@ -58,6 +75,7 @@ class CoILAgent(Agent):
             target: Final objective.
 
         Returns:
+            Controls for the vehicle on the CARLA simulator.
 
         """
 
@@ -66,26 +84,19 @@ class CoILAgent(Agent):
         norm_speed = torch.cuda.FloatTensor([norm_speed]).unsqueeze(0)
         directions_tensor = torch.cuda.LongTensor([directions])
         # Compute the forward pass processing the sensors got from CARLA.
-        model_outputs = self.model.forward_branch(self._process_sensors(sensor_data), norm_speed,
+        model_outputs = self._model.forward_branch(self._process_sensors(sensor_data), norm_speed,
                                                   directions_tensor)
 
-        if 'brake' in g_conf.TARGETS:
-            steer, throttle, brake = self._process_model_outputs(model_outputs[0])
-        else:
-            steer, throttle, brake = self._process_model_outputs_no_brake(model_outputs[0])
+        steer, throttle, brake = self._process_model_outputs(model_outputs[0])
 
-        control = carla_protocol.Control()
-        control.steer = steer
-        control.throttle = throttle
-        control.brake = brake
+        control = carla.VehicleControl()
+        control.steer = float(steer)
+        control.throttle = float(throttle)
+        control.brake = float(brake)
 
         # There is the posibility to replace some of the predictions with oracle predictions.
         if g_conf.USE_ORACLE:
             _, control.throttle, control.brake = self._get_oracle_prediction(
-                measurements, target)
-
-        if g_conf.USE_FULL_ORACLE:
-            control.steer, control.throttle, control.brake = self._get_oracle_prediction(
                 measurements, target)
 
         if self.first_iter:
@@ -94,44 +105,49 @@ class CoILAgent(Agent):
                                     self.checkpoint['iteration'])
         self.first_iter = False
 
-        print("speed ", measurements.player_measurements.forward_speed)
         print('Steer', control.steer, 'Gas', control.throttle, 'Brake', control.brake)
         return control
 
+    def get_attentions(self, layers=None):
+        """
 
+        Returns
+            The activations obtained from the first layers of the latest iteration.
 
-
+        """
+        if layers is None:
+            layers = [0, 1, 2]
+        if self.latest_image_tensor is None:
+            raise ValueError('No step was ran yet. '
+                             'No image to compute the activations, Try Running ')
+        all_layers = self._model.get_perception_layers(self.latest_image_tensor)
+        cmap = plt.get_cmap('inferno')
+        attentions = []
+        for layer in layers:
+            y = all_layers[layer]
+            att = torch.abs(y).mean(1)[0].data.cpu().numpy()
+            att = att / att.max()
+            att = cmap(att)
+            att = np.delete(att, 3, 2)
+            attentions.append(imresize(att, [88, 200]))
+        return attentions
 
     def _process_sensors(self, sensors):
 
         iteration = 0
         for name, size in g_conf.SENSORS.items():
 
-            sensor = sensors[name].data[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
+            sensor = sensors[name][g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
 
-            if sensors[name].type == 'SemanticSegmentation':
-                # For now we have just for RGB images and semantic segmentation.
+            sensor = scipy.misc.imresize(sensor, (size[1], size[2]))
 
-                # TODO: the camera name has to be sincronized with what is in the experiment...
-                sensor = join_classes(sensor)
-                sensor = sensor[:, :, np.newaxis]
+            self.latest_image = sensor
 
-                sensor = scipy.misc.imresize(sensor, (size[1], size[2]), interp='nearest')
-                sensor = sensor * (1 / (number_of_seg_classes - 1))
+            sensor = np.swapaxes(sensor, 0, 1)
 
-                sensor = torch.from_numpy(sensor).type(torch.FloatTensor).cuda()
+            sensor = np.transpose(sensor, (2, 1, 0))
 
-                # OBS: Is using image transform better ?
-
-            else:
-
-                sensor = scipy.misc.imresize(sensor, (size[1], size[2]))
-
-                sensor = np.swapaxes(sensor, 0, 1)
-
-                sensor = np.transpose(sensor, (2, 1, 0))
-
-                sensor = torch.from_numpy(sensor / 255.0).type(torch.FloatTensor).cuda()
+            sensor = torch.from_numpy(sensor / 255.0).type(torch.FloatTensor).cuda()
 
             if iteration == 0:
                 image_input = sensor
@@ -142,7 +158,7 @@ class CoILAgent(Agent):
 
         image_input = image_input.unsqueeze(0)
 
-        print(image_input.shape)
+        self.latest_image_tensor = image_input
 
         return image_input
 
@@ -162,24 +178,6 @@ class CoILAgent(Agent):
 
         return steer, throttle, brake
 
-    def _process_model_outputs_no_brake(self, outputs):
-        """
-         A bit of heuristics in the control, to eventually make car faster, for instance.
-        Returns:
-
-        """
-        steer, throttle_brake = outputs[0], outputs[1]
-
-        if throttle_brake >= 0.0:
-            throttle = throttle_brake
-            brake = 0.0
-        else:
-            brake = -throttle_brake
-            throttle = 0.0
-
-
-
-        return steer, throttle, brake
 
 
     def _process_model_outputs_wp(self, outputs):
@@ -201,11 +199,6 @@ class CoILAgent(Agent):
             steer = min(steer, 1)
         else:
             steer = max(steer, -1)
-
-        # else:
-        #    throttle = throttle * 2
-        # if speed > 35.0 and brake == 0.0:
-        #    throttle = 0.0
 
         return steer, throttle, brake
 

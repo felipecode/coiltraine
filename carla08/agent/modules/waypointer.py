@@ -4,9 +4,9 @@ import random
 import numpy as np
 from numpy import linalg as LA
 
-from carla.planner.converter import Converter
-from carla.planner.city_track import CityTrack
-from carla.planner import bezier
+from carla08.planner.converter import Converter
+from carla08.planner.city_track import CityTrack
+from carla08.planner import bezier
 
 
 

@@ -14,32 +14,14 @@ import cv2
 
 from torch.utils.data import Dataset
 
-from logger import coil_logger
 from . import splitter
+from . import data_parser
 
 # TODO: Warning, maybe this does not need to be included everywhere.
 from configs import g_conf
 
 from utils.general import sort_nicely
 
-
-def parse_boost_configuration(configuration):
-    """
-    Turns the configuration line of sliptting into a name and a set of params.
-    """
-
-    if configuration is None:
-        return "None", None
-    print('conf', configuration)
-    conf_dict = collections.OrderedDict(configuration)
-
-    name = 'get_boost'
-    for key in conf_dict.keys():
-        if key != 'weights' and key != 'boost':
-            name += '_'
-            name += key
-
-    return name, conf_dict
 
 
 def parse_remove_configuration(configuration):
@@ -93,7 +75,7 @@ class CoILDataset(Dataset):
                 os.path.join('_preloads', self.preload_name + '.npy'))
             print(self.sensor_data_names)
         else:
-            self.sensor_data_names, self.measurements = self.pre_load_image_folders(root_dir)
+            self.sensor_data_names, self.measurements = self._pre_load_image_folders(root_dir)
 
         print("preload Name ", self.preload_name)
 
@@ -147,16 +129,19 @@ class CoILDataset(Dataset):
         # If the measurement data is not removable is because it is part of this experiment dataa
         return not self._check_remove_function(measurement_data, self._remove_params)
 
-    def _get_final_measurement(self, speed, measurement_data, angle, directions):
+    def _get_final_measurement(self, speed, measurement_data, angle,
+                               directions, avaliable_measurements_dict):
         """
         Function to load the measurement with a certain angle and augmented direction.
         Also, it will choose if the brake is gona be present or if acceleration -1,1 is the default.
 
-        :return:
+        Returns
+            The final measurement dict
         """
         if angle != 0:
             measurement_augmented = self.augment_measurement(copy.copy(measurement_data), angle,
-                                                             3.6 * speed)
+                                                             3.6 * speed,
+                                                 steer_name=avaliable_measurements_dict['steer'])
         else:
             # We have to copy since it reference a file.
             measurement_augmented = copy.copy(measurement_data)
@@ -164,25 +149,23 @@ class CoILDataset(Dataset):
         if 'gameTimestamp' in measurement_augmented:
             time_stamp = measurement_augmented['gameTimestamp']
         else:
-            time_stamp = measurement_augmented['game_time']
+            time_stamp = measurement_augmented['elapsed_seconds']
 
-        final_measurement = {'steer': measurement_augmented['steer'],
-                             'steer_noise': measurement_augmented['steer_noise'],
-                             'throttle': measurement_augmented['throttle'],
-                             'throttle_noise': measurement_augmented['throttle_noise'],
-                             'brake': measurement_augmented['brake'],
-                             'brake_noise': measurement_augmented['brake_noise'],
-                             'speed_module': speed / g_conf.SPEED_FACTOR,
-                             'directions': directions,
-                             "pedestrian": measurement_augmented['stop_pedestrian'],
-                             "traffic_lights": measurement_augmented['stop_traffic_lights'],
-                             "vehicle": measurement_augmented['stop_vehicle'],
-                             "game_time": time_stamp,
-                             'angle': angle}
+        final_measurement = {}
+        # We go for every available measurement, previously tested
+        # and update for the measurements vec that is used on the training.
+        for measurement, name_in_dataset in avaliable_measurements_dict.items():
+            # This is mapping the name of measurement in the target dataset
+            final_measurement.update({measurement: measurement_augmented[name_in_dataset]})
+
+        # Add now the measurements that actually need some kind of processing
+        final_measurement.update({'speed_module': speed / g_conf.SPEED_FACTOR})
+        final_measurement.update({'directions': directions})
+        final_measurement.update({'game_time': time_stamp})
 
         return final_measurement
 
-    def pre_load_image_folders(self, path):
+    def _pre_load_image_folders(self, path):
         """
         Pre load the image folders for each episode, keep in mind that we only take
         the measurements that we think that are interesting for now.
@@ -209,6 +192,9 @@ class CoILDataset(Dataset):
 
         number_of_hours_pre_loaded = 0
 
+        # Now we do a check to try to find all the
+        available_measurements_dict = data_parser.check_available_measurements(episodes_list[0])
+        print (available_measurements_dict)
         for episode in episodes_list:
 
             print('Episode ', episode)
@@ -239,17 +225,12 @@ class CoILDataset(Dataset):
                 # that are not going to be used for this experiment
                 # We extract the interesting subset from the measurement dict
 
-                # If the forward speed is not on the dataset it is because speed is zero.
-                if 'forwardSpeed' in measurement_data['playerMeasurements']:
-                    speed = measurement_data['playerMeasurements']['forwardSpeed']
-                else:
-                    speed = 0
-
+                speed = data_parser.get_speed(measurement_data)
 
                 directions = measurement_data['directions']
-
                 final_measurement = self._get_final_measurement(speed, measurement_data, 0,
-                                                                directions)
+                                                                directions,
+                                                                available_measurements_dict)
 
                 if self.is_measurement_partof_experiment(final_measurement):
                     float_dicts.append(final_measurement)
@@ -263,7 +244,8 @@ class CoILDataset(Dataset):
                 # We extract the interesting subset from the measurement dict
 
                 final_measurement = self._get_final_measurement(speed, measurement_data, -30.0,
-                                                                directions)
+                                                                directions,
+                                                                available_measurements_dict)
 
                 if self.is_measurement_partof_experiment(final_measurement):
                     float_dicts.append(final_measurement)
@@ -274,7 +256,8 @@ class CoILDataset(Dataset):
                 # We do measurements augmentation for the right side cameras
 
                 final_measurement = self._get_final_measurement(speed, measurement_data, 30.0,
-                                                                directions)
+                                                                directions,
+                                                                available_measurements_dict)
 
                 if self.is_measurement_partof_experiment(final_measurement):
                     float_dicts.append(final_measurement)
@@ -299,7 +282,6 @@ class CoILDataset(Dataset):
             np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
 
         return sensor_data_names, float_dicts
-
 
     def augment_directions(self, directions):
 
@@ -339,14 +321,14 @@ class CoILDataset(Dataset):
         # print('Angle', camera_angle, ' Steer ', old_steer, ' speed ', speed, 'new steer', steer)
         return steer
 
-    def augment_measurement(self, measurements, angle, speed):
+    def augment_measurement(self, measurements, angle, speed, steer_name='steer'):
         """
             Augment the steering of a measurement dict
 
         """
-        new_steer = self.augment_steering(angle, measurements['steer'],
+        new_steer = self.augment_steering(angle, measurements[steer_name],
                                           speed)
-        measurements['steer'] = new_steer
+        measurements[steer_name] = new_steer
         return measurements
 
     def controls_position(self):
