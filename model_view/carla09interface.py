@@ -26,9 +26,7 @@ import random
 import re
 import sys
 import weakref
-import queue
 
-from PIL import Image
 
 try:
     import pygame
@@ -147,7 +145,7 @@ class SensorCollector():
 
         return dict
 
-    def read(self, wait_period = 0.25, timeout = 10):
+    def read(self, wait_period=0.05, timeout = 10):
         empty = True
         end = time.time() + timeout
 
@@ -195,6 +193,10 @@ class Camera():
 
 
 class World(object):
+    """
+        This world class example has one vehicle, the agent, and stores sensor data to put
+        into the neural network.
+    """
     def __init__(self, carla_world, hud):
         self.world = carla_world
         self.hud = hud
@@ -202,6 +204,7 @@ class World(object):
         self.collision_sensor = None
         self.lane_invasion_sensor = None
         self.camera_manager = None
+        self._latest_image = None   #
         self._weather_presets = find_weather_presets()
         self._weather_index = 0
         self._command_cache = 2.0
@@ -254,7 +257,7 @@ class World(object):
         }
         # Spawn the sensor at the vehicle
         self.cam = Camera(self.world, camera, self.vehicle)
-        self._latest_image = None
+
 
         weak_self = weakref.ref(self)
         self.cam.actor.listen(lambda image: World._parse_camera(weak_self, image))
@@ -287,7 +290,8 @@ class World(object):
         """
             Get the forward speed of the agent.
         Returns
-            The forward speed in form of measurements
+            The forward speed in form of measurements class to keep compatibility with
+            carla 0.84
         """
         velocity = self.vehicle.get_velocity()
         transform = self.vehicle.get_transform()
@@ -301,7 +305,6 @@ class World(object):
         measurements = Measurements()
         measurements.player_measurements.forward_speed = speed
         return measurements
-
 
     def next_weather(self, reverse=False):
         self._weather_index += -1 if reverse else 1
@@ -371,8 +374,6 @@ class KeyboardControl(object):
     @staticmethod
     def _is_quit_shortcut(key):
         return (key == K_ESCAPE) or (key == K_q and pygame.key.get_mods() & KMOD_CTRL)
-
-
 
 
 class ColorText(object):
@@ -808,7 +809,8 @@ def game_loop(args, agent):
         hud = HUD(args.width, args.height)
         world = World(client.get_world(), hud)
         controller = KeyboardControl(world, False)
-
+        print (" AGENT VISUALIZATION SYSTEM "
+                " WE SHOW THE FIRST PERSON VIEW AND THE ACTIVATIONS OF THE FIRST 3 LAYERS ")
 
         spawn_point = world.world.get_map().get_spawn_points()[0]
 

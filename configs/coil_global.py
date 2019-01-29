@@ -63,6 +63,10 @@ _g_conf.SPEED_FACTOR = 12.0
 _g_conf.AUGMENT_LATERAL_STEERINGS = 6
 _g_conf.NUMBER_OF_HOURS = 1
 _g_conf.WEATHERS = [1, 3, 6, 8]
+#### Starting the model by loading another
+_g_conf.PRELOAD_MODEL_BATCH = None
+_g_conf.PRELOAD_MODEL_ALIAS = None
+_g_conf.PRELOAD_MODEL_CHECKPOINT = None
 
 
 """#### Network Related Parameters ####"""
