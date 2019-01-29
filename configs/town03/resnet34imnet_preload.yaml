@@ -23,7 +23,7 @@ AUGMENTATION: None  # The image augmentation applied on every input image
 DATA_USED: 'all'  # The part of the data to be used
 USE_NOISE_DATA: True  # If we use the noise data.
 NUMBER_OF_HOURS: 50  # Number of hours to be taken from the input data
-PRELOAD_MODEL_ALIAS: 'resnet34imnet'
+PRELOAD_MODEL_ALIAS: 'resnet34imnet10'
 PRELOAD_MODEL_BATCH: 'nocrash'
 PRELOAD_MODEL_CHECKPOINT: '320000'
 
