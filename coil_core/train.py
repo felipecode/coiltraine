@@ -54,6 +54,14 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                                            + str(os.getpid()) + ".out"),
                               "a", buffering=1)
 
+        # Preload option
+        if g_conf.PRELOAD_MODEL_ALIAS is not None:
+            checkpoint = torch.load(os.path.join('_logs', g_conf.PRELOAD_MODEL_BATCH,
+                                                  g_conf.PRELOAD_MODEL_ALIAS,
+                                                 'checkpoints',
+                                                 str(g_conf.PRELOAD_MODEL_CHECKPOINT)+'.pth'))
+
+
         # Get the latest checkpoint to be loaded
         # returns none if there are no checkpoints saved for this model
         checkpoint_file = get_latest_saved_checkpoint()
@@ -68,12 +76,6 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             best_loss = 10000.0
             best_loss_iter = 0
 
-        if g_conf.PRELOAD_MODEL_ALIAS is not None:
-            checkpoint = torch.load(os.path.join('_logs', g_conf.PRELOAD_MODEL_BATCH,
-                                                  g_conf.PRELOAD_MODEL_ALIAS,
-                                                 'checkpoints',
-                                                 str(g_conf.PRELOAD_MODEL_CHECKPOINT)+'.pth'))
-            checkpoint_file = g_conf.PRELOAD_MODEL_CHECKPOINT
 
         # Define the dataset. This structure is has the __get_item__ redefined in a way
         # that you can access the positions from the root directory as a in a vector.
@@ -94,7 +96,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         model.cuda()
         optimizer = optim.Adam(model.parameters(), lr=g_conf.LEARNING_RATE)
 
-        if checkpoint_file is not None:
+        if checkpoint_file is not None or g_conf.PRELOAD_MODEL_ALIAS is not None:
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             accumulated_time = checkpoint['total_time']

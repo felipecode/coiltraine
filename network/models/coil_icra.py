@@ -29,7 +29,6 @@ class CoILICRA(nn.Module):
         sensor_input_shape = [number_first_layer_channels, sensor_input_shape[1],
                               sensor_input_shape[2]]
 
-
         # For this case we check if the perception layer is of the type "conv"
         if 'conv' in params['perception']:
             perception_convs = Conv(params={'channels': [number_first_layer_channels] +
@@ -91,7 +90,7 @@ class CoILICRA(nn.Module):
                                                'dropouts': params['branches']['fc']['dropouts'] + [0.0],
                                                'end_layer': True}))
 
-        self.branches = Branching(branch_fc_vector) #  Here we set branching automatically
+        self.branches = Branching(branch_fc_vector)  # Here we set branching automatically
 
         if 'conv' in params['perception']:
             for m in self.modules():
@@ -137,7 +136,6 @@ class CoILICRA(nn.Module):
 
         """
         # Convert to integer just in case .
-
         # TODO: take four branches, this is hardcoded
         output_vec = torch.stack(self.forward(x, a)[0:4])
 

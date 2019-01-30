@@ -33,17 +33,6 @@ except IndexError:
 
 
 import carla
-# Parameters for using semantic segmentation as input.
-number_of_seg_classes = 5
-classes_join = {0: 2, 1: 2, 2: 2, 3: 2, 5: 2, 12: 2, 9: 2, 11: 2, 4: 0, 10: 1, 8: 3, 6: 3, 7: 4}
-
-
-def join_classes(labels_image):
-    compressed_labels_image = np.copy(labels_image)
-    for key, value in classes_join.iteritems():
-        compressed_labels_image[np.where(labels_image == key)] = value
-
-    return compressed_labels_image
 
 
 class CoILAgent(object):
@@ -96,7 +85,6 @@ class CoILAgent(object):
         control.steer = float(steer)
         control.throttle = float(throttle)
         control.brake = float(brake)
-
         # There is the posibility to replace some of the predictions with oracle predictions.
         if g_conf.USE_ORACLE:
             _, control.throttle, control.brake = self._get_oracle_prediction(
@@ -108,7 +96,6 @@ class CoILAgent(object):
                                     self.checkpoint['iteration'])
         self.first_iter = False
 
-        #print('Steer', control.steer, 'Gas', control.throttle, 'Brake', control.brake)
         return control
 
     def get_attentions(self, layers=None):
@@ -185,7 +172,6 @@ class CoILAgent(object):
         return steer, throttle, brake
 
 
-
     def _process_model_outputs_wp(self, outputs):
         """
          A bit of heuristics in the control, to eventually make car faster, for instance.
@@ -209,9 +195,6 @@ class CoILAgent(object):
         return steer, throttle, brake
 
     def _get_oracle_prediction(self, measurements, target):
-
-
-
         # For the oracle, the current version of sensor data is not really relevant.
         control, _, _, _, _ = self.control_agent.run_step(measurements, [], [], target)
 

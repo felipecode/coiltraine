@@ -229,12 +229,12 @@ class World(object):
             self.destroy()
 
             spawn_points = self.world.get_map().get_spawn_points()
-            spawn_point = spawn_points[1]
+            spawn_point = spawn_points[random.randint(0, 40)]
             self.vehicle = self.world.spawn_actor(blueprint, spawn_point)
 
         while self.vehicle is None:
             spawn_points = self.world.get_map().get_spawn_points()
-            spawn_point = spawn_points[1]
+            spawn_point = spawn_points[random.randint(0, 40)]
             self.vehicle = self.world.spawn_actor(blueprint, spawn_point)
 
         # Set a collector in order to read from the topics of the cameras.
@@ -803,9 +803,11 @@ def game_loop(args, agent):
         hud = HUD(args.width, args.height)
         world = World(client.get_world(), hud)
         controller = KeyboardControl(world, False)
-        print(" AGENT VISUALIZATION SYSTEM "
-              " ON THE BOTTON CORNER WE SHOW THE FIRST PERSON VIEW"
-              " AND THE ACTIVATIONS OF THE FIRST 3 LAYERS ")
+        print("###########################################################\n"
+              "   CONDITIONAL IMITATION LEARNING VISUALIZATION SYSTEM \n"
+              "    ON THE BOTTOM CORNER WE SHOW THE FIRST PERSON VIEW \n"
+              "        AND THE ACTIVATIONS OF THE FIRST 3 LAYERS \n "
+              "###########################################################\n")
 
         spawn_point = world.world.get_map().get_spawn_points()[random.randint(0, 40)]
         clock = pygame.time.Clock()

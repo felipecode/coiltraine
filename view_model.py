@@ -20,7 +20,7 @@ if __name__ == '__main__':
     argparser.add_argument(
         '-cv',
         '--carla-version',
-        dest= 'carla_version',
+        dest='carla_version',
         default='0.9',
         type=str
     )
@@ -68,17 +68,14 @@ if __name__ == '__main__':
         help='The folder to store images received by the network and its activations'
     )
 
-
     args = argparser.parse_args()
-
     args.width, args.height = [int(x) for x in args.res.split('x')]
-
     merge_with_yaml(os.path.join('configs', args.folder, args.exp + '.yaml'))
-
     checkpoint = torch.load(os.path.join('_logs', args.folder, args.exp
                                          , 'checkpoints', str(args.checkpoint) + '.pth'))
 
-    agent = CoILAgent(checkpoint, 'Town01', args.carla_version)
+    agent = CoILAgent(checkpoint, '_', args.carla_version)
+    # Decide the version
     if args.carla_version == '0.9':
 
         try:
