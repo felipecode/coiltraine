@@ -45,7 +45,9 @@ layers. You can command some destination for the agent by using the keyboard arr
 #### Training
 
 
-Download the dataset
+Download the dataset. Make sure you have set the COIL_DATASET_PATH variable before:
+
+    python3 tools/get_town03_dataset.py
 
 You can learn how to use the framework on the following the [main tutorial](../README.md)
 However to do a single train of the model for town03 using the
@@ -54,7 +56,7 @@ sample data:
     python3 coiltraine.py --single-process train -e resnet34imnet4 --folder town03 --gpus 0
 
 To check images and train curves there is also a tensorboard log
-being saved.
+being saved at _logs
 
 
 
@@ -71,11 +73,7 @@ require a different set of high level commands.
 
 #### Inference
 
-Download
-Visualize.
-
-
-### Training
+#### Training
 
 
 Data available soon !
