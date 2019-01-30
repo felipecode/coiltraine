@@ -67,7 +67,7 @@ Town01/2 Agent
 This agent is much more powerfull since it had much more
 time for development, but if follows the same principle as the
 agent for town03. Town03 is more complicated and probably
-require
+require a different set of high level commands.
 
 #### Inference
 
