@@ -70,10 +70,5 @@ time for development, but if follows the same principle as the
 agent for town03. Town03 is more complicated and probably
 require a different set of high level commands.
 
-#### Inference
-
-#### Training
-
-
-Data available soon !
+Comming Soon
 
