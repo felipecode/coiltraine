@@ -39,7 +39,7 @@ To run the and visualize the model run:
 
 
 You will see on the botton corner the activations of resnet intermediate
-layers. You can control the agent actions by using the keyboard arrows.
+layers. You can command some destination for the agent by using the keyboard arrows.
 
 
 #### Training
