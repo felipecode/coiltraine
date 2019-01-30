@@ -51,6 +51,7 @@ class CoILAgent(object):
     def __init__(self, checkpoint, town_name, carla_version='0.84'):
 
         # Set the carla version that is going to be used by the interface
+        self._carla_version = carla_version
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
         self._model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         self.first_iter = True
@@ -88,8 +89,10 @@ class CoILAgent(object):
                                                   directions_tensor)
 
         steer, throttle, brake = self._process_model_outputs(model_outputs[0])
-
-        control = carla.VehicleControl()
+        if self._carla_version == '0.9':
+            control = carla.VehicleControl()
+        else:
+            control = VehicleControl()
         control.steer = float(steer)
         control.throttle = float(throttle)
         control.brake = float(brake)
@@ -137,7 +140,10 @@ class CoILAgent(object):
         iteration = 0
         for name, size in g_conf.SENSORS.items():
 
-            sensor = sensors[name][g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
+            if self._carla_version == '0.9':
+                sensor = sensors[name][g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
+            else:
+                sensor = sensors[name].data[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
 
             sensor = scipy.misc.imresize(sensor, (size[1], size[2]))
 

@@ -27,30 +27,16 @@ export the python path
 
 
 #### Inference
- 
-    
- 
-
-
-##### Executing
-
 
 First have a CARLA 0.92 executing at some terminal at 40 fps (Recommend)
-
 
     sh CarlaUE4.sh Town03 -windowed -world-port=2000  -benchmark -fps=40
  
 
-Assuming
-
-
 To run the and visualize the model run:
 
-    python3 view_model.py  -f town03 -e resnet34imnet -cp 20000 -cv 0.9
+    python3 view_model.py  -f town03 -e resnet34imnet -cp 100000 -cv 0.9
 
-Visualize
-
-To train use this data ()
 
 
 

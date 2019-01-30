@@ -184,7 +184,7 @@ class Camera():
             yaw = camera["rotation_yaw"]
         camera_transform = carla.Transform(carla.Location(x=camera["position_x"],
                                                           y=camera["position_y"], z=camera["position_z"]),
-                                           carla.Rotation(pitch=0.0))
+                                           carla.Rotation(pitch=camera["rotation_pitch"]))
         self.actor = world.spawn_actor(camera_bp, camera_transform, attach_to=agent_vehicle)
 
     def destroy(self):
@@ -812,7 +812,6 @@ def game_loop(args, agent):
                 " WE SHOW THE FIRST PERSON VIEW AND THE ACTIVATIONS OF THE FIRST 3 LAYERS ")
 
         spawn_point = world.world.get_map().get_spawn_points()[0]
-
         clock = pygame.time.Clock()
         while True:
             if controller.parse_events(world, clock):
@@ -829,6 +828,7 @@ def game_loop(args, agent):
             world.render(display)
 
             pygame.display.flip()
+            # Run an step for the agent giving the forward speed sensor data and the commands
             control = agent.run_step(world.get_forward_speed(), sensor_data,
                                      controller.get_command(), (spawn_point.location.x,
                                                                 spawn_point.location.y,
