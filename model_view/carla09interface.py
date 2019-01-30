@@ -79,10 +79,6 @@ except IndexError:
 
 import carla
 from carla import ColorConverter as cc
-#from agents.navigation.roaming_agent import *
-#from agents.navigation.basic_agent import *
-# Imports from the coiltraine system.
-from utils import AttributeDict
 
 # Interface classes to make this work with the original interface in 0.8.4
 
@@ -253,7 +249,7 @@ class World(object):
             "position_x": 2.0,
             "position_y": 0.0,
             "position_z": 1.4,
-            "rotation_pitch": -15.0
+            "rotation_pitch": -0.0
         }
         # Spawn the sensor at the vehicle
         self.cam = Camera(self.world, camera, self.vehicle)
@@ -750,7 +746,6 @@ class CameraManager(object):
         if self._agent_view_internal_3 is not None:
             display.blit(self._agent_view_internal_3, (920, 3 * display.get_height() / 4))
 
-
     def show_image_mini(self, image1, image2, image3, image4):
         self._agent_view = pygame.surfarray.make_surface(image1.swapaxes(0, 1))
         self._agent_view_internal_1 = pygame.surfarray.make_surface(image2.swapaxes(0, 1))
@@ -808,10 +803,11 @@ def game_loop(args, agent):
         hud = HUD(args.width, args.height)
         world = World(client.get_world(), hud)
         controller = KeyboardControl(world, False)
-        print (" AGENT VISUALIZATION SYSTEM "
-                " WE SHOW THE FIRST PERSON VIEW AND THE ACTIVATIONS OF THE FIRST 3 LAYERS ")
+        print(" AGENT VISUALIZATION SYSTEM "
+              " ON THE BOTTON CORNER WE SHOW THE FIRST PERSON VIEW"
+              " AND THE ACTIVATIONS OF THE FIRST 3 LAYERS ")
 
-        spawn_point = world.world.get_map().get_spawn_points()[0]
+        spawn_point = world.world.get_map().get_spawn_points()[random.randint(0, 40)]
         clock = pygame.time.Clock()
         while True:
             if controller.parse_events(world, clock):
@@ -833,6 +829,7 @@ def game_loop(args, agent):
                                      controller.get_command(), (spawn_point.location.x,
                                                                 spawn_point.location.y,
                                                                 spawn_point.location.z))
+            # Get the activations from the last inference
             attentions = agent.get_attentions()
             world.camera_manager.show_image_mini(agent.latest_image,
                                                  attentions[0],

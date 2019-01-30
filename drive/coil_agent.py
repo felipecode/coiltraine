@@ -108,7 +108,7 @@ class CoILAgent(object):
                                     self.checkpoint['iteration'])
         self.first_iter = False
 
-        print('Steer', control.steer, 'Gas', control.throttle, 'Brake', control.brake)
+        #print('Steer', control.steer, 'Gas', control.throttle, 'Brake', control.brake)
         return control
 
     def get_attentions(self, layers=None):
