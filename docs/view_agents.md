@@ -8,7 +8,7 @@ agents driving on the CARLA towns.
 
 Getting Started
 -------------
-
+### Preparation
 
 [Install the system](../README.md/#installation) and set the environment.
 
@@ -39,7 +39,7 @@ To run the and visualize the model run:
 
 
 You will see on the botton corner the activations of resnet intermediate
-layers. You can command some destination for the agent by using the keyboard arrows.
+layers. You can command some destination for the agent by using the arrow keys from the keyboard.
 
 
 #### Training
