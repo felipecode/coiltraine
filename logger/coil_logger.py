@@ -184,14 +184,14 @@ def erase_csv(checkpoint_name):
     os.remove(file_name)
 
 
-
 def recover_loss_window(dataset_name, iteration):
 
     root_path = "_logs"
     full_path_name = os.path.join(root_path, EXPERIMENT_BATCH_NAME,
                                   EXPERIMENT_NAME)
     file_name = os.path.join(full_path_name, str(dataset_name) + '_error' + '.csv')
-
+    if not os.path.exists(file_name):
+        return []
     recovered_list = list(np.loadtxt(file_name))[0:iteration]
 
     # Now we need to rewrite on top of the recovered list, so everything syncs

@@ -17,6 +17,7 @@ class CoILICRA(nn.Module):
         # TODO: Improve the model autonaming function
 
         super(CoILICRA, self).__init__()
+        self.params = params
 
         number_first_layer_channels = 0
 
@@ -141,6 +142,9 @@ class CoILICRA(nn.Module):
         output_vec = torch.stack(self.forward(x, a)[0:4])
 
         return self.extract_branch(output_vec, branch_number)
+
+    def get_perception_layers(self, x):
+        return self.perception.get_layers_features(x)
 
     def extract_branch(self, output_vec, branch_number):
 

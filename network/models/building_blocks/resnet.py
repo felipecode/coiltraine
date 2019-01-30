@@ -156,6 +156,25 @@ class ResNet(nn.Module):
 
         return x, [x0, x1, x2, x3, x4]  # output, intermediate
 
+    def get_layers_features(self, x):
+        # Just get the intermediate layers directly.
+
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x0 = self.relu(x)
+        x = self.maxpool(x0)
+
+        x1 = self.layer1(x)
+        x2 = self.layer2(x1)
+        x3 = self.layer3(x2)
+        x4 = self.layer4(x3)
+
+        x5 = self.avgpool(x4)
+        x = x5.view(x.size(0), -1)
+        x = self.fc(x)
+
+        all_layers = [x0, x1, x2, x3, x4, x5, x]
+        return all_layers
 
 
 def resnet18(pretrained=False, **kwargs):

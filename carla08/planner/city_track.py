@@ -5,11 +5,10 @@
 # For a copy, see <https://opensource.org/licenses/MIT>.
 import numpy as np
 
-from carla.planner.graph import sldist
+from carla08.planner.graph import sldist
 
-from carla.planner.astar import AStar
-from carla.planner.map import CarlaMap
-import sys
+from carla08.planner.astar import AStar
+from carla08.planner.map import CarlaMap
 
 
 class CityTrack(object):

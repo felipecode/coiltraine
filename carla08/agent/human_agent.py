@@ -1,5 +1,5 @@
-from carla.agent.agent import Agent
-from carla.client import VehicleControl
+from carla08.agent.agent import Agent
+from carla08.client import VehicleControl
 
 try:
     import pygame

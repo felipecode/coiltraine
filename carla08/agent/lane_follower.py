@@ -1,7 +1,7 @@
 
 
 
-from carla.agent.agent import Agent
+from carla08.agent.agent import Agent
 
 
 class LaneFollower(Agent):
