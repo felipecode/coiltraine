@@ -20,7 +20,7 @@ The checkpoints should now be allocated already on the proper folders.
 
 Make sure you have the python path for the CARLA egg set:
 
-     export PYTHON_PATH=<Path-To-CARLA-93>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg
+     export PYTHONPATH=<Path-To-CARLA-93>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg
 
 
 ### Town03 Agent
