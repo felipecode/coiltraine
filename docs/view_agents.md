@@ -10,7 +10,7 @@ Getting Started
 -------------
 ### Preparation
 
-First [Install the system](../README.md/#installation) and set the environment.
+First [install the system](../README.md/#installation) and set the environment.
 
 You can download the pytorch checkpoints by running the following script:
 
