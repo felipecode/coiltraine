@@ -193,12 +193,12 @@ class CoILDataset(Dataset):
         number_of_hours_pre_loaded = 0
 
         # Now we do a check to try to find all the
-        available_measurements_dict = data_parser.check_available_measurements(episodes_list[0])
-        print (available_measurements_dict)
         for episode in episodes_list:
 
             print('Episode ', episode)
 
+            available_measurements_dict = data_parser.check_available_measurements(episode)
+            print (available_measurements_dict)
             if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
                 # The number of wanted hours achieved
                 break

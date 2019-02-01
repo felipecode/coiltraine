@@ -10,7 +10,7 @@ SENSORS:
 MEASUREMENTS:
   float_data: [31]  # Number of float data that must be read from the dataset
 BATCH_SIZE: 120
-NUMBER_ITERATIONS: 100000
+NUMBER_ITERATIONS: 300000
 TARGETS: ['steer', 'throttle', 'brake']  # From the float data, the ones that the network should estimate
 INPUTS: ['speed_module'] # From the float data, the ones that are input to the neural network
 NUMBER_FRAMES_FUSION: 1  # Number of frames fused
@@ -59,7 +59,8 @@ PRE_TRAINED: True  # If the weights are started with imagenet.
 # For now we use only use adam
 LEARNING_RATE: 0.0002  # First learning rate
 LEARNING_RATE_DECAY_INTERVAL: 75000 # Number of iterations where the learning rate is reduced
-LEARNING_RATE_DECAY_LEVEL: 0.5 # Th factor of reduction applied to the learning rate
+LEARNING_RATE_THRESHOLD: 5000 # Number of iterations without going down to reduce learning rate
+LEARNING_RATE_DECAY_LEVEL: 0.1 # Th factor of reduction applied to the learning rate
 
 # Loss Parameters #
 BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05] # how much each branch is weighted when computing loss
