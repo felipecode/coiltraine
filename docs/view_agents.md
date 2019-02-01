@@ -86,7 +86,7 @@ In another terminal change the directory to where CARLA 0.9.3 is:
 
     cd <Path-To-CARLA-93>/
 
-Then to add 40 vehicles for instance run:
+Then to add 40 vehicles, for instance, run:
 
     python3 spawn_npc.py -n 40
     
