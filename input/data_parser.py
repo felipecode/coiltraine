@@ -44,7 +44,7 @@ def check_available_measurements(episode):
         measurement_data = json.load(f)
 
     available_measurements = {}
-    for meas_name  in measurement_data.keys():
+    for meas_name in measurement_data.keys():
 
         # Add steer
         if 'steer' in meas_name and 'noise' not in meas_name:

@@ -62,7 +62,7 @@ class CoILAgent(object):
             measurements: All the float measurements from CARLA ( Just speed is used)
             sensor_data: All the sensor data used on this benchmark
             directions: The directions, high level commands
-            target: Final objective.
+            target: Final objective. Not used when the agent is predicting all outputs.
 
         Returns:
             Controls for the vehicle on the CARLA simulator.
