@@ -35,7 +35,6 @@ class RandomSampler(Sampler):
         self.iterations_to_execute = ((g_conf.NUMBER_ITERATIONS) * g_conf.BATCH_SIZE) -\
                                      (executed_iterations)
 
-
         self.keys = keys
 
     def __iter__(self):
@@ -44,6 +43,66 @@ class RandomSampler(Sampler):
 
     def __len__(self):
         return self.iterations_to_execute
+
+
+class RandomSequenceSampler(Sampler):
+    r"""Samples random sequences. The sequences can have a stride.
+
+    Arguments:
+        indices (list): a list of indices
+    """
+
+    def __init__(self, keys, executed_iterations, batch_size,
+                 sequence_stride, sequence_size, drop_last=True):
+        """
+        Args
+            keys: All the keys that exist on the dataset. For a dataset of size 1000 you have
+            keys from 0 to 1000
+            executed_iterations: The number of executed iterations so far.
+            batch_size: The batch size of the training
+            sequence_stride: The number of images  jumped when a sequence is sampled
+            sequence_size: The number of images per sequence
+            drop_last: If you reduce remove the last and incomplete batch
+        """
+        self.keys = keys
+        if batch_size % sequence_size != 0:
+            raise ValueError (" For now the batch size must be divisible by the batch size")
+
+        sampler = RandomSampler(keys, executed_iterations)
+
+        if not isinstance(sampler, Sampler):
+            raise ValueError("sampler should be an instance of "
+                             "torch.utils.data.Sampler, but got sampler={}"
+                             .format(sampler))
+        if not isinstance(sequence_size, int) or isinstance(sequence_size, bool) or \
+                sequence_size <= 0:
+            raise ValueError("sequence should be a positive integeral value, "
+                             "but got sequence_size={}".format(sequence_size))
+        if not isinstance(drop_last, bool):
+            raise ValueError("drop_last should be a boolean value, but got "
+                             "drop_last={}".format(drop_last))
+        self.sampler = sampler
+        self.sequence_size = sequence_size
+        self.batch_size = batch_size
+        self.drop_last = drop_last
+        self.sequence_stride = sequence_stride
+
+    def __iter__(self):
+        batch = []
+        for idx in self.sampler:
+            for seq in range(0, self.sequence_size * self.sequence_stride, self.sequence_stride):
+                batch.append(int(idx) + seq)
+            if len(batch) == self.batch_size:
+                yield batch
+                batch = []
+        if len(batch) > 0 and not self.drop_last:
+            yield batch
+
+    def __len__(self):
+        if self.drop_last:
+            return len(self.sampler)
+        else:
+            return len(self.sampler)
 
 
 class SubsetSampler(Sampler):
