@@ -807,6 +807,9 @@ def game_loop(args, agent):
               "   CONDITIONAL IMITATION LEARNING VISUALIZATION SYSTEM \n"
               "    ON THE BOTTOM CORNER WE SHOW THE FIRST PERSON VIEW \n"
               "        AND THE ACTIVATIONS OF THE FIRST 3 LAYERS \n "
+                                "\n"        
+              " Use ARROWS  keys to give high level commands to the Agent"
+                                "\n"
               "###########################################################\n")
 
         spawn_point = world.world.get_map().get_spawn_points()[random.randint(0, 40)]

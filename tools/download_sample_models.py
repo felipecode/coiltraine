@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     # Download the full data from the models
     print ("Downloading the coil models checkpoints  500 MB")
-    file_id = '1CT37umZ9lMzR-Nz8IfEi3qetSM30MtQV'
+    file_id = '1ynh2V6FMpC7NLXX2kbuxSHb3ymu7fp-r'
     destination_pack = 'coil_view_models.tar.gz'
 
     download_file_from_google_drive(file_id, destination_pack)
