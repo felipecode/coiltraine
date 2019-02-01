@@ -36,7 +36,7 @@ First have a CARLA 0.93 executing at some terminal at 40 fps (Recommend)
 
 To run the and visualize the model run:
 
-    python3 view_model.py  -f town03 -e resnet34imnet -cp 100000 -cv 0.9
+    python3 view_model.py  -f town03 -e resnet34imnet -cp 200000 -cv 0.9
 
 After running, you will see on the botton corner the activations of resnet intermediate
 layers. You can command a destination for the agent by using the arrow keys from the keyboard.
@@ -60,9 +60,6 @@ being saved at "_logs" folder on the repository root.
 
 
 
-
-
-
 ###  Town01/2 Agent
 
 This agent is much more powerfull since it had much more
@@ -70,5 +67,37 @@ time for development, but if follows the same principle as the
 agent for town03. Town03 is more complicated and probably
 require a different set of high level commands.
 
-Comming Soon
+#### Inference
+
+First have a CARLA 0.93 executing at some terminal at 40 fps (Recommend)
+
+    sh CarlaUE4.sh Town01 -windowed -world-port=2000  -benchmark -fps=40
+ 
+To run the and visualize the model run:
+
+    python3 view_model.py  -f nocrash -e resnet34imnet10 -cp 320000 -cv 0.9
+
+### Adding Vehicles and Weather Changes
+
+If you want to make the life of the agents harder, you can use the pythonAPI sample
+scripts to add dynamic objects and changes on the weather conditions.
+
+In another terminal change the directory to where CARLA 0.9.3 is:
+
+    cd <Path-To-CARLA-93>/
+
+Then to add 40 vehicles, for instance, run:
+
+    python3 spawn_npc.py -n 40
+    
+To add dynamic weather change:
+
+    python3 dynamic_weather.py
+    
+
+
+
+
+
+
 
