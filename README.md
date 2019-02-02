@@ -74,8 +74,8 @@ For doing scenario evaluation in CARLA you must install CARLA 0.8.4 or CARLA 0.8
      
     python3 coiltraine.py --folder sample --gpus 0 -de TestT1_Town01 -vd CoILVal1 --docker carlasim/carla:version
 
-Where the --folder sample is the [experiment batch](https://github.com/felipecode/CoIL/blob/master/docs/configuration.md)
-containg all the experiments that are going to 
+Where the `--folder` sample is the [experiment batch](https://github.com/felipecode/coiltraine/blob/master/docs/configuration.md)
+containing all the experiments that are going to 
 be trained and validated.
 The TestT1 is a driving scenario on Town01, defined as one of the classes on the
 drive/suites folder. The validation datasets are passed as parameter with -vd  and should be placed 
