@@ -35,7 +35,6 @@ dependencies:
     - astor==0.6.2
     - backcall==0.1.0
     - bleach==2.1.3
-    - carla==0.9.3
     - configparser==3.5.0
     - cycler==0.10.0
     - cython==0.28.2
