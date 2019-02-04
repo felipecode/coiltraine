@@ -32,7 +32,6 @@ except IndexError:
     pass
 
 
-import carla
 
 
 class CoILAgent(object):
@@ -79,6 +78,7 @@ class CoILAgent(object):
 
         steer, throttle, brake = self._process_model_outputs(model_outputs[0])
         if self._carla_version == '0.9':
+            import carla
             control = carla.VehicleControl()
         else:
             control = VehicleControl()
