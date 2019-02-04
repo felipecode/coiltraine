@@ -43,6 +43,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         coil_logger.add_message('Loading', {'GPU': gpu})
 
         # Put the output to a separate file if it is the case
+        """
         if suppress_output:
             if not os.path.exists('_output_logs'):
                 os.mkdir('_output_logs')
@@ -53,6 +54,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                               exp_alias + '_err_'+g_conf.PROCESS_NAME + '_'
                                            + str(os.getpid()) + ".out"),
                               "a", buffering=1)
+        """
 
         # Preload option
         if g_conf.PRELOAD_MODEL_ALIAS is not None:
@@ -90,6 +92,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         dataset = CoILDataset(full_dataset, transform=augmenter,
                               preload_name=str(g_conf.NUMBER_OF_HOURS)
                                                + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+        print ("Loaded dataset")
 
         data_loader = select_balancing_strategy(dataset, iteration, number_of_workers)
         model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
@@ -104,6 +107,8 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         else:  # We accumulate iteration time and keep the average speed
             accumulated_time = 0
             loss_window = []
+
+        print ("Before the loss")
 
         criterion = Loss(g_conf.LOSS_FUNCTION)
 

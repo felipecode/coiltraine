@@ -249,7 +249,7 @@ class World(object):
             "position_x": 2.0,
             "position_y": 0.0,
             "position_z": 1.4,
-            "rotation_pitch": -0.0
+            "rotation_pitch": -15.0
         }
         # Spawn the sensor at the vehicle
         self.cam = Camera(self.world, camera, self.vehicle)
@@ -807,6 +807,9 @@ def game_loop(args, agent):
               "   CONDITIONAL IMITATION LEARNING VISUALIZATION SYSTEM \n"
               "    ON THE BOTTOM CORNER WE SHOW THE FIRST PERSON VIEW \n"
               "        AND THE ACTIVATIONS OF THE FIRST 3 LAYERS \n "
+                                "\n"        
+              " Use ARROWS  keys to give high level commands to the Agent"
+                                "\n"
               "###########################################################\n")
 
         spawn_point = world.world.get_map().get_spawn_points()[random.randint(0, 40)]
