@@ -12,7 +12,7 @@ import os
 
 
 from skimage.transform import rescale
-from carla.planner import map
+from carla08.planner import map
 from PIL import Image
 import numpy as np
 

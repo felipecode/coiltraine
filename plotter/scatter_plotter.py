@@ -1,10 +1,6 @@
 
 import numpy as np
-import json
-import matplotlib as mpl
-mpl.use('Agg')
 import matplotlib.pyplot as plt
-
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 

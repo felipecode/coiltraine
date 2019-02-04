@@ -1,11 +1,9 @@
-import  numpy as np
+import numpy as np
 import os
 import math
 import traceback
 import collections
-import h5py
 
-from configs import g_conf
 from utils.general import static_vars
 
 
