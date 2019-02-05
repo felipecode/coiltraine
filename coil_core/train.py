@@ -43,7 +43,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
         coil_logger.add_message('Loading', {'GPU': gpu})
 
         # Put the output to a separate file if it is the case
-        """
+
         if suppress_output:
             if not os.path.exists('_output_logs'):
                 os.mkdir('_output_logs')
@@ -54,7 +54,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                               exp_alias + '_err_'+g_conf.PROCESS_NAME + '_'
                                            + str(os.getpid()) + ".out"),
                               "a", buffering=1)
-        """
+        
 
         # Preload option
         if g_conf.PRELOAD_MODEL_ALIAS is not None:
