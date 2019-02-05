@@ -32,11 +32,15 @@ def get_speed(measurement_data):
         return measurement_data['playerMeasurements']['forwardSpeed']
     elif 'velocity_x' in measurement_data:  # We have a 0.9.X data here
         return forward_speed(measurement_data)
-    else: # There is no speed key, probably speed is zero.
+    else:  # There is no speed key, probably speed is zero.
         return 0
 
 
 def check_available_measurements(episode):
+    """ Try to automatically check the measurements
+        The ones named 'steer' are probably the steer for the vehicle
+        This needs to be made more general to avoid possible mistakes on dataset reading
+    """
 
     measurements_list = glob.glob(os.path.join(episode, 'measurement*'))
     # Open a sample measurement
@@ -54,26 +58,11 @@ def check_available_measurements(episode):
         if 'throttle' in meas_name and 'noise' not in meas_name:
             available_measurements.update({'throttle': meas_name})
 
-        # Add brake
-        if 'brake' in meas_name and 'noise' not in meas_name:
+        # Add brake ( Not hand brake)
+        if 'brake' in meas_name and 'noise' not in meas_name and 'hand' not in meas_name:
             available_measurements.update({'brake': meas_name})
 
         # add game time
-    """
-    'steer': measurement_augmented['steer'],
-    'steer_noise': measurement_augmented['steer_noise'],
-    'throttle': measurement_augmented['throttle'],
-    'throttle_noise': measurement_augmented['throttle_noise'],
-    'brake': measurement_augmented['brake'],
-    'brake_noise': measurement_augmented['brake_noise'],
-    'speed_module': speed / g_conf.SPEED_FACTOR,
-    'directions': directions,
-    "pedestrian": measurement_augmented['stop_pedestrian'],
-    "traffic_lights": measurement_augmented['stop_traffic_lights'],
-    "vehicle": measurement_augmented['stop_vehicle'],
-    "game_time": time_stamp,
-    'angle': angle}
-    """
 
     return available_measurements
 

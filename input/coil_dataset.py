@@ -198,7 +198,7 @@ class CoILDataset(Dataset):
             print('Episode ', episode)
 
             available_measurements_dict = data_parser.check_available_measurements(episode)
-            print (available_measurements_dict)
+
             if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
                 # The number of wanted hours achieved
                 break
@@ -268,10 +268,10 @@ class CoILDataset(Dataset):
             # Check how many hours were actually added
 
             last_data_point_number = measurements_list[-4].split('_')[-1].split('.')[0]
-            print("last and float dicts len", last_data_point_number, count_added_measurements)
+            #print("last and float dicts len", last_data_point_number, count_added_measurements)
             number_of_hours_pre_loaded += (float(count_added_measurements / 10.0) / 3600.0)
-            print(" Added ", ((float(count_added_measurements) / 10.0) / 3600.0))
-            print(" LOADED ", number_of_hours_pre_loaded, " hours of data")
+            #print(" Added ", ((float(count_added_measurements) / 10.0) / 3600.0))
+            print(" Loaded ", number_of_hours_pre_loaded, " hours of data")
 
 
         # Make the path to save the pre loaded datasets
