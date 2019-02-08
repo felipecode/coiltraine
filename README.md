@@ -64,9 +64,12 @@ To collect other datasets please check the data collector repository.
 https://github.com/carla-simulator/data-collector
 
 #### Getting CARLA
-
+Note: the automatic scenario evaluation only works for CARLA 0.8.x, however you can [train and evaluate
+agents in CARLA 0.9.X](docs/view_agents.md).
+ 
 For doing scenario evaluation in CARLA you must install CARLA 0.8.4 or CARLA 0.8.2 under docker.
 [This tutorial](https://carla.readthedocs.io/en/latest/carla_docker/) explains how to install  CARLA under docker.
+
 
 #### Executing
 
