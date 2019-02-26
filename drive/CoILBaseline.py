@@ -124,6 +124,7 @@ class CoILBaseline(AutonomousAgent):
 
         steer, throttle, brake = self._process_model_outputs(model_outputs[0])
 
+        print ("outputs: ", steer,throttle,brake)
         control = carla.VehicleControl()
         control.steer = float(steer)
         control.throttle = float(throttle)
