@@ -77,6 +77,7 @@ class CoILDataset(Dataset):
         else:
             self.sensor_data_names, self.measurements = self._pre_load_image_folders(root_dir)
 
+
         print("preload Name ", self.preload_name)
 
         self.transform = transform
@@ -102,6 +103,8 @@ class CoILDataset(Dataset):
                                 self.sensor_data_names[index].split('/')[-1])
 
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+        print ("Path ", img_path)
+        print ("shape ", img.shape)
         # Apply the image transformation
         if self.transform is not None:
             boost = 1
