@@ -57,9 +57,9 @@ class CoILBaseline(AutonomousAgent):
         yaml_conf, checkpoint_number = checkpoint_parse_configuration_file(config_file)
 
         # Take the checkpoint name and load it
-        checkpoint = torch.load(os.path.join( os.path.join(*os.path.realpath(__file__).split('/')[:-2]),
+        checkpoint = torch.load(os.path.join('/', os.path.join(*os.path.realpath(__file__).split('/')[:-2]),
                                               '_logs',
-                                             yaml_conf.split('/')[-2], yaml_conf.split('/')[-1]
+                                             yaml_conf.split('/')[-2], yaml_conf.split('/')[-1].split('.')[-2]
                                              , 'checkpoints', str(checkpoint_number) + '.pth'))
 
         # do the merge here
