@@ -97,33 +97,44 @@ class CoILDataset(Dataset):
         Returns:
 
         """
+        try:
+            img_path = os.path.join(self.root_dir,
+                                    self.sensor_data_names[index].split('/')[-2],
+                                    self.sensor_data_names[index].split('/')[-1])
 
-        img_path = os.path.join(self.root_dir,
-                                self.sensor_data_names[index].split('/')[-2],
-                                self.sensor_data_names[index].split('/')[-1])
+            img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+            print ("Path ", img_path)
+            print ("shape ", img.shape)
+            # Apply the image transformation
+            if self.transform is not None:
+                boost = 1
+                img = self.transform(self.batch_read_number * boost, img)
+            else:
+                img = img.transpose(2, 0, 1)
 
-        img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-        print ("Path ", img_path)
-        print ("shape ", img.shape)
-        # Apply the image transformation
-        if self.transform is not None:
-            boost = 1
-            img = self.transform(self.batch_read_number * boost, img)
-        else:
-            img = img.transpose(2, 0, 1)
+            img = img.astype(np.float)
+            img = torch.from_numpy(img).type(torch.FloatTensor)
+            img = img / 255.
 
-        img = img.astype(np.float)
-        img = torch.from_numpy(img).type(torch.FloatTensor)
-        img = img / 255.
+            measurements = self.measurements[index].copy()
+            for k, v in measurements.items():
+                v = torch.from_numpy(np.asarray([v, ]))
+                measurements[k] = v.float()
 
-        measurements = self.measurements[index].copy()
-        for k, v in measurements.items():
-            v = torch.from_numpy(np.asarray([v, ]))
-            measurements[k] = v.float()
+            measurements['rgb'] = img
 
-        measurements['rgb'] = img
+            self.batch_read_number += 1
+        except AttributeError:
+            print ("Blank IMAGE")
 
-        self.batch_read_number += 1
+            measurements = self.measurements[0].copy()
+            for k, v in measurements.items():
+                v = torch.from_numpy(np.asarray([v, ]))
+                measurements[k] = v.float()
+            measurements['steer'] = 0.0
+            measurements['throttle'] = 0.0
+            measurements['brake'] = 0.0
+            measurements['rgb'] = np.zeros(3, 88, 200)
 
         return measurements
 
