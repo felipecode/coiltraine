@@ -11,7 +11,7 @@ from PIL import Image
 
 import matplotlib.pyplot as plt
 
-
+from utils.drive_utils import checkpoint_parse_configuration_file
 from configs import g_conf, merge_with_yaml
 from network import CoILModel
 
@@ -51,16 +51,14 @@ def distance_vehicle(waypoint, vehicle_position):
 
 class CoILBaseline(AutonomousAgent):
 
-    def setup(self, config_file):
+    def setup(self):
 
-
-        yaml_conf, checkpoint, town_name, carla_version = checkpoint_parse_configuration_file(config_file)
+        config_file = "file.xml"
+        yaml_conf, checkpoint = checkpoint_parse_configuration_file(config_file)
 
         merge_with_yaml(yaml_conf)
         # do the merge here
 
-        # Set the carla version that is going to be used by the interface
-        self._carla_version = carla_version
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
         self._model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         self.first_iter = True
