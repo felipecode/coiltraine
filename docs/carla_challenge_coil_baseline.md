@@ -39,10 +39,10 @@ You can download the pytorch checkpoints by running the following script:
 
 The checkpoints should now be allocated already on the proper folders.
 
-Make sure you set the python path for the CARLA egg:
+Make sure you set the PYTHONPATH with the CARLA egg and the Python API
 
-     export PYTHONPATH=<Path-To-CARLA-93>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg
-
+     export PYTHONPATH=<Path-To-CARLA-93>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg:/<Path-To-CARLA-93>/PythonAPI:$PYTHONPATH
+     
 
 
 
@@ -66,11 +66,22 @@ layers. You can command a destination for the agent by using the arrow keys from
 #### Get the agent performance on the CARLA Challenge
 
 
-You should download the challenge evaluator 
+
+
+Clone the scenario  runner repository:
 
 
 
-    python3 challenge_evaluator.py --scenario config:ChallengeBasic -a srunner/challenge/agents/DummyAgent.py --carla-root <path_to_carla_root>
+Export the path to the evaluator to your PYTHONPATH, 
+
+
+Execute the challenge with the conditional imitation learning baseline
+
+
+
+    python3  /home/felipe/scenario_runner/srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic
+     --agent=/home/felipe/coiltraine/drive/CoILBaseline.py
+
 
 
 #### Training
