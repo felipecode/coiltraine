@@ -80,36 +80,21 @@ class CoILBaseline(AutonomousAgent):
 
     def sensors(self):
 
-        sensors = [['sensor.camera.rgb',
-                   {'x': 2.0, 'y': 0.0,
+        sensors = [{'type': 'sensor.camera.rgb',
+                   'x': 2.0, 'y': 0.0,
                     'z': 1.40, 'roll': 0.0,
                     'pitch': -15.0, 'yaw': 0.0,
                     'width': 800, 'height': 600,
-                    'fov': 100},
-                    'rgb'],
-                   ['sensor.speedometer',
-                    {'reading_frequency': 12},
-                    'speed'
-                    ],
-                   ['sensor.other.gnss', {'x': 0.7, 'y': -0.4, 'z': 1.60},
-                    'GPS']
+                    'fov': 100,
+                    'id': 'rgb'},
+                   {'type': 'sensor.speedometer',
+                    'reading_frequency': 25,
+                    'id': 'speed'
+                    },
+                   {'type': 'sensor.other.gnss',
+                    'x': 0.7, 'y': -0.4, 'z': 1.60,
+                    'id': 'GPS'}
                    ]
-        """
-        sensors = [{'type': 'sensor.camera.rgb', 'x':0.7, 'y':0.0, 'z':1.60, 'roll':0.0, 'pitch':0.0, 'yaw':0.0,
-                    'width':800, 'height': 600, 'fov':100, 'id': 'Center'},
-                   {'type': 'sensor.camera.rgb', 'x':0.7, 'y':-0.4, 'z': 1.60, 'roll': 0.0, 'pitch': 0.0,
-                    'yaw': -45.0, 'width': 800, 'height': 600, 'fov': 100, 'id': 'Left'},
-                   {'type': 'sensor.camera.rgb', 'x':0.7, 'y':0.4, 'z':1.60, 'roll':0.0, 'pitch':0.0, 'yaw':45.0,
-                    'width':800, 'height':600, 'fov':100, 'id': 'Right'},
-                   {'type': 'sensor.lidar.ray_cast', 'x': 0.7, 'y': -0.4, 'z': 1.60, 'roll': 0.0, 'pitch': 0.0,
-                    'yaw': -45.0, 'id': 'LIDAR'},
-                   {'type': 'sensor.other.gnss', 'x': 0.7, 'y': -0.4, 'z': 1.60, 'id': 'GPS'},
-                   {'type': 'sensor.speedometer','reading_frequency': 25, 'id': 'speed'}
-
-                  ]
-          
-        """
-
 
         return sensors
 
