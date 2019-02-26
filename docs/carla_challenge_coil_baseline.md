@@ -2,15 +2,9 @@ CARLA Challenge Track 2 Baseline - Conditional Imitation Learning
 ============
 
 
-Here we present our sample conditional imitation learning
-performing on different CARLA Towns.
-
-
-
-
-
-
 VIDEO GOES HERE
+
+
 
 
 CARLA Challenge Test Results
@@ -18,35 +12,35 @@ CARLA Challenge Test Results
 
 Obtained scores on current scenarios.
 
-
-
 Results on Current scenarios goes here:
 
 
 
+Running the Baseline
+----------
 
-Getting Started
--------------
 ### Preparation
 
-TODO: Make this independend from the repository put some instructions here
 
-First [install the system](../README.md/#installation) and set the environment.
+Clone the repository:
 
-You can download the pytorch checkpoints by running the following script:
+    git clone https://github.com/felipecode/coiltraine.git 
+    cd coiltraine
+
+We provide a conda environment requirements file, to
+install, just run:
+
+    conda env create -f requirements.yaml
+
+Download the agent pytorch checkpoint by running the following script:
 
     python3 tools/download_sample_models.py
 
 The checkpoints should now be allocated already on the proper folders.
-
 Make sure you set the PYTHONPATH with the CARLA egg and the Python API:
 
      export PYTHONPATH=<Path-To-CARLA-93>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg:/<Path-To-CARLA-93>/PythonAPI:$PYTHONPATH
      
-
-
-
-This agent is specialized on the Town03.
 
 #### Visualize the agent results 
 
@@ -67,30 +61,34 @@ layers. You can command a destination for the agent by using the arrow keys from
 
 
 
-
 Clone the scenario  runner repository:
+    
+    cd
+    git clone https://github.com/carla-simulator/scenario_runner.git
+
+Setup the scenario runner challenge repository by setting the path to your CARLA root
+folder.
+
+    cd scenario_runner
+    bash setup_environment --carla-root <path_to_carla_root_folder>
 
 
-Export coiltraine to path
+Export the coiltraine path to the PYTHONPATH
 
+    cd ~/coitraine
     export PYTHONPATH=`pwd`:$PYTHONPATH
-
-Export the path to the evaluator to your PYTHONPATH, 
-
-
-    export PYTHONPATH=
-
 
 
 Execute the challenge with the conditional imitation learning baseline
 
-
-
     python3  /home/felipe/scenario_runner/srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic --agent=/home/felipe/coiltraine/drive/CoILBaseline.py
 
 
+Watch the results: 
 
-#### Training
+
+Training
+---------
 
 
 Download the dataset. Make sure you have set the COIL_DATASET_PATH variable before:

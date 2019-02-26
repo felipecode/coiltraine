@@ -7,8 +7,6 @@ import glob
 import torch
 
 from scipy.misc import imresize
-from PIL import Image
-
 import matplotlib.pyplot as plt
 
 from utils.drive_utils import checkpoint_parse_configuration_file
@@ -263,7 +261,6 @@ class CoILBaseline(AutonomousAgent):
 
                 start = -1
 
-        print (curves_start_end)
 
         for start_end_index_command in curves_start_end:
             start_index = start_end_index_command[0]
@@ -281,7 +278,5 @@ class CoILBaseline(AutonomousAgent):
                 changed_index = end_index + index
                 if changed_index < len(topological_plan):
                     topological_plan[changed_index] = (topological_plan[changed_index][0], command)
-
-        print (topological_plan)
 
         return topological_plan
