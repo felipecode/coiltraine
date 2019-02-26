@@ -130,7 +130,6 @@ class CoILBaseline(AutonomousAgent):
         control.brake = float(brake)
         # There is the posibility to replace some of the predictions with oracle predictions.
         self.first_iter = False
-        self.count_iterations += 1
         return control
 
     def set_global_plan(self, topological_plan):
