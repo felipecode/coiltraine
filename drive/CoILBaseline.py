@@ -1,6 +1,7 @@
 import numpy as np
 import scipy
 import sys
+import math
 import os
 import glob
 import torch
@@ -10,16 +11,9 @@ from PIL import Image
 
 import matplotlib.pyplot as plt
 
-try:
-    from carla08 import carla_server_pb2 as carla_protocol
-except ImportError:
-    raise RuntimeError(
-        'cannot import "carla_server_pb2.py", run the protobuf compiler to generate this file')
-
 
 from configs import g_conf, merge_with_yaml
 from network import CoILModel
-from logger import coil_logger
 
 try:
     sys.path.append(glob.glob('**/carla-*%d.%d-%s.egg' % (
@@ -42,15 +36,22 @@ except IndexError:
 # We  need to add two things here to the python path,
 
 from srunner.challenge.agents.autonomous_agent import AutonomousAgent
-from agents.navigation.local_planner import  RoadOption
+from agents.navigation.local_planner import RoadOption
 
 import carla
+
+
+def distance_vehicle(waypoint, vehicle_position):
+
+    dx = waypoint['lat'] - vehicle_position[0]
+    dy = waypoint['lon'] - vehicle_position[1]
+
+    return math.sqrt(dx * dx + dy * dy)
 
 
 class CoILBaseline(AutonomousAgent):
 
     def setup(self, config_file):
-
 
 
         yaml_conf, checkpoint, town_name, carla_version = checkpoint_parse_configuration_file(config_file)
@@ -67,7 +68,6 @@ class CoILBaseline(AutonomousAgent):
         self._model.load_state_dict(checkpoint['state_dict'])
         self._model.cuda()
         self._model.eval()
-
         self.latest_image = None
         self.latest_image_tensor = None
 
@@ -105,7 +105,6 @@ class CoILBaseline(AutonomousAgent):
         directions = self._get_current_direction(input_data['GPS'][1])
 
         print ("Directions : ", directions)
-
         # Take the forward speed and normalize it for it to go from 0-1
         norm_speed = input_data['speed'][1] / self._params['speed_factor']
         # norm_speed = 0.2
@@ -123,7 +122,6 @@ class CoILBaseline(AutonomousAgent):
         control.throttle = float(throttle)
         control.brake = float(brake)
         # There is the posibility to replace some of the predictions with oracle predictions.
-
         self.first_iter = False
         self.count_iterations += 1
         return control
@@ -131,9 +129,7 @@ class CoILBaseline(AutonomousAgent):
     def set_global_plan(self, topological_plan):
         # We expand the commands before the curves in order to give more time
         # for the agent to respond.
-
         topological_plan = self._expand_commands(topological_plan)
-
         self._global_plan = topological_plan
 
     def get_attentions(self, layers=None):
@@ -163,9 +159,9 @@ class CoILBaseline(AutonomousAgent):
 
         iteration = 0
 
-        sensor = sensor[self._params['image_cut'][0]:self._params['image_cut'][1], ...]
+        sensor = sensor[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
 
-        sensor = scipy.misc.imresize(sensor, (self._params['size'][1], self._params['size'][2]))
+        sensor = scipy.misc.imresize(sensor, (g_conf.SENSORS['rgb'][1], g_conf.SENSORS['rgb'][2]))
 
         self.latest_image = sensor
 

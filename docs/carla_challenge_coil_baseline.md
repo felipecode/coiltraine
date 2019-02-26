@@ -79,8 +79,7 @@ Execute the challenge with the conditional imitation learning baseline
 
 
 
-    python3  /home/felipe/scenario_runner/srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic
-     --agent=/home/felipe/coiltraine/drive/CoILBaseline.py
+    python3  /home/felipe/scenario_runner/srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic --agent=/home/felipe/coiltraine/drive/CoILBaseline.py
 
 
 
