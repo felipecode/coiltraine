@@ -113,7 +113,7 @@ class CoILBaseline(AutonomousAgent):
 
         print ("Directions : ", directions)
         # Take the forward speed and normalize it for it to go from 0-1
-        norm_speed = input_data['speed'][1] / self._params['speed_factor']
+        norm_speed = input_data['speed'][1] / g_conf.SPEED_FACTOR
         # norm_speed = 0.2
         norm_speed = torch.cuda.FloatTensor([norm_speed]).unsqueeze(0)
         directions_tensor = torch.cuda.LongTensor([directions])
