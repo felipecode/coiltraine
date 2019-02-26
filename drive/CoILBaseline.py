@@ -56,7 +56,8 @@ class CoILBaseline(AutonomousAgent):
         config_file = "file.xml"
         yaml_conf, checkpoint = checkpoint_parse_configuration_file(config_file)
 
-        merge_with_yaml(os.path.join(os.path.realpath(__file__)[:-1], yaml_conf))
+        merge_with_yaml(os.path.join(os.path.join(*os.path.realpath(__file__).split('/')[:-2]),
+                                     yaml_conf))
         # do the merge here
 
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
