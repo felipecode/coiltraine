@@ -29,7 +29,7 @@ Getting Started
 -------------
 ### Preparation
 
-TODO: Make this independend from the repository put some 
+TODO: Make this independend from the repository put some instructions here
 
 First [install the system](../README.md/#installation) and set the environment.
 
@@ -39,7 +39,7 @@ You can download the pytorch checkpoints by running the following script:
 
 The checkpoints should now be allocated already on the proper folders.
 
-Make sure you set the PYTHONPATH with the CARLA egg and the Python API
+Make sure you set the PYTHONPATH with the CARLA egg and the Python API:
 
      export PYTHONPATH=<Path-To-CARLA-93>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg:/<Path-To-CARLA-93>/PythonAPI:$PYTHONPATH
      
@@ -71,8 +71,15 @@ layers. You can command a destination for the agent by using the arrow keys from
 Clone the scenario  runner repository:
 
 
+Export coiltraine to path
+
+    export PYTHONPATH=`pwd`:$PYTHONPATH
 
 Export the path to the evaluator to your PYTHONPATH, 
+
+
+    export PYTHONPATH=
+
 
 
 Execute the challenge with the conditional imitation learning baseline

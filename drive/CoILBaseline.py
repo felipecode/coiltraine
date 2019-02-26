@@ -35,7 +35,7 @@ except IndexError:
     pass
 # We  need to add two things here to the python path,
 
-from srunner.challenge.agents.autonomous_agent import AutonomousAgent
+from srunner.challenge.autoagents.autonomous_agent import AutonomousAgent
 from agents.navigation.local_planner import RoadOption
 
 import carla
