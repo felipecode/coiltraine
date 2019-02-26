@@ -103,8 +103,6 @@ class CoILDataset(Dataset):
                                     self.sensor_data_names[index].split('/')[-1])
 
             img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-            print ("Path ", img_path)
-            print ("shape ", img.shape)
             # Apply the image transformation
             if self.transform is not None:
                 boost = 1
