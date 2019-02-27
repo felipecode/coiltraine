@@ -28,9 +28,10 @@ Clone the repository:
     cd coiltraine
 
 We provide a conda environment requirements file, to
-install, just run:
+install and activate, just run:
 
     conda env create -f requirements.yaml
+    conda activate coiltraine
 
 Download the agent pytorch checkpoint by running the following script:
 
@@ -51,7 +52,7 @@ First have a CARLA 0.93 executing at some terminal at 40 fps (Recommend)
 
 To run the and visualize the model run:
 
-    python3 view_model.py  -f town03 -e resnet34imnet -cp 200000 -cv 0.9
+    python3 view_model.py  -f baselines -e resnet34imnet -cp 200000 -cv 0.9
 
 After running, you will see on the botton corner the activations of resnet intermediate
 layers. You can command a destination for the agent by using the arrow keys from the keyboard.
