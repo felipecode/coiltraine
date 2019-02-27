@@ -74,7 +74,7 @@ folder.
     bash setup_environment --carla-root <path_to_carla_root_folder>
 
 
-Export the coiltraine path to the PYTHONPATH
+Export the coiltraine path to the PYTHONPATH:
 
     cd ~/coitraine
     export PYTHONPATH=`pwd`:$PYTHONPATH
@@ -82,7 +82,7 @@ Export the coiltraine path to the PYTHONPATH
 
 Execute the challenge with the conditional imitation learning baseline
 
-    python3  /home/felipe/scenario_runner/srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic --agent=/home/felipe/coiltraine/drive/CoILBaseline.py
+    python3  srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic --agent=/home/felipe/coiltraine/drive/CoILBaseline.py --config ../coiltraine/drive/sample_agent.json
 
 
 Watch the results: 
