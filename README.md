@@ -13,7 +13,7 @@ Objectives:
  on the paper "On Offline Evaluation of Vision-based Driving Models"
  * Model ZOO of some published imitation learning approaches. (New
  pull requests accepted)
- * You can also visualize [sample imitation learning agents](docs/view_agents.md).
+ * *You can also use a [baseline for CARLA Challenge](docs/carla_challenge_coil_baseline.md)*
    
 
 
