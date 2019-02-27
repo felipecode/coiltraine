@@ -43,7 +43,7 @@ Make sure you set the PYTHONPATH with the CARLA egg and the Python API:
      export PYTHONPATH=<Path-To-CARLA-93>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg:/<Path-To-CARLA-93>/PythonAPI:$PYTHONPATH
      
 
-#### Visualize the agent results 
+### Visualize the agent results 
 
 First have a CARLA 0.93 executing at some terminal at 40 fps (Recommend)
 
@@ -58,7 +58,7 @@ After running, you will see on the botton corner the activations of resnet inter
 layers. You can command a destination for the agent by using the arrow keys from the keyboard.
 
 
-#### Get the agent performance on the CARLA Challenge
+### Get the agent performance on the CARLA Challenge
 
 
 
