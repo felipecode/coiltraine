@@ -18,8 +18,9 @@ except ImportError:
 
 from carla08.agent import CommandFollower
 from carla08.client import VehicleControl
-from configs import g_conf, merge_with_yaml
+
 from network import CoILModel
+from configs import g_conf
 from logger import coil_logger
 
 try:
@@ -30,17 +31,12 @@ try:
 except IndexError:
     pass
 
-# Point directly to the autonomous agent class here.
 
 
-class CoILAgent(AutonomousAgent):
 
-    def setup(self, config_file):
+class CoILAgent(object):
 
-        yaml_conf, checkpoint, town_name, carla_version = checkpoint_parse_configuration_file(config_file)
-
-        merge_with_yaml(yaml_conf)
-        # do the merge here
+    def __init__(self, checkpoint, town_name, carla_version='0.84'):
 
         # Set the carla version that is going to be used by the interface
         self._carla_version = carla_version
@@ -57,25 +53,6 @@ class CoILAgent(AutonomousAgent):
 
         if g_conf.USE_ORACLE or g_conf.USE_FULL_ORACLE:
             self.control_agent = CommandFollower(town_name)
-
-    def sensors(self):
-
-        sensors = [['sensor.camera.rgb',
-                   {'x': 2.0, 'y': 0.0,
-                    'z': 1.40, 'roll': 0.0,
-                    'pitch': -15.0, 'yaw': 0.0,
-                    'width': 800, 'height': 600,
-                    'fov': 100},
-                    'rgb'],
-                   ['sensor.speedometer',
-                    {'reading_frequency': 12},
-                    'speed'
-                    ],
-                   ['sensor.other.gnss', {'x': 0.7, 'y': -0.4, 'z': 1.60},
-                    'GPS']
-                   ]
-
-        return sensors
 
     def run_step(self, measurements, sensor_data, directions, target):
         """
