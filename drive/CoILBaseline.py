@@ -51,8 +51,7 @@ class CoILBaseline(AutonomousAgent):
 
     def setup(self, path_to_config_file):
 
-        config_file = "file.xml"
-        yaml_conf, checkpoint_number = checkpoint_parse_configuration_file(config_file)
+        yaml_conf, checkpoint_number = checkpoint_parse_configuration_file(path_to_config_file)
 
         # Take the checkpoint name and load it
         checkpoint = torch.load(os.path.join('/', os.path.join(*os.path.realpath(__file__).split('/')[:-2]),
@@ -246,13 +245,11 @@ class CoILBaseline(AutonomousAgent):
             print (command)
 
             if command != RoadOption.LANEFOLLOW and not inside:
-                print ("A curve starts")
                 inside = True
                 start = index
                 current_curve = command
 
             if command == RoadOption.LANEFOLLOW and inside:
-                print ("A curve ends")
                 inside = False
                 # End now is the index.
                 curves_start_end.append([start, index, current_curve])
