@@ -861,7 +861,8 @@ def game_loop(args, agent):
             world.camera_manager.show_image_mini(agent.latest_image,
                                                  attentions[0],
                                                  attentions[1],
-                                                 attentions[2])
+                                                 attentions[2],
+                                                 out_folder = args.output_folder)
 
             world.vehicle.apply_control(control)
 
