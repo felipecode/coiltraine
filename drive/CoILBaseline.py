@@ -74,6 +74,10 @@ class CoILBaseline(AutonomousAgent):
         self.latest_image = None
         self.latest_image_tensor = None
 
+        # We add more time to the curve commands
+        self.expand_command_front = 5
+        self.expand_command_back = 3
+
 
     def sensors(self):
 
