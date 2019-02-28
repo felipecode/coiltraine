@@ -761,11 +761,11 @@ class CameraManager(object):
         if out_folder is not None:
             scipy.misc.imsave(os.path.join(out_folder, 'layer1_' + str(self._current_frame) + '.png'), image1)
 
-            scipy.misc.imsave(os.path.join(out_folder, 'layer2_' + str(self._current_frame) + '.png'), cmap(image2))
+            scipy.misc.imsave(os.path.join(out_folder, 'layer2_' + str(self._current_frame) + '.png'), image2)
 
-            scipy.misc.imsave(os.path.join(out_folder, 'layer3_' + str(self._current_frame) + '.png'), cmap(image3))
+            scipy.misc.imsave(os.path.join(out_folder, 'layer3_' + str(self._current_frame) + '.png'), image3)
 
-            scipy.misc.imsave(os.path.join(out_folder, 'layer4_' + str(self._current_frame) + '.png'), cmap(image4))
+            scipy.misc.imsave(os.path.join(out_folder, 'layer4_' + str(self._current_frame) + '.png'), image4)
 
 
 
