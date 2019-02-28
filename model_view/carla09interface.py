@@ -26,7 +26,9 @@ import random
 import re
 import sys
 import weakref
-
+import matplotlib.pyplot as plt
+cmap = plt.get_cmap('inferno')
+import scipy
 
 try:
     import pygame
@@ -186,6 +188,11 @@ class Camera():
     def destroy(self):
 
         self.actor.destroy()
+
+
+def make_image_folders():
+
+
 
 
 class World(object):
@@ -668,6 +675,7 @@ class CameraManager(object):
         self._surface = None
         # Now we plot the posible views that the agent can have
         self._agent_view = None
+        self._current_frame = 0
 
         self._agent_view_internal_1 = None
         self._agent_view_internal_2 = None
@@ -675,7 +683,7 @@ class CameraManager(object):
 
         self._parent = parent_actor
         self._hud = hud
-        self._recording = False
+        self._recording = True
         self._camera_transforms = [
             carla.Transform(carla.Location(x=-5.5, z=2.8), carla.Rotation(pitch=-15)),
             carla.Transform(carla.Location(x=1.6, z=1.7))]
@@ -731,6 +739,7 @@ class CameraManager(object):
         self._hud.notification('Recording %s' % ('On' if self._recording else 'Off'))
 
     def render(self, display):
+        # Here just call to save all the images we will need sync mode though
         if self._surface is not None:
             display.blit(self._surface, (0, 0))
 
@@ -746,11 +755,21 @@ class CameraManager(object):
         if self._agent_view_internal_3 is not None:
             display.blit(self._agent_view_internal_3, (920, 3 * display.get_height() / 4))
 
-    def show_image_mini(self, image1, image2, image3, image4):
+    def show_image_mini(self, image1, image2, image3, image4, out_folder = None):
         self._agent_view = pygame.surfarray.make_surface(image1.swapaxes(0, 1))
         self._agent_view_internal_1 = pygame.surfarray.make_surface(image2.swapaxes(0, 1))
         self._agent_view_internal_2 = pygame.surfarray.make_surface(image3.swapaxes(0, 1))
         self._agent_view_internal_3 = pygame.surfarray.make_surface(image4.swapaxes(0, 1))
+
+        if out_folder is not None:
+            scipy.misc.imsave(os.path.join(out_folder, 'layer1_' + str(self._current_frame) + '.png'), image1)
+
+            scipy.misc.imsave(os.path.join(out_folder, 'layer2_' + str(self._current_frame) + '.png'), cmap(image2))
+
+            scipy.misc.imsave(os.path.join(out_folder, 'layer3_' + str(self._current_frame) + '.png'), cmap(image3))
+
+            scipy.misc.imsave(os.path.join(out_folder, 'layer4_' + str(self._current_frame) + '.png'), cmap(image4))
+
 
 
     @staticmethod
@@ -778,6 +797,7 @@ class CameraManager(object):
             array = array[:, :, :3]
             array = array[:, :, ::-1]
             self._surface = pygame.surfarray.make_surface(array.swapaxes(0, 1))
+        self._current_frame = image.frame_number
         if self._recording:
             image.save_to_disk('_out/%08d' % image.frame_number)
 
@@ -799,6 +819,11 @@ def game_loop(args, agent):
         display = pygame.display.set_mode(
             (args.width, args.height),
             pygame.HWSURFACE | pygame.DOUBLEBUF)
+
+        if not os.path.exists(args.output_folder):
+            os.mkdir(args.output_folder)
+
+
 
         hud = HUD(args.width, args.height)
         world = World(client.get_world(), hud)
