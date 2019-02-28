@@ -75,8 +75,8 @@ class CoILBaseline(AutonomousAgent):
         self.latest_image_tensor = None
 
         # We add more time to the curve commands
-        self.expand_command_front = 5
-        self.expand_command_back = 3
+        self._expand_command_front = 5
+        self._expand_command_back = 3
 
 
     def sensors(self):
@@ -246,7 +246,6 @@ class CoILBaseline(AutonomousAgent):
         for index in range(len(topological_plan)):
 
             command = topological_plan[index][1]
-            print (command)
 
             if command != RoadOption.LANEFOLLOW and not inside:
                 inside = True
