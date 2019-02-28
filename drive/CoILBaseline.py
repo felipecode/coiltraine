@@ -102,17 +102,17 @@ class CoILBaseline(AutonomousAgent):
     def run_step(self, input_data):
 
         # measurements, sensor_data, directions, target
-        print("=====================>")
+        #print("=====================>")
         for key, val in input_data.items():
             shape = val[1].shape
-            print("[{} -- {:06d}] with shape {}".format(key, val[0], shape))
-        print("<=====================")
-        print ("speed: ", input_data['speed'])
-        print ("gps: ", input_data['GPS'])
+            #print("[{} -- {:06d}] with shape {}".format(key, val[0], shape))
+        #print("<=====================")
+        #print ("speed: ", input_data['speed'])
+        #print ("gps: ", input_data['GPS'])
 
         directions = self._get_current_direction(input_data['GPS'][1])
 
-        print ("Directions : ", directions)
+        #print ("Directions : ", directions)
         # Take the forward speed and normalize it for it to go from 0-1
         norm_speed = input_data['speed'][1] / g_conf.SPEED_FACTOR
         # norm_speed = 0.2
@@ -125,7 +125,7 @@ class CoILBaseline(AutonomousAgent):
 
         steer, throttle, brake = self._process_model_outputs(model_outputs[0])
 
-        print ("outputs: ", steer,throttle,brake)
+        #print ("outputs: ", steer,throttle,brake)
         control = carla.VehicleControl()
         control.steer = float(steer)
         control.throttle = float(throttle)
@@ -137,6 +137,7 @@ class CoILBaseline(AutonomousAgent):
     def set_global_plan(self, topological_plan):
         # We expand the commands before the curves in order to give more time
         # for the agent to respond.
+        print (" Set the plan ")
         #topological_plan = self._expand_commands(topological_plan)
         self._global_plan = topological_plan
         
@@ -207,7 +208,7 @@ class CoILBaseline(AutonomousAgent):
                 min_distance = computed_distance
                 closest_id = index
 
-        print ("Closest waypoint ", closest_id, "dist ", min_distance)
+        #print ("Closest waypoint ", closest_id, "dist ", min_distance)
         direction = self._global_plan[closest_id][1]
 
         if direction == RoadOption.LEFT:
