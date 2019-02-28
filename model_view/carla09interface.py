@@ -248,8 +248,7 @@ class World(object):
             "fov": 100,
             "position_x": 2.0,
             "position_y": 0.0,
-            "position_z": 1.4,
-            "rotation_pitch": -15.0
+            "position_z": 1.4
         }
         # Spawn the sensor at the vehicle
         self.cam = Camera(self.world, camera, self.vehicle)
