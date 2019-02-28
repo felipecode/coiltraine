@@ -190,9 +190,6 @@ class Camera():
         self.actor.destroy()
 
 
-def make_image_folders():
-
-
 
 
 class World(object):
