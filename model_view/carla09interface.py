@@ -841,7 +841,7 @@ def game_loop(args, agent):
                 return
 
             # as soon as the server is ready continue!
-            if not world.world.wait_for_tick(10.0):
+            if not world.world.wait_for_tick(20.0):
                 continue
 
             world.tick(clock)
