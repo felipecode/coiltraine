@@ -137,8 +137,11 @@ class CoILBaseline(AutonomousAgent):
     def set_global_plan(self, topological_plan):
         # We expand the commands before the curves in order to give more time
         # for the agent to respond.
-        topological_plan = self._expand_commands(topological_plan)
+        #topological_plan = self._expand_commands(topological_plan)
         self._global_plan = topological_plan
+        
+        #print (" plan after ")
+        #print (self._global_plan)
 
     def get_attentions(self, layers=None):
         """
@@ -246,7 +249,7 @@ class CoILBaseline(AutonomousAgent):
         for index in range(len(topological_plan)):
 
             command = topological_plan[index][1]
-
+            print (command)
             if command != RoadOption.LANEFOLLOW and not inside:
                 inside = True
                 start = index
