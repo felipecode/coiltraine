@@ -12,7 +12,8 @@ CARLA Challenge Test Results
 -----------------------------
 
 
-ChallengeBasic: 
+| Challenge Basic:  | 284.07 |
+|-------------------|--------|
 
 
 
@@ -40,19 +41,19 @@ Download the agent pytorch checkpoint by running the following script:
 The checkpoints should now be allocated already on the proper folders.
 Make sure you set the PYTHONPATH with the CARLA egg and the Python API:
 
-     export PYTHONPATH=<Path-To-CARLA-93>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg:/<Path-To-CARLA-93>/PythonAPI:$PYTHONPATH
+     export PYTHONPATH=<Path-To-CARLA-Latest>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg:/<Path-To-CARLA-Latest>/PythonAPI:$PYTHONPATH
      
 
 ### Visualize the agent results 
 
-First have a CARLA 0.93 executing at some terminal at 40 fps (Recommend)
+First have the latest version of CARLA executing at some terminal at 40 fps (Recommend)
 
     sh CarlaUE4.sh Town03 -windowed -world-port=2000  -benchmark -fps=40
  
 
 To run the and visualize the model run:
 
-    python3 view_model.py  -f baselines -e resnet34imnet -cp 200000 -cv 0.9
+    python3 view_model.py  -f baselines -e resnet34imnet -cp 180000 -cv 0.9
 
 After running, you will see on the botton corner the activations of resnet intermediate
 layers. You can command a destination for the agent by using the arrow keys from the keyboard.
@@ -85,7 +86,7 @@ Execute the challenge with the conditional imitation learning baseline
     python3  srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic --agent=../coiltraine/drive/CoILBaseline.py --config ../coiltraine/drive/sample_agent.json
 
 
-Watch the results: 
+Watch the results.
 
 
 Training
