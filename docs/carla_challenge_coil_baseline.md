@@ -3,7 +3,7 @@ CARLA Challenge Track 2 Baseline - Conditional Imitation Learning
 
 
 
-[![CARLA Video](img/thumbnail.png)](https://youtu.be/0joqdoyjS7Q)
+[![CARLA Video](img/thumbnail.png)](https://youtu.be/fX1omU4IRwI)
 
 
 
