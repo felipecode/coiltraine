@@ -11,9 +11,8 @@ CARLA Challenge Track 2 Baseline - Conditional Imitation Learning
 CARLA Challenge Test Results
 -----------------------------
 
-Obtained scores on current scenarios.
 
-Results on Current scenarios goes here:
+ChallengeBasic: 
 
 
 
@@ -83,7 +82,7 @@ Export the coiltraine path to the PYTHONPATH:
 
 Execute the challenge with the conditional imitation learning baseline
 
-    python3  srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic --agent=/home/felipe/coiltraine/drive/CoILBaseline.py --config ../coiltraine/drive/sample_agent.json
+    python3  srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic --agent=../coiltraine/drive/CoILBaseline.py --config ../coiltraine/drive/sample_agent.json
 
 
 Watch the results: 
