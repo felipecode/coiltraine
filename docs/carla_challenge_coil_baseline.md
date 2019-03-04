@@ -92,16 +92,21 @@ Watch the results.
 Training
 ---------
 
+Define the datasets folder.
+This is the folder that will contain your training and validation datasets
 
-Download the dataset. Make sure you have set the COIL_DATASET_PATH variable before:
+    export COIL_DATASET_PATH=<Path to where your dataset folders are>
 
-    python3 tools/get_town03_dataset.py
+
+Download the dataset:
+
+    python3 tools/get_baseline_dataset.py
 
 You can learn how to use the framework on the following [main tutorial](../README.md)
 However, you can also do a single train of the model  using the
 basic dataset:
 
-    python3 coiltraine.py --single-process train -e resnet34imnet4 --folder town03 --gpus 0
+    python3 coiltraine.py --single-process train -e resnet34imnet --folder baselines --gpus 0
 
 To check images and train curves there is also a tensorboard log
 being saved at "_logs" folder on the repository root.
