@@ -42,7 +42,7 @@ Download the agent pytorch checkpoint by running the following script:
 The checkpoints should now be allocated already on the proper folders.
 Make sure you set the PYTHONPATH with the CARLA egg and the Python API:
 
-     export PYTHONPATH=<Path-To-CARLA-Latest>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg:/<Path-To-CARLA-Latest>/PythonAPI:$PYTHONPATH
+     export PYTHONPATH=<Path-To-CARLA-Latest>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg:<Path-To-CARLA-Latest>/PythonAPI:$PYTHONPATH
      
 
 ### Visualize the agent results 

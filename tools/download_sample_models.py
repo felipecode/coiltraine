@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     # Now you move the two models for their respective folders
     # The 180000.pth model is the checkpoint
-    distination_town02 = '_logs/baselines/resnet34imnet10/checkpoints/'
+    distination_town02 = '_logs/baselines/resnet34imnet/checkpoints/'
     if not os.path.exists(distination_town02):
         os.makedirs(distination_town02)
     os.rename("_logs/180000.pth", distination_town02 + '180000.pth')
