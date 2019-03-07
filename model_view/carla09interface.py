@@ -680,7 +680,7 @@ class CameraManager(object):
 
         self._parent = parent_actor
         self._hud = hud
-        self._recording = True
+        self._recording = False
         self._camera_transforms = [
             carla.Transform(carla.Location(x=-5.5, z=2.8), carla.Rotation(pitch=-15)),
             carla.Transform(carla.Location(x=1.6, z=1.7))]
@@ -817,8 +817,10 @@ def game_loop(args, agent):
             (args.width, args.height),
             pygame.HWSURFACE | pygame.DOUBLEBUF)
 
-        if not os.path.exists(args.output_folder):
-            os.mkdir(args.output_folder)
+        # We create an output image to save footage "
+        if args.output_folder is not None:
+            if not os.path.exists(args.output_folder):
+                os.mkdir(args.output_folder)
 
 
 

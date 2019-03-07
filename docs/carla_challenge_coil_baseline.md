@@ -40,9 +40,19 @@ Download the agent pytorch checkpoint by running the following script:
     python3 tools/download_sample_models.py
 
 The checkpoints should now be allocated already on the proper folders.
-Make sure you set the PYTHONPATH with the CARLA egg and the Python API:
 
-     export PYTHONPATH=<Path-To-CARLA-Latest>/PythonAPI/carla-0.9.3-py3.5-linux-x86_64.egg:<Path-To-CARLA-Latest>/PythonAPI:$PYTHONPATH
+Download the [latest CARLA 0.9.x version](https://github.com/carla-simulator/carla/blob/master/Docs/download.md).
+Then, after unpacking it,  define where the root folder was placed:
+
+    export CARLA_ROOT=<path_to_carla_root>
+
+Install the latest CARLA API:
+
+    easy_install ${CARLA_ROOT}/PythonAPI/*-py3.5-linux-x86_64.egg
+
+Make sure you set the PYTHONPATH PythonAPI path:
+
+     export PYTHONPATH=${CARLA_ROOT}/PythonAPI:$PYTHONPATH
      
 
 ### Visualize the agent results 
