@@ -10,9 +10,10 @@ CARLA Challenge Track 2 Baseline - Conditional Imitation Learning
 
 CARLA Challenge Test Results
 -----------------------------
+We keep an updated score for the current challenge tasks:
 
 
-| Challenge Basic:  | 284.07 |
+| Challenge Basic:  | 34.65 |
 |-------------------|--------|
 
 
