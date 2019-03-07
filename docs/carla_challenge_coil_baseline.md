@@ -13,7 +13,7 @@ CARLA Challenge Test Results
 We keep an updated score for the current challenge tasks:
 
 
-| Challenge Basic:  | AVG Score 23.90 |
+| Challenge Basic:  | AVG Score 34.70 |
 |-------------------|--------|
 
 
