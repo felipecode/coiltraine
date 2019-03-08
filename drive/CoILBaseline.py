@@ -7,6 +7,8 @@ import glob
 import torch
 
 from scipy.misc import imresize
+import matplotlib as mpl 
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 
 from utils.drive_utils import checkpoint_parse_configuration_file
