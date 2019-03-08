@@ -7,7 +7,7 @@ import glob
 import torch
 
 from scipy.misc import imresize
-import matplotlib as mpl 
+import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 
@@ -90,9 +90,9 @@ class CoILBaseline(AutonomousAgent):
                     'width': 800, 'height': 600,
                     'fov': 100,
                     'id': 'rgb'},
-                   {'type': 'sensor.speedometer',
+                   {'type': 'sensor.can_bus',
                     'reading_frequency': 25,
-                    'id': 'speed'
+                    'id': 'can_bus'
                     },
                    {'type': 'sensor.other.gnss',
                     'x': 0.7, 'y': -0.4, 'z': 1.60,
@@ -116,7 +116,7 @@ class CoILBaseline(AutonomousAgent):
 
         #print ("Directions : ", directions)
         # Take the forward speed and normalize it for it to go from 0-1
-        norm_speed = input_data['speed'][1] / g_conf.SPEED_FACTOR
+        norm_speed = input_data['can_bus'][1]['speed'] / g_conf.SPEED_FACTOR
         # norm_speed = 0.2
         norm_speed = torch.cuda.FloatTensor([norm_speed]).unsqueeze(0)
         directions_tensor = torch.cuda.LongTensor([directions])
