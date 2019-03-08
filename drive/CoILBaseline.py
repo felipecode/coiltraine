@@ -105,9 +105,9 @@ class CoILBaseline(AutonomousAgent):
 
         # measurements, sensor_data, directions, target
         #print("=====================>")
-        for key, val in input_data.items():
-            shape = val[1].shape
-            #print("[{} -- {:06d}] with shape {}".format(key, val[0], shape))
+        #or key, val in input_data.items():
+        #    shape = val[1].shape
+        #    #print("[{} -- {:06d}] with shape {}".format(key, val[0], shape))
         #print("<=====================")
         #print ("speed: ", input_data['speed'])
         #print ("gps: ", input_data['GPS'])
