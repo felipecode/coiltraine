@@ -112,11 +112,11 @@ class CoILBaseline(AutonomousAgent):
                                                    directions_tensor)
 
         steer, throttle, brake = self._process_model_outputs(model_outputs[0])
-
         control = carla.VehicleControl()
         control.steer = float(steer)
         control.throttle = float(throttle)
         control.brake = float(brake)
+        print (" Output ", control)
         # There is the posibility to replace some of the predictions with oracle predictions.
         self.first_iter = False
         return control
