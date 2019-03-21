@@ -74,7 +74,7 @@ import carla08 as carla
 # from agents.navigation.roaming_agent import *
 # from agents.navigation.basic_agent import *
 # Imports from the coiltraine system.
-from utils import AttributeDict
+from coilutils import AttributeDict
 
 
 

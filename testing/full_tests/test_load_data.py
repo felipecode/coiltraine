@@ -3,7 +3,7 @@ import os
 
 from configs import g_conf, set_type_of_process, merge_with_yaml
 from input import CoILDataset
-from utils.general import create_log_folder, create_exp_path
+from coilutils.general import create_log_folder, create_exp_path
 """
 The idea for this test is to check if the system is able to open all the available datasets.
 After you add anything the changes the input you should test if the datasets (The sample ones)

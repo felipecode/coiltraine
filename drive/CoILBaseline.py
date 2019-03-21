@@ -11,7 +11,7 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 
-from utils.drive_utils import checkpoint_parse_configuration_file
+from coilutils.drive_utils import checkpoint_parse_configuration_file
 from configs import g_conf, merge_with_yaml
 from network import CoILModel
 

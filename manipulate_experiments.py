@@ -1,9 +1,9 @@
 import argparse
 
-from utils.general import get_validation_datasets, get_driving_environments
+from coilutils.general import get_validation_datasets, get_driving_environments
 
 
-from utils.exporter import export_status, export_csv_separate
+from coilutils.exporter import export_status, export_csv_separate
 
 
 # You could send the module to be executed and they could have the same interface.

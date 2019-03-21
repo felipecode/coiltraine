@@ -3,9 +3,9 @@ import time
 import multiprocessing
 import heapq
 
-from utils.experiment_schedule import get_gpu_resources, allocate_gpu_resources, \
+from coilutils.experiment_schedule import get_gpu_resources, allocate_gpu_resources, \
     mount_experiment_heap
-from utils.general import create_exp_path
+from coilutils.general import create_exp_path
 from logger import printer, monitorer
 
 from . import train, validate, run_drive

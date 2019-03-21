@@ -4,7 +4,7 @@ import math
 import traceback
 import collections
 
-from utils.general import static_vars
+from coilutils.general import static_vars
 
 
 def augment_steering(camera_angle, steer, speed):

@@ -6,7 +6,7 @@ import torch
 
 from configs import g_conf
 from logger import coil_logger
-from utils.general import softmax
+from coilutils.general import softmax
 
 from .coil_sampler import PreSplittedSampler, RandomSampler
 

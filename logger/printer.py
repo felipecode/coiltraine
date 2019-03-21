@@ -4,7 +4,7 @@ import time
 from .monitorer import get_status, get_episode_number, get_number_episodes_completed
 from configs import g_conf, merge_with_yaml
 from configs.coil_global import get_names
-from utils.general import sort_nicely, get_latest_path, static_vars
+from coilutils.general import sort_nicely, get_latest_path, static_vars
 
 
 """

@@ -4,7 +4,7 @@ import numpy as np
 
 from logger import json_formatter
 from configs import g_conf
-from utils.general import sort_nicely
+from coilutils.general import sort_nicely
 
 
 from .carla_metrics_parser import get_averaged_metrics

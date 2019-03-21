@@ -20,7 +20,7 @@ from . import data_parser
 # TODO: Warning, maybe this does not need to be included everywhere.
 from configs import g_conf
 
-from utils.general import sort_nicely
+from coilutils.general import sort_nicely
 
 
 

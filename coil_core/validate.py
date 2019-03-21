@@ -14,7 +14,7 @@ from configs import g_conf, set_type_of_process, merge_with_yaml
 from network import CoILModel
 from input import CoILDataset, Augmenter
 from logger import coil_logger
-from utils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_checkpoint_ready,\
+from coilutils.checkpoint_schedule import get_latest_evaluated_checkpoint, is_next_checkpoint_ready,\
     maximun_checkpoint_reach, get_next_checkpoint
 
 

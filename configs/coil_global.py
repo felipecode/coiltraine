@@ -4,7 +4,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from ast import literal_eval
-from utils import AttributeDict
+from coilutils import AttributeDict
 import copy
 import numpy as np
 import os

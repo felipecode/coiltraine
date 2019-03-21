@@ -4,7 +4,7 @@ import torch
 import importlib
 
 from configs import g_conf
-from utils.general import command_number_to_index
+from coilutils.general import command_number_to_index
 
 from .building_blocks import Conv
 from .building_blocks import Branching

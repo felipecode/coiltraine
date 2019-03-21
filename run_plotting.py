@@ -7,7 +7,7 @@ import sys
 
 
 from plotter import plot_scatter
-from utils.general import erase_wrong_plotting_summaries
+from coilutils.general import erase_wrong_plotting_summaries
 
 
 if __name__ == '__main__':

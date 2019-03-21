@@ -1,7 +1,7 @@
 import argparse
 
 from coil_core import execute_train, execute_validation, execute_drive, folder_execute
-from utils.general import create_log_folder, create_exp_path, erase_logs,\
+from coilutils.general import create_log_folder, create_exp_path, erase_logs,\
                           erase_wrong_plotting_summaries, erase_validations
 
 # You could send the module to be executed and they could have the same interface.
