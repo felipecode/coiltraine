@@ -100,6 +100,7 @@ class CoILBaseline(AutonomousAgent):
     def run_step(self, input_data):
         # Get the current directions for following the route
         directions = self._get_current_direction(input_data['GPS'][1])
+        print (" gps ", input_data['GPS'][1])
         print (" Directions ", directions)
 
         # Take the forward speed and normalize it for it to go from 0-1
@@ -191,7 +192,7 @@ class CoILBaseline(AutonomousAgent):
                 min_distance = computed_distance
                 closest_id = index
 
-        print ("Closest waypoint ", closest_id, "dist ", min_distance)
+        print ("Closest waypoint ", closest_id, " pos ", waypoint, " dist ", min_distance)
         direction = self._global_plan[closest_id][1]
 
         if direction == RoadOption.LEFT:

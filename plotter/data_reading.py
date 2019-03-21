@@ -205,9 +205,6 @@ def _read_step_data(step_path):
     #steer_gt = np.loadtxt(step_path + '_seq_gt_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
     step_dictionary.update({'steer_gt': ground_truth})
 
-    #steer_error = np.loadtxt(step_path + '_seq_error_val.csv', delimiter=" ", skiprows=0, usecols=([0]))
-    #step_dictionary.update({'steer_error': compute_error(predictions, ground_truth)})
-
     step_dictionary.update({'speed_input': get_speed_ground_truth(val_dataset_name)})
 
     return step_dictionary
