@@ -65,7 +65,6 @@ class CoILBaseline(AutonomousAgent):
         merge_with_yaml(os.path.join('/', os.path.join(*os.path.realpath(__file__).split('/')[:-2]),
                                      yaml_conf))
 
-
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
         self._model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         self.first_iter = True
@@ -75,14 +74,11 @@ class CoILBaseline(AutonomousAgent):
         self._model.eval()
         self.latest_image = None
         self.latest_image_tensor = None
-
         # We add more time to the curve commands
         self._expand_command_front = 5
         self._expand_command_back = 3
 
-
     def sensors(self):
-
         sensors = [{'type': 'sensor.camera.rgb',
                    'x': 2.0, 'y': 0.0,
                     'z': 1.40, 'roll': 0.0,
@@ -102,22 +98,12 @@ class CoILBaseline(AutonomousAgent):
         return sensors
 
     def run_step(self, input_data):
-
-        # measurements, sensor_data, directions, target
-        #print("=====================>")
-        #or key, val in input_data.items():
-        #    shape = val[1].shape
-        #    #print("[{} -- {:06d}] with shape {}".format(key, val[0], shape))
-        #print("<=====================")
-        #print ("speed: ", input_data['speed'])
-        #print ("gps: ", input_data['GPS'])
-
+        # Get the current directions for following the route
         directions = self._get_current_direction(input_data['GPS'][1])
+        print (" Directions ", directions)
 
-        #print ("Directions : ", directions)
         # Take the forward speed and normalize it for it to go from 0-1
         norm_speed = input_data['can_bus'][1]['speed'] / g_conf.SPEED_FACTOR
-        # norm_speed = 0.2
         norm_speed = torch.cuda.FloatTensor([norm_speed]).unsqueeze(0)
         directions_tensor = torch.cuda.LongTensor([directions])
         # Compute the forward pass processing the sensors got from CARLA.
@@ -127,7 +113,6 @@ class CoILBaseline(AutonomousAgent):
 
         steer, throttle, brake = self._process_model_outputs(model_outputs[0])
 
-        #print ("outputs: ", steer,throttle,brake)
         control = carla.VehicleControl()
         control.steer = float(steer)
         control.throttle = float(throttle)
@@ -139,12 +124,7 @@ class CoILBaseline(AutonomousAgent):
     def set_global_plan(self, topological_plan):
         # We expand the commands before the curves in order to give more time
         # for the agent to respond.
-        print (" Set the plan ")
-        #topological_plan = self._expand_commands(topological_plan)
         self._global_plan = topological_plan
-        
-        #print (" plan after ")
-        #print (self._global_plan)
 
     def get_attentions(self, layers=None):
         """
@@ -210,7 +190,7 @@ class CoILBaseline(AutonomousAgent):
                 min_distance = computed_distance
                 closest_id = index
 
-        #print ("Closest waypoint ", closest_id, "dist ", min_distance)
+        print ("Closest waypoint ", closest_id, "dist ", min_distance)
         direction = self._global_plan[closest_id][1]
 
         if direction == RoadOption.LEFT:
@@ -252,7 +232,6 @@ class CoILBaseline(AutonomousAgent):
         for index in range(len(topological_plan)):
 
             command = topological_plan[index][1]
-            print (command)
             if command != RoadOption.LANEFOLLOW and not inside:
                 inside = True
                 start = index
@@ -266,7 +245,6 @@ class CoILBaseline(AutonomousAgent):
                     raise ValueError("End of curve without start")
 
                 start = -1
-
 
         for start_end_index_command in curves_start_end:
             start_index = start_end_index_command[0]
