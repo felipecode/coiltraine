@@ -125,6 +125,7 @@ class CoILBaseline(AutonomousAgent):
         # We expand the commands before the curves in order to give more time
         # for the agent to respond.
         self._global_plan = topological_plan
+        print (topological_plan)
 
     def get_attentions(self, layers=None):
         """
