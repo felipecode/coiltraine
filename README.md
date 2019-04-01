@@ -107,9 +107,9 @@ Please, test some of the models from the conditional models zoo to get high perf
 #### Conditional Models Zoo
 
 * Conditional Imitation Learning
-* Conditional Imitation Learning CARLA paper
-* [On Offline Evaluation of Vision-based Driving Models](docs/on_offline_evaluation.md) [paper](https://arxiv.org/abs/1809.04843)
-* [Exploring the Limitations of Behavior Cloning for Autonomous Driving](docs/exploring_limitations.md)[paper](soon)
+* Conditional Imitation Learning CARLA (paper)
+* [On Offline Evaluation of Vision-based Driving Models](docs/on_offline_evaluation.md) ([paper](https://arxiv.org/abs/1809.04843))
+* [Exploring the Limitations of Behavior Cloning for Autonomous Driving](docs/exploring_limitations.md) ([paper](soon))
 
 
 
