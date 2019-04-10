@@ -48,11 +48,11 @@ Then, after unpacking it,  define where the root folder was placed:
 
 Install the latest CARLA API:
 
-    easy_install ${CARLA_ROOT}/PythonAPI/*-py3.5-linux-x86_64.egg
+    easy_install ${CARLA_ROOT}/PythonAPI/carla/dist/*-py3.5-linux-x86_64.egg
 
 Make sure you set the PYTHONPATH PythonAPI path:
 
-     export PYTHONPATH=${CARLA_ROOT}/PythonAPI:$PYTHONPATH
+     export PYTHONPATH=${CARLA_ROOT}/PythonAPI/carla:$PYTHONPATH
      
 
 ### Visualize the agent results 

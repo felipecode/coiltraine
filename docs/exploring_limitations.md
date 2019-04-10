@@ -16,8 +16,12 @@ all the needed files.
 
 #### Models present
 
- * resnet34imnet10S1 is the model with the random seed 1 from figure 
- * resnet34imnet10S1 is the model with the random seed 2 from figure 
- * 
+ * *resnet34imnet10S1*: is the model with the random seed 1 from Figure 6
+ * *resnet34imnet10S2*: is the model with the random seed 2 from Figure 6
+ * *resnetmodel without the speed prediction and ten hours of training (Yellow model Fig. 5)
+ * Our Best overall model (Green model Figure)
 
 
+
+
+#### View our best model driving 
