@@ -77,7 +77,7 @@ layers. You can command a destination for the agent by using the arrow keys from
 Clone the scenario  runner repository:
     
     cd
-    git clone https://github.com/carla-simulator/scenario_runner.git
+    git clone -b carla_challenge  https://github.com/carla-simulator/scenario_runner.git
 
 Setup the scenario runner challenge repository by setting the path to your CARLA root
 folder.
@@ -98,9 +98,7 @@ Start the CARLA server on another terminal:
 
 Execute the challenge with the conditional imitation learning baseline
 
-    python3  srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic --agent=../coiltraine/drive/CoILBaseline.py --config ../coiltraine/drive/sample_agent.json
-
-    python ${ROOT_SCENARIO_RUNNER}/srunner/challenge/challenge_evaluator_routes.py \
+     python3 ${ROOT_SCENARIO_RUNNER}/srunner/challenge/challenge_evaluator_routes.py \
     --scenarios=${ROOT_SCENARIO_RUNNER}/srunner/challenge/all_towns_traffic_scenarios1_3_4.json \
     --routes=${ROOT_SCENARIO_RUNNER}/srunner/challenge/routes_training.xml \
     --repetitions=3 \

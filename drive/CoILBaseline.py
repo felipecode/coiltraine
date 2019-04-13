@@ -35,7 +35,7 @@ except IndexError:
     pass
 # We  need to add two things here to the python path,
 
-from srunner.challenge.autoagents.autonomous_agent import AutonomousAgent
+from srunner.challenge.autoagents.autonomous_agent import AutonomousAgent, Track
 from agents.navigation.local_planner import RoadOption
 
 import carla
@@ -77,6 +77,7 @@ class CoILBaseline(AutonomousAgent):
         # We add more time to the curve commands
         self._expand_command_front = 5
         self._expand_command_back = 3
+        self.track = Track.CAMERAS
 
     def sensors(self):
         sensors = [{'type': 'sensor.camera.rgb',
@@ -97,7 +98,7 @@ class CoILBaseline(AutonomousAgent):
 
         return sensors
 
-    def run_step(self, input_data):
+    def run_step(self, input_data, timestamp):
         # Get the current directions for following the route
         directions = self._get_current_direction(input_data['GPS'][1])
         print (" Directions ", directions)
@@ -120,11 +121,6 @@ class CoILBaseline(AutonomousAgent):
         # There is the posibility to replace some of the predictions with oracle predictions.
         self.first_iter = False
         return control
-
-    def set_global_plan(self, topological_plan):
-        # We expand the commands before the curves in order to give more time
-        # for the agent to respond.
-        self._global_plan = topological_plan
 
     def get_attentions(self, layers=None):
         """
