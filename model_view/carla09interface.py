@@ -68,16 +68,6 @@ except ImportError:
     raise RuntimeError(
         'cannot import numpy, make sure numpy package is installed')
 
-# ==============================================================================
-# -- find carla module ---------------------------------------------------------
-# ==============================================================================
-try:
-    sys.path.append(glob.glob('**/carla-*%d.%d-%s.egg' % (
-        sys.version_info.major,
-        sys.version_info.minor,
-        'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
-except IndexError:
-    pass
 
 import carla
 from carla import ColorConverter as cc
@@ -646,7 +636,7 @@ class LaneInvasionSensor(object):
         self._parent = parent_actor
         self._hud = hud
         world = self._parent.get_world()
-        bp = world.get_blueprint_library().find('sensor.other.lane_detector')
+        bp = world.get_blueprint_library().find('sensor.other.lane_invasion')
         self.sensor = world.spawn_actor(bp, carla.Transform(), attach_to=self._parent)
         # We need to pass the lambda a weak reference to self to avoid circular
         # reference.

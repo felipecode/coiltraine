@@ -15,13 +15,6 @@ from coilutils.drive_utils import checkpoint_parse_configuration_file
 from configs import g_conf, merge_with_yaml
 from network import CoILModel
 
-try:
-    sys.path.append(glob.glob('**/carla-*%d.%d-%s.egg' % (
-        sys.version_info.major,
-        sys.version_info.minor,
-        'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
-except IndexError:
-    pass
 
 # CARLA ROOT can probably be erased
 
@@ -35,7 +28,7 @@ except IndexError:
     pass
 # We  need to add two things here to the python path,
 
-from srunner.challenge.autoagents.autonomous_agent import AutonomousAgent
+from srunner.challenge.autoagents.autonomous_agent import AutonomousAgent, Track
 from agents.navigation.local_planner import RoadOption
 
 import carla
@@ -68,6 +61,7 @@ class CoILBaseline(AutonomousAgent):
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
         self._model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         self.first_iter = True
+        print ( " SETUP MODEL ")
         # Load the model and prepare set it for evaluation
         self._model.load_state_dict(checkpoint['state_dict'])
         self._model.cuda()
@@ -77,6 +71,7 @@ class CoILBaseline(AutonomousAgent):
         # We add more time to the curve commands
         self._expand_command_front = 5
         self._expand_command_back = 3
+        self.track = Track.CAMERAS
 
     def sensors(self):
         sensors = [{'type': 'sensor.camera.rgb',
@@ -97,7 +92,7 @@ class CoILBaseline(AutonomousAgent):
 
         return sensors
 
-    def run_step(self, input_data):
+    def run_step(self, input_data, timestamp):
         # Get the current directions for following the route
         directions = self._get_current_direction(input_data['GPS'][1])
         print (" Directions ", directions)
@@ -120,11 +115,6 @@ class CoILBaseline(AutonomousAgent):
         # There is the posibility to replace some of the predictions with oracle predictions.
         self.first_iter = False
         return control
-
-    def set_global_plan(self, topological_plan):
-        # We expand the commands before the curves in order to give more time
-        # for the agent to respond.
-        self._global_plan = topological_plan
 
     def get_attentions(self, layers=None):
         """
@@ -153,7 +143,7 @@ class CoILBaseline(AutonomousAgent):
 
         iteration = 0
 
-        sensor = sensor[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
+        sensor = sensor[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], 0:3]
 
         sensor = scipy.misc.imresize(sensor, (g_conf.SENSORS['rgb'][1], g_conf.SENSORS['rgb'][2]))
 
@@ -173,7 +163,7 @@ class CoILBaseline(AutonomousAgent):
         image_input = image_input.unsqueeze(0)
 
         self.latest_image_tensor = image_input
-
+        print ("SHAPE ", image_input.shape)
         return image_input
 
     def _get_current_direction(self, vehicle_position):

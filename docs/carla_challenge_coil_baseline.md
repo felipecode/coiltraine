@@ -48,11 +48,11 @@ Then, after unpacking it,  define where the root folder was placed:
 
 Install the latest CARLA API:
 
-    easy_install ${CARLA_ROOT}/PythonAPI/*-py3.5-linux-x86_64.egg
+    easy_install ${CARLA_ROOT}/PythonAPI/carla/dist/*-py3.5-linux-x86_64.egg
 
 Make sure you set the PYTHONPATH PythonAPI path:
 
-     export PYTHONPATH=${CARLA_ROOT}/PythonAPI:$PYTHONPATH
+     export PYTHONPATH=${CARLA_ROOT}/PythonAPI/carla:$PYTHONPATH
      
 
 ### Visualize the agent results 
@@ -66,7 +66,7 @@ To run the and visualize the model run:
 
     python3 view_model.py  -f baselines -e resnet34imnet -cp 180000 -cv 0.9
 
-After running, you will see on the botton corner the activations of resnet intermediate
+After running, you will see on the bottom corner the activations of resnet intermediate
 layers. You can command a destination for the agent by using the arrow keys from the keyboard.
 
 
@@ -77,7 +77,7 @@ layers. You can command a destination for the agent by using the arrow keys from
 Clone the scenario  runner repository:
     
     cd
-    git clone https://github.com/carla-simulator/scenario_runner.git
+    git clone -b carla_challenge  https://github.com/carla-simulator/scenario_runner.git
 
 Setup the scenario runner challenge repository by setting the path to your CARLA root
 folder.
@@ -90,12 +90,21 @@ Export the coiltraine path to the PYTHONPATH:
 
     cd ~/coitraine
     export PYTHONPATH=`pwd`:$PYTHONPATH
+    
+Start the CARLA server on another terminal:
+
+    ./CarlaUE4.sh -benchmark -fps=20 -quality-level=Epic
 
 
 Execute the challenge with the conditional imitation learning baseline
 
-    python3  srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic --agent=../coiltraine/drive/CoILBaseline.py --config ../coiltraine/drive/sample_agent.json
-
+     CHALLENGE_PHASE_CODENAME=dev_track_2 python3 ${ROOT_SCENARIO_RUNNER}/srunner/challenge/challenge_evaluator_routes.py \
+    --scenarios=${ROOT_SCENARIO_RUNNER}/srunner/challenge/all_towns_traffic_scenarios1_3_4.json \
+    --routes=${ROOT_SCENARIO_RUNNER}/srunner/challenge/routes_training.xml \
+    --repetitions=3 \
+    --debug=0 \
+    --agent=../coiltraine/drive/CoILBaseline.py \
+    --config=../coiltraine/drive/sample_agent.json
 
 Watch the results.
 
