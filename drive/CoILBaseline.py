@@ -15,13 +15,6 @@ from coilutils.drive_utils import checkpoint_parse_configuration_file
 from configs import g_conf, merge_with_yaml
 from network import CoILModel
 
-try:
-    sys.path.append(glob.glob('**/carla-*%d.%d-%s.egg' % (
-        sys.version_info.major,
-        sys.version_info.minor,
-        'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
-except IndexError:
-    pass
 
 # CARLA ROOT can probably be erased
 
