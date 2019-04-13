@@ -98,7 +98,7 @@ Start the CARLA server on another terminal:
 
 Execute the challenge with the conditional imitation learning baseline
 
-     python3 ${ROOT_SCENARIO_RUNNER}/srunner/challenge/challenge_evaluator_routes.py \
+     CHALLENGE_PHASE_CODENAME=dev_track_2 python3 ${ROOT_SCENARIO_RUNNER}/srunner/challenge/challenge_evaluator_routes.py \
     --scenarios=${ROOT_SCENARIO_RUNNER}/srunner/challenge/all_towns_traffic_scenarios1_3_4.json \
     --routes=${ROOT_SCENARIO_RUNNER}/srunner/challenge/routes_training.xml \
     --repetitions=3 \
