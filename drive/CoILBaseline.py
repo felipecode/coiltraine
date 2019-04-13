@@ -61,6 +61,7 @@ class CoILBaseline(AutonomousAgent):
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
         self._model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         self.first_iter = True
+        print ( " SETUP MODEL ")
         # Load the model and prepare set it for evaluation
         self._model.load_state_dict(checkpoint['state_dict'])
         self._model.cuda()
@@ -162,7 +163,6 @@ class CoILBaseline(AutonomousAgent):
         image_input = image_input.unsqueeze(0)
 
         self.latest_image_tensor = image_input
-        print ("processed image ", image_input)
         return image_input
 
     def _get_current_direction(self, vehicle_position):
