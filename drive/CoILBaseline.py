@@ -143,7 +143,7 @@ class CoILBaseline(AutonomousAgent):
 
         iteration = 0
 
-        sensor = sensor[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], ...]
+        sensor = sensor[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], 0:3]
 
         sensor = scipy.misc.imresize(sensor, (g_conf.SENSORS['rgb'][1], g_conf.SENSORS['rgb'][2]))
 
