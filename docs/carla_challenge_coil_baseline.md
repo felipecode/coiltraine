@@ -66,7 +66,7 @@ To run the and visualize the model run:
 
     python3 view_model.py  -f baselines -e resnet34imnet -cp 180000 -cv 0.9
 
-After running, you will see on the botton corner the activations of resnet intermediate
+After running, you will see on the bottom corner the activations of resnet intermediate
 layers. You can command a destination for the agent by using the arrow keys from the keyboard.
 
 
@@ -90,12 +90,23 @@ Export the coiltraine path to the PYTHONPATH:
 
     cd ~/coitraine
     export PYTHONPATH=`pwd`:$PYTHONPATH
+    
+Start the CARLA server on another terminal:
+
+    ./CarlaUE4.sh -benchmark -fps=20 -quality-level=Epic
 
 
 Execute the challenge with the conditional imitation learning baseline
 
     python3  srunner/challenge/challenge_evaluator.py --file --scenario=group:ChallengeBasic --agent=../coiltraine/drive/CoILBaseline.py --config ../coiltraine/drive/sample_agent.json
 
+    python ${ROOT_SCENARIO_RUNNER}/srunner/challenge/challenge_evaluator_routes.py \
+    --scenarios=${ROOT_SCENARIO_RUNNER}/srunner/challenge/all_towns_traffic_scenarios1_3_4.json \
+    --routes=${ROOT_SCENARIO_RUNNER}/srunner/challenge/routes_training.xml \
+    --repetitions=3 \
+    --debug=0 \
+    --agent=../coiltraine/drive/CoILBaseline.py \
+    --config=../coiltraine/drive/sample_agent.json
 
 Watch the results.
 
