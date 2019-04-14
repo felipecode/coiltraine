@@ -1,15 +1,16 @@
-import numpy as np
-import scipy
-import sys
+import glob
+import logging
 import math
 import os
-import glob
-import torch
+import sys
 
-from scipy.misc import imresize
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
+import numpy as np
+import scipy
+from scipy.misc import imresize
+import torch
 
 from coilutils.drive_utils import checkpoint_parse_configuration_file
 from configs import g_conf, merge_with_yaml
@@ -21,7 +22,7 @@ from network import CoILModel
 try:
     CARLA_ROOT = os.environ.get('CARLA_ROOT')
     if not CARLA_ROOT:
-        print('Warning! Define environment variable CARLA_ROOT pointing to the CARLA base folder.')
+        logging.warning('Define environment variable CARLA_ROOT pointing to the CARLA base folder.')
 
     sys.path.append(glob.glob('{}/PythonAPI'.format(CARLA_ROOT))[0])
 except IndexError:
@@ -61,7 +62,7 @@ class CoILBaseline(AutonomousAgent):
         self.checkpoint = checkpoint  # We save the checkpoint for some interesting future use.
         self._model = CoILModel(g_conf.MODEL_TYPE, g_conf.MODEL_CONFIGURATION)
         self.first_iter = True
-        print ( " SETUP MODEL ")
+        logging.info("Setup Model")
         # Load the model and prepare set it for evaluation
         self._model.load_state_dict(checkpoint['state_dict'])
         self._model.cuda()
@@ -95,7 +96,7 @@ class CoILBaseline(AutonomousAgent):
     def run_step(self, input_data, timestamp):
         # Get the current directions for following the route
         directions = self._get_current_direction(input_data['GPS'][1])
-        print (" Directions ", directions)
+        logging.debug("Directions {}".format(directions))
 
         # Take the forward speed and normalize it for it to go from 0-1
         norm_speed = input_data['can_bus'][1]['speed'] / g_conf.SPEED_FACTOR
@@ -111,7 +112,7 @@ class CoILBaseline(AutonomousAgent):
         control.steer = float(steer)
         control.throttle = float(throttle)
         control.brake = float(brake)
-        print (" Output ", control)
+        logging.debug("Output ", control)
         # There is the posibility to replace some of the predictions with oracle predictions.
         self.first_iter = False
         return control
@@ -168,7 +169,7 @@ class CoILBaseline(AutonomousAgent):
                 min_distance = computed_distance
                 closest_id = index
 
-        print ("Closest waypoint ", closest_id, "dist ", min_distance)
+        logging.debug("Closest waypoint {} dist {}".format(closest_id, min_distance))
         direction = self._global_plan[closest_id][1]
 
         if direction == RoadOption.LEFT:
