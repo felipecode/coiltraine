@@ -140,30 +140,18 @@ class CoILBaseline(AutonomousAgent):
         return attentions
 
     def _process_sensors(self, sensor):
-
-        iteration = 0
-
-        sensor = sensor[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], 0:3]
-
+        sensor = sensor[:, :, 0:3]  # BGRA->BRG drop alpha channel
+        sensor = sensor[:, :, ::-1]  # BGR->RGB
+        sensor = sensor[g_conf.IMAGE_CUT[0]:g_conf.IMAGE_CUT[1], :, :]  # crop
         sensor = scipy.misc.imresize(sensor, (g_conf.SENSORS['rgb'][1], g_conf.SENSORS['rgb'][2]))
-
         self.latest_image = sensor
 
         sensor = np.swapaxes(sensor, 0, 1)
-
         sensor = np.transpose(sensor, (2, 1, 0))
-
         sensor = torch.from_numpy(sensor / 255.0).type(torch.FloatTensor).cuda()
-
-        if iteration == 0:
-            image_input = sensor
-
-        iteration += 1
-
-        image_input = image_input.unsqueeze(0)
-
+        image_input = sensor.unsqueeze(0)
         self.latest_image_tensor = image_input
-        print ("SHAPE ", image_input.shape)
+
         return image_input
 
     def _get_current_direction(self, vehicle_position):
