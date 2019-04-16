@@ -25,13 +25,21 @@ all the needed files.
 
 #### Reproducing the results
 
-To reproduce one any of these models run:
+To reproduce all  of the available models, using the gpu 0, run:
 
-python3 coiltraine.py -de 
+    python3 coiltraine.py --gpus 0 1 2 3 4 --folder nocrash -de NocrashNewWeatherTown_Town02 NocrashNewWeather_Town01\
+     NocrashTraining_Town01 NocrashNewTown_Town02 --docker carlagear
+      
+
+Note, the models use the CARLA single gear version of 0.8.4.
+
+To test our best model on the hardest condition: 
+
+    python3 coiltraine.py --gpus 0 --single-process drive -e resnet34imnet10S2 --folder nocrash -de NocrashNewWeatherTown_Town02
 
 
-To test all of them in batch:
 
 
+If you use any of our baselines please cite our paper:
 
-If you use any of our baselines please cite the paper
+*Added Soon*

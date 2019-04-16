@@ -8,10 +8,10 @@
 
 from __future__ import print_function
 
-from carla.driving_benchmark.experiment import Experiment
-from carla.sensor import Camera
-from carla.settings import CarlaSettings
-from carla.driving_benchmark.experiment_suites.experiment_suite import ExperimentSuite
+from carla08.driving_benchmark.experiment import Experiment
+from carla08.sensor import Camera
+from carla08.settings import CarlaSettings
+from carla08.driving_benchmark.experiment_suites.experiment_suite import ExperimentSuite
 
 
 
