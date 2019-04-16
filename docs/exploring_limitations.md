@@ -35,11 +35,11 @@ Note, the models use the CARLA single gear version of 0.8.4.
 
 To test our best model on the hardest condition: 
 
-    python3 coiltraine.py --gpus 0 --single-process drive -e resnet34imnet10S2 --folder nocrash -de NocrashNewWeatherTown_Town02
-
+    python3 coiltraine.py --gpus 0 --single-process drive -e resnet34imnet10S2 --folder nocrash \
+    -de NocrashNewWeatherTown_Town02 --docker carlagear
 
 
 
 If you use any of our baselines please cite our paper:
 
-*Added Soon*
+*Add Soon*

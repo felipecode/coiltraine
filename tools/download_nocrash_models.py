@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     # Download the full data from the models
     print ("Downloading the coil models checkpoints   1.1 GB")
-    file_id = '1U4GpTMUN2PWpTQd96gDP2XGVk4OwzONg'
+    file_id = '1AzSIkmGETGSNLBtWxoTLGjqLlXNVgkEH'
     destination_pack = 'nocrash_basic.tar.xz'
 
     download_file_from_google_drive(file_id, destination_pack)
