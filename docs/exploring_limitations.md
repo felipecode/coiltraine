@@ -4,8 +4,7 @@ Exploring the Limitations of Behavior Cloning for Autonomous Driving
 
 #### Downloading Checkpoints
 
-The configs/nocrash folder has some of the basic models that can be found on the paper.
-Soon we will post how to reproduce the full results, including the plots. 
+The configs/nocrash folder has some of the relevant models that can be found on the paper.
 
 The following script will download
 all the needed files.
