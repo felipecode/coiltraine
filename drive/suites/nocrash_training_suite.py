@@ -8,7 +8,6 @@
 
 from __future__ import print_function
 
-
 from carla.driving_benchmark.experiment import Experiment
 from carla.sensor import Camera
 from carla.settings import CarlaSettings
@@ -16,19 +15,18 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 
 
-class CARLA100NewWeatherTown(ExperimentSuite):
+class NocrashTraining(ExperimentSuite):
 
     def __init__(self):
-        super(CARLA100NewWeatherTown, self).__init__('Town02')
+        super(NocrashTraining, self).__init__('Town01')
 
     @property
     def train_weathers(self):
-        return []
+        return [1, 3, 6, 8]
 
     @property
     def test_weathers(self):
-        return [10, 14]
-
+        return []
     @property
     def collision_as_failure(self):
         return True
@@ -45,24 +43,21 @@ class CARLA100NewWeatherTown(ExperimentSuite):
     def _poses(self):
 
         def _poses_navigation():
-            return [[19, 66], [79, 14], [19, 57], [39, 53], [60, 26],
-             [53, 76], [42, 13], [31, 71], [59, 35], [47, 16],
-             [10, 61], [66, 3], [20, 79], [14, 56], [26, 69],
-             [79, 19], [2, 29], [16, 14], [5, 57], [77, 68],
-             [70, 73], [46, 67], [34, 77], [61, 49], [21, 12]]
+            return [[105, 29], [27, 130], [102, 87], [132, 27], [25, 44],
+                 [4, 64], [34, 67], [54, 30], [140, 134], [105, 9],
+                 [148, 129], [65, 18], [21, 16], [147, 97], [134, 49],
+                 [30, 41], [81, 89], [69, 45], [102, 95], [18, 145],
+                 [111, 64], [79, 45], [84, 69], [73, 31], [37, 81]]
 
         return [_poses_navigation(),
                 _poses_navigation(),
-                _poses_navigation()]
-
-
+                _poses_navigation()
+                ]
 
     def build_experiments(self):
         """
         Creates the whole set of experiment objects,
         The experiments created depend on the selected Town.
-
-
         """
 
         # We set the camera
@@ -74,10 +69,9 @@ class CARLA100NewWeatherTown(ExperimentSuite):
         camera.set_position(2.0, 0.0, 1.4)
         camera.set_rotation(-15.0, 0, 0)
 
-
         poses_tasks = self._poses()
-        vehicles_tasks = [0, 15, 70]
-        pedestrians_tasks = [0, 50, 150]
+        vehicles_tasks = [0, 20, 100]
+        pedestrians_tasks = [0, 50, 250]
 
         task_names = ['empty', 'normal', 'cluttered']
 
@@ -114,6 +108,4 @@ class CARLA100NewWeatherTown(ExperimentSuite):
                 experiments_vector.append(experiment)
 
         return experiments_vector
-
-
 

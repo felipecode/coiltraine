@@ -16,22 +16,23 @@ from carla.driving_benchmark.experiment_suites.experiment_suite import Experimen
 
 
 
-class CARLA100NewTown(ExperimentSuite):
+class NocrashNewWeatherTown(ExperimentSuite):
 
     def __init__(self):
-        super(CARLA100NewTown, self).__init__('Town02')
+        super(NocrashNewWeatherTown, self).__init__('Town02')
 
     @property
     def train_weathers(self):
-        return [1, 3, 6, 8]
+        return []
 
     @property
     def test_weathers(self):
-        return []
+        return [10, 14]
 
     @property
     def collision_as_failure(self):
         return True
+
 
     def calculate_time_out(self, path_distance):
         """
@@ -45,11 +46,10 @@ class CARLA100NewTown(ExperimentSuite):
 
         def _poses_navigation():
             return [[19, 66], [79, 14], [19, 57], [39, 53], [60, 26],
-                    [53, 76], [42, 13], [31, 71], [59, 35], [47, 16],
-                    [10, 61], [66, 3], [20, 79], [14, 56], [26, 69],
-                    [79, 19], [2, 29], [16, 14], [5, 57], [77, 68],
-                    [70, 73], [46, 67], [34, 77], [61, 49], [21, 12]]
-
+             [53, 76], [42, 13], [31, 71], [59, 35], [47, 16],
+             [10, 61], [66, 3], [20, 79], [14, 56], [26, 69],
+             [79, 19], [2, 29], [16, 14], [5, 57], [77, 68],
+             [70, 73], [46, 67], [34, 77], [61, 49], [21, 12]]
 
         return [_poses_navigation(),
                 _poses_navigation(),
@@ -114,5 +114,6 @@ class CARLA100NewTown(ExperimentSuite):
                 experiments_vector.append(experiment)
 
         return experiments_vector
+
 
 

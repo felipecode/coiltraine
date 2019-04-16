@@ -13,10 +13,10 @@ from carla.sensor import Camera
 from carla.settings import CarlaSettings
 from carla.driving_benchmark.experiment_suites.experiment_suite import ExperimentSuite
 
-class CARLA100NewWeather(ExperimentSuite):
+class NocrashNewWeather(ExperimentSuite):
 
     def __init__(self):
-        super(CARLA100NewWeather, self).__init__('Town01')
+        super(NocrashNewWeather, self).__init__('Town01')
 
     @property
     def train_weathers(self):
