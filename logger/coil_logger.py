@@ -93,6 +93,31 @@ def add_message(phase, message, iteration=None):
     # We can monitor the status based on error message. An error should mean the exp is not working
 
 
+def check_finish(process, drive_name=None):
+    """
+    Check if the finish file is already written.
+    Args
+        checkpoint_name: the name of the checkpoint being writen
+        output: what is being written on the file
+
+
+    Returns:
+
+    """
+    if process != 'drive' and process != 'train':
+        raise ValueError('Wrong process to write finish')
+
+    root_path = "_logs"
+
+    full_path_name = os.path.join(root_path, EXPERIMENT_BATCH_NAME,
+                                  EXPERIMENT_NAME)
+    if drive_name is not None:
+        process += '_' + drive_name
+
+    file_name = os.path.join(full_path_name, process + "_finish.csv")
+    return os.path.exists(file_name)
+
+
 def write_on_csv(checkpoint_name, output):
     """
     We also create the posibility to write on a csv file. So it is faster to load

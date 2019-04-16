@@ -75,4 +75,4 @@ VARIABLE_WEIGHT: # how much each of the outputs specified on TARGETS are weighte
 IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
-AVOID_STOPPING: True
+AVOID_STOPPING: False

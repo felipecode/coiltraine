@@ -54,7 +54,10 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                               exp_alias + '_err_'+g_conf.PROCESS_NAME + '_'
                                            + str(os.getpid()) + ".out"),
                               "a", buffering=1)
-        
+
+        if coil_logger.check_finish('train'):
+            coil_logger.add_message('Finished', {})
+            return
 
         # Preload option
         if g_conf.PRELOAD_MODEL_ALIAS is not None:

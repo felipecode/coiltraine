@@ -58,7 +58,7 @@ PRE_TRAINED: True  # If the weights are started with imagenet.
 
 # Optimizer Parameters #
 # For now we use only use adam
-LEARNING_RATE: 0.00001  # First learning rate
+LEARNING_RATE: 0.0002  # First learning rate
 LEARNING_RATE_DECAY_INTERVAL: 75000 # Number of iterations where the learning rate is reduced
 LEARNING_RATE_THRESHOLD: 5000 # Number of iterations without going down to reduce learning rate
 LEARNING_RATE_DECAY_LEVEL: 0.1 # Th factor of reduction applied to the learning rate
@@ -76,4 +76,4 @@ VARIABLE_WEIGHT: # how much each of the outputs specified on TARGETS are weighte
 IMAGE_CUT: [90, 485]  # How you should cut the input image that is received from the server
 USE_ORACLE: False
 USE_FULL_ORACLE: False
-AVOID_STOPPING: True
+AVOID_STOPPING: False
