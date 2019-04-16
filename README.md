@@ -11,7 +11,7 @@ Objectives:
    and testings on CARLA with a single glance.
  * Allows [to perform the testing methodology proposed](docs/on_offline_evaluation.md)
  on the paper "On Offline Evaluation of Vision-based Driving Models"
- * Allows to use the models from the paper "[Exploring the Limitations of Behavior Cloning for Autonomous Driving]"(docs/exploring_limitations.md) ([paper](soon)).
+ * Allows to use the models from the paper [Exploring the Limitations of Behavior Cloning for Autonomous Driving](docs/exploring_limitations.md) ([paper](soon)).
  * *You can also use a [baseline for CARLA Challenge](docs/carla_challenge_coil_baseline.md)*
    
 
