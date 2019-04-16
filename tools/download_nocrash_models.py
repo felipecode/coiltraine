@@ -13,8 +13,8 @@ from tools.download_tools import download_file_from_google_drive
 if __name__ == "__main__":
 
     # Download the full data from the models
-    print ("Downloading the coil models checkpoints   660 MB")
-    file_id = '1S7f7Hee2c4qZK7D6MLUC2ULAwknk8X8y'
+    print ("Downloading the coil models checkpoints   1.1 GB")
+    file_id = '1ISOaTjMS-c-73krlIewCLuneTjNxz5XI'
     destination_pack = 'nocrash_basic.tar.xz'
 
     download_file_from_google_drive(file_id, destination_pack)
