@@ -179,9 +179,8 @@ class CoILDataset(Dataset):
 
     def _pre_load_image_folders(self, path):
         """
-        Pre load the image folders for each episode, keep in mind that we only take
-        the measurements that we think that are interesting for now.
-
+        We preload a dataset compleetely and pre process if necessary by using the
+        C-EX interface.
         Args
             the path for the dataset
 
@@ -193,14 +192,56 @@ class CoILDataset(Dataset):
 
         """
 
-        episodes_list = glob.glob(os.path.join(path, 'episode_*'))
-        sort_nicely(episodes_list)
-        # Do a check if the episodes list is empty
-        if len(episodes_list) == 0:
-            raise ValueError("There are no episodes on the training dataset folder %s" % path)
+
+        env_batch = C_EX(json, params, number_of_iterations, params['batch_size'], sequential=True)
+        # Here some docker was set
+        env_batch.start(no_server=True)  # no carla server mode.
 
         sensor_data_names = []
+
         float_dicts = []
+
+        for env in env_batch:
+            # it can be personalized to return different types of data.
+            print ("recovering ", env)
+            try:
+                env_data = env.get_data()  # returns a basically a way to read all the data properly
+            except NoDataGenerated:
+                print (" No data generate for episode ", env)
+            else:
+                # for now it basically returns a big vector containing all the
+                print ("PRINTING DATA POINTS")
+
+                for data_point in env_data:
+
+                    # TODO pre process trhis data if needed
+
+                    # TODO take this from the metadata
+                    for sensor_data in sensor_names:
+                        sensor_data_names.append(data_point[])
+
+
+                    print("################################")
+                    print (data_point)
+
+
+
+        #episodes_list = glob.glob(os.path.join(path, 'episode_*'))
+        #sort_nicely(episodes_list)
+        # Do a check if the episodes list is empty
+        #if len(episodes_list) == 0:
+        #    raise ValueError("There are no episodes on the training dataset folder %s" % path)
+
+
+
+        # Make the path to save the pre loaded datasets
+        if not os.path.exists('_preloads'):
+            os.mkdir('_preloads')
+        # If there is a name we saved the preloaded data
+        if self.preload_name is not None:
+            np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
+
+
 
         number_of_hours_pre_loaded = 0
 
