@@ -169,9 +169,9 @@ class CoILBaseline(AutonomousAgent):
                 min_distance = computed_distance
                 closest_id = index
 
-        logging.debug("Closest waypoint {} dist {}".format(closest_id, min_distance))
+        #print("Closest waypoint {} dist {}".format(closest_id, min_distance))
         direction = self._global_plan[closest_id][1]
-
+        print ("Direction ", direction)
         if direction == RoadOption.LEFT:
             direction = 3.0
         elif direction == RoadOption.RIGHT:

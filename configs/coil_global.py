@@ -16,8 +16,6 @@ from logger.coil_logger import create_log, add_message
 
 
 _g_conf = AttributeDict()
-
-
 _g_conf.immutable(False)
 
 """#### GENERAL CONFIGURATION PARAMETERS ####"""
