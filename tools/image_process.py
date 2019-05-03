@@ -170,6 +170,7 @@ if __name__ == "__main__":
                     batch_path_name = os.path.join(*(['/'] + list(batch[0].keys())[0].split('/')[0:-1]))
                     if 'processed' in os.listdir(batch_path_name):
                         continue
+                    exit(1)
                     for data_point in batch:
                         # assume standard name
 
