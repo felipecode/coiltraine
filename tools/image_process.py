@@ -161,13 +161,13 @@ if __name__ == "__main__":
 
             #TODO CHECK FOR ALREADY PRE PROCESSED
             count_exp = 0
+            len(env_data)
             for exp in env_data:
                 print("    Exp: ", count_exp)
                 count_batch = 0
                 for batch in exp:
                     print("      Batch: ", count_batch)
                     batch_path_name = os.path.join(env.get_path(),str(count_exp),str(count_batch))
-
                     if 'processed' in os.listdir(batch_path_name):
                         continue
 
