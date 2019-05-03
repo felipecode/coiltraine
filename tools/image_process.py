@@ -166,23 +166,19 @@ if __name__ == "__main__":
                 count_batch = 0
                 for batch in exp:
                     print("      Batch: ", count_batch)
-                    # Criptic line to get the path name in this context.
-                    batch_path_name = os.path.join(*(['/'] + batch[0][list(batch[0].keys())[0]].split('/')[0:-1]))
+                    batch_path_name = os.path.join(env.get_path(),str(count_exp),str(count_batch))
+
                     if 'processed' in os.listdir(batch_path_name):
                         continue
 
                     for data_point in batch:
                         # assume standard name
 
-
-
                         for key in data_point.keys():
-
                             if args.delete_depth and 'depth' in key:
                                 os.remove(data_point[key])
                             if args.delete_semantic_segmentation and 'labels' in key:
                                 os.remove(data_point[key])
-
                         #Process in the orign or copy ??
                         path_vector = ['/'] + data_point[key].split('/')
                         if args.new_package is not None:
@@ -197,7 +193,6 @@ if __name__ == "__main__":
 
                         if not args.delete_depth and 'depth' in key:
                             reshape_images("depth", data_point[key], out_name)
-
 
                     with open(os.path.join(batch_path_name, 'processed'), 'w') as f:
                         pass
