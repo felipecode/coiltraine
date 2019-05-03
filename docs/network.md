@@ -42,7 +42,7 @@ Example:
 ```
 
 The perception can also be defined layer by layer
-as it is defined on the [example](../configs/sample/coil_icra.yaml).
+as it is defined on the [example](../configs/oldconfigs/sample/coil_icra.yaml).
 
 
 #### Loss

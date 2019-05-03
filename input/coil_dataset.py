@@ -201,29 +201,49 @@ class CoILDataset(Dataset):
 
         float_dicts = []
 
+
+        sensor_data_names = []
+
+        float_dicts = []
+
+        env_batch = CEXP(json, params, number_of_iterations, params['batch_size'], sequential=True)
+        # Here some docker was set
+        env_batch.start(no_server=True)  # no carla server mode.
+        # count, we count the environments that are read
         for env in env_batch:
+            steer_vec = []
+            throttle_vec = []
+            brake_vec = []
             # it can be personalized to return different types of data.
-            print ("recovering ", env)
+            print("Environment Name: ", env)
             try:
                 env_data = env.get_data()  # returns a basically a way to read all the data properly
             except NoDataGenerated:
-                print (" No data generate for episode ", env)
+                print("No data generate for episode ", env)
             else:
-                # for now it basically returns a big vector containing all the
-                print ("PRINTING DATA POINTS")
+                count_exp = 0
+                for exp in env_data:
+                    print("    Exp: ", count_exp)
+                    count_batch = 0
+                    for batch in exp:
+                        print("      Batch: ", count_batch)
+                        for data_point in batch:
+                            for sensor in g_conf.SENSORS.keys():
 
-                for data_point in env_data:
+                                # TODO Imagee Size check for some at least.
 
-                    # TODO pre process trhis data if needed
+                                sensor_data_names.append(data_point[sensor])
 
-                    # TODO take this from the metadata
-                    for sensor_data in sensor_names:
-                        sensor_data_names.append(data_point[])
+                        count_batch += 1
+                    count_exp += 1
 
 
-                    print("################################")
-                    print (data_point)
-
+        # Make the path to save the pre loaded datasets
+        if not os.path.exists('_preloads'):
+            os.mkdir('_preloads')
+        # If there is a name we saved the preloaded data
+        if self.preload_name is not None:
+            np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
 
 
         #episodes_list = glob.glob(os.path.join(path, 'episode_*'))
@@ -327,12 +347,7 @@ class CoILDataset(Dataset):
             print(" Loaded ", number_of_hours_pre_loaded, " hours of data")
 
 
-        # Make the path to save the pre loaded datasets
-        if not os.path.exists('_preloads'):
-            os.mkdir('_preloads')
-        # If there is a name we saved the preloaded data
-        if self.preload_name is not None:
-            np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
+
 
         return sensor_data_names, float_dicts
 
