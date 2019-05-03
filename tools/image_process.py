@@ -180,7 +180,7 @@ if __name__ == "__main__":
                         path_vector = data_point[key].split('/')
                         if args.new_package is not None:
                             path_vector[-5] = args.new_package
-                        out_name = os.path.join(path_vector)
+                        out_name = os.path.join(*path_vector)
 
                         if 'rgb' in key:
                             reshape_images("rgb", data_point[key], out_name)
@@ -192,7 +192,7 @@ if __name__ == "__main__":
                             reshape_images("depth", data_point[key], out_name)
 
                     if out_name is not None:
-                        batch_path_name = os.path.join(out_name.split('/')[0:-1])
+                        batch_path_name = os.path.join(*(out_name.split('/')[0:-1]))
                         with open(os.path.join(batch_path_name, 'processed')) as f:
                             pass
 
