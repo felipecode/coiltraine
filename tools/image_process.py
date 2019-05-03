@@ -166,15 +166,15 @@ if __name__ == "__main__":
                 count_batch = 0
                 for batch in exp:
                     print("      Batch: ", count_batch)
-                    out_name = None
+
+                    batch_path_name = os.path.join(*(['/'] + batch[0].keys()[0].split('/')[0:-1]))
+                    if 'processed' in os.listdir(batch_path_name):
+                        continue
                     for data_point in batch:
                         # assume standard name
 
-                        batch_path_name = os.path.join(*(['/'] + out_name.split('/')[0:-1]))
 
-                        if 'processed' in os.listdir(batch_path_name):
-                            continue
-                            
+
                         for key in data_point.keys():
 
                             if args.delete_depth and 'depth' in key:
@@ -197,9 +197,9 @@ if __name__ == "__main__":
                         if not args.delete_depth and 'depth' in key:
                             reshape_images("depth", data_point[key], out_name)
 
-                    if out_name is not None:
-                        with open(os.path.join(batch_path_name, 'processed'), 'w') as f:
-                            pass
+
+                    with open(os.path.join(batch_path_name, 'processed'), 'w') as f:
+                        pass
 
 
                     count_batch += 1
