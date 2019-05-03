@@ -178,20 +178,21 @@ if __name__ == "__main__":
                                 os.remove(data_point[key])
                             if args.delete_semantic_segmentation and 'labels' in key:
                                 os.remove(data_point[key])
-                        #Process in the orign or copy ??
-                        path_vector = ['/'] + data_point[key].split('/')
-                        if args.new_package is not None:
-                            path_vector[-5] = args.new_package
-                        out_name = os.path.join(*path_vector)
 
-                        if 'rgb' in key:
-                            reshape_images("rgb", data_point[key], out_name)
+                            #Process in the orign or copy ??
+                            path_vector = ['/'] + data_point[key].split('/')
+                            if args.new_package is not None:
+                                path_vector[-5] = args.new_package
+                            out_name = os.path.join(*path_vector)
 
-                        if not args.delete_depth and 'labels' in key:
-                            reshape_images("labels", data_point[key], out_name)
+                            if 'rgb' in key:
+                                reshape_images("rgb", data_point[key], out_name)
 
-                        if not args.delete_depth and 'depth' in key:
-                            reshape_images("depth", data_point[key], out_name)
+                            if not args.delete_depth and 'labels' in key:
+                                reshape_images("labels", data_point[key], out_name)
+
+                            if not args.delete_depth and 'depth' in key:
+                                reshape_images("depth", data_point[key], out_name)
 
                     with open(os.path.join(batch_path_name, 'processed'), 'w') as f:
                         pass
