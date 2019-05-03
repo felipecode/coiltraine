@@ -14,15 +14,9 @@ from collections import deque
 import scipy.ndimage
 from cexp.cexp import CEXP
 
+from cexp.env.environment import NoDataGenerated
 
 
-
-class Control:
-    steer = 0
-    throttle = 0
-    brake = 0
-    hand_brake = 0
-    reverse = 0
 
 
 # Configurations for this script
@@ -143,12 +137,6 @@ if __name__ == "__main__":
     path = args.path
 
 
-    data_configuration_name = 'coil_training_dataset'
-    print ( data_configuration_name)
-    print ('dataset_configurations.' + (data_configuration_name) )
-    settings_module = __import__('dataset_configurations.' + (data_configuration_name),
-                                 fromlist=['dataset_configurations'] )
-
     first_time = True
     count = 0
     steering_pred = []
@@ -200,6 +188,7 @@ if __name__ == "__main__":
                         # assume standard name
                         for key in data_point.keys():
                             print (data_point[key])
+                        """
                             if args.delete_depth and 'depth' in key:
                                 print ("***Depth***")
                                 purge(episode, "*depth*")
@@ -215,7 +204,7 @@ if __name__ == "__main__":
 
                         if not args.delete_depth:
                             reshape_images("depth", episode, data_point_number)
-
+                        """
 
                     count_batch += 1
                 count_exp += 1
