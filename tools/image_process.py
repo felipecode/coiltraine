@@ -167,7 +167,7 @@ if __name__ == "__main__":
                 for batch in exp:
                     print("      Batch: ", count_batch)
 
-                    batch_path_name = os.path.join(*(['/'] + batch[0].keys()[0].split('/')[0:-1]))
+                    batch_path_name = os.path.join(*(['/'] + list(batch[0].keys())[0].split('/')[0:-1]))
                     if 'processed' in os.listdir(batch_path_name):
                         continue
                     for data_point in batch:
