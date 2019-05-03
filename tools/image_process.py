@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
             #TODO CHECK FOR ALREADY PRE PROCESSED
             count_exp = 0
-            print (env_data)
+            #print (env_data)
             for exp in env_data:
                 print("    Exp: ", count_exp)
                 count_batch = 0
@@ -173,7 +173,6 @@ if __name__ == "__main__":
 
                     for data_point in batch:
                         # assume standard name
-
                         for key in data_point.keys():
                             if args.delete_depth and 'depth' in key:
                                 os.remove(data_point[key])
