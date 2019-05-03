@@ -200,7 +200,6 @@ if __name__ == "__main__":
                         # assume standard name
                         for key in data_point.keys():
                             print (data_point[key])
-                            print
                             if args.delete_depth and 'depth' in key:
                                 print ("***Depth***")
                                 purge(episode, "*depth*")
