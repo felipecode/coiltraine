@@ -112,7 +112,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--dataset',
         help=' the json configuration file name',
-        default='all'
+        default=None
     )
     """ You should pass this extra arguments if you want to delete the semantic segmenation labels"""
     parser.add_argument(
