@@ -74,7 +74,7 @@ def reshape_images(image_type, image_name, out_path):
     print ("reshape ", image_name)
     image = scipy.ndimage.imread(image_name)
 
-    if image_name.shape[0] == 600:
+    if image.shape[0] == 600:
         center = image[IMAGE_CUT[0]:IMAGE_CUT[1], ...]
         center = scipy.misc.imresize(center, (88, 200), interp=interp_type)
         scipy.misc.imsave(out_path, center)
