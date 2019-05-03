@@ -56,26 +56,8 @@ def join_classes_for(labels_image, join_dic):
             compressed_labels_image[i, j, 0] = join_dic[labels_image[i, j, 0]]
 
     return compressed_labels_image
-def tryint(s):
-    try:
-        return int(s)
-    except:
-        return s
 
-def alphanum_key(s):
-    """ Turn a string into a list of string and number chunks.
-        "z23a" -> ["z", 23, "a"]
-    """
-    return [tryint(c) for c in re.split('([0-9]+)', s) ]
-
-def sort_nicely(l):
-    """ Sort the given list in the way that humans expect.
-    """
-    l.sort(key=alphanum_key)
-
-
-
-def reshape_images(image_type, image_name, in_path, out_path):
+def reshape_images(image_type, image_name, out_path):
 
     """
     Function for reshaping all the images of an episode and save it again on the
@@ -89,14 +71,13 @@ def reshape_images(image_type, image_name, in_path, out_path):
         interp_type = 'nearest'
     else:
         interp_type = 'bicubic'
-
-
-    image = scipy.ndimage.imread(os.path.join(in_path, image_name))
+    print ("reshape ", image_name)
+    image = scipy.ndimage.imread(image_name)
 
     if image_name.shape[0] == 600:
         center = image[IMAGE_CUT[0]:IMAGE_CUT[1], ...]
         center = scipy.misc.imresize(center, (88, 200), interp=interp_type)
-        scipy.misc.imsave(os.path.join(out_path, image_name), center)
+        scipy.misc.imsave(out_path, center)
 
     else:
         raise ValueError("Unexpected Size")
@@ -129,8 +110,9 @@ if __name__ == "__main__":
         help='Flag to tell the system to NOT erase the semantic segmentation labels from the dataset'
     )
     parser.add_argument(
-        '-c', '--copy-path',
-        help=' Set the path when coppying to another folder insteaed of the same'
+        '-np','--new-package',
+        help=' Set the new package_name ',
+        default=None
     )
 
     args = parser.parse_args()
@@ -184,27 +166,36 @@ if __name__ == "__main__":
                 count_batch = 0
                 for batch in exp:
                     print("      Batch: ", count_batch)
+                    out_name = None
                     for data_point in batch:
                         # assume standard name
                         for key in data_point.keys():
-                            print (data_point[key])
-                        """
+
                             if args.delete_depth and 'depth' in key:
-                                print ("***Depth***")
-                                purge(episode, "*depth*")
-
+                                os.remove(data_point[key])
                             if args.delete_semantic_segmentation and 'labels' in key:
-                                print ("***Purging SemanticSeg***")
-                                purge(episode, "*labels*")
+                                os.remove(data_point[key])
+
                         #Process in the orign or copy ??
+                        path_vector = data_point[key].split('/')
+                        if args.new_package is not None:
+                            path_vector[-5] = args.new_package
+                        out_name = os.path.join(path_vector)
 
-                        reshape_images("rgb", episode, data_point_number)
-                        if not args.delete_depth:
-                            reshape_images("labels", episode, data_point_number)
+                        if 'rgb' in key:
+                            reshape_images("rgb", data_point[key], out_name)
 
-                        if not args.delete_depth:
-                            reshape_images("depth", episode, data_point_number)
-                        """
+                        if not args.delete_depth and 'labels' in key:
+                            reshape_images("labels", data_point[key], out_name)
+
+                        if not args.delete_depth and 'depth' in key:
+                            reshape_images("depth", data_point[key], out_name)
+
+                    if out_name is not None:
+                        batch_path_name = os.path.join(out_name.split('/')[0:-1])
+                        with open(os.path.join(batch_path_name, 'processed')) as f:
+                            pass
+
 
                     count_batch += 1
                 count_exp += 1
