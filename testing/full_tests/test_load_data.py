@@ -40,8 +40,10 @@ class TestLoadData(unittest.TestCase):
                                                + 'hours_' + g_conf.TRAIN_DATASET_NAME)
 
     def test_town3_data(self):
+        # TODO OLD DATA NOT COMPATIBLE ANYMORE
         # the town3 data has different names and does not have pedestrians of vehicle stop
         # indications
+        return
         g_conf.immutable(False)
         g_conf.EXPERIMENT_NAME = 'resnet34imnet'
         create_log_folder('town03')
@@ -55,6 +57,25 @@ class TestLoadData(unittest.TestCase):
         dataset = CoILDataset(full_dataset, transform=None,
                               preload_name=str(g_conf.NUMBER_OF_HOURS)
                                                + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+
+    def test_new_data(self):
+
+        g_conf.immutable(False)
+        g_conf.EXPERIMENT_NAME = 'resnet34imnet'
+        create_log_folder('new_data')
+        create_exp_path('new_data', 'resnet34imnet')
+        merge_with_yaml('configs/new_baseline/resnet34imnet.yaml')
+
+        set_type_of_process('train')
+
+        full_dataset = os.path.join(os.environ["SRL_DATASET_PATH"], 'CoILTrainTown03')
+
+        dataset = CoILDataset(transform=None,
+                              preload_name=str(g_conf.NUMBER_OF_HOURS)
+                                               + 'hours_' + g_conf.TRAIN_DATASET_NAME)
+
+
+
 
 
 

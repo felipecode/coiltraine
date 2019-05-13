@@ -22,6 +22,9 @@ from configs import g_conf
 
 from coilutils.general import sort_nicely
 
+from cexp.cexp import CEXP
+from cexp.env.environment import NoDataGenerated
+
 
 
 def parse_remove_configuration(configuration):
@@ -53,9 +56,8 @@ def get_episode_weather(episode):
 class CoILDataset(Dataset):
     """ The conditional imitation learning dataset"""
 
-    def __init__(self, root_dir, transform=None, preload_name=None):
-        # Setting the root directory for this dataset
-        self.root_dir = root_dir
+    def __init__(self, transform=None, preload_name=None):
+
         # We add to the preload name all the remove labels
         if g_conf.REMOVE is not None and g_conf.REMOVE is not "None":
             name, self._remove_params = parse_remove_configuration(g_conf.REMOVE)
@@ -75,7 +77,7 @@ class CoILDataset(Dataset):
                 os.path.join('_preloads', self.preload_name + '.npy'))
             print(self.sensor_data_names)
         else:
-            self.sensor_data_names, self.measurements = self._pre_load_image_folders(root_dir)
+            self.sensor_data_names, self.measurements = self._pre_load_image_folders()
 
 
         print("preload Name ", self.preload_name)
@@ -177,7 +179,7 @@ class CoILDataset(Dataset):
 
         return final_measurement
 
-    def _pre_load_image_folders(self, path):
+    def _pre_load_image_folders(self):
         """
         We preload a dataset compleetely and pre process if necessary by using the
         C-EX interface.
@@ -193,27 +195,17 @@ class CoILDataset(Dataset):
         """
 
 
-        env_batch = C_EX(json, params, number_of_iterations, params['batch_size'], sequential=True)
-        # Here some docker was set
-        env_batch.start(no_server=True)  # no carla server mode.
-
         sensor_data_names = []
+        jsonfile = g_conf.EXPERIENCE_FILE   # The experience file full path.
+
 
         float_dicts = []
-
-
-        sensor_data_names = []
-
-        float_dicts = []
-
-        env_batch = CEXP(json, params, number_of_iterations, params['batch_size'], sequential=True)
-        # Here some docker was set
+        env_batch = CEXP(jsonfile, params=None, iterations_to_execute=g_conf.NUMBER_OF_ITERATIONS,
+                         sequential=True)
+        # Here we start the server without docker
         env_batch.start(no_server=True)  # no carla server mode.
         # count, we count the environments that are read
         for env in env_batch:
-            steer_vec = []
-            throttle_vec = []
-            brake_vec = []
             # it can be personalized to return different types of data.
             print("Environment Name: ", env)
             try:
@@ -233,10 +225,14 @@ class CoILDataset(Dataset):
                                 # TODO Imagee Size check for some at least.
 
                                 sensor_data_names.append(data_point[sensor])
+                            float_dicts.append( data_point['measurements'])
 
                         count_batch += 1
                     count_exp += 1
 
+
+        print (float_dicts)
+        print (sensor_data_names)
 
         # Make the path to save the pre loaded datasets
         if not os.path.exists('_preloads'):
@@ -245,6 +241,7 @@ class CoILDataset(Dataset):
         if self.preload_name is not None:
             np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
 
+        return sensor_data_names, float_dicts
 
         #episodes_list = glob.glob(os.path.join(path, 'episode_*'))
         #sort_nicely(episodes_list)
@@ -253,7 +250,7 @@ class CoILDataset(Dataset):
         #    raise ValueError("There are no episodes on the training dataset folder %s" % path)
 
 
-
+        """
         # Make the path to save the pre loaded datasets
         if not os.path.exists('_preloads'):
             os.mkdir('_preloads')
@@ -347,9 +344,10 @@ class CoILDataset(Dataset):
             print(" Loaded ", number_of_hours_pre_loaded, " hours of data")
 
 
-
+        
 
         return sensor_data_names, float_dicts
+        """
 
     def augment_directions(self, directions):
 
