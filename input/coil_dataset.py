@@ -46,10 +46,29 @@ def parse_remove_configuration(configuration):
     return name, conf_dict
 
 
+def convert_scenario_name_number(measurements):
+
+    if measurements['scenario'] == 'S0_lane_following':
+        measurements['scenario'] = 0.0
+    elif measurements['scenario'] == 'S1_intersection':
+        measurements['scenario'] = 1.0
+    elif measurements['scenario'] == 'S2_before_intersection':
+        measurements['scenario'] = 2.0
+    else:
+        measurements['scenario'] = 3.0
+
+
+
+
+
+def check_size(image_filename, size):
+    img = cv2.imread(image_filename, cv2.IMREAD_COLOR)
+    return img.shape[0] == size[1] and img.shape[1] == size[2]
+
+
 def get_episode_weather(episode):
     with open(os.path.join(episode, 'metadata.json')) as f:
         metadata = json.load(f)
-    print(" WEATHER OF EPISODE ", metadata['weather'])
     return int(metadata['weather'])
 
 
@@ -79,9 +98,6 @@ class CoILDataset(Dataset):
         else:
             self.sensor_data_names, self.measurements = self._pre_load_image_folders()
 
-
-        print("preload Name ", self.preload_name)
-
         self.transform = transform
         self.batch_read_number = 0
 
@@ -100,12 +116,13 @@ class CoILDataset(Dataset):
 
         """
         try:
-            img_path = os.path.join(self.root_dir,
-                                    self.sensor_data_names[index].split('/')[-2],
-                                    self.sensor_data_names[index].split('/')[-1])
+            #img_path = os.path.join(self.root_dir,
+            #                        self.sensor_data_names[index].split('/')[-2],
+            #                        self.sensor_data_names[index].split('/')[-1])
 
-            img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+            img = cv2.imread(self.sensor_data_names[index], cv2.IMREAD_COLOR)
             # Apply the image transformation
+            print (img.shape)
             if self.transform is not None:
                 boost = 1
                 img = self.transform(self.batch_read_number * boost, img)
@@ -117,16 +134,18 @@ class CoILDataset(Dataset):
             img = img / 255.
 
             measurements = self.measurements[index].copy()
+            print (measurements)
             for k, v in measurements.items():
                 v = torch.from_numpy(np.asarray([v, ]))
                 measurements[k] = v.float()
 
-            measurements['rgb'] = img
+            # TODO remove hardcode
+            measurements['rgb_central'] = img
 
             self.batch_read_number += 1
         except AttributeError:
+            traceback.print_exc()
             print ("Blank IMAGE")
-
             measurements = self.measurements[0].copy()
             for k, v in measurements.items():
                 v = torch.from_numpy(np.asarray([v, ]))
@@ -134,7 +153,7 @@ class CoILDataset(Dataset):
             measurements['steer'] = 0.0
             measurements['throttle'] = 0.0
             measurements['brake'] = 0.0
-            measurements['rgb'] = np.zeros(3, 88, 200)
+            measurements['rgb_central'] = np.zeros(3, 88, 200)
 
         return measurements
 
@@ -197,14 +216,16 @@ class CoILDataset(Dataset):
 
         sensor_data_names = []
         jsonfile = g_conf.EXPERIENCE_FILE   # The experience file full path.
-
-
+        # We check one image at least to see if matches the size expected by the network
+        checked_image = False
         float_dicts = []
-        env_batch = CEXP(jsonfile, params=None, iterations_to_execute=g_conf.NUMBER_OF_ITERATIONS,
+        env_batch = CEXP(jsonfile, params=None, iterations_to_execute=g_conf.NUMBER_ITERATIONS,
                          sequential=True)
         # Here we start the server without docker
         env_batch.start(no_server=True)  # no carla server mode.
         # count, we count the environments that are read
+
+        # TODO add the lateral cameras for training.
         for env in env_batch:
             # it can be personalized to return different types of data.
             print("Environment Name: ", env)
@@ -213,26 +234,30 @@ class CoILDataset(Dataset):
             except NoDataGenerated:
                 print("No data generate for episode ", env)
             else:
-                count_exp = 0
                 for exp in env_data:
-                    print("    Exp: ", count_exp)
-                    count_batch = 0
-                    for batch in exp:
-                        print("      Batch: ", count_batch)
-                        for data_point in batch:
-                            for sensor in g_conf.SENSORS.keys():
+                    print("    Exp: ", exp[1])
 
-                                # TODO Imagee Size check for some at least.
+                    for batch in exp[0]:
+                        print("      Batch: ", batch[1])
+                        for data_point in batch[0]:
+                            for sensor in g_conf.SENSORS.keys():
+                                if not checked_image:
+                                    print (data_point[sensor], g_conf.SENSORS[sensor])
+                                    if not check_size(data_point[sensor], g_conf.SENSORS[sensor]):
+                                        raise RuntimeError("Unexpected image size for the network")
+                                    checked_image = True
+                                # TODO lunch meaningful exception if not found sensor name
 
                                 sensor_data_names.append(data_point[sensor])
-                            float_dicts.append( data_point['measurements'])
-
-                        count_batch += 1
-                    count_exp += 1
-
-
-        print (float_dicts)
-        print (sensor_data_names)
+                            # We delete some non floatable cases
+                            del data_point['measurements']['ego_actor']
+                            del data_point['measurements']['opponents']
+                            del data_point['measurements']['lane']
+                            del data_point['measurements']['hand_brake']
+                            del data_point['measurements']['reverse']
+                            # Convert the scenario name to some floatable type.
+                            convert_scenario_name_number(data_point['measurements'])
+                            float_dicts.append(data_point['measurements'])
 
         # Make the path to save the pre loaded datasets
         if not os.path.exists('_preloads'):
@@ -249,105 +274,6 @@ class CoILDataset(Dataset):
         #if len(episodes_list) == 0:
         #    raise ValueError("There are no episodes on the training dataset folder %s" % path)
 
-
-        """
-        # Make the path to save the pre loaded datasets
-        if not os.path.exists('_preloads'):
-            os.mkdir('_preloads')
-        # If there is a name we saved the preloaded data
-        if self.preload_name is not None:
-            np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
-
-
-
-        number_of_hours_pre_loaded = 0
-
-        # Now we do a check to try to find all the
-        for episode in episodes_list:
-
-            print('Episode ', episode)
-
-            available_measurements_dict = data_parser.check_available_measurements(episode)
-
-            if number_of_hours_pre_loaded > g_conf.NUMBER_OF_HOURS:
-                # The number of wanted hours achieved
-                break
-
-            # Get all the measurements from this episode
-            measurements_list = glob.glob(os.path.join(episode, 'measurement*'))
-            sort_nicely(measurements_list)
-
-            if len(measurements_list) == 0:
-                print("EMPTY EPISODE")
-                continue
-
-            # A simple count to keep track how many measurements were added this episode.
-            count_added_measurements = 0
-
-            for measurement in measurements_list[:-3]:
-
-                data_point_number = measurement.split('_')[-1].split('.')[0]
-
-                with open(measurement) as f:
-                    measurement_data = json.load(f)
-
-                # depending on the configuration file, we eliminated the kind of measurements
-                # that are not going to be used for this experiment
-                # We extract the interesting subset from the measurement dict
-
-                speed = data_parser.get_speed(measurement_data)
-
-                directions = measurement_data['directions']
-                final_measurement = self._get_final_measurement(speed, measurement_data, 0,
-                                                                directions,
-                                                                available_measurements_dict)
-
-                if self.is_measurement_partof_experiment(final_measurement):
-                    float_dicts.append(final_measurement)
-                    rgb = 'CameraRGB_' + data_point_number + '.png'
-                    sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
-                    count_added_measurements += 1
-
-                # We do measurements for the left side camera
-                # We convert the speed to KM/h for the augmentation
-
-                # We extract the interesting subset from the measurement dict
-
-                final_measurement = self._get_final_measurement(speed, measurement_data, -30.0,
-                                                                directions,
-                                                                available_measurements_dict)
-
-                if self.is_measurement_partof_experiment(final_measurement):
-                    float_dicts.append(final_measurement)
-                    rgb = 'LeftAugmentationCameraRGB_' + data_point_number + '.png'
-                    sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
-                    count_added_measurements += 1
-
-                # We do measurements augmentation for the right side cameras
-
-                final_measurement = self._get_final_measurement(speed, measurement_data, 30.0,
-                                                                directions,
-                                                                available_measurements_dict)
-
-                if self.is_measurement_partof_experiment(final_measurement):
-                    float_dicts.append(final_measurement)
-                    rgb = 'RightAugmentationCameraRGB_' + data_point_number + '.png'
-                    sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
-                    count_added_measurements += 1
-
-            # Check how many hours were actually added
-
-            last_data_point_number = measurements_list[-4].split('_')[-1].split('.')[0]
-            #print("last and float dicts len", last_data_point_number, count_added_measurements)
-            number_of_hours_pre_loaded += (float(count_added_measurements / 10.0) / 3600.0)
-            #print(" Added ", ((float(count_added_measurements) / 10.0) / 3600.0))
-            print(" Loaded ", number_of_hours_pre_loaded, " hours of data")
-
-
-        
-
-        return sensor_data_names, float_dicts
-        """
 
     def augment_directions(self, directions):
 

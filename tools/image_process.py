@@ -118,7 +118,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     path = args.path
 
-
     first_time = True
     count = 0
     steering_pred = []
@@ -139,10 +138,8 @@ if __name__ == "__main__":
 
     # Start a screen to show everything. The way we work is that we do IMAGES x Sensor.
     # But maybe a more arbitrary configuration may be useful
-
     ts = []
-
-    env_batch = CEXP(args.dataset, params, 100000, 1, sequential=True)
+    env_batch = CEXP(args.dataset, params=params, iterations_to_execute=100000, sequential=True)
     # Here some docker was set
     env_batch.start(no_server=True)  # no carla server mode.
     # count, we count the environments that are read
@@ -160,18 +157,16 @@ if __name__ == "__main__":
         else:
 
             #TODO CHECK FOR ALREADY PRE PROCESSED
-            count_exp = 0
-            #print (env_data)
             for exp in env_data:
-                print("    Exp: ", count_exp)
-                count_batch = 0
-                for batch in exp:
-                    print("      Batch: ", count_batch)
-                    batch_path_name = os.path.join(env.get_path(), str(count_exp), str(count_batch))
+                print("    Exp: ", exp[1])
+                #count_batch = 0
+                for batch in exp[0]:
+                    print("      Batch: ", batch[1])
+                    batch_path_name = os.path.join(env.get_path(), exp[1], batch[1])
                     if 'processed' in os.listdir(batch_path_name):
                         continue
 
-                    for data_point in batch:
+                    for data_point in batch[0]:
                         # assume standard name
                         for key in data_point.keys():
                             if 'depth' in key or 'labels' in key or 'rgb' in key:
@@ -198,5 +193,3 @@ if __name__ == "__main__":
                     with open(os.path.join(batch_path_name, 'processed'), 'w') as f:
                         pass
 
-                    count_batch += 1
-                count_exp += 1

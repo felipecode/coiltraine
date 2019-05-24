@@ -5,9 +5,9 @@ MAGICAL_SEED: 26957017
 #### Input related parameters ####
 # A dictionary with all the sensors that are going to be used as input
 # this should match the train dataset
-EXPERIENCE_FILE: 'test_every_scenario.json'
+EXPERIENCE_FILE: '/home/adas/cexp/database/test_every_scenario.json'
 SENSORS:
-  rgb: [3, 88, 200] # A RGB input sensor with three channels that is resized to 200x88
+  rgb_central: [3, 88, 200] # A RGB input sensor with three channels that is resized to 200x88
 MEASUREMENTS:
   float_data: [31]  # Number of float data that must be read from the dataset
 BATCH_SIZE: 120

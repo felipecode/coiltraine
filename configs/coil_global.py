@@ -40,6 +40,7 @@ _g_conf.BATCH_SIZE = 120
 _g_conf.SPLIT = None
 _g_conf.REMOVE = None
 _g_conf.AUGMENTATION = None
+_g_conf.EXPERIENCE_FILE = None
 
 
 _g_conf.DATA_USED = 'all' #  central, all, sides,
