@@ -44,4 +44,12 @@ To test our best model on the hardest condition:
 
 If you use any of our baselines please cite our paper:
 
-*Add Soon*
+```
+@article{codevilla2019exploring,
+  title={Exploring the Limitations of Behavior Cloning for Autonomous Driving},
+  author={Codevilla, Felipe and Santana, Eder and L{\'o}pez, Antonio M and Gaidon, Adrien},
+  journal={arXiv preprint arXiv:1904.08980},
+  year={2019}
+}
+
+```
