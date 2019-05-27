@@ -24,6 +24,7 @@ from coilutils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_ch
 from coilutils.general import compute_average_std_separatetasks, get_latest_path, write_header_control_summary,\
      write_data_point_control_summary, camelcase_to_snakecase, unique
 from plotter.plot_on_map import plot_episodes_tracks
+from cexp.benchmark import benchmark
 
 
 def find_free_port():
@@ -32,35 +33,27 @@ def find_free_port():
         return s.getsockname()[1]
 
 
-def start_carla_simulator(gpu, town_name, docker):
-    """
-        Start a CARLA simulator, either by running a docker image or by running the binary
-        directly. For that, the CARLA_PATH environment variable should be specified.
-    Args:
-        gpu: the gpu number to run carla
-        town_name: The town name
-        docker: the docker name, if used. If not used docker should be None.
 
-    Returns:
 
-    """
 
-    port = find_free_port()
+def cexp_benchmark(benchmark_name, checkpoint_number, gpu, params, exp_batch, exp_alias):
+    # experiment_set, exp_batch, exp_alias, control_filename, task_list):
 
-    sp = subprocess.Popen(['docker', 'run', '--rm', '-d', '-p',
-                           str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
-                           '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), docker,
-                           '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name, '-windowed',
-                           '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
-                           stdout=subprocess.PIPE)
-    (out, err) = sp.communicate()
 
-    print("Going to communicate")
+    # TODO make checkpoint path direct
 
-    coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4' 
-                            '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
+    # Benchmark name
+    agent_params_path = os.path.join('_logs', exp_batch, exp_alias, 'checkpoints',
+                                     str(checkpoint_number) + '.pth')
 
-    return sp, port, out
+
+    # The
+
+
+    benchmark(benchmark_name, params['docker'], gpu, agent_class_path, agent_params_path,
+              batch_size=1, save_dataset=False)
+
+
 
 
 def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_batch, exp_alias,
@@ -271,3 +264,37 @@ def execute(gpu, exp_batch, exp_alias, drive_conditions, params):
 
 
 
+
+
+
+"""
+def start_carla_simulator(gpu, town_name, docker):
+
+        Start a CARLA simulator, either by running a docker image or by running the binary
+        directly. For that, the CARLA_PATH environment variable should be specified.
+    Args:
+        gpu: the gpu number to run carla
+        town_name: The town name
+        docker: the docker name, if used. If not used docker should be None.
+
+    Returns:
+
+
+    port = find_free_port()
+
+    sp = subprocess.Popen(['docker', 'run', '--rm', '-d', '-p',
+                           str(port)+'-'+str(port+2)+':'+str(port)+'-'+str(port+2),
+                           '--runtime=nvidia', '-e', 'NVIDIA_VISIBLE_DEVICES='+str(gpu), docker,
+                           '/bin/bash', 'CarlaUE4.sh', '/Game/Maps/' + town_name, '-windowed',
+                           '-benchmark', '-fps=10', '-world-port=' + str(port)], shell=False,
+                           stdout=subprocess.PIPE)
+    (out, err) = sp.communicate()
+
+    print("Going to communicate")
+
+    coil_logger.add_message('Loading', {'CARLA':  '/CarlaUE4/Binaries/Linux/CarlaUE4' 
+                            '-windowed'+ '-benchmark'+ '-fps=10'+ '-world-port='+ str(port)})
+
+    return sp, port, out
+
+"""
