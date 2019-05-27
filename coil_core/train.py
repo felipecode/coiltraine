@@ -92,7 +92,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
         # Instantiate the class used to read a dataset. The coil dataset generator
         # can be found
-        dataset = CoILDataset(full_dataset, transform=augmenter,
+        dataset = CoILDataset(transform=augmenter,
                               preload_name=str(g_conf.NUMBER_OF_HOURS)
                                                + 'hours_' + g_conf.TRAIN_DATASET_NAME)
         print ("Loaded dataset")
@@ -139,7 +139,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             controls = data['directions']
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
             model.zero_grad()
-            branches = model(torch.squeeze(data['rgb'].cuda()),
+            branches = model(torch.squeeze(data['rgb_central'].cuda()),
                              dataset.extract_inputs(data).cuda())
             loss_function_params = {
                 'branches': branches,
@@ -179,7 +179,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
                 #################################################
             """
             coil_logger.add_scalar('Loss', loss.data, iteration)
-            coil_logger.add_image('Image', torch.squeeze(data['rgb']), iteration)
+            coil_logger.add_image('Image', torch.squeeze(data['rgb_central']), iteration)
             if loss.data < best_loss:
                 best_loss = loss.data.tolist()
                 best_loss_iter = iteration

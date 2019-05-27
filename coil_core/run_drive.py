@@ -46,11 +46,9 @@ def cexp_benchmark(benchmark_name, checkpoint_number, gpu, params, exp_batch, ex
     agent_params_path = os.path.join('_logs', exp_batch, exp_alias, 'checkpoints',
                                      str(checkpoint_number) + '.pth')
 
-
-    # The
-
-
-    benchmark(benchmark_name, params['docker'], gpu, agent_class_path, agent_params_path,
+    # We use the baseline CEXP directly
+    # TODO the summary file now has no more separate tasks  ?? We must to be able to join benchmarks
+    summary_file = benchmark(benchmark_name, params['docker'], gpu, 'drive/CoILBaselineCEXP.py', agent_params_path,
               batch_size=1, save_dataset=False)
 
 
@@ -116,7 +114,6 @@ def driving_benchmark(checkpoint_number, gpu, town_name, experiment_set, exp_bat
                                              averaged_dict, checkpoint_number, i)
 
         """ Write the  paths for the resulting driving performance """
-
         plot_episodes_tracks(exp_batch, exp_alias,
                              checkpoint_number, town_name, g_conf.PROCESS_NAME.split('_')[1])
 

@@ -87,8 +87,6 @@ class CoILDataset(Dataset):
             self._remove_params = []
             self.preload_name = preload_name
 
-        print("preload Name ", self.preload_name)
-
         if self.preload_name is not None and os.path.exists(
                 os.path.join('_preloads', self.preload_name + '.npy')):
             print(" Loading from NPY ")
@@ -116,13 +114,9 @@ class CoILDataset(Dataset):
 
         """
         try:
-            #img_path = os.path.join(self.root_dir,
-            #                        self.sensor_data_names[index].split('/')[-2],
-            #                        self.sensor_data_names[index].split('/')[-1])
-
             img = cv2.imread(self.sensor_data_names[index], cv2.IMREAD_COLOR)
             # Apply the image transformation
-            print (img.shape)
+
             if self.transform is not None:
                 boost = 1
                 img = self.transform(self.batch_read_number * boost, img)
@@ -134,7 +128,6 @@ class CoILDataset(Dataset):
             img = img / 255.
 
             measurements = self.measurements[index].copy()
-            print (measurements)
             for k, v in measurements.items():
                 v = torch.from_numpy(np.asarray([v, ]))
                 measurements[k] = v.float()
