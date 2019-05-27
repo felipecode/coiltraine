@@ -463,6 +463,7 @@ def write_data_point_control_summary(path, task, averaged_dict, step, pos):
 
     csv_outfile.close()
 
+
 # TODO: Needs refactoring
 def compute_average_std_separatetasks(dic_list, weathers, number_of_tasks=1):
     """
