@@ -9,13 +9,34 @@ from coilutils.general import sort_nicely
 
 from .carla_metrics_parser import get_averaged_metrics
 from plotter.data_reading import read_summary_csv
-
+from cexp.benchmark import check_benchmarked_episodes, check_benchmark_completed
 # Check the log and also put it to tensorboard
 
 
+
 #### Get things from CARLA benchmark directly to plot as logs #####
+
+def get_episode_number(exp_config_filename):
+
+    summary_benchmark = check_benchmarked_episodes(exp_config_filename)
+
+    return len(summary_benchmark)
+
+def get_number_episodes_completed(exp_config_filename):
+
+    completed_dict = check_benchmark_completed(exp_config_filename)
+    number_completed_episode = 0
+
+    for env_completed in completed_dict.keys():
+        number_completed_episode += completed_dict[env_completed]
+
+    return number_completed_episode
+
+
+
+"""
 def get_episode_number(benchmark_log_name):
-    """ Get the current episode"""
+     Get the current episode
 
     control_dict = read_summary_csv(os.path.join(benchmark_log_name, 'summary.csv'))
     if control_dict is None:
@@ -29,7 +50,7 @@ def get_episode_number(benchmark_log_name):
 
 
 def get_number_episodes_completed(benchmark_log_name):
-    """ Get the number of episodes that where completed"""
+    
     control_dict = read_summary_csv(os.path.join(benchmark_log_name, 'summary.csv'))
     if control_dict is None:
         return None
@@ -37,7 +58,7 @@ def get_number_episodes_completed(benchmark_log_name):
         return sum(control_dict['result'])
     except:
         return sum(control_dict['resul'])
-
+"""
 
 
 

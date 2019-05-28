@@ -219,14 +219,15 @@ def erase_validations(exp_batch_name, validation_data_list ):
 
 
 
+#""" Considering a certain path for experiments, get the latest one."""
+"""
 def get_latest_path(path):
-    """ Considering a certain path for experiments, get the latest one."""
     import glob
     files_list = glob.glob(os.path.join('_benchmarks_results', path+'*'))
     sort_nicely(files_list)
 
     return files_list[-1]
-
+"""
 
 def send_email(address, message):
     msg = MIMEText(message)

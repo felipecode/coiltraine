@@ -6,6 +6,7 @@ from configs import g_conf, merge_with_yaml
 from configs.coil_global import get_names
 from coilutils.general import sort_nicely, get_latest_path, static_vars
 
+from agents.tools.misc import vector
 
 """
 COLOR CODINGS, USED FOR PRINTING ON THE TERMINAL.
@@ -70,23 +71,25 @@ def print_validation_summary(current, latest, verbose):
 @static_vars(previous_checkpoint=g_conf.TEST_SCHEDULE[0],
              previous_checkpoint_number=None,
              previous_checkpoint_time=0)
-def print_drive_summary(path,  checkpoint ):
+def print_drive_summary(path, agent_benchmarked,  checkpoint ):
     print('        CHECKPOINT: ', DARK_BLUE + str(checkpoint) + END)
 
+    # the full path to the file used for partial results adding
+    benchmark_results_path = os.path.join(path, agent_benchmarked + '_benchmark_summary.csv')
     # Check if there is already files to check
 
-    if os.path.exists(os.path.join(path, 'summary.csv')):
+    if os.path.exists(benchmark_results_path):
         print('        CURRENT: ')
-        print('            Episode: ', BLUE + str(get_episode_number(path)) + END, ' Time: ',
+        print('            Episode: ', BLUE + str(get_episode_number(benchmark_results_path)) + END, ' Time: ',
               time.time() - print_drive_summary.previous_checkpoint_time)
         print('            Completed: ',
-              GREEN + UNDERLINE + str(get_number_episodes_completed(path)) + END)
+              GREEN + UNDERLINE + str(get_number_episodes_completed(benchmark_results_path)) + END)
 
     if print_drive_summary.previous_checkpoint != checkpoint:
         print_drive_summary.previous_checkpoint = checkpoint
 
-    if get_episode_number(path) != print_drive_summary.previous_checkpoint_number:
-        print_drive_summary.previous_checkpoint_number = get_episode_number(path)
+    if get_episode_number(benchmark_results_path) != print_drive_summary.previous_checkpoint_number:
+        print_drive_summary.previous_checkpoint_number = get_episode_number(benchmark_results_path)
         print_drive_summary.previous_checkpoint_time = time.time()
 
     if checkpoint == g_conf.TEST_SCHEDULE[0]:
@@ -190,6 +193,7 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                         control_filename = 'control_output_auto'
                     else:
                         control_filename = 'control_output'
+
 
                     path = exp_batch + '_' + experiment + '_' + str(checkpoint) \
                            + '_' + process.split('_')[0] + '_' + control_filename \

@@ -46,6 +46,52 @@ def parse_remove_configuration(configuration):
     return name, conf_dict
 
 
+
+LANE_FOLLOW_DISTANCE = 25.0
+
+def identify_scenario(distance_intersection, road_angle):
+
+    """
+    Returns the scenario for this specific point or trajectory
+
+    S0: Lane Following -Straight - S0_lane_following
+    S1: Intersection - S1_intersection
+    S2: Traffic Light/ before intersection - S2_before_intersection
+    S3: Lane Following - Curve - S3_lane_following_curve
+
+    S3: Lead Vehicle Following - S3_lead_vehicle
+    S4: Control Loss (TS1) - S4_control_loss
+    S5: Pedestrian Crossing (TS3) - S5_pedestrian_crossing
+    S6: Bike Crossing (TS4)
+    S7: Vehicles crossing on red light (TS7-8-9)
+    Complex Towns Scenarios
+    S8: Lane change
+    S9: Roundabout
+    S10: Different kinds of intersections with different angles
+
+
+    :param exp:
+    :return:
+
+    We can have for now
+    """
+
+    # TODO for now only for scenarios 0-2
+
+    if distance_intersection > LANE_FOLLOW_DISTANCE:
+        # For now far away from an intersection means that it is a simple lane following
+
+        return 0.0 #'S0_lane_following'
+    elif distance_intersection> 1.0:
+        # S2  Check if it is directly affected by the next intersection
+        return 2.0 # 'S2_before_intersection'
+
+    else:  # Then it is
+
+        return 1.0 # 'S1_intersection'
+
+
+"""
 def convert_scenario_name_number(measurements):
 
     if measurements['scenario'] == 'S0_lane_following':
@@ -58,6 +104,7 @@ def convert_scenario_name_number(measurements):
         measurements['scenario'] = 3.0
 
 
+"""
 
 
 
