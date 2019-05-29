@@ -117,6 +117,12 @@ def read_summary_tasks_csv(control_csv_file):
 
 def read_control_csv(control_csv_file):
 
+    """
+        the dictionary is reference by the stepskey
+    :param control_csv_file:
+    :return:
+    """
+
     # If the file does not exist, return None,None, to point out that data is missing
     if not os.path.exists(control_csv_file):
         return None, None

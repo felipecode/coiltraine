@@ -9,7 +9,7 @@ from coilutils.general import sort_nicely
 
 from .carla_metrics_parser import get_averaged_metrics
 from plotter.data_reading import read_summary_csv
-from cexp.benchmark import check_benchmarked_episodes, check_benchmark_completed
+from cexp.benchmark import check_benchmarked_environments
 # Check the log and also put it to tensorboard
 
 
@@ -17,18 +17,30 @@ from cexp.benchmark import check_benchmarked_episodes, check_benchmark_completed
 #### Get things from CARLA benchmark directly to plot as logs #####
 
 def get_episode_number(exp_config_filename):
+    """ Return the number of different benchmarks that were benchmarked"""
 
-    summary_benchmark = check_benchmarked_episodes(exp_config_filename)
+    #TODO take repetition into consideration
 
-    return len(summary_benchmark)
+    summary_benchmark = check_benchmarked_environments(exp_config_filename)
+
+    if not summary_benchmark:
+        return 0
+
+    return len(summary_benchmark) -1
 
 def get_number_episodes_completed(exp_config_filename):
 
-    completed_dict = check_benchmark_completed(exp_config_filename)
+    """
+
+    :param exp_config_filename:
+    :return:
+    """
+
+    summary_benchmark = check_benchmarked_environments(exp_config_filename)
     number_completed_episode = 0
 
-    for env_completed in completed_dict.keys():
-        number_completed_episode += completed_dict[env_completed]
+    for env_completed in summary_benchmark.keys():
+        number_completed_episode += summary_benchmark['episodes_fully_completed']
 
     return number_completed_episode
 
