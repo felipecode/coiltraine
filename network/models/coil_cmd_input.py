@@ -76,24 +76,19 @@ class CoILICRA(nn.Module):
                     }
          )
 
-        #if 'scenario' in g_conf.INPUTS:
-        #    input_len += 3
-
         self.speed_branch = FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                   params['speed_branch']['fc']['neurons'] + [1],
                                        'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
                                        'end_layer': True})
 
-        # Create the fc vector separatedely
-        branch_fc_vector = []
-        for i in range(params['branches']['number_of_branches']):
-            branch_fc_vector.append(FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
+
+
+        self.action = FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                          params['branches']['fc']['neurons'] +
                                                          [len(g_conf.TARGETS)],
                                                'dropouts': params['branches']['fc']['dropouts'] + [0.0],
-                                               'end_layer': True}))
+                                               'end_layer': True})
 
-        self.branches = Branching(branch_fc_vector)  # Here we set branching automatically
 
         if 'conv' in params['perception']:
             for m in self.modules():
@@ -118,14 +113,14 @@ class CoILICRA(nn.Module):
         """ Join measurements and perception"""
         j = self.join(x, m)
 
-        branch_outputs = self.branches(j)
+        branch_outputs = self.action(j)
 
         speed_branch_output = self.speed_branch(x)
 
         # We concatenate speed with the rest.
         return branch_outputs + [speed_branch_output]
 
-    def forward_branch(self, x, a, branch_number):
+    def forward_branch(self, x, a):
         """
         DO a forward operation and return a single branch.
 
@@ -139,10 +134,9 @@ class CoILICRA(nn.Module):
 
         """
         # Convert to integer just in case .
-        # TODO: take four branches, this is hardcoded
-        output_vec = torch.stack(self.forward(x, a)[0:4])
+        output_vec = torch.stack(self.forward(x, a)[0])
 
-        return self.extract_branch(output_vec, branch_number)
+        return self.extract_branch(output_vec, 0)
 
     def get_perception_layers(self, x):
         return self.perception.get_layers_features(x)

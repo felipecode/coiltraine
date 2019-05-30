@@ -21,7 +21,7 @@ from logger import coil_logger
 from configs import g_conf, merge_with_yaml, set_type_of_process
 from coilutils.checkpoint_schedule import  maximun_checkpoint_reach, get_next_checkpoint,\
     is_next_checkpoint_ready, get_latest_evaluated_checkpoint, validation_stale_point
-from coilutils.general import compute_average_std_separatetasks, get_latest_path, write_header_control_summary,\
+from coilutils.general import compute_average_std_separatetasks,  write_header_control_summary,\
      write_data_point_control_summary, camelcase_to_snakecase, unique
 from plotter.plot_on_map import plot_episodes_tracks
 from cexp.benchmark import benchmark

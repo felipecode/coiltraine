@@ -23,6 +23,7 @@ from configs import g_conf
 from coilutils.general import sort_nicely
 
 from cexp.cexp import CEXP
+from cexp.env.scenario_identification import identify_scenario
 from cexp.env.environment import NoDataGenerated
 
 
@@ -49,62 +50,22 @@ def parse_remove_configuration(configuration):
 
 LANE_FOLLOW_DISTANCE = 25.0
 
-def identify_scenario(distance_intersection, road_angle):
-
-    """
-    Returns the scenario for this specific point or trajectory
-
-    S0: Lane Following -Straight - S0_lane_following
-    S1: Intersection - S1_intersection
-    S2: Traffic Light/ before intersection - S2_before_intersection
-    S3: Lane Following - Curve - S3_lane_following_curve
-
-    S3: Lead Vehicle Following - S3_lead_vehicle
-    S4: Control Loss (TS1) - S4_control_loss
-    S5: Pedestrian Crossing (TS3) - S5_pedestrian_crossing
-    S6: Bike Crossing (TS4)
-    S7: Vehicles crossing on red light (TS7-8-9)
-    Complex Towns Scenarios
-    S8: Lane change
-    S9: Roundabout
-    S10: Different kinds of intersections with different angles
 
 
-    :param exp:
-    :return:
-
-    We can have for now
-    """
-
-    # TODO for now only for scenarios 0-2
-
-    if distance_intersection > LANE_FOLLOW_DISTANCE:
-        # For now far away from an intersection means that it is a simple lane following
-
-        return 0.0 #'S0_lane_following'
-    elif distance_intersection> 1.0:
-        # S2  Check if it is directly affected by the next intersection
-        return 2.0 # 'S2_before_intersection'
-
-    else:  # Then it is
-
-        return 1.0 # 'S1_intersection'
-
-
-"""
 def convert_scenario_name_number(measurements):
+    scenario = identify_scenario(measurements['distance_intersection'], measurements['road_angle'])
 
-    if measurements['scenario'] == 'S0_lane_following':
-        measurements['scenario'] = 0.0
-    elif measurements['scenario'] == 'S1_intersection':
-        measurements['scenario'] = 1.0
-    elif measurements['scenario'] == 'S2_before_intersection':
-        measurements['scenario'] = 2.0
+    if scenario == 'S0_lane_following':
+        return [0, 0, 0]
+    elif scenario == 'S1_lane_following_curve':
+        return [1, 0, 0]
+    elif scenario == 'S2_before_intersection':
+        return [0, 1, 0]
+    elif scenario == 'S3_intersection':
+        return [0, 0, 1]
     else:
-        measurements['scenario'] = 3.0
+        raise ValueError("Unexpcted scenario identified %s" % scenario)
 
-
-"""
 
 
 
@@ -265,7 +226,7 @@ class CoILDataset(Dataset):
         env_batch.start(no_server=True)  # no carla server mode.
         # count, we count the environments that are read
 
-        # TODO add the lateral cameras for training.
+        # TODO add the lateral cameras for training. !!!!!!!!!!
         for env in env_batch:
             # it can be personalized to return different types of data.
             print("Environment Name: ", env)
@@ -296,7 +257,8 @@ class CoILDataset(Dataset):
                             del data_point['measurements']['hand_brake']
                             del data_point['measurements']['reverse']
                             # Convert the scenario name to some floatable type.
-                            convert_scenario_name_number(data_point['measurements'])
+                            data_point['measurements'].update(
+                                {'scenario': convert_scenario_name_number(data_point['measurements'])})
                             float_dicts.append(data_point['measurements'])
 
         # Make the path to save the pre loaded datasets
@@ -307,12 +269,6 @@ class CoILDataset(Dataset):
             np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
 
         return sensor_data_names, float_dicts
-
-        #episodes_list = glob.glob(os.path.join(path, 'episode_*'))
-        #sort_nicely(episodes_list)
-        # Do a check if the episodes list is empty
-        #if len(episodes_list) == 0:
-        #    raise ValueError("There are no episodes on the training dataset folder %s" % path)
 
 
     def augment_directions(self, directions):

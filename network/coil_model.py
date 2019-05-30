@@ -17,6 +17,9 @@ def CoILModel(architecture_name, architecture_configuration):
     if architecture_name == 'coil-icra':
 
         return CoILICRA(architecture_configuration)
+    if architecture_name == 'coil-cmd-input':
+
+        return CoILICRA(architecture_configuration)
 
     else:
 

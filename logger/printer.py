@@ -4,7 +4,7 @@ import time
 from .monitorer import get_status, get_episode_number, get_number_episodes_completed
 from configs import g_conf, merge_with_yaml
 from configs.coil_global import get_names
-from coilutils.general import sort_nicely, get_latest_path, static_vars
+from coilutils.general import sort_nicely,  static_vars
 
 from agents.tools.misc import vector
 
@@ -44,7 +44,6 @@ def print_validation_summary(current, latest, verbose):
         return
 
     print('        CHECKPOINT: ', DARK_BLUE + str(current['Checkpoint']) + END)
-
     print('        CURRENT: ')
     print('            Iteration: ', BLUE + str(current['Iteration']) + END)
     if verbose:
@@ -198,8 +197,8 @@ def plot_folder_summaries(exp_batch, train, validation_datasets, drive_environme
                     path = exp_batch + '_' + experiment + '_' + str(checkpoint) \
                            + '_' + process.split('_')[0] + '_' + control_filename \
                            + '_' + process.split('_')[1] + '_' + process.split('_')[2]
-
-                    print_drive_summary(get_latest_path(path), checkpoint)
+                    # TODO fix this for benchmarking
+                    print_drive_summary(path, checkpoint)
 
 
 def print_folder_process_names(exp_batch):
