@@ -13,7 +13,11 @@ MEASUREMENTS:
 BATCH_SIZE: 120
 NUMBER_ITERATIONS: 300000
 TARGETS: ['steer', 'throttle', 'brake']  # From the float data, the ones that the network should estimate
-INPUTS: ['forward_speed'] # From the float data, the ones that are input to the neural network
+TARGETS_AUX: ['forward_speed'] # From
+MEASUREMENTS_INPUTS:
+  forward_speed: 1
+COMMANDS:
+  command: 4
 NUMBER_FRAMES_FUSION: 1  # Number of frames fuseUMBER_IMAGES_SEQUENCE: 1  # Number of frames sent in sequence
 SEQUENCE_STRIDE: 1  # Number of frames skipped when reading the data
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
@@ -36,8 +40,11 @@ MODEL_CONFIGURATION:  # Based on the MODEL_TYPE, we specify the structure
     res:
       name: 'resnet34'
       num_classes: 512
-
   measurements:  # The module the process the input float data, in this case speed_input
+    fc:  # Easy to configure fully connected layer
+      neurons: [128, 128] # Each position add a new layer with the specified number of neurons
+      dropouts: [0.0, 0.0]
+  command:  # The module the process the command
     fc:  # Easy to configure fully connected layer
       neurons: [128, 128] # Each position add a new layer with the specified number of neurons
       dropouts: [0.0, 0.0]

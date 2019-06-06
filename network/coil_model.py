@@ -3,7 +3,7 @@
 
 """
 
-from .models import CoILICRA
+from .models import CoILICRA, CmdInput
 
 
 def CoILModel(architecture_name, architecture_configuration):
@@ -19,7 +19,7 @@ def CoILModel(architecture_name, architecture_configuration):
         return CoILICRA(architecture_configuration)
     if architecture_name == 'coil-cmd-input':
 
-        return CoILICRA(architecture_configuration)
+        return CmdInput(architecture_configuration)
 
     else:
 

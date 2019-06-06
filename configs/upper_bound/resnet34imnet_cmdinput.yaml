@@ -5,7 +5,7 @@ MAGICAL_SEED: 26957017
 #### Input related parameters ####
 # A dictionary with all the sensors that are going to be used as input
 # this should match the train dataset
-EXPERIENCE_FILE: '/home/adas/cexp/database/dataset_l0.json'
+EXPERIENCE_FILE: '/home/adas/cexp/database/dataset_l0.json' # Add a expection to quickly catch this error
 SENSORS:
   rgb_central: [3, 88, 200] # A RGB input sensor with three channels that is resized to 200x88
 MEASUREMENTS:
@@ -13,9 +13,13 @@ MEASUREMENTS:
 BATCH_SIZE: 120
 NUMBER_ITERATIONS: 300000
 TARGETS: ['steer', 'throttle', 'brake']  # From the float data, the ones that the network should estimate
-TARGETS_AUX: ['forward_speed'] # From
-MEASUREMENTS_INPUTS: ['forward_speed', 'scenario'] # From the float data, the ones that are input to the neural network
-NUMBER_FRAMES_FUSION: 1  # Number of frames fuseUMBER_IMAGES_SEQUENCE: 1  # Number of frames sent in sequence
+TARGETS_AUX: ['forward_speed'] # Try to predict the forward speed
+MEASUREMENTS_INPUTS:
+  forward_speed: 1
+  scenario: 4
+COMMANDS:
+  command: 4
+NUMBER_FRAMES_FUSION: 1  # Number of frames fuse  # Number of frames sent in sequence
 SEQUENCE_STRIDE: 1  # Number of frames skipped when reading the data
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers
 SPEED_FACTOR: 12.0  # The constant that is divides the speed_module in order to make it from 0-1
@@ -31,14 +35,17 @@ TEST_SCHEDULE: [2000, 100000]  # The frequency the model is actually tested.
 
 #### Model Related Parameters ####
 # Network Parameters #
-MODEL_TYPE: 'coil-icra' # The type of model. Defines which modules the model has.
+MODEL_TYPE: 'coil-cmd-input' # The type of model. Defines which modules the model has.
 MODEL_CONFIGURATION:  # Based on the MODEL_TYPE, we specify the structure
   perception:  # The module that process the image input, it ouput the number of classes
     res:
       name: 'resnet34'
       num_classes: 512
-
   measurements:  # The module the process the input float data, in this case speed_input
+    fc:  # Easy to configure fully connected layer
+      neurons: [128, 128] # Each position add a new layer with the specified number of neurons
+      dropouts: [0.0, 0.0]
+  command:  # The module the process the command
     fc:  # Easy to configure fully connected layer
       neurons: [128, 128] # Each position add a new layer with the specified number of neurons
       dropouts: [0.0, 0.0]
@@ -50,8 +57,7 @@ MODEL_CONFIGURATION:  # Based on the MODEL_TYPE, we specify the structure
     fc:
       neurons: [256, 256]
       dropouts: [0.0, 0.5]
-  branches:  # The output branches for the different possible directions ( Straight, Left, Right, None)
-    number_of_branches: 4
+  action:  # The output branches for the different possible directions ( Straight, Left, Right, None)
     fc:
       neurons: [256, 256]
       dropouts: [0.0, 0.5]
@@ -65,7 +71,7 @@ LEARNING_RATE_THRESHOLD: 5000 # Number of iterations without going down to reduc
 LEARNING_RATE_DECAY_LEVEL: 0.1 # Th factor of reduction applied to the learning rate
 
 # Loss Parameters #
-BRANCH_LOSS_WEIGHT: [0.95, 0.95, 0.95, 0.95, 0.05] # how much each branch is weighted when computing loss
+BRANCH_LOSS_WEIGHT: [0.95, 0.05] # how much each branch is weighted when computing loss
 LOSS_FUNCTION: 'L1' # The loss function used
 VARIABLE_WEIGHT: # how much each of the outputs specified on TARGETS are weighted for learning.
   Steer: 0.5

@@ -7,16 +7,16 @@ from configs import g_conf
 from coilutils.general import command_number_to_index
 
 from .building_blocks import Conv
-from .building_blocks import Branching
 from .building_blocks import FC
 from .building_blocks import Join
+import network.models.building_blocks.utils as utils
 
-class CoILICRA(nn.Module):
+class CmdInput(nn.Module):
 
     def __init__(self, params):
         # TODO: Improve the model autonaming function
 
-        super(CoILICRA, self).__init__()
+        super(CmdInput, self).__init__()
         self.params = params
 
         number_first_layer_channels = 0
@@ -51,7 +51,7 @@ class CoILICRA(nn.Module):
             resnet_module = importlib.import_module('network.models.building_blocks.resnet')
             resnet_module = getattr(resnet_module, params['perception']['res']['name'])
             self.perception = resnet_module(pretrained=g_conf.PRE_TRAINED,
-                                             num_classes=params['perception']['res']['num_classes'])
+                                            num_classes=params['perception']['res']['num_classes'])
 
             number_output_neurons = params['perception']['res']['num_classes']
 
@@ -59,9 +59,14 @@ class CoILICRA(nn.Module):
 
             raise ValueError("invalid convolution layer type")
 
-        self.measurements = FC(params={'neurons': [len(g_conf.INPUTS)] +
+        self.measurements = FC(params={'neurons': [utils.get_network_input_size(g_conf.MEASUREMENTS_INPUTS)] +
                                                    params['measurements']['fc']['neurons'],
                                        'dropouts': params['measurements']['fc']['dropouts'],
+                                       'end_layer': False})
+
+        self.command = FC(params={'neurons': [utils.get_network_input_size(g_conf.COMMANDS)] +
+                                                   params['command']['fc']['neurons'],
+                                       'dropouts': params['command']['fc']['dropouts'],
                                        'end_layer': False})
 
         self.join = Join(
@@ -81,14 +86,11 @@ class CoILICRA(nn.Module):
                                        'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
                                        'end_layer': True})
 
-
-
         self.action = FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
-                                                         params['branches']['fc']['neurons'] +
+                                                         params['action']['fc']['neurons'] +
                                                          [len(g_conf.TARGETS)],
-                                               'dropouts': params['branches']['fc']['dropouts'] + [0.0],
+                                               'dropouts': params['action']['fc']['dropouts'] + [0.0],
                                                'end_layer': True})
-
 
         if 'conv' in params['perception']:
             for m in self.modules():
@@ -101,8 +103,7 @@ class CoILICRA(nn.Module):
                     nn.init.xavier_uniform_(m.weight)
                     nn.init.constant_(m.bias, 0.1)
 
-
-    def forward(self, x, a):
+    def forward(self, x, a, c):
         """ ###### APPLY THE PERCEPTION MODULE """
         x, inter = self.perception(x)
         ## Not a variable, just to store intermediate layers for future vizualization
@@ -110,6 +111,8 @@ class CoILICRA(nn.Module):
 
         """ ###### APPLY THE MEASUREMENT MODULE """
         m = self.measurements(a)
+        """ ###### APPLY THE Command MODULE  that can also be output of another network"""
+        c = self.command(c)
         """ Join measurements and perception"""
         j = self.join(x, m)
 
@@ -118,25 +121,7 @@ class CoILICRA(nn.Module):
         speed_branch_output = self.speed_branch(x)
 
         # We concatenate speed with the rest.
-        return branch_outputs + [speed_branch_output]
-
-    def forward_branch(self, x, a):
-        """
-        DO a forward operation and return a single branch.
-
-        Args:
-            x: the image input
-            a: speed measurement
-            branch_number: the branch number to be returned
-
-        Returns:
-            the forward operation on the selected branch
-
-        """
-        # Convert to integer just in case .
-        output_vec = torch.stack(self.forward(x, a)[0])
-
-        return self.extract_branch(output_vec, 0)
+        return [branch_outputs] + [speed_branch_output]
 
     def get_perception_layers(self, x):
         return self.perception.get_layers_features(x)
@@ -154,5 +139,4 @@ class CoILICRA(nn.Module):
                                      torch.cuda.LongTensor(range(0, len(branch_number)))])
 
         return output_vec[branch_number[0], branch_number[1], :]
-
 

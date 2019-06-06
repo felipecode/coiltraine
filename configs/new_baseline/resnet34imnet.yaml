@@ -13,7 +13,8 @@ MEASUREMENTS:
 BATCH_SIZE: 120
 NUMBER_ITERATIONS: 300000
 TARGETS: ['steer', 'throttle', 'brake']  # From the float data, the ones that the network should estimate
-INPUTS: ['forward_speed'] # From the float data, the ones that are input to the neural network
+TARGETS_AUX: ['forward_speed'] # aaa
+MEASUREMENTS_INPUTS: ['forward_speed'] # From the float data, the ones that are input to the neural network
 NUMBER_FRAMES_FUSION: 1  # Number of frames fuseUMBER_IMAGES_SEQUENCE: 1  # Number of frames sent in sequence
 SEQUENCE_STRIDE: 1  # Number of frames skipped when reading the data
 AUGMENT_LATERAL_STEERINGS: 6  # Depending on this value there is a constant multiplying lateral steers

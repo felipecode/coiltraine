@@ -84,7 +84,7 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
 
         # Define the dataset. This structure is has the __get_item__ redefined in a way
         # that you can access the positions from the root directory as a in a vector.
-        full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
+        #full_dataset = os.path.join(os.environ["COIL_DATASET_PATH"], g_conf.TRAIN_DATASET_NAME)
 
         # By instantiating the augmenter we get a callable that augment images and transform them
         # into tensors.
@@ -139,11 +139,30 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             controls = data['directions']
             # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
             model.zero_grad()
-            branches = model(torch.squeeze(data['rgb_central'].cuda()),
-                             dataset.extract_inputs(data).cuda())
+            if g_conf.COMMANDS is None:  # We are dealing with a branched case  TODO how can we better merge both ?
+                branches = model(torch.squeeze(data['rgb_central'].cuda()),
+                                 dataset.extract_inputs(data).cuda())
+
+            else: # command as input case
+                if g_conf.COMMANDS == 'msn_produced':
+                    raise ValueError(" Not implemented")
+                    #import msn
+                    # Check how to do this forward based step.
+                    #command = msn.forward()
+
+                else:
+                    command = dataset.extract_commands(data).cuda()
+
+                branches = model(torch.squeeze(data['rgb_central'].cuda()),
+                                 dataset.extract_inputs(data).cuda(),
+                                 command
+                                 )
+
             loss_function_params = {
                 'branches': branches,
                 'targets': dataset.extract_targets(data).cuda(),
+                'targets_aux': dataset.extract_aux_targets(data).cuda(),
+                'type': g_conf.MODEL_TYPE,
                 'controls': controls.cuda(),
                 'inputs': dataset.extract_inputs(data).cuda(),
                 'branch_weights': g_conf.BRANCH_LOSS_WEIGHT,
@@ -187,7 +206,11 @@ def execute(gpu, exp_batch, exp_alias, suppress_output=True, number_of_workers=1
             # Log a random position
             position = random.randint(0, len(data) - 1)
 
-            output = model.extract_branch(torch.stack(branches[0:4]), controls)
+            if g_conf.COMMANDS is None:
+                output = model.extract_branch(torch.stack(branches[0:4]), controls)
+            else:
+                output = branches[0]
+
             error = torch.abs(output - dataset.extract_targets(data).cuda())
 
             accumulated_time += time.time() - capture_time

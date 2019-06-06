@@ -3,15 +3,16 @@ import torch
 
 
 def l1(params):
-    return branched_loss(LF.l1_loss, params)
+    if params['type'] == 'coil-cmd-input':
+        return command_input_loss(LF.l1_loss, params)
+    else:
+        return branched_loss(LF.l1_loss, params)
 
 
 def l2(params):
+
+    raise ValueError("Deprecated")
     return branched_loss(LF.l2_loss, params)
-
-
-def l1_attention(params):
-    return branched_loss(LF.l1_attention_loss, params)
 
 
 def branched_loss(loss_function, params):
@@ -54,6 +55,46 @@ def branched_loss(loss_function, params):
                     loss_branches_vec[3]
 
     speed_loss = loss_branches_vec[4]/(params['branches'][0].shape[0])
+
+    return torch.sum(loss_function) / (params['branches'][0].shape[0])\
+                + torch.sum(speed_loss) / (params['branches'][0].shape[0]),\
+           plotable_params
+
+
+def command_input_loss(loss_function, params):
+
+    """
+    Args
+        loss_function: The loss functional that is actually computing the loss
+        params: all the parameters, including
+                branches: The tensor containing all the branches branches output from the network
+                targets: The ground truth targets that the network should produce
+                controls: the controls used for each point
+                branches weights: the weigths that each branch will have on the loss function
+                speed_gt: the ground truth speed for these data points
+                variable_weights: The weights for each of the variables used
+
+                For other losses it could contain more parameters
+
+    Returns
+        The computed loss function, but also a dictionary with plotable variables for tensorboard
+    """
+    # Update the dictionary to add also the controls mask.
+
+    params.update({'controls_mask': torch.ones(params['branches'][0].size()).cuda()})
+    # calculate loss for each branch with specific activation
+    loss_branches_vec, plotable_params = loss_function(params)
+
+    # Apply the variable weights
+    # This is applied to all branches except the last one, that is the speed branch...
+    # TODO This is hardcoded to  have 4 branches not using speed.
+
+    loss_branches_vec[0] = loss_branches_vec[0][:, 0] * params['variable_weights']['Steer'] \
+                               + loss_branches_vec[0][:, 1] * params['variable_weights']['Gas'] \
+                               + loss_branches_vec[0][:, 2] * params['variable_weights']['Brake']
+
+    loss_function = loss_branches_vec[0]
+    speed_loss = loss_branches_vec[-1]/(params['branches'][0].shape[0])
 
     return torch.sum(loss_function) / (params['branches'][0].shape[0])\
                 + torch.sum(speed_loss) / (params['branches'][0].shape[0]),\

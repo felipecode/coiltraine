@@ -56,17 +56,29 @@ def convert_scenario_name_number(measurements):
     scenario = identify_scenario(measurements['distance_intersection'], measurements['road_angle'])
 
     if scenario == 'S0_lane_following':
-        return [0, 0, 0]
+        return [1, 0, 0, 0]
     elif scenario == 'S1_lane_following_curve':
-        return [1, 0, 0]
+        return [0, 1, 0, 0]
     elif scenario == 'S2_before_intersection':
-        return [0, 1, 0]
+        return [0, 0, 1, 0]
     elif scenario == 'S3_intersection':
-        return [0, 0, 1]
+        return [0, 0, 0, 1]
     else:
         raise ValueError("Unexpcted scenario identified %s" % scenario)
 
+def encode_directions(measurements):
+    directions = measurements['directions']
 
+    if directions == 2.0:
+        return [1, 0, 0, 0]
+    elif directions == 3.0:
+        return [0, 1, 0, 0]
+    elif directions == 4.0:
+        return [0, 0, 1, 0]
+    elif directions == 5.0:
+        return [0, 0, 0, 1]
+    else:
+        raise ValueError("Unexpcted direction identified %s" % str(directions))
 
 
 def check_size(image_filename, size):
@@ -175,7 +187,7 @@ class CoILDataset(Dataset):
         if angle != 0:
             measurement_augmented = self.augment_measurement(copy.copy(measurement_data), angle,
                                                              3.6 * speed,
-                                                 steer_name=avaliable_measurements_dict['steer'])
+                                                             steer_name=avaliable_measurements_dict['steer'])
         else:
             # We have to copy since it reference a file.
             measurement_augmented = copy.copy(measurement_data)
@@ -214,7 +226,6 @@ class CoILDataset(Dataset):
 
         """
 
-
         sensor_data_names = []
         jsonfile = g_conf.EXPERIENCE_FILE   # The experience file full path.
         # We check one image at least to see if matches the size expected by the network
@@ -237,13 +248,12 @@ class CoILDataset(Dataset):
             else:
                 for exp in env_data:
                     print("    Exp: ", exp[1])
-
                     for batch in exp[0]:
-                        print("      Batch: ", batch[1])
+                        print("      Batch: ", batch[1], " of len ", len(batch[0]))
                         for data_point in batch[0]:
                             for sensor in g_conf.SENSORS.keys():
                                 if not checked_image:
-                                    print (data_point[sensor], g_conf.SENSORS[sensor])
+                                    print(data_point[sensor], g_conf.SENSORS[sensor])
                                     if not check_size(data_point[sensor], g_conf.SENSORS[sensor]):
                                         raise RuntimeError("Unexpected image size for the network")
                                     checked_image = True
@@ -259,7 +269,11 @@ class CoILDataset(Dataset):
                             # Convert the scenario name to some floatable type.
                             data_point['measurements'].update(
                                 {'scenario': convert_scenario_name_number(data_point['measurements'])})
+                            data_point['measurements'].update(
+                                {'command': encode_directions(data_point['measurements'])})
+
                             float_dicts.append(data_point['measurements'])
+
 
         # Make the path to save the pre loaded datasets
         if not os.path.exists('_preloads'):
@@ -326,6 +340,7 @@ class CoILDataset(Dataset):
     """
         Methods to interact with the dataset attributes that are used for training.
     """
+    # TODO should be static and maybe a single method
 
     def extract_targets(self, data):
         """
@@ -346,6 +361,44 @@ class CoILDataset(Dataset):
 
         return torch.cat(targets_vec, 1)
 
+    def extract_aux_targets(self, data):
+        """
+        Method used to get to know which positions from the dataset are the targets
+        for this experiments
+        Args:
+            labels: the set of all float data got from the dataset
+
+        Returns:
+            the float data that is actually targets
+
+        Raises
+            value error when the configuration set targets that didn't exist in metadata
+        """
+        targets_vec = []
+        for target_name in g_conf.TARGETS_AUX:
+            targets_vec.append(data[target_name])
+
+        return torch.cat(targets_vec, 1)
+
+    def extract_commands(self, data):
+        """
+        Method used to get to know which positions from the dataset are the targets
+        for this experiments
+        Args:
+            labels: the set of all float data got from the dataset
+
+        Returns:
+            the float data that is actually targets
+
+        Raises
+            value error when the configuration set targets that didn't exist in metadata
+        """
+        targets_vec = []
+        for target_name in g_conf.COMMANDS.keys():
+            targets_vec.append(data[target_name])
+
+        return torch.cat(targets_vec, 1)
+
     def extract_inputs(self, data):
         """
         Method used to get to know which positions from the dataset are the inputs
@@ -360,10 +413,14 @@ class CoILDataset(Dataset):
             value error when the configuration set targets that didn't exist in metadata
         """
         inputs_vec = []
-        for input_name in g_conf.INPUTS:
-            inputs_vec.append(data[input_name])
+        for input_name in g_conf.MEASUREMENTS_INPUTS.keys():
+            if len(data[input_name].size()) > 2:
+                inputs_vec.append(torch.squeeze(data[input_name]))
+            else:
+                inputs_vec.append(data[input_name])
 
-        return torch.cat(inputs_vec, 1)
+        cat_input = torch.cat(inputs_vec, 1)
+        return cat_input
 
     def extract_intentions(self, data):
         """
