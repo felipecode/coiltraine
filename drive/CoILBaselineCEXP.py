@@ -43,7 +43,7 @@ def distance_vehicle(waypoint, vehicle_position):
     return math.sqrt(dx * dx + dy * dy)
 
 
-class CoILBaseline(Agent):
+class CoILBaselineCEXP(Agent):
 
     def setup(self, path_to_config_file):
 
