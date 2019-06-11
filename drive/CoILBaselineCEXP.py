@@ -35,10 +35,31 @@ from agents.navigation.local_planner import RoadOption
 import carla
 
 
-def distance_vehicle(waypoint, vehicle_position):
+def location_to_gps(location, lat_ref= 42.0, lon_ref= 2.0):
+    """
+    Convert from world coordinates to GPS coordinates
+    :param lat_ref: latitude reference for the current map
+    :param lon_ref: longitude reference for the current map
+    :param location: location to translate
+    :return: dictionary with lat, lon and height
+    """
+    EARTH_RADIUS_EQUA = 6378137.0   # pylint: disable=invalid-name
+    scale = math.cos(lat_ref * math.pi / 180.0)
+    mx = scale * lon_ref * math.pi * EARTH_RADIUS_EQUA / 180.0
+    my = scale * EARTH_RADIUS_EQUA * math.log(math.tan((90.0 + lat_ref) * math.pi / 360.0))
+    mx += location.x
+    my += location.y
 
-    dx = waypoint['lat'] - vehicle_position[0]
-    dy = waypoint['lon'] - vehicle_position[1]
+    lon = mx * 180.0 / (math.pi * EARTH_RADIUS_EQUA * scale)
+    lat = 360.0 * math.atan(math.exp(my / (EARTH_RADIUS_EQUA * scale))) / math.pi - 90.0
+    z = location.z
+
+    return {'lat': lat, 'lon': lon, 'z': z}
+
+def distance_vehicle(waypoint, vehicle_position):
+    wp_gps = location_to_gps(waypoint.location)
+    dx = wp_gps['lat'] - vehicle_position[0]
+    dy = wp_gps['lon'] - vehicle_position[1]
 
     return math.sqrt(dx * dx + dy * dy)
 
@@ -72,16 +93,10 @@ class CoILBaselineCEXP(Agent):
         # We add more time to the curve commands
         self._expand_command_front = 5
         self._expand_command_back = 3
-        self.track = Track.CAMERAS
+        #self.track = Track.CAMERAS
 
     def sensors(self):
-        sensors = [{'type': 'sensor.camera.rgb',
-                   'x': 2.0, 'y': 0.0,
-                    'z': 1.40, 'roll': 0.0,
-                    'pitch': 0.0, 'yaw': 0.0,
-                    'width': 800, 'height': 600,
-                    'fov': 100,
-                    'id': 'rgb'},
+        sensors = [
                    {'type': 'sensor.can_bus',
                     'reading_frequency': 25,
                     'id': 'can_bus'
@@ -98,21 +113,21 @@ class CoILBaselineCEXP(Agent):
         # state is divided in three parts, the speed, the angle_error, the high level command
         # Get the closest waypoint
 
-        # TODO make the state that is just one camera, speed and direction.
-
-
         #waypoint, _ = self._get_current_wp_direction(exp._ego_actor.get_transform().location, exp._route)
         #norm, angle = compute_magnitude_angle(waypoint.location, exp._ego_actor.get_transform().location,
         #                                      exp._ego_actor.get_transform().rotation.yaw)
-
         #return np.array([_get_forward_speed(exp._ego_actor) / 12.0,  # Normalize to by dividing by 12
         #                 angle / 180.0])
+        self._global_plan = exp._route
 
-        return None
+        return exp._sensor_interface.get_data()
+
 
 
     def run_step(self, input_data):
+
         # Get the current directions for following the route
+
         directions = self._get_current_direction(input_data['GPS'][1])
         logging.debug("Directions {}".format(directions))
 

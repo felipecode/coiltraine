@@ -1,4 +1,4 @@
 {
-  "yaml": "configs/baselines/resnet34imnet.yaml",
-  "checkpoint": 180000
+  "yaml": "configs/nocrash/resnet34imnet10S1.yaml",
+  "checkpoint": 660000
 } 
