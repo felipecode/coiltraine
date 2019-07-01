@@ -246,7 +246,7 @@ class CoILDataset(Dataset):
 
                 if self.is_measurement_partof_experiment(final_measurement):
                     float_dicts.append(final_measurement)
-                    rgb = 'CameraRGB_' + data_point_number + '.png'
+                    rgb = 'CentralRGB_' + data_point_number + '.png'
                     sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
                     count_added_measurements += 1
 
@@ -261,7 +261,7 @@ class CoILDataset(Dataset):
 
                 if self.is_measurement_partof_experiment(final_measurement):
                     float_dicts.append(final_measurement)
-                    rgb = 'LeftAugmentationCameraRGB_' + data_point_number + '.png'
+                    rgb = 'LeftRGB_' + data_point_number + '.png'
                     sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
                     count_added_measurements += 1
 
@@ -273,16 +273,14 @@ class CoILDataset(Dataset):
 
                 if self.is_measurement_partof_experiment(final_measurement):
                     float_dicts.append(final_measurement)
-                    rgb = 'RightAugmentationCameraRGB_' + data_point_number + '.png'
+                    rgb = 'RightRGB_' + data_point_number + '.png'
                     sensor_data_names.append(os.path.join(episode.split('/')[-1], rgb))
                     count_added_measurements += 1
 
             # Check how many hours were actually added
 
             last_data_point_number = measurements_list[-4].split('_')[-1].split('.')[0]
-            #print("last and float dicts len", last_data_point_number, count_added_measurements)
             number_of_hours_pre_loaded += (float(count_added_measurements / 10.0) / 3600.0)
-            #print(" Added ", ((float(count_added_measurements) / 10.0) / 3600.0))
             print(" Loaded ", number_of_hours_pre_loaded, " hours of data")
 
 
