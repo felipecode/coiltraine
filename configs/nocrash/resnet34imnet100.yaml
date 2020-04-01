@@ -23,7 +23,7 @@ TRAIN_DATASET_NAME: 'CoILTrain'  # The name of the training dataset used. Must b
 AUGMENTATION: None  # The image augmentation applied on every input image
 DATA_USED: 'all'  # The part of the data to be used
 USE_NOISE_DATA: True  # If we use the noise data.
-NUMBER_OF_HOURS: 50  # Number of hours to be taken from the input data
+NUMBER_OF_HOURS: 100  # Number of hours to be taken from the input data
 
 #### Testing Related Parameters ####
 TEST_SCHEDULE: [2000, 100000]  # The frequency the model is actually tested.
