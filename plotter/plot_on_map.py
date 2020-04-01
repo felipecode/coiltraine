@@ -62,13 +62,10 @@ def split_episodes(meas_file):
     """
     f = open(meas_file, "rU")
     header_details = f.readline()
-
-    header_details = header_details.split(',')
-    header_details[-1] = header_details[-1][:-2]
+    header_details = [s.strip() for s in header_details.split(',')]
     f.close()
 
     print (header_details)
-
 
     details_matrix = np.loadtxt(open(meas_file, "rb"), delimiter=",", skiprows=1)
 
@@ -122,9 +119,7 @@ def get_causes_of_end(summary_file):
     """
     f = open(summary_file, "rU")
     header_summary = f.readline()
-
-    header_summary = header_summary.split(',')
-    header_summary[-1] = header_summary[-1][:-2]
+    header_summary = [s.strip() for s in header_summary.split(',')]
     f.close()
 
     summary_matrix = np.loadtxt(open(summary_file, "rb"), delimiter=",", skiprows=1)
