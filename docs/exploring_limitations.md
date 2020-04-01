@@ -27,9 +27,24 @@ The expert demonstration present on the paper is available at this repository:
 https://github.com/carla-simulator/data-collector
 
 #### CARLA100 Dataset
+Links for downloading.
 
-It will be available shortly. 
-Meanwhile you can collect a similar dataset using the data collector.
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_01.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_02.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_03.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_04.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_05.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_06.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_07.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_08.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_09.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_10.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_11.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_12.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_13.zip
+http://datasets.cvc.uab.es/CVPR2019-CARLA100/CVPR2019-CARLA100_14.zip
+
+You can also collect a similar dataset using the data collector.
 https://github.com/carla-simulator/data-collector
 
 
