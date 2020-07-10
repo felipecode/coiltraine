@@ -26,7 +26,7 @@ Running the Baseline
 
 Clone the repository:
 
-    git clone https://github.com/felipecode/coiltraine.git 
+    git clone https://github.com/felipecode/coiltraine.git
     cd coiltraine
 
 We provide a conda environment requirements file, to
@@ -34,6 +34,12 @@ install and activate, just run:
 
     conda env create -f requirements.yaml
     conda activate coiltraine
+
+Should in case you get the error `CMake must be installed to build the following extensions: dlib` on Ubuntu, run the following:
+
+    sudo apt-get install build-essential cmake
+    sudo apt-get install libgtk-3-dev
+    sudo apt-get install libboost-all-dev
 
 Download the agent pytorch checkpoint by running the following script:
 
@@ -53,14 +59,14 @@ Install the latest CARLA API:
 Make sure you set the PYTHONPATH PythonAPI path:
 
      export PYTHONPATH=${CARLA_ROOT}/PythonAPI/carla:$PYTHONPATH
-     
 
-### Visualize the agent results 
+
+### Visualize the agent results
 
 First have the latest version of CARLA executing at some terminal at 40 fps (Recommend)
 
     sh CarlaUE4.sh Town03 -windowed -world-port=2000  -benchmark -fps=40
- 
+
 
 To run the and visualize the model run:
 
@@ -75,7 +81,7 @@ layers. You can command a destination for the agent by using the arrow keys from
 
 
 Clone the scenario  runner repository:
-    
+
     cd
     git clone -b carla_challenge  https://github.com/carla-simulator/scenario_runner.git
 
@@ -83,14 +89,14 @@ Setup the scenario runner challenge repository by setting the path to your CARLA
 folder.
 
     cd scenario_runner
-    bash setup_environment --carla-root <path_to_carla_root_folder>
+    bash setup_environment.sh --carla-root <path_to_carla_root_folder>
 
 
 Export the coiltraine path to the PYTHONPATH:
 
     cd ~/coitraine
     export PYTHONPATH=`pwd`:$PYTHONPATH
-    
+
 Start the CARLA server on another terminal:
 
     ./CarlaUE4.sh -benchmark -fps=20 -quality-level=Epic
@@ -129,12 +135,3 @@ basic dataset:
 
 To check images and train curves there is also a tensorboard log
 being saved at "_logs" folder on the repository root.
-
-
-
-
-
-
-
-
-
